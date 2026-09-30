@@ -1,0 +1,22 @@
+{
+  "model": "gemini-3.8-flash",
+  "prompt_version": "pairs-v1",
+  "base_seed": 2027,
+  "calls": 220,
+  "generated": 1100,
+  "kept": 1000,
+  "dropped": {
+    "schema": 0,
+    "length": 0,
+    "identical": 0,
+    "duplicate": 0,
+    "leak": 0
+  },
+  "tokens": {
+    "input": 83347,
+    "output": 61836
+  },
+  "cost_usd": 0.2944,
+  "duration_s": 403.7,
+  "generated_at": "2026-09-30T14:36:58-0600"
+}
