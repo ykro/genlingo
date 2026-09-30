@@ -103,7 +103,7 @@ async def main_async(args) -> None:
             meta.append(m)
             continue
         if m["kind"] == "gemini":
-            client = MockClient() if s.mock_ai else GeminiClient(s.project, s.location, temperature=0.0, thinking_level=s.gemini_thinking_level or None)
+            client = MockClient() if s.mock_ai else GeminiClient(s.project, s.location, temperature=0.0, thinking_level=s.gemini_thinking_level or None, timeout_s=60)
             price, conc = Price(s.gemini_input_usd_per_m, s.gemini_output_usd_per_m), 4
         else:
             client, price, conc = ollama, Price.free(), 1  # one at a time: latency as on stage

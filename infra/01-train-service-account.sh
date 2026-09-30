@@ -4,9 +4,9 @@
 # Base weights come from Model Garden's public bucket (no credentials needed).
 source "$(dirname "$0")/env.sh"
 
-SA="genlingo-train"
+SA="${APP}-train"
 SA_EMAIL="${SA}@${PROJECT_ID}.iam.gserviceaccount.com"
-MODELS_BUCKET="${MODELS_BUCKET:-gs://${PROJECT_ID}-genlingo-models}"
+MODELS_BUCKET="${MODELS_BUCKET:-gs://${PROJECT_ID}-${APP}-models}"
 STAGING_BUCKET="${STAGING_BUCKET:-gs://${PROJECT_ID}-train-eu}"
 
 say "Service account ${SA_EMAIL}"

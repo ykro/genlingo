@@ -7,7 +7,7 @@ TAG     ?= genlingo-$(shell date +%Y-%m)
 DUEL_PORT ?= 8787
 DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
 
-.PHONY: help up duel reset test eval train train-data pull-model export review-test review-test-apply \
+.PHONY: help up duel reset test eval train train-local train-data pull-model export review-test review-test-apply \
         test-set pairs datasheet data deploy
 
 help:
@@ -57,6 +57,10 @@ train-data: ## Render approved training pairs into chat JSONL
 
 train: train-data ## Fine-tune on Vertex AI (L4, europe-west4) and record cost: make train TAG=genlingo-2027-03
 	$(UV) python train/submit_job.py --app genlingo --tag $(TAG) --data data/train/chat.jsonl
+
+train-local: train-data ## Same training on this Mac (MPS) when the cloud GPU is unavailable
+	uv run --python 3.12 --with-requirements train/requirements.txt --with torch==2.14.0 \
+	  python train/train_local.py $(TAG) data/train/chat.jsonl
 
 pull-model: ## Download a trained David into Ollama: make pull-model TAG=... [FP16=1]
 	MODELS_BUCKET=$(MODELS_BUCKET) train/pull_model.sh $(TAG)

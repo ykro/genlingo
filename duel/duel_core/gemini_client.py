@@ -55,6 +55,7 @@ class GeminiClient:
             temperature=self.temperature,
             max_output_tokens=self.max_output_tokens,
             thinking_config=types.ThinkingConfig(thinking_level=self.thinking_level) if self.thinking_level else None,
+            automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),  # no tools here
         )
 
     async def complete(self, messages: list[Message], *, model: str) -> Completion:
@@ -73,7 +74,8 @@ class GeminiClient:
                 self.timeout_s,
             )
         except asyncio.TimeoutError as exc:
-            raise OfflineError(f"Gemini did not answer in {self.timeout_s}s") from exc
+            # Slow is not offline: the round shows an error for Goliath, not "sin conexión".
+            raise TimeoutError(f"Gemini did not answer in {self.timeout_s}s") from exc
         except Exception as exc:
             if _is_network_error(exc):
                 raise OfflineError(str(exc)) from exc
