@@ -19,3 +19,5 @@ data/train/
 duel/state/
 evals/results/
 train/.ipynb_checkpoints/
+CLAUDE.md
+*.tsbuildinfo
