@@ -30,7 +30,10 @@ from genlingo_duel.dataset import Pair, read_jsonl, write_jsonl  # noqa: E402
 from genlingo_duel.prompts import COUNTRIES  # noqa: E402
 from genlingo_duel.settings import get_settings  # noqa: E402
 
-PROMPT_VERSION = "pairs-v1"
+# pairs-v1 let Gemini paraphrase freely; David learned to add "mijo", extra clauses and length,
+# and scored below the base model on real test pairs. pairs-v2 asks for minimal edits: change
+# only the generational words, keep everything else. That is what a translation of register is.
+PROMPT_VERSION = "pairs-v2"
 PAIRS_PER_CALL = 5
 MAX_WORDS = 30
 
@@ -40,7 +43,11 @@ Escribes pares de frases para entrenar un traductor generacional:
 - Habla de papás: adultos de 45 a 60 años de {country_name}, registro coloquial de su generación, sin slang juvenil.
 Cada par dice lo mismo en las dos formas de hablar. Frases cotidianas y variadas (escuela, trabajo,
 familia, comida, fiestas, dinero, redes, noviazgo), de 4 a {max_words} palabras, sin groserías fuertes
-ni contenido sexual, sin nombres de personas reales."""
+ni contenido sexual, sin nombres de personas reales.
+Reglas del "target" (es una traducción de registro, no una paráfrasis):
+- Cambia solo las palabras y expresiones generacionales; conserva el resto de palabras, el orden y la puntuación.
+- No agregues vocativos que no estén en el "source" (mijo, hijo, bro, mano, parce…), ni explicaciones, ni información nueva.
+- Misma longitud aproximada (±3 palabras) y misma persona gramatical."""
 
 USER = """Término real: «{term}» ({generation_label})
 Significado: {meaning}

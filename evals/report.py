@@ -131,6 +131,14 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None) -> str:
         ),
         "",
     ]
+    ids = [p["id"] for p in raw["pairs"]]
+    copy = corpus_chrf_pp([pairs[i]["source"] for i in ids], [pairs[i]["target"] for i in ids])
+    lines += [
+        f"**Línea base \"copiar la frase\"** (devolver el texto original sin traducir): chrF++ {copy:.1f}. "
+        "Un modelo que no supera esta línea no está traduciendo mejor que no hacer nada; mide cuánto del "
+        "puntaje viene de palabras que la referencia comparte con el original.",
+        "",
+    ]
     skipped = [m for m in raw["models"] if m.get("skip")]
     if skipped:
         lines += ["Sin evaluar: " + "; ".join(f"`{m['name']}` ({m['skip']})" for m in skipped) + ".", ""]

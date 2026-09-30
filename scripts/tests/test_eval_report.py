@@ -31,6 +31,6 @@ def test_pick_base_respects_latency_budget():
 
 def test_report_has_all_sections(tmp_path):
     text = write_report(raw(), tmp_path / "r.md")
-    for section in ("## Resumen", "por origen", "E2B vs E4B", "f16 vs Q4", "Dónde pierde David", "Ensayo"):
+    for section in ("## Resumen", "copiar la frase", "por origen", "E2B vs E4B", "f16 vs Q4", "Dónde pierde David", "Ensayo"):
         assert section in text
     assert "`david-f16`" in text
