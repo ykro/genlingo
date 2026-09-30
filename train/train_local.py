@@ -62,7 +62,7 @@ def main() -> None:
     extra = sys.argv[3:]
     llama = subprocess.run([str(HERE / "setup_llama_cpp.sh")], capture_output=True, text=True, check=True).stdout.strip().splitlines()[-1]
     os.environ["PATH"] = f"{llama}/bin:{os.environ['PATH']}"
-    work = HERE.parent / "models" / ".work" / tag
+    work = Path(os.environ.get("TRAIN_WORK_DIR") or HERE.parent / "models" / ".work" / tag)
     t0 = time.time()
     # Train + GGUF without publishing, so the run is recorded even if the upload is slow or fails.
     metrics = train_lora.main(["--data", data, "--tag", tag, "--llama-cpp", llama, "--work-dir", str(work), "--output-uri", "", *extra])

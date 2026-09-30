@@ -70,6 +70,9 @@ def job_spec(args, image: str, data_uri: str, sa: str) -> dict:
             }
         ],
         "serviceAccount": sa,
+        # SPOT uses the (much more available) preemptible GPU quota at a lower price; a preempted
+        # job is restarted by Vertex. STANDARD = on-demand.
+        "scheduling": {"strategy": env("TRAIN_SCHEDULING", "STANDARD")},
     }
 
 
@@ -119,7 +122,7 @@ def main() -> None:
         "job_id": job_id,
         "job_name": name,
         "region": region,
-        "machine": f"{env('TRAIN_MACHINE', 'g2-standard-8')} + 1x {env('TRAIN_ACCELERATOR', 'NVIDIA_L4')}",
+        "machine": f"{env('TRAIN_MACHINE', 'g2-standard-8')} + 1x {env('TRAIN_ACCELERATOR', 'NVIDIA_L4')} ({env('TRAIN_SCHEDULING', 'STANDARD').lower()})",
         "image": image,
         "base_model": env("GEMMA_BASE_MODEL"),
         "data_uri": data_uri,

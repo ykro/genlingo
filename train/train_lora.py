@@ -103,8 +103,8 @@ def publish(local_dir: Path, uri: str, only: list[str] | None = None) -> None:
 
 
 def hf_token_from_secret_manager(project: str | None, secret: str = "hf-token") -> str | None:
-    """Only needed when weights come from Hugging Face (gated). Read from Secret Manager so
-    the token never lives in the image, the job spec or the repo."""
+    """Read from Secret Manager so the token never lives in the image, the job spec or the repo.
+    Missing secret or no access -> None (anonymous download)."""
     if not project:
         return None
     import google.auth
@@ -112,7 +112,11 @@ def hf_token_from_secret_manager(project: str | None, secret: str = "hf-token") 
 
     creds, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
     url = f"https://secretmanager.googleapis.com/v1/projects/{project}/secrets/{secret}/versions/latest:access"
-    res = AuthorizedSession(creds).get(url, timeout=10)
+    try:
+        res = AuthorizedSession(creds).get(url, timeout=10)
+    except Exception as exc:  # no network to Secret Manager: go anonymous
+        log(f"secret {secret} not reachable ({type(exc).__name__})")
+        return None
     if res.status_code != 200:
         log(f"secret {secret} not readable ({res.status_code})")
         return None
@@ -127,8 +131,7 @@ def base_weights(base_model: str, weights_uri: str, work: Path) -> Path:
         from huggingface_hub import snapshot_download
 
         repo = f"{weights_uri.removeprefix('hf://').strip('/')}/{base_model}"
-        token = os.environ.get("HF_TOKEN") or hf_token_from_secret_manager(os.environ.get("GOOGLE_CLOUD_PROJECT"))
-        return Path(snapshot_download(repo, local_dir=work / base_model, token=token))
+        return Path(snapshot_download(repo, local_dir=work / base_model, token=os.environ.get("HF_TOKEN") or None))
     if weights_uri.startswith("gs://"):
         return fetch(f"{weights_uri.rstrip('/')}/{base_model}", work / base_model)
     return Path(weights_uri) / base_model
@@ -310,6 +313,14 @@ def main(argv: list[str] | None = None) -> dict:
     metrics: dict = {"tag": args.tag, "base_model": args.base_model, "weights_uri": args.weights_uri,
                      "hyperparams": {k: getattr(args, k) for k in ("lora_r", "lora_alpha", "lr", "epochs", "batch_size", "grad_accum", "max_length", "seed")}}
     t_all = time.time()
+
+    # Hugging Face token: from the env, else from Secret Manager (`hf-token`) when it exists,
+    # else anonymous. Gemma 4 isn't gated, but anonymous downloads from cloud IPs can get 429s.
+    if not os.environ.get("HF_TOKEN"):
+        token = hf_token_from_secret_manager(os.environ.get("GOOGLE_CLOUD_PROJECT"))
+        if token:
+            os.environ["HF_TOKEN"] = token
+    log(f"Hugging Face token: {'yes' if os.environ.get('HF_TOKEN') else 'no (anonymous)'}")
 
     t0 = time.time()
     base_dir = base_weights(args.base_model, args.weights_uri, work / "base")
