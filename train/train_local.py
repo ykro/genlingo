@@ -33,17 +33,8 @@ def machine() -> str:
         return f"{platform.machine()} (local)"
 
 
-def main() -> None:
-    tag, data = sys.argv[1], sys.argv[2]
-    extra = sys.argv[3:]
-    llama = subprocess.run([str(HERE / "setup_llama_cpp.sh")], capture_output=True, text=True, check=True).stdout.strip().splitlines()[-1]
-    os.environ["PATH"] = f"{llama}/bin:{os.environ['PATH']}"
-    t0 = time.time()
-    metrics = train_lora.main([
-        "--data", data, "--tag", tag, "--llama-cpp", llama,
-        "--work-dir", str(HERE.parent / "models" / ".work" / tag), *extra,
-    ])
-    duration = time.time() - t0
+def record(tag: str, metrics: dict, duration_s: float) -> dict:
+    bucket = os.environ.get("MODELS_BUCKET", "").rstrip("/")
     run = {
         "tag": tag,
         "app": tag.rsplit("-", 2)[0],  # tags are <app>-YYYY-MM
@@ -53,17 +44,32 @@ def main() -> None:
         "base_model": metrics["base_model"],
         "data_date": tag[-7:],
         "examples": metrics["examples"],
-        "output_uri": f"{os.environ.get('MODELS_BUCKET', '').rstrip('/')}/{tag}/" if os.environ.get("MODELS_BUCKET") else None,
+        "output_uri": f"{bucket}/{tag}/" if bucket else None,
         "hourly_usd": 0.0,
         "state": "JOB_STATE_SUCCEEDED",
-        "duration_s": round(duration, 1),
+        "duration_s": round(duration_s, 1),
         "estimated_cost_usd": 0.0,
         "metrics": {k: v for k, v in metrics.items() if k != "merged_dir"},
     }
     out = HERE / "runs" / f"{tag}.json"
     out.parent.mkdir(exist_ok=True)
     out.write_text(json.dumps(run, indent=2) + "\n")
-    print(json.dumps({k: run[k] for k in ("tag", "machine", "duration_s", "examples")}))
+    return run
+
+
+def main() -> None:
+    tag, data = sys.argv[1], sys.argv[2]
+    extra = sys.argv[3:]
+    llama = subprocess.run([str(HERE / "setup_llama_cpp.sh")], capture_output=True, text=True, check=True).stdout.strip().splitlines()[-1]
+    os.environ["PATH"] = f"{llama}/bin:{os.environ['PATH']}"
+    work = HERE.parent / "models" / ".work" / tag
+    t0 = time.time()
+    # Train + GGUF without publishing, so the run is recorded even if the upload is slow or fails.
+    metrics = train_lora.main(["--data", data, "--tag", tag, "--llama-cpp", llama, "--work-dir", str(work), "--output-uri", "", *extra])
+    run = record(tag, metrics, time.time() - t0)
+    print(json.dumps({k: run[k] for k in ("tag", "machine", "duration_s", "examples")}), flush=True)
+    if run["output_uri"]:
+        train_lora.publish(work / "out", run["output_uri"].rstrip("/"))
 
 
 if __name__ == "__main__":

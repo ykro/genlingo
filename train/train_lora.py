@@ -91,9 +91,15 @@ def publish(local_dir: Path, uri: str, only: list[str] | None = None) -> None:
             if f.stat().st_size > 256 * 1024**2:
                 from google.cloud.storage import transfer_manager
 
-                transfer_manager.upload_chunks_concurrently(str(f), blob, chunk_size=64 * 1024**2, max_workers=16)
-            else:
-                blob.upload_from_filename(f)
+                try:  # parallel parts: fast inside GCP
+                    transfer_manager.upload_chunks_concurrently(
+                        str(f), blob, chunk_size=64 * 1024**2, max_workers=8, worker_type=transfer_manager.THREAD
+                    )
+                    continue
+                except Exception as exc:  # slow home uplinks time out: fall back to one resumable upload
+                    log(f"parallel upload failed ({type(exc).__name__}), retrying as a single resumable upload")
+            blob.chunk_size = 64 * 1024**2
+            blob.upload_from_filename(f, timeout=3600)
 
 
 def hf_token_from_secret_manager(project: str | None, secret: str = "hf-token") -> str | None:
