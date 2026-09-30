@@ -80,7 +80,7 @@ def cloud_run_cost(duration_s: float) -> float:
 def run_cloud_run(args, image: str, data_uri: str, region: str, run: dict, out: Path) -> dict:
     job = f"{args.app}-train"
     print(f"==> Cloud Run Job {job} ({region}, 1x L4)", flush=True)
-    subprocess.run(["bash", str(REPO / "infra" / "04-train-job.sh")], check=True, capture_output=True, env={**os.environ, "IMAGE": image})
+    subprocess.run(["bash", str(REPO / "infra" / "03-train-job.sh")], check=True, stdout=subprocess.DEVNULL, env={**os.environ, "IMAGE": image})
     # Bulky files live on the Cloud Storage volume (Cloud Run's own filesystem is in memory).
     work_dir = f"/mnt/work/{args.app}/runs/{args.tag}"
     execution = sh(
