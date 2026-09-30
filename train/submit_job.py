@@ -96,10 +96,18 @@ def main() -> None:
     with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as fh:
         json.dump(job_spec(args, image, data_uri, sa), fh)
         spec_path = fh.name
-    name = sh(
-        "gcloud", "ai", "custom-jobs", "create", f"--project={project}", f"--region={region}",
-        f"--display-name={args.tag}", f"--config={spec_path}", "--format=value(name)",
-    )
+    try:
+        name = sh(
+            "gcloud", "ai", "custom-jobs", "create", f"--project={project}", f"--region={region}",
+            f"--display-name={args.tag}", f"--config={spec_path}", "--format=value(name)",
+        )
+    except subprocess.CalledProcessError as exc:
+        if "quota" in (exc.stderr or "").lower():
+            sys.exit(
+                f"No Vertex AI training GPU quota in {region} ({env('TRAIN_ACCELERATOR', 'NVIDIA_L4')}).\n"
+                "Request it with infra/03-request-training-gpu-quota.sh, or train on this Mac with `make train-local`."
+            )
+        sys.exit(exc.stderr)
     job_id = name.rsplit("/", 1)[-1]
     print(f"==> job {job_id} submitted in {region}", flush=True)
     print(f"    https://console.cloud.google.com/vertex-ai/training/custom-jobs?project={project}", flush=True)

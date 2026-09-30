@@ -58,11 +58,13 @@ def fetch(uri: str, dest: Path) -> Path:
 
     bucket_name, prefix = _split_gs(uri)
     bucket = _gcs().bucket(bucket_name)
-    blobs = [b for b in bucket.list_blobs(prefix=prefix) if not b.name.endswith("/")]
-    if len(blobs) == 1 and blobs[0].name == prefix:  # single file
+    single = bucket.blob(prefix)
+    if single.exists():  # a single file
         dest.parent.mkdir(parents=True, exist_ok=True)
-        blobs[0].download_to_filename(dest)
+        single.download_to_filename(dest)
         return dest
+    # A "directory": list with a trailing slash so gemma-4-E2B-it doesn't also match gemma-4-E2B-it-assistant.
+    blobs = [b for b in bucket.list_blobs(prefix=prefix + "/") if not b.name.endswith("/")]
     dest.mkdir(parents=True, exist_ok=True)
     for b in blobs:
         target = dest / Path(b.name).relative_to(prefix)
