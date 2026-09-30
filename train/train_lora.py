@@ -285,6 +285,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--weights-uri", default=env("GEMMA_WEIGHTS_URI", "gs://vertex-model-garden-public-us/gemma4"))
     ap.add_argument("--output-uri", default=env("MODELS_BUCKET"), help="gs://bucket (the tag is appended); empty = keep local")
     ap.add_argument("--work-dir", default=env("WORK_DIR", "/tmp/train_lora"))
+    # Base weights are cached here between runs (on Cloud Run: a Cloud Storage volume, so next
+    # month's retrain skips the 10 GB download). Default: inside the work dir.
+    ap.add_argument("--cache-dir", default=env("CACHE_DIR", ""))
     ap.add_argument("--llama-cpp", default=env("LLAMA_CPP_DIR", "/opt/llama.cpp"))
     ap.add_argument("--quant", default="Q4_K_M")
     ap.add_argument("--ollama-renderer", default=env("OLLAMA_RENDERER", "gemma4"))
@@ -323,7 +326,7 @@ def main(argv: list[str] | None = None) -> dict:
     log(f"Hugging Face token: {'yes' if os.environ.get('HF_TOKEN') else 'no (anonymous)'}")
 
     t0 = time.time()
-    base_dir = base_weights(args.base_model, args.weights_uri, work / "base")
+    base_dir = base_weights(args.base_model, args.weights_uri, Path(args.cache_dir) if args.cache_dir else work / "base")
     data_path = fetch(args.data, work / "train.jsonl")
     metrics["weights_s"] = round(time.time() - t0, 1)
     log(f"base weights at {base_dir} ({metrics['weights_s']}s)")
