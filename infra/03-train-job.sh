@@ -12,7 +12,7 @@ SA_EMAIL="${APP}-train@${PROJECT_ID}.iam.gserviceaccount.com"
 STAGING_BUCKET="${STAGING_BUCKET:-gs://${PROJECT_ID}-train-eu}"
 IMAGE="${IMAGE:-$(bash "$INFRA_DIR/02-train-image.sh")}"
 
-# L4 minimums on Cloud Run: 4 vCPU / 16 GiB. We use 8 / 32 GiB: loading, merging and converting a
+# GPU jobs: tasks may run at most 1 h. L4 minimums on Cloud Run: 4 vCPU / 16 GiB. We use 8 / 32 GiB: loading, merging and converting a
 # 5B-parameter checkpoint is CPU- and RAM-heavy. Cloud Run's filesystem lives in memory, so the
 # bulky files (base weights ~10 GB, merged model, GGUFs) go to a Cloud Storage volume at /mnt/work
 # in the same region as the GPU; base weights stay cached there for the next retrain.
@@ -24,7 +24,7 @@ gcloud run jobs "${verb[@]}" "$JOB" \
   --image "$IMAGE" \
   --gpu 1 --gpu-type nvidia-l4 --no-gpu-zonal-redundancy \
   --cpu 8 --memory 32Gi \
-  --task-timeout 3h --max-retries 0 --tasks 1 \
+  --task-timeout 1h --max-retries 0 --tasks 1 \
   --service-account "$SA_EMAIL" \
   --add-volume "name=work,type=cloud-storage,bucket=${STAGING_BUCKET#gs://}" \
   --add-volume-mount "volume=work,mount-path=/mnt/work" \
