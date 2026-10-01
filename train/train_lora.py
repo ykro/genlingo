@@ -288,6 +288,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     # Base weights are cached here between runs (on Cloud Run: a Cloud Storage volume, so next
     # month's retrain skips the 10 GB download). Default: inside the work dir.
     ap.add_argument("--cache-dir", default=env("CACHE_DIR", ""))
+    # Outputs (GGUFs, adapter, metrics). On Cloud Run keep them on the local (in-memory) disk:
+    # GGUF writers do many small writes, which are very slow on a Cloud Storage volume.
+    ap.add_argument("--out-dir", default=env("OUT_DIR", ""))
     ap.add_argument("--llama-cpp", default=env("LLAMA_CPP_DIR", "/opt/llama.cpp"))
     ap.add_argument("--quant", default="Q4_K_M")
     ap.add_argument("--ollama-renderer", default=env("OLLAMA_RENDERER", "gemma4"))
@@ -311,7 +314,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> dict:
     args = parse_args(argv)
     work = Path(args.work_dir)
-    out = work / "out"
+    out = Path(args.out_dir) if args.out_dir else work / "out"
     out.mkdir(parents=True, exist_ok=True)
     metrics: dict = {"tag": args.tag, "base_model": args.base_model, "weights_uri": args.weights_uri,
                      "hyperparams": {k: getattr(args, k) for k in ("lora_r", "lora_alpha", "lr", "epochs", "batch_size", "grad_accum", "max_length", "seed")}}
