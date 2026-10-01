@@ -6,9 +6,15 @@ import { chromium } from "@playwright/test";
 const [web, presenterUrl, phrase] = process.argv.slice(2);
 const duel = process.env.DUEL_URL ?? "http://127.0.0.1:8787";
 const browser = await chromium.launch();
+// App Check: headless browsers can't pass reCAPTCHA, so tests use the registered debug token.
+const debug = process.env.APPCHECK_DEBUG_TOKEN;
+const withAppCheck = async (ctx) => {
+  if (debug) await ctx.addInitScript((t) => localStorage.setItem("genlingo.appcheckDebug", t), debug);
+  return ctx;
+};
 const stage = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 await stage.goto(`${presenterUrl}/presenter`);
-const admin = await browser.newPage();
+const admin = await (await withAppCheck(await browser.newContext())).newPage();
 await admin.goto(`${web}/admin`);
 await admin.fill("input[type=email]", process.env.E2E_ADMIN_EMAIL);
 await admin.fill("input[type=password]", process.env.E2E_ADMIN_PASSWORD);

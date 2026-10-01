@@ -15,7 +15,17 @@ const ok = (cond, msg) => {
 };
 
 const browser = await chromium.launch();
+// App Check: headless browsers can't pass reCAPTCHA, so tests use the registered debug token.
+const debug = process.env.APPCHECK_DEBUG_TOKEN;
+const withAppCheck = async (ctx) => {
+  if (debug) await ctx.addInitScript((t) => localStorage.setItem("genlingo.appcheckDebug", t), debug);
+  return ctx;
+};
 await fetch(`${duel}/reset`, { method: "POST" });
+
+// Without an App Check token the API refuses to work at all.
+const bare = await fetch(`${web}/api/phrases`, { method: "POST", body: "{}" });
+ok(bare.status === 401 || !debug, `sin App Check la API responde ${bare.status}`);
 
 // Presenter view (stage)
 const stage = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
@@ -26,7 +36,7 @@ await stage.waitForSelector("text=En línea", { timeout: 20000 });
 const models = ["Pixel 7", "iPhone 13", "Galaxy S9+", "iPhone SE"];
 const phones = [];
 for (const m of models) {
-  const ctx = await browser.newContext({ ...devices[m] });
+  const ctx = await withAppCheck(await browser.newContext({ ...devices[m] }));
   const p = await ctx.newPage();
   await p.goto(web);
   phones.push(p);
@@ -49,7 +59,7 @@ await phones[1].waitForSelector("text=no pasa el filtro", { timeout: 10000 });
 ok(true, "la lista de bloqueo frena la frase del teléfono 2");
 
 // Presenter approves it in /admin.
-const admin = await browser.newPage({ viewport: { width: 1280, height: 860 } });
+const admin = await (await withAppCheck(await browser.newContext({ viewport: { width: 1280, height: 860 } }))).newPage();
 await admin.goto(`${web}/admin`);
 await admin.fill("input[type=email]", process.env.E2E_ADMIN_EMAIL);
 await admin.fill("input[type=password]", process.env.E2E_ADMIN_PASSWORD);

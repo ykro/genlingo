@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 export interface PublicConfig {
   firebase: { apiKey: string; authDomain: string; projectId: string; appId: string };
   database: string;
+  recaptchaSiteKey: string;
   event: string;
   country: "MX" | "GT" | "CO" | "LATAM";
   audienceUrl: string;

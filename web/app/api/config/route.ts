@@ -15,6 +15,7 @@ export async function GET() {
       appId: process.env.FIREBASE_APP_ID ?? "",
     },
     database: process.env.FIRESTORE_DATABASE ?? "genlingo",
+    recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY ?? "",
     event: process.env.EVENT_ID ?? "ensayo",
     country: process.env.EVENT_COUNTRY ?? "LATAM",
     audienceUrl: process.env.AUDIENCE_URL ?? "",

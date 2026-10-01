@@ -1,6 +1,19 @@
 "use client";
 
+import { getToken } from "firebase/app-check";
 import type { User } from "firebase/auth";
+
+import { currentAppCheck } from "./firebase";
+
+async function appCheckHeader(): Promise<Record<string, string>> {
+  const appCheck = currentAppCheck();
+  if (!appCheck) return {};
+  try {
+    return { "X-Firebase-AppCheck": (await getToken(appCheck, false)).token };
+  } catch {
+    return {}; // the server answers 401 with a clear message if it requires App Check
+  }
+}
 
 export class ApiError extends Error {
   constructor(public status: number, message: string, public retryAfterMs?: number) {
@@ -14,7 +27,11 @@ export async function api<T = Record<string, unknown>>(user: User, path: string,
   try {
     res = await fetch(path, {
       method: body === undefined ? "GET" : "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${await user.getIdToken()}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${await user.getIdToken()}`,
+        ...(await appCheckHeader()),
+      },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   } catch {
