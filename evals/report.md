@@ -1,6 +1,6 @@
 # Genlingo — evaluación
 
-Generado por `make eval` el 2026-09-30 21:52. 319 pares de prueba (web; nunca sintéticos).
+Generado por `make eval` el 2026-10-01 00:50. 319 pares de prueba (web; nunca sintéticos).
 
 > **Ensayo:** las referencias de prueba aún están en `pending_review` (sin revisión del presentador). Los números cambiarán al aprobar/corregir el set con `make review-test`.
 
@@ -10,13 +10,38 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 
 | modelo | rol | chrF++ | p50 | p95 | costo total | costo / 1,000 frases | tamaño | errores |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma4:e2b-it-qat | base (sin ajuste) | 47.1 | 328 ms | 453 ms | $0 | $0 | 4.34 GB | 0 |
-| gemma4:e4b | base (sin ajuste) | 47.0 | 685 ms | 890 ms | $0 | $0 | 6.58 GB | 0 |
-| genlingo-2026-09 | David (LoRA, Q4) | 52.1 | 388 ms | 561 ms | $0 | $0 | 3.42 GB | 0 |
-| genlingo-2026-09-f16 | David (LoRA, f16) | 52.0 | 439 ms | 643 ms | $0 | $0 | 9.27 GB | 0 |
-| gemini-3.8-flash | Goliath | 48.2 | 1.28 s | 5.82 s | $0.13 | $0.41 | — | 0 |
+| gemma4:e2b-it-qat | base (sin ajuste) | 47.1 | 329 ms | 451 ms | $0 | $0 | 4.34 GB | 0 |
+| gemma4:e4b | base (sin ajuste) | 47.0 | 689 ms | 934 ms | $0 | $0 | 6.58 GB | 0 |
+| genlingo-2026-09 | David (LoRA, Q4) | 52.1 | 388 ms | 568 ms | $0 | $0 | 3.42 GB | 0 |
+| genlingo-2026-09-f16 | David (LoRA, f16) | 52.0 | 447 ms | 683 ms | $0 | $0 | 9.27 GB | 0 |
+| gemini-3.8-flash | Goliath | 48.7 | 1.71 s | 6.51 s | $0.13 | $0.40 | — | 0 |
+
+Costo de Goliath con la tarifa del día del eval: $0.75 entrada / $3.75 salida por millón de tokens (vigente desde 2026-09-30).
+Con la tarifa desde 2027-01-01 ($1.50 / $7.50), este mismo eval costaría $0.25 ($0.80 por 1,000 frases).
 
 **Línea base "copiar la frase"** (devolver el texto original sin traducir): chrF++ 50.0. Un modelo que no supera esta línea no está traduciendo mejor que no hacer nada; mide cuánto del puntaje viene de palabras que la referencia comparte con el original.
+
+## ¿Tradujo la jerga?
+
+chrF++ premia parecerse a la referencia, y una reescritura de registro conserva casi todas las palabras: por eso copiar la frase ya saca ~50. Estas dos métricas miran solo lo que tenía que cambiar (detalle en `evals/term_accuracy.py`):
+
+- **Jerga resuelta**: Gen Z → papás, no queda en la salida ningún término Gen Z del banco que tenía la frase; papás → Gen Z, la salida usa al menos un término Gen Z del banco del país. Mide que cambió el registro, no que el significado sea correcto.
+- **Cambios acertados**: de las palabras que la referencia humana cambió respecto al original, cuántas aparecen en la salida. Mide significado, pero solo con palabras exactas: un sinónimo válido cuenta como fallo para todos.
+
+| modelo | jerga resuelta Gen Z → papás | jerga resuelta papás → Gen Z | jerga resuelta total | cambios acertados |
+| --- | --- | --- | --- | --- |
+| copiar la frase (línea base) | 0 % (n=149) | 1 % (n=155) | 0 % (n=304) | 0 % |
+| gemma4:e2b-it-qat | 96 % (n=149) | 10 % (n=155) | 52 % (n=304) | 12 % |
+| gemma4:e4b | 97 % (n=149) | 17 % (n=155) | 56 % (n=304) | 16 % |
+| genlingo-2026-09 | 90 % (n=149) | 21 % (n=155) | 55 % (n=304) | 15 % |
+| genlingo-2026-09-f16 | 90 % (n=149) | 28 % (n=155) | 58 % (n=304) | 13 % |
+| gemini-3.8-flash | 99 % (n=149) | 39 % (n=155) | 68 % (n=304) | 29 % |
+
+Cara a cara en jerga resuelta: David la resuelve y Goliath no en **19** frases; al revés en **61**.
+
+Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): David 16 de 155, Goliath 7 de 155.
+
+**Lectura honesta:** en jerga gana Goliath. La ventaja de David en chrF++ viene sobre todo de quedarse cerca de la frase original, como la referencia, no de traducir mejor el término. El próximo David necesita datos que cambien la jerga de verdad (sobre todo papás → Gen Z) y del país correcto.
 
 ### chrF++ por origen
 
@@ -26,7 +51,7 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 | gemma4:e4b | 47.0 (n=319) |
 | genlingo-2026-09 | 52.1 (n=319) |
 | genlingo-2026-09-f16 | 52.0 (n=319) |
-| gemini-3.8-flash | 48.2 (n=319) |
+| gemini-3.8-flash | 48.7 (n=319) |
 
 ### chrF++ por dirección
 
@@ -36,7 +61,7 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 | gemma4:e4b | 54.4 (n=164) | 38.3 (n=155) |
 | genlingo-2026-09 | 59.5 (n=164) | 43.5 (n=155) |
 | genlingo-2026-09-f16 | 59.0 (n=164) | 43.9 (n=155) |
-| gemini-3.8-flash | 55.6 (n=164) | 39.6 (n=155) |
+| gemini-3.8-flash | 54.3 (n=164) | 42.1 (n=155) |
 
 ### chrF++ por país
 
@@ -46,19 +71,19 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 | gemma4:e4b | 48.8 (n=88) | 48.1 (n=73) | 45.1 (n=70) | 45.3 (n=88) |
 | genlingo-2026-09 | 51.7 (n=88) | 56.4 (n=73) | 51.1 (n=70) | 49.5 (n=88) |
 | genlingo-2026-09-f16 | 52.5 (n=88) | 56.3 (n=73) | 50.9 (n=70) | 48.5 (n=88) |
-| gemini-3.8-flash | 47.6 (n=88) | 43.0 (n=73) | 55.3 (n=70) | 47.2 (n=88) |
+| gemini-3.8-flash | 49.0 (n=88) | 44.2 (n=73) | 53.1 (n=70) | 48.2 (n=88) |
 
 ## Modelo base: E2B vs E4B
 
 Regla: el más pequeño que cumpla p50 < 1 s con el mejor chrF++.
 
-**gemma4:e2b-it-qat**: mejor chrF++ (47.1) entre los que cumplen p50 < 1 s (p50 328 ms, 4.34 GB).
+**gemma4:e2b-it-qat**: mejor chrF++ (47.1) entre los que cumplen p50 < 1 s (p50 329 ms, 4.34 GB).
 
 ## Compresión: f16 vs Q4
 
 | versión | tamaño | p50 | chrF++ |
 | --- | --- | --- | --- |
-| f16 | 9.27 GB | 439 ms | 52.0 |
+| f16 | 9.27 GB | 447 ms | 52.0 |
 | Q4_K_M | 3.42 GB | 388 ms | 52.1 |
 
 ## Entrenamiento
@@ -71,20 +96,20 @@ Costo = segundos facturados × tarifas por segundo de Cloud Run (GPU L4 sin redu
 
 ## Dónde pierde David
 
-David gana 178 de 319 frases por chrF++ de oración. Las 10 peores derrotas:
+David gana 180 de 319 frases por chrF++ de oración. Las 10 peores derrotas:
 
 | frase | referencia | David | Goliath | Δ chrF++ |
 | --- | --- | --- | --- | --- |
-| […] | Shakira se lució en la gala del MET | Shakira fue la sensación en la gala. | Shakira se lució en la gala del MET | -55.0 |
+| […] | ¿Usted cree que yo soy boba o qué? | ¿A que nací ayer, no? | ¿Usted cree que yo soy marica o qué? | -67.3 |
 | […] | La película estuvo regular, nada del otro mundo. | La película fue nada especial. | La película estuvo regular—nada del otro mundo. | -54.8 |
-| […] | ¿Por qué me deja en visto, parce? | […] ¿Por qué no me llega el mensaje? | ¿Por qué me deja en visto, mk? | -53.3 |
-| […] | Esa morra es red flag, bro. | Esa chava no te conviene. | Esa morra es pura red flag, no te conviene. | -51.0 |
-| […] | ¿Qué onda? Te quedaste en modo NPC | ¿Qué te pasa? Andai re bugueado. | ¿Qué onda? Te quedaste tieso | -49.3 |
+| […] | ¡Quiubo, mijo! ¿Cómo le va? | ¡Qué hubo pues compañero! ¿Todo bien o no? | ¡Quiubo mijo! ¿Cómo me le va? | -54.4 |
+| […] | ¿Qué, creen que soy su chacha o qué onda? | ¿Qué onda que soy tu sirvienta? | ¿Qué onda, creen que soy su chacha o qué? | -54.0 |
+| Qué hueva ir a la chamba hoy. | Qué flojera me da ir a trabajar hoy. | Qué pereza ir al trabajo hoy. | Qué flojera me da tener que ir a trabajar hoy. | -54.0 |
+| […] | ¡Qué chido que ganaste, te la rifaste! | ¡Qué chido que ganaras! | ¡Qué chido que ganaste, te la rifaste! | -50.6 |
 | […] | Sí, yo le aviso. | Claro que sí, yo te digo. | Sale y vale, yo le aviso. | -48.6 |
-| Qué hueva ir a la chamba hoy. | Qué flojera me da ir a trabajar hoy. | Qué pereza ir al trabajo hoy. | Qué flojera ir a trabajar hoy. | -46.7 |
-| Qué cuerudo sos, no te da vergüenza nada. | Qué descarado sos, maje, cero pena. | Qué chévere sos, no te da pena nada. | Qué descarado sos, cero pena te da todo. | -44.6 |
-| […] | ¿De veras? Pero ¿qué fue lo que pasó? | ¿En serio? Pero, ¿qué pasó? | ¿En serio? Pero ¿qué fue lo que pasó? | -44.5 |
-| […] | Eres un as en ese juego | Eres muy bueno en ese juego | Eres un as en ese juego | -44.1 |
+| […] | Esa morra es red flag, bro. | Esa chava no te conviene. | Esa morra es una red flag andante. | -47.3 |
+| […] | Ese parche no me cuadra | Esa amistad no me llega. | Ese parche no me da buena vibra | -45.1 |
+| […] | ¿Por qué tan decaído, mijo? —Es que perdí la materia, hermano. | ¿Por qué tan descorazonado, amigo? —Es que me cargó el payaso, parce. | ¿Por qué tan achicopalado, mijo? —Es que perdí la materia, hermano. | -44.6 |
 
 ## Metodología
 
