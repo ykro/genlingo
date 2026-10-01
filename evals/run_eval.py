@@ -60,7 +60,8 @@ def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str
     for tag in davids:
         role = "david" if tag == s.david_tag else "david_alt"
         add(tag, role, "ollama", prompt_style_for(s, tag), quant="Q4_K_M")
-        add(f"{tag}-f16", "david_f16" if role == "david" else "david_alt_f16", "ollama", prompt_style_for(s, tag), quant="F16")
+        if available is None or {f"{tag}-f16", f"{tag}-f16:latest"} & available:  # only if it was pulled
+            add(f"{tag}-f16", "david_f16" if role == "david" else "david_alt_f16", "ollama", prompt_style_for(s, tag), quant="F16")
     if with_goliath and s.gemini_model:
         add(s.gemini_model, "goliath", "gemini", "v2")
         add(s.gemini_model, "goliath_glossary", "gemini", "v2+glossary")
@@ -176,6 +177,14 @@ async def main_async(args) -> None:
         "results": results,
         "david_tag": s.david_tag,
     }
+    if args.merge_with:
+        # Add these variants to an earlier run (same test set): the report compares all of them.
+        prev = json.loads(Path(args.merge_with).read_text())
+        assert [p["id"] for p in prev["pairs"]] == [p["id"] for p in raw["pairs"]], "different test set"
+        new_labels = {m.get("label", m["name"]) for m in raw["models"]}
+        raw["models"] = [m for m in prev["models"] if m.get("label", m["name"]) not in new_labels] + raw["models"]
+        raw["results"] = [r for r in prev["results"] if r["model"] not in new_labels] + raw["results"]
+        raw["merged_from"] = Path(args.merge_with).name
     (out_dir / f"{stamp}.json").write_text(json.dumps(raw, ensure_ascii=False, indent=1))
     report = write_report(raw, ROOT / "evals" / "report.md", runs_dir=s.runs_dir)
     print(f"report -> evals/report.md ({len(report)} chars), raw -> evals/results/{stamp}.json")
@@ -186,6 +195,7 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--models", default="")
     ap.add_argument("--no-goliath", action="store_true")
+    ap.add_argument("--merge-with", default="", help="earlier raw results to merge these variants into")
     asyncio.run(main_async(ap.parse_args()))
 
 

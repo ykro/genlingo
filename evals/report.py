@@ -22,7 +22,7 @@ def _jsonl(path: Path) -> list[dict]:
     return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()] if path.exists() else []
 
 
-def term_section(raw: dict, summary: dict[str, dict], data_dir: Path) -> list[str]:
+def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dict | None = None) -> list[str]:
     """Slang-level metrics, so a win is about meaning and not surface overlap (see term_accuracy)."""
     terms = _jsonl(data_dir / "terms.jsonl")
     if not terms:
@@ -74,16 +74,29 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path) -> list[st
         xs = c["genz_to_parent"] + c["parent_to_genz"]
         return sum(xs) / len(xs) if xs else 0.0
 
-    # On-stage David: the David variant that resolves the most slang, within the latency budget.
+    # On-stage David. Rule: the best slang handling among Davids within the latency budget; if a
+    # quantization sweep exists, the SMALLEST file within 2 points of that best (compression wins
+    # unless it costs slang).
     candidates = [n for n, sm in summary.items() if sm["role"] in ("david", "david_alt", "david_f16", "david_alt_f16")
                   and sm["p50"] is not None and sm["p50"] < P50_BUDGET_MS]
-    david = max(candidates, key=lambda n: (round(handled_total(computed[n]), 3), summary[n]["chrf"] or 0), default=None)
-    if david:
+    best = max(candidates, key=lambda n: (round(handled_total(computed[n]), 3), summary[n]["chrf"] or 0), default=None)
+    david = best
+    if best:
+        # Reference: the unquantized f16 of the best family when it was evaluated, else the best.
+        family = best.removesuffix(" + glosario").split("-q")[0].split("-iq")[0].removesuffix("-f16")
+        ref = next((n for n in candidates if n.removesuffix(" + glosario") == f"{family}-f16"), best)
+        near = [n for n in candidates if handled_total(computed[n]) >= handled_total(computed[ref]) - 0.02
+                and summary[n].get("size_bytes")]
+        david = min(near, key=lambda n: summary[n]["size_bytes"], default=best)
         lines += [
-            f"**David en escena:** `{david}` — la variante de David con más jerga resuelta "
-            f"({100 * handled_total(computed[david]):.0f} %) que cumple p50 < 1 s (p50 {_ms(summary[david]['p50'])}).",
+            f"**David en escena:** `{david}` ({_gb(summary[david].get('size_bytes'))}, p50 {_ms(summary[david]['p50'])}): "
+            f"el archivo más pequeño a ≤ 2 puntos de `{ref}` ({100 * handled_total(computed[ref]):.0f} % de jerga resuelta), "
+            f"con p50 < 1 s. Resuelve {100 * handled_total(computed[david]):.0f} %.",
             "",
         ]
+    if rates is not None:  # read by compression_section
+        rates.update({n: {"handled": handled_total(c), "recall": sum(c["recall"]) / max(1, len(c["recall"]))}
+                      for n, c in computed.items()})
     for gname in [n for n, sm in summary.items() if sm["role"] in ("goliath", "goliath_glossary")]:
         if not david:
             break
@@ -237,6 +250,78 @@ def slice_table(summary, key, title):
     return f"### chrF++ por {title}\n\n" + table(["modelo", *groups], rows)
 
 
+def compression_section(summary: dict, rates: dict, out_dir: Path) -> list[str]:
+    """Size vs slang for the quantized exports of one David (quant sweep), with a small SVG chart."""
+    sweep_path = ROOT / "evals" / "quant_sweep.json"
+    if not sweep_path.exists() or not rates:
+        return []
+    sweep = json.loads(sweep_path.read_text())
+    fam = sweep["tag"]
+    rows = []
+    for name, sm in summary.items():
+        if not name.startswith(fam) or not sm.get("size_bytes") or name not in rates:
+            continue
+        variant = name.removesuffix(" + glosario")
+        quant = "F16" if variant.endswith("-f16") else (variant[len(fam) + 1:].upper().replace("IQ-", "") if variant != fam else "Q4_K_M")
+        rows.append({"name": name, "quant": quant, "imatrix": "-iq-" in variant, "gb": sm["size_bytes"] / 1e9,
+                     "handled": rates[name]["handled"], "recall": rates[name]["recall"], "chrf": sm["chrf"], "p50": sm["p50"]})
+    if len(rows) < 2:
+        return []
+    rows.sort(key=lambda r: r["gb"])
+    svg = compression_svg(rows)
+    (out_dir / "compression.svg").write_text(svg, encoding="utf-8")
+    table_rows = [[f"`{r['name']}`", r["quant"], "sí" if r["imatrix"] else "no", f"{r['gb']:.2f} GB", f"{100 * r['handled']:.0f} %",
+                   f"{100 * r['recall']:.0f} %", _n(r["chrf"]), _ms(r["p50"])] for r in rows]
+    return [
+        "## Compresión: tamaño vs jerga",
+        "",
+        f"Las exportaciones de `{fam}` con el mismo prompt y glosario. La curva muestra cuánta jerga se pierde al comprimir.",
+        "",
+        "![Tamaño vs jerga resuelta](compression.svg)",
+        "",
+        table(["variante", "cuantización", "imatrix", "tamaño", "jerga resuelta", "cambios acertados", "chrF++", "p50"], table_rows),
+        "",
+        "**imatrix (importance matrix):** antes de cuantizar, llama.cpp pasa el modelo f16 por texto de calibración y mide "
+        "qué pesos influyen más; la cuantización gasta los bits ahí. Calibramos con **pares de entrenamiento** renderizados con "
+        "el prompt de David (`train/quant_sweep.py`), nunca con el set de prueba: eso inflaría el eval.",
+        "",
+    ]
+
+
+def compression_svg(rows: list[dict]) -> str:
+    """Tiny dependency-free scatter: size (GB) vs slang handled (%), Marcador palette."""
+    w, h, pad = 720, 360, 56
+    xs = [r["gb"] for r in rows]
+    ys = [100 * r["handled"] for r in rows]
+    x0, x1 = 0, max(xs) * 1.08
+    y0, y1 = max(0, min(ys) - 10), min(100, max(ys) + 6)
+    px = lambda x: pad + (x - x0) / (x1 - x0) * (w - 2 * pad)  # noqa: E731
+    py = lambda y: h - pad - (y - y0) / (y1 - y0) * (h - 2 * pad)  # noqa: E731
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" font-family="Figtree, sans-serif" font-size="13">',
+             f'<rect width="{w}" height="{h}" fill="#F6F3EC"/>',
+             f'<line x1="{pad}" y1="{h - pad}" x2="{w - pad}" y2="{h - pad}" stroke="#16181D"/>',
+             f'<line x1="{pad}" y1="{pad / 2}" x2="{pad}" y2="{h - pad}" stroke="#16181D"/>',
+             f'<text x="{w / 2}" y="{h - 14}" text-anchor="middle" fill="#5A5E66">tamaño del archivo (GB)</text>',
+             f'<text x="16" y="{h / 2}" text-anchor="middle" fill="#5A5E66" transform="rotate(-90 16 {h / 2})">jerga resuelta (%)</text>']
+    for gb in range(0, int(x1) + 1, 2):
+        parts.append(f'<text x="{px(gb):.0f}" y="{h - pad + 18}" text-anchor="middle" fill="#5A5E66">{gb}</text>')
+    for v in range(int(y0 // 5 * 5), int(y1) + 1, 5):
+        if v >= y0:
+            parts.append(f'<text x="{pad - 8}" y="{py(v) + 4:.0f}" text-anchor="end" fill="#5A5E66">{v}</text>')
+    pts = " ".join(f"{px(r['gb']):.1f},{py(100 * r['handled']):.1f}" for r in rows)
+    parts.append(f'<polyline points="{pts}" fill="none" stroke="#D9D4C7" stroke-width="2"/>')
+    for r in rows:
+        color = "#2B4ACB" if r["imatrix"] else "#C23D19"
+        x, y = px(r["gb"]), py(100 * r["handled"])
+        parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="6" fill="{color}"/>')
+        label = r["quant"] + (" imatrix" if r["imatrix"] else "")
+        parts.append(f'<text x="{x + 9:.1f}" y="{y - 8:.1f}" fill="#16181D">{label} · {100 * r["handled"]:.0f} %</text>')
+    parts.append(f'<text x="{w - pad}" y="{pad / 2 + 4}" text-anchor="end" fill="#5A5E66">'
+                 '<tspan fill="#C23D19">●</tspan> cuantización normal  <tspan fill="#2B4ACB">●</tspan> con imatrix</text>')
+    parts.append("</svg>")
+    return "\n".join(parts)
+
+
 def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: Path = DATA) -> str:
     summary = summarize(raw)
     pairs = {p["id"]: p for p in raw["pairs"]}
@@ -297,7 +382,9 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
     if skipped:
         lines += ["Sin evaluar: " + "; ".join(f"`{m.get('label', m['name'])}` ({m['skip']})" for m in skipped) + ".", ""]
 
-    lines += term_section(raw, summary, data_dir)
+    rates: dict = {}
+    lines += term_section(raw, summary, data_dir, rates)
+    lines += compression_section(summary, rates, path.parent)
 
     lines += [slice_table(summary, "by_origin", "origen"), "", slice_table(summary, "by_direction", "dirección"), "",
               slice_table(summary, "by_country", "país"), ""]

@@ -26,6 +26,7 @@ from .dataset import read_jsonl
 from .glossary import Glossary, hashing_embedder
 from .glossary import render as render_glossary
 from .prompts import COUNTRIES, STYLES, Direction, prompt_version, translation_messages
+from .runs import load_run
 from .settings import Settings, goliath_prices
 from .terms import TermBank
 
@@ -45,12 +46,9 @@ def _mock_responder(table: dict[str, str]):
 
 def prompt_style_for(settings: Settings, david_tag: str) -> str:
     """Each David is prompted the way its training data was rendered (recorded in its run file)."""
-    run_tag = david_tag.removesuffix("-f16")  # the f16 export shares its run (and prompt) with the Q4 one
-    path = settings.runs_dir / f"{run_tag}.json"
-    if path.exists():
-        style = json.loads(path.read_text()).get("prompt_style")
-        if style in STYLES:
-            return style
+    run = load_run(settings.runs_dir, david_tag)  # exports (-f16, -q5_k_m…) share their run's prompt
+    if run and run.get("prompt_style") in STYLES:
+        return run["prompt_style"]
     return settings.david_prompt_style
 
 

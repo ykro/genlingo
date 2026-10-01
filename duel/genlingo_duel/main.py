@@ -22,6 +22,7 @@ from .arena import Arena
 from .audience_feed import AudienceFeed
 from .dataset import test_pairs
 from .prompts import COUNTRIES, Direction
+from .runs import load_run
 from .scoreboard import Scoreboard
 from .settings import Settings, get_settings
 
@@ -51,12 +52,11 @@ class VotesRequest(BaseModel):
 
 
 def training_run(settings: Settings, tag: str) -> dict | None:
-    """Training cost/duration for a David tag, written by `make train` (train/runs/<tag>.json).
-    David's inference is free; his cost is the training run, amortized over the rounds."""
-    path = settings.runs_dir / f"{tag}.json"
-    if not path.exists():
+    """Training cost/duration for a David tag (train/runs/<tag>.json; quantized exports map to
+    their run). David's inference is free; his cost is the training run, amortized over the rounds."""
+    run = load_run(settings.runs_dir, tag)
+    if run is None:
         return None
-    run = json.loads(path.read_text())
     return {k: run.get(k) for k in ("tag", "estimated_cost_usd", "duration_s", "machine", "base_model", "data_date")}
 
 

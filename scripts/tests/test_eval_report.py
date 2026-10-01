@@ -37,3 +37,15 @@ def test_report_has_all_sections(tmp_path):
         assert section in text
     assert "`david-f16`" in text
     assert "vigente desde 2026-09-30" in text and "desde 2027-01-01" in text
+
+
+def test_compression_svg_plots_every_variant():
+    from report import compression_svg
+
+    rows = [
+        {"quant": "Q4_K_M", "imatrix": True, "gb": 3.4, "handled": 0.70},
+        {"quant": "Q6_K", "imatrix": False, "gb": 4.9, "handled": 0.74},
+        {"quant": "F16", "imatrix": False, "gb": 9.3, "handled": 0.75},
+    ]
+    svg = compression_svg(rows)
+    assert svg.startswith("<svg") and svg.count("<circle") == 3 and "Q4_K_M imatrix · 70 %" in svg

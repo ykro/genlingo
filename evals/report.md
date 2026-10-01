@@ -1,6 +1,6 @@
 # Genlingo — evaluación
 
-Generado por `make eval` el 2026-10-01 11:41. 319 pares de prueba (web; nunca sintéticos).
+Generado por `make eval` el 2026-10-01 15:25. 319 pares de prueba (web; nunca sintéticos).
 
 > **Ensayo:** las referencias de prueba aún están en `pending_review` (sin revisión del presentador). Los números cambiarán al aprobar/corregir el set con `make review-test`.
 
@@ -20,6 +20,11 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 | genlingo-2026-09-f16 | David candidato (LoRA, f16) | v1 | 52.0 | 432 ms | 636 ms | $0 | $0 | 9.27 GB | 0 |
 | gemini-3.8-flash | Goliath | v2 | 52.1 | 5.22 s | 14.68 s | $0.35 | $1.10 | — | 6 |
 | gemini-3.8-flash + glosario | Goliath con el glosario de David | v2 + glosario | 55.0 | 5.09 s | 15.97 s | $0.37 | $1.17 | — | 1 |
+| genlingo-2026-10-e2b-q5_k_m + glosario | David candidato (LoRA, Q4) | v2 + glosario | 51.5 | 587 ms | 815 ms | $0 | $0 | 3.62 GB | 0 |
+| genlingo-2026-10-e2b-q6_k + glosario | David candidato (LoRA, Q4) | v2 + glosario | 51.9 | 527 ms | 721 ms | $0 | $0 | 3.83 GB | 0 |
+| genlingo-2026-10-e2b-q8_0 + glosario | David candidato (LoRA, Q4) | v2 + glosario | 51.9 | 532 ms | 751 ms | $0 | $0 | 4.95 GB | 0 |
+| genlingo-2026-10-e2b-iq-q4_k_m + glosario | David candidato (LoRA, Q4) | v2 + glosario | 51.6 | 539 ms | 770 ms | $0 | $0 | 3.42 GB | 0 |
+| genlingo-2026-10-e2b-iq-q5_k_m + glosario | David candidato (LoRA, Q4) | v2 + glosario | 52.2 | 624 ms | 846 ms | $0 | $0 | 3.62 GB | 0 |
 
 Costo de Goliath con la tarifa del día del eval: $0.75 entrada / $3.75 salida por millón de tokens (vigente desde 2026-09-30).
 Con la tarifa desde 2027-01-01 ($1.50 / $7.50), este mismo eval costaría $0.69 ($2.21 por 1,000 frases).
@@ -48,20 +53,41 @@ chrF++ premia parecerse a la referencia, y una reescritura de registro conserva 
 | genlingo-2026-09-f16 | 90 % (n=149) | 28 % (n=155) | 58 % (n=304) | 13 % |
 | gemini-3.8-flash | 98 % (n=145) | 37 % (n=153) | 66 % (n=298) | 25 % |
 | gemini-3.8-flash + glosario | 99 % (n=149) | 65 % (n=155) | 82 % (n=304) | 30 % |
+| genlingo-2026-10-e2b-q5_k_m + glosario | 96 % (n=149) | 57 % (n=155) | 76 % (n=304) | 14 % |
+| genlingo-2026-10-e2b-q6_k + glosario | 97 % (n=149) | 52 % (n=155) | 74 % (n=304) | 15 % |
+| genlingo-2026-10-e2b-q8_0 + glosario | 97 % (n=149) | 53 % (n=155) | 75 % (n=304) | 14 % |
+| genlingo-2026-10-e2b-iq-q4_k_m + glosario | 95 % (n=149) | 50 % (n=155) | 72 % (n=304) | 14 % |
+| genlingo-2026-10-e2b-iq-q5_k_m + glosario | 97 % (n=149) | 54 % (n=155) | 75 % (n=304) | 15 % |
 
-**David en escena:** `genlingo-2026-10-e2b-f16 + glosario` — la variante de David con más jerga resuelta (75 %) que cumple p50 < 1 s (p50 534 ms).
+**David en escena:** `genlingo-2026-10-e2b-q5_k_m + glosario` (3.62 GB, p50 587 ms): el archivo más pequeño a ≤ 2 puntos de `genlingo-2026-10-e2b-f16 + glosario` (75 % de jerga resuelta), con p50 < 1 s. Resuelve 76 %.
 
-Cara a cara con `gemini-3.8-flash` en jerga resuelta: David la resuelve y Goliath no en **51** frases; al revés en **26**.
+Cara a cara con `gemini-3.8-flash` en jerga resuelta: David la resuelve y Goliath no en **53** frases; al revés en **25**.
 
-Cara a cara con `gemini-3.8-flash + glosario` en jerga resuelta: David la resuelve y Goliath no en **27** frases; al revés en **48**.
+Cara a cara con `gemini-3.8-flash + glosario` en jerga resuelta: David la resuelve y Goliath no en **25** frases; al revés en **43**.
 
-Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): gemma4:e2b-it-qat 7, gemma4:e2b-it-qat + glosario 6, gemma4:e4b 14, genlingo-2026-10-e2b + glosario 13, genlingo-2026-10-e4b + glosario 10, genlingo-2026-09 16, gemini-3.8-flash 8, gemini-3.8-flash + glosario 2 (de 155).
+Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): gemma4:e2b-it-qat 7, gemma4:e2b-it-qat + glosario 6, gemma4:e4b 14, genlingo-2026-10-e2b + glosario 13, genlingo-2026-10-e4b + glosario 10, genlingo-2026-09 16, gemini-3.8-flash 8, gemini-3.8-flash + glosario 2, genlingo-2026-10-e2b-q5_k_m + glosario 9, genlingo-2026-10-e2b-q6_k + glosario 14, genlingo-2026-10-e2b-q8_0 + glosario 15, genlingo-2026-10-e2b-iq-q4_k_m + glosario 6, genlingo-2026-10-e2b-iq-q5_k_m + glosario 9 (de 155).
 
 **Lectura honesta:** resultado mixto: cada uno gana en una de las dos métricas de jerga.
 
-Con el mismo glosario, Goliath resuelve 82 % de la jerga frente al 75 % de David: la ventaja de David viene de **sus datos** (el banco de términos), no de ser mejor modelo; y esos datos los tiene él, no Goliath.
+Con el mismo glosario, Goliath resuelve 82 % de la jerga frente al 76 % de David: la ventaja de David viene de **sus datos** (el banco de términos), no de ser mejor modelo; y esos datos los tiene él, no Goliath.
 
-Compresión y jerga: `genlingo-2026-10-e2b + glosario` (Q4, 3.42 GB) resuelve 67 % frente al 75 % de `genlingo-2026-10-e2b-f16 + glosario` (9.27 GB). Cuantizar cuesta jerga, no solo chrF++.
+## Compresión: tamaño vs jerga
+
+Las exportaciones de `genlingo-2026-10-e2b` con el mismo prompt y glosario. La curva muestra cuánta jerga se pierde al comprimir.
+
+![Tamaño vs jerga resuelta](compression.svg)
+
+| variante | cuantización | imatrix | tamaño | jerga resuelta | cambios acertados | chrF++ | p50 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `genlingo-2026-10-e2b + glosario` | Q4_K_M | no | 3.42 GB | 67 % | 13 % | 51.2 | 496 ms |
+| `genlingo-2026-10-e2b-iq-q4_k_m + glosario` | Q4_K_M | sí | 3.42 GB | 72 % | 14 % | 51.6 | 539 ms |
+| `genlingo-2026-10-e2b-q5_k_m + glosario` | Q5_K_M | no | 3.62 GB | 76 % | 14 % | 51.5 | 587 ms |
+| `genlingo-2026-10-e2b-iq-q5_k_m + glosario` | Q5_K_M | sí | 3.62 GB | 75 % | 15 % | 52.2 | 624 ms |
+| `genlingo-2026-10-e2b-q6_k + glosario` | Q6_K | no | 3.83 GB | 74 % | 15 % | 51.9 | 527 ms |
+| `genlingo-2026-10-e2b-q8_0 + glosario` | Q8_0 | no | 4.95 GB | 75 % | 14 % | 51.9 | 532 ms |
+| `genlingo-2026-10-e2b-f16 + glosario` | F16 | no | 9.27 GB | 75 % | 15 % | 51.9 | 534 ms |
+
+**imatrix (importance matrix):** antes de cuantizar, llama.cpp pasa el modelo f16 por texto de calibración y mide qué pesos influyen más; la cuantización gasta los bits ahí. Calibramos con **pares de entrenamiento** renderizados con el prompt de David (`train/quant_sweep.py`), nunca con el set de prueba: eso inflaría el eval.
 
 ### chrF++ por origen
 
@@ -77,6 +103,11 @@ Compresión y jerga: `genlingo-2026-10-e2b + glosario` (Q4, 3.42 GB) resuelve 67
 | genlingo-2026-09-f16 | 52.0 (n=319) |
 | gemini-3.8-flash | 52.1 (n=313) |
 | gemini-3.8-flash + glosario | 55.0 (n=318) |
+| genlingo-2026-10-e2b-q5_k_m + glosario | 51.5 (n=319) |
+| genlingo-2026-10-e2b-q6_k + glosario | 51.9 (n=319) |
+| genlingo-2026-10-e2b-q8_0 + glosario | 51.9 (n=319) |
+| genlingo-2026-10-e2b-iq-q4_k_m + glosario | 51.6 (n=319) |
+| genlingo-2026-10-e2b-iq-q5_k_m + glosario | 52.2 (n=319) |
 
 ### chrF++ por dirección
 
@@ -92,6 +123,11 @@ Compresión y jerga: `genlingo-2026-10-e2b + glosario` (Q4, 3.42 GB) resuelve 67
 | genlingo-2026-09-f16 | 59.0 (n=164) | 43.9 (n=155) |
 | gemini-3.8-flash | 58.9 (n=160) | 44.3 (n=153) |
 | gemini-3.8-flash + glosario | 61.7 (n=163) | 47.3 (n=155) |
+| genlingo-2026-10-e2b-q5_k_m + glosario | 58.7 (n=164) | 42.9 (n=155) |
+| genlingo-2026-10-e2b-q6_k + glosario | 58.6 (n=164) | 44.0 (n=155) |
+| genlingo-2026-10-e2b-q8_0 + glosario | 58.5 (n=164) | 44.0 (n=155) |
+| genlingo-2026-10-e2b-iq-q4_k_m + glosario | 57.8 (n=164) | 44.4 (n=155) |
+| genlingo-2026-10-e2b-iq-q5_k_m + glosario | 58.8 (n=164) | 44.3 (n=155) |
 
 ### chrF++ por país
 
@@ -107,6 +143,11 @@ Compresión y jerga: `genlingo-2026-10-e2b + glosario` (Q4, 3.42 GB) resuelve 67
 | genlingo-2026-09-f16 | 52.5 (n=88) | 56.3 (n=73) | 50.9 (n=70) | 48.5 (n=88) |
 | gemini-3.8-flash | 52.4 (n=87) | 49.4 (n=71) | 55.9 (n=68) | 50.6 (n=87) |
 | gemini-3.8-flash + glosario | 54.1 (n=88) | 55.0 (n=73) | 59.6 (n=70) | 51.8 (n=87) |
+| genlingo-2026-10-e2b-q5_k_m + glosario | 51.2 (n=88) | 56.9 (n=73) | 50.2 (n=70) | 47.7 (n=88) |
+| genlingo-2026-10-e2b-q6_k + glosario | 52.0 (n=88) | 56.4 (n=73) | 51.3 (n=70) | 48.1 (n=88) |
+| genlingo-2026-10-e2b-q8_0 + glosario | 51.3 (n=88) | 56.3 (n=73) | 51.5 (n=70) | 48.7 (n=88) |
+| genlingo-2026-10-e2b-iq-q4_k_m + glosario | 51.5 (n=88) | 55.7 (n=73) | 50.8 (n=70) | 48.8 (n=88) |
+| genlingo-2026-10-e2b-iq-q5_k_m + glosario | 51.9 (n=88) | 56.9 (n=73) | 50.9 (n=70) | 49.3 (n=88) |
 
 ## Modelo base: E2B vs E4B
 

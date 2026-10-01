@@ -116,3 +116,10 @@ def test_last_months_david_keeps_his_old_prompt(settings):
     with client(settings) as c:
         r = c.post("/duel", json={"phrase": "x", "direction": "genz_to_parent", "country": "MX"}).json()
     assert r["david"]["extra"]["prompt"] == "translate-v1"
+
+
+def test_quantized_exports_map_to_their_training_run(settings):
+    with client(settings) as c:
+        sb = c.get("/scoreboard", params={"david_tag": "genlingo-test-q5_k_m"}).json()
+        assert sb["david_training"]["estimated_cost_usd"] == 0.42
+        assert c.get("/scoreboard", params={"david_tag": "genlingo-test-f16"}).json()["david_training"]["duration_s"] == 900

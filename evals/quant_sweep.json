@@ -1,0 +1,31 @@
+{
+  "tag": "genlingo-2026-10-e2b",
+  "variants": {
+    "genlingo-2026-10-e2b-q5_k_m": {
+      "quant": "Q5_K_M",
+      "imatrix": false,
+      "bytes": 3616709600
+    },
+    "genlingo-2026-10-e2b-q6_k": {
+      "quant": "Q6_K",
+      "imatrix": false,
+      "bytes": 3829835744
+    },
+    "genlingo-2026-10-e2b-q8_0": {
+      "quant": "Q8_0",
+      "imatrix": false,
+      "bytes": 4947415008
+    },
+    "genlingo-2026-10-e2b-iq-q4_k_m": {
+      "quant": "Q4_K_M",
+      "imatrix": true,
+      "bytes": 3416120640
+    },
+    "genlingo-2026-10-e2b-iq-q5_k_m": {
+      "quant": "Q5_K_M",
+      "imatrix": true,
+      "bytes": 3616709952
+    }
+  },
+  "imatrix_s": 224.4
+}
