@@ -214,22 +214,9 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
     train_s = time.time() - t0
     losses = [h["loss"] for h in trainer.state.log_history if "loss" in h]
 
-    adapter_dir = work / "adapter"
+    adapter_dir = work / "adapter"  # on Cloud Run: the bucket volume, so it survives the job
     trainer.model.save_pretrained(adapter_dir)
-
-    # Merge: W' = W + (alpha/r)·B·A. After this there is no adapter at inference time,
-    # so llama.cpp/Ollama see an ordinary model.
-    t1 = time.time()
-    merged = trainer.model.merge_and_unload()
-    # On Cloud Run the merged checkpoint goes to the in-memory disk (MERGED_DIR): the GGUF
-    # converter reads it tensor by tensor, and random reads from a bucket mount crawl.
-    merged_dir = Path(args.merged_dir) if args.merged_dir else work / "merged"
-    merged.save_pretrained(merged_dir, safe_serialization=True)
-    for f in base_dir.iterdir():  # tokenizer, chat template, processor config… (not weights/config)
-        if f.is_file() and not f.name.endswith(WEIGHT_SUFFIXES) and f.name not in {"config.json", "model.safetensors.index.json"}:
-            shutil.copy2(f, merged_dir / f.name)
-    merge_s = time.time() - t1
-    return {
+    stats = {
         "examples": len(dataset),
         "trainable_params": trainable,
         "total_params": total,
@@ -239,35 +226,60 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
         "steps": trainer.state.global_step,
         "device": device,
         "train_s": round(train_s, 1),
-        "merge_s": round(merge_s, 1),
-        "merged_dir": str(merged_dir),
         "adapter_dir": str(adapter_dir),
     }
+    if args.adapter_only:  # bigger bases: merge + GGUF on a machine with more RAM (finish_local.py)
+        return {**stats, "merge_s": 0.0, "merged_dir": None}
+
+    # Free what training no longer needs before the RAM-heavy part.
+    import gc
+
+    peft_model = trainer.model
+    del trainer, dataset
+    gc.collect()
+    if device == "cuda":
+        torch.cuda.empty_cache()
+
+    # Merge: W' = W + (alpha/r)·B·A. After this there is no adapter at inference time,
+    # so llama.cpp/Ollama see an ordinary model.
+    t1 = time.time()
+    merged = peft_model.merge_and_unload()
+    # On Cloud Run the merged checkpoint goes to the in-memory disk (MERGED_DIR): the GGUF
+    # converter reads it tensor by tensor, and random reads from a bucket mount crawl.
+    merged_dir = Path(args.merged_dir) if args.merged_dir else work / "merged"
+    merged.save_pretrained(merged_dir, safe_serialization=True)
+    for f in base_dir.iterdir():  # tokenizer, chat template, processor config… (not weights/config)
+        if f.is_file() and not f.name.endswith(WEIGHT_SUFFIXES) and f.name not in {"config.json", "model.safetensors.index.json"}:
+            shutil.copy2(f, merged_dir / f.name)
+    merge_s = time.time() - t1
+    return {**stats, "merge_s": round(merge_s, 1), "merged_dir": str(merged_dir)}
 
 
 # ---------------------------------------------------------------------------------------------
 # GGUF + Modelfile
 # ---------------------------------------------------------------------------------------------
 def to_gguf(merged_dir: Path, out_dir: Path, tag: str, llama_cpp: Path, quant: str, drop_merged: bool = False,
-            intermediate: str = "f16") -> dict:
+            outtype: str = "f16") -> dict:
     """f16 GGUF (the "uncompressed" reference) and a quantized one (what the laptop runs).
     Q4_K_M keeps ~4.5 bits per weight with mixed precision on the most sensitive tensors.
-    `intermediate="q8_0"` halves the peak disk/RAM for bigger bases (E4B on a 32 GiB Cloud Run job)
-    at the cost of not publishing an f16 reference."""
+    `outtype="q8_0"` halves the intermediate file for bigger bases, at the cost of not publishing
+    an f16 reference (the q8_0 file is deleted once quantized)."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    f16 = out_dir / f"{tag}-{intermediate}.gguf"
+    f16 = out_dir / f"{tag}-{outtype}.gguf"
     q = out_dir / f"{tag}-{quant.lower()}.gguf"
     t0 = time.time()
     subprocess.run(
-        [sys.executable, str(llama_cpp / "convert_hf_to_gguf.py"), str(merged_dir), "--outtype", intermediate, "--outfile", str(f16)],
+        [sys.executable, str(llama_cpp / "convert_hf_to_gguf.py"), str(merged_dir), "--outtype", outtype, "--outfile", str(f16)],
         check=True,
     )
     if drop_merged:
         shutil.rmtree(merged_dir, ignore_errors=True)
     quantize = shutil.which("llama-quantize") or str(llama_cpp / "llama-quantize")
-    requant = ["--allow-requantize"] if intermediate != "f16" else []
+    requant = ["--allow-requantize"] if outtype not in ("f16", "bf16", "f32") else []
     subprocess.run([quantize, *requant, str(f16), str(q), quant], check=True)
-    return {"gguf_f16": f16.name if intermediate == "f16" else None, "gguf_intermediate": f16.name, "gguf_quant": q.name, "quant": quant, "f16_bytes": f16.stat().st_size if intermediate == "f16" else None,
+    is_f16 = outtype == "f16"
+    return {"gguf_f16": f16.name if is_f16 else None, "gguf_intermediate": f16.name, "gguf_quant": q.name, "quant": quant,
+            "f16_bytes": f16.stat().st_size if is_f16 else None,
             "quant_bytes": q.stat().st_size, "gguf_s": round(time.time() - t0, 1)}
 
 
@@ -300,7 +312,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     # GGUF writers do many small writes, which are very slow on a Cloud Storage volume.
     ap.add_argument("--out-dir", default=env("OUT_DIR", ""))
     ap.add_argument("--merged-dir", default=env("MERGED_DIR", ""))
-    ap.add_argument("--gguf-intermediate", default="f16", choices=["f16", "q8_0"])
+    ap.add_argument("--gguf-outtype", default=env("GGUF_OUTTYPE", "f16"), choices=["f16", "q8_0"],
+                    help="intermediate GGUF before quantizing: f16 (published as reference) or q8_0 (smaller)")
+    ap.add_argument("--adapter-only", action="store_true", default=env("ADAPTER_ONLY", "") == "1",
+                    help="stop after saving the LoRA adapter (merge + GGUF later with finish_local.py)")
     ap.add_argument("--drop-merged", action="store_true", default=env("DROP_MERGED", "") == "1",
                     help="delete the merged checkpoint once converted (frees ~10 GB of in-memory disk)")
     ap.add_argument("--llama-cpp", default=env("LLAMA_CPP_DIR", "/opt/llama.cpp"))
@@ -349,9 +364,9 @@ def main(argv: list[str] | None = None) -> dict:
     metrics.update(train_and_merge(args, base_dir, data_path, work))
     shutil.make_archive(str(out / f"{args.tag}-adapter"), "zip", metrics.pop("adapter_dir"))
 
-    if not args.skip_gguf:
+    if not args.skip_gguf and metrics["merged_dir"]:
         metrics.update(to_gguf(Path(metrics["merged_dir"]), out, args.tag, Path(args.llama_cpp), args.quant,
-                               args.drop_merged, args.gguf_intermediate))
+                               args.drop_merged, args.gguf_outtype))
         write_modelfile(out, metrics["gguf_quant"], args.ollama_renderer, args.temperature)
         if metrics["gguf_f16"]:
             write_modelfile(out, metrics["gguf_f16"], args.ollama_renderer, args.temperature)

@@ -9,7 +9,7 @@ DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
 # JDK 21 for the Firestore emulator (rules tests), only inside make: brew install openjdk@21
 JAVA21    := $(shell brew --prefix openjdk@21 2>/dev/null)/libexec/openjdk.jdk/Contents/Home
 
-.PHONY: help up duel reset test eval train train-local train-data pull-model export review-test review-test-apply \
+.PHONY: help up duel reset test eval train train-local train-finish train-data pull-model export review-test review-test-apply \
         test-set pairs datasheet data deploy
 
 help:
@@ -61,6 +61,10 @@ train: train-data ## Fine-tune on a Cloud Run GPU job (L4): make train TAG=genli
 train-local: train-data ## Same training on this Mac (MPS), for experiments
 	uv run --python 3.12 --with-requirements train/requirements.txt --with torch==2.14.0 \
 	  python train/train_local.py $(TAG) data/train/chat.jsonl
+
+train-finish: ## Merge + GGUF a cloud-trained adapter on this Mac and publish it: make train-finish TAG=…
+	uv run --python 3.12 --with-requirements train/requirements.txt --with torch==2.14.0 \
+	  python train/finish_local.py $(TAG)
 
 pull-model: ## Download a trained David into Ollama: make pull-model TAG=... [FP16=1]
 	MODELS_BUCKET=$(MODELS_BUCKET) train/pull_model.sh $(TAG)
