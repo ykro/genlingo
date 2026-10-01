@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1040 752" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ciclo-mensual-title ciclo-mensual-desc">
+      <title id="ciclo-mensual-title">El ciclo mensual de David</title>
+      <desc id="ciclo-mensual-desc">Ciclo mensual de Genlingo: investigar jerga en la web, generar pares sintéticos validados, entrenar LoRA en Cloud Run, evaluar con métricas de términos, duelo en escena sin internet y pares del público, que vuelven al banco de datos fechado del que sale el David del mes siguiente.</desc>
+      <defs>
+      <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;family=Noto+Sans+KR:wght@400;500;600&amp;family=Noto+Serif+KR:wght@400&amp;family=Noto+Sans+TC:wght@400;500;600&amp;family=Noto+Serif+TC:wght@400&amp;display=swap');</style>
+      <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+      <marker id="arrow-start" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto-start-reverse"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+      <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#C23D19"/></marker>
+      <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+      <marker id="arrow-soft" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7a8399"/></marker>
+      </defs>
+      <rect width="1040" height="752" fill="#f5f5f5"/>
+      <path d="M600 113.726 A240 240 0 0 1 704.969 187.073" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <path d="M743.285 252 A240 240 0 0 1 743.722 426.882" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <path d="M705.731 492 A240 240 0 0 1 601.130 565.871" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <path d="M440 566.274 A240 240 0 0 1 335.031 492.927" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <path d="M296.715 428 A240 240 0 0 1 296.278 253.118" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <path d="M334.269 188 A240 240 0 0 1 438.870 114.129" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <path d="M520 132 V280" fill="none" stroke="#7a8399" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+      <path d="M672 252 L616 284" fill="none" stroke="#7a8399" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+      <path d="M672 428 L616 396" fill="none" stroke="#7a8399" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+      <path d="M520 548 V400" fill="none" stroke="#7a8399" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+      <path d="M368 428 L424 396" fill="none" stroke="#7a8399" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+      <path d="M368 252 L424 284" fill="none" stroke="#7a8399" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+      <rect x="528" y="196" width="72" height="16" rx="4" fill="#f5f5f5"/>
+      <text x="564" y="208" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">TÉRMINOS</text>
+      <rect x="448" y="460" width="64" height="16" rx="4" fill="#f5f5f5"/>
+      <text x="480" y="472" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">REPORTE</text>
+      <rect x="440" y="68" width="160" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1"/>
+      <text x="520" y="96" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Investigar la web</text>
+      <text x="520" y="114" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">terms.jsonl · SOURCES.md</text>
+      <rect x="648" y="188" width="160" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1"/>
+      <text x="728" y="216" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Pares sintéticos</text>
+      <text x="728" y="234" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">make pairs · validados</text>
+      <rect x="648" y="428" width="160" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1"/>
+      <text x="728" y="456" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Entrenar LoRA</text>
+      <text x="728" y="474" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">make train · L4 · &lt; $1</text>
+      <rect x="440" y="548" width="160" height="64" rx="6" fill="#c23d19" fill-opacity="0.08" stroke="#C23D19" stroke-width="1.2"/>
+      <text x="520" y="576" fill="#C23D19" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Evaluar</text>
+      <text x="520" y="594" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">make eval · jerga resuelta</text>
+      <rect x="232" y="428" width="160" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1"/>
+      <text x="312" y="456" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Duelo en escena</text>
+      <text x="312" y="474" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">make up · sin internet</text>
+      <rect x="232" y="188" width="160" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1"/>
+      <text x="312" y="216" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Pares del público</text>
+      <text x="312" y="234" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">/admin → make export</text>
+      <rect x="420" y="288" width="200" height="104" rx="8" fill="#2d3142"/>
+      <text x="520" y="334" fill="#f5f5f5" font-size="16" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Datos fechados</text>
+      <text x="520" y="354" fill="#f5f5f5" fill-opacity="0.72" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">origin en cada par · runs/&lt;tag&gt;.json</text>
+      <text x="520" y="368" fill="#f5f5f5" fill-opacity="0.72" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">genlingo-AAAA-MM</text>
+      <text x="300" y="112" fill="#4f5d75" font-size="14" font-family="'Instrument Serif', serif" text-anchor="middle" font-style="italic">mes siguiente →</text>
+      <line x1="40" y1="664" x2="1000" y2="664" stroke="#2d3142" stroke-opacity="0.10" stroke-width="0.8"/>
+      <text x="40" y="686" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="start" letter-spacing="0.18em">LEYENDA</text>
+      <rect x="40" y="700" width="16" height="10" rx="2" fill="#c23d19" fill-opacity="0.08" stroke="#C23D19" stroke-width="1"/>
+      <text x="64" y="709" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Compuerta: el eval elige al David de escena (más jerga resuelta, p50 &lt; 1 s)</text>
+      <line x1="440" y1="705" x2="468" y2="705" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <text x="476" y="708" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Paso del ciclo</text>
+      <line x1="600" y1="705" x2="628" y2="705" stroke="#7a8399" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+      <text x="636" y="708" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Lo que cada paso deja escrito</text>
+      <rect x="820" y="700" width="16" height="10" rx="2" fill="#2d3142"/>
+      <text x="844" y="709" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Estado acumulado</text>
+    </svg>

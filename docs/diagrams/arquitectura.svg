@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="arquitectura-title arquitectura-desc">
+      <title id="arquitectura-title">Genlingo: qué corre en la laptop y qué en la nube</title>
+      <desc id="arquitectura-desc">Arquitectura de Genlingo: la vista del presentador, el servicio del duelo y David (Gemma afinado en Ollama) corren en la laptop y funcionan sin internet; la app de la audiencia, Firestore, Gemini (Goliath) y el entrenamiento mensual corren en Google Cloud, y el duelo solo los usa cuando hay red.</desc>
+      <defs>
+      <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;family=Noto+Sans+KR:wght@400;500;600&amp;family=Noto+Serif+KR:wght@400&amp;family=Noto+Sans+TC:wght@400;500;600&amp;family=Noto+Serif+TC:wght@400&amp;display=swap');</style>
+      <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+      <marker id="arrow-start" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto-start-reverse"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+      <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#C23D19"/></marker>
+      <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+      <marker id="arrow-soft" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7a8399"/></marker>
+      </defs>
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+      <rect x="40" y="112" width="400" height="480" rx="8" fill="#c23d19" fill-opacity="0.05" stroke="#c23d19" stroke-opacity="0.50" stroke-width="1" stroke-dasharray="4,4"/>
+      <rect x="128" y="106" width="224" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="240" y="115" fill="#C23D19" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" font-weight="500" letter-spacing="0.14em">LAPTOP · FUNCIONA SIN INTERNET</text>
+      <rect x="560" y="112" width="400" height="480" rx="8" fill="#2d3142" fill-opacity="0.02" stroke="#2d3142" stroke-opacity="0.10" stroke-width="0.8"/>
+      <rect x="576" y="106" width="168" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="660" y="115" fill="#2d3142" fill-opacity="0.55" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" font-weight="500" letter-spacing="0.14em">GOOGLE CLOUD · CON RED</text>
+      <line x1="760" y1="76" x2="760" y2="158" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="768" y="134" width="100" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="818.0" y="143" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">HTTPS + APP CHECK</text>
+      <line x1="760" y1="224" x2="760" y2="270" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="768" y="241" width="60" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="798.0" y="250" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">ADMIN SDK</text>
+      <line x1="240" y1="224" x2="240" y2="302" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="248" y="257" width="64" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="280.0" y="266" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">HTTP LOCAL</text>
+      <line x1="240" y1="368" x2="240" y2="446" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="248" y="401" width="80" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="288.0" y="410" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">OLLAMA :11434</text>
+      <path d="M 402,324 H 472 Q 480,324 480,316 V 312 Q 480,304 488,304 H 598" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-start="url(#arrow-start)" marker-end="url(#arrow)"/>
+      <rect x="499" y="284" width="88" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="543" y="293" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">FRASES Y VOTOS</text>
+      <path d="M 400,348 H 512 Q 520,348 520,356 V 408 Q 520,416 528,416 H 598" fill="none" stroke="#2e5aa8" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-link)"/>
+      <rect x="531" y="396" width="64" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="563" y="405" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">SI HAY RED</text>
+      <path d="M 600,528 H 508 Q 500,528 500,520 V 492 Q 500,484 492,484 H 402" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+      <rect x="516" y="508" width="76" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="554" y="517" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">GGUF MENSUAL</text>
+      <rect x="600" y="28" width="320" height="48" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="28" width="320" height="48" rx="6" fill="#4f5d75" fill-opacity="0.10" stroke="#7a8399" stroke-width="1"/>
+      <text x="760.0" y="50.0" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Teléfonos del público</text>
+      <text x="760.0" y="66.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">QR · sin registro (Auth anónima)</text>
+      <rect x="80" y="160" width="320" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="80" y="160" width="320" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="88" y="166" width="28" height="12" rx="2" fill="none" stroke="#2d3142" stroke-opacity="0.4" stroke-width="0.8"/>
+      <text x="102.0" y="175" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">WEB</text>
+      <text x="240.0" y="194.0" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Vista del presentador</text>
+      <text x="240.0" y="210.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Next.js · 127.0.0.1:3000/presenter</text>
+      <rect x="80" y="304" width="320" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="80" y="304" width="320" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="88" y="310" width="28" height="12" rx="2" fill="none" stroke="#2d3142" stroke-opacity="0.4" stroke-width="0.8"/>
+      <text x="102.0" y="319" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">API</text>
+      <text x="240.0" y="338.0" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Servicio del duelo</text>
+      <text x="240.0" y="354.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">FastAPI :8787 · marcador en SQLite</text>
+      <rect x="80" y="448" width="320" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="80" y="448" width="320" height="72" rx="6" fill="#c23d19" fill-opacity="0.08" stroke="#C23D19" stroke-width="1.2"/>
+      <rect x="88" y="454" width="40" height="12" rx="2" fill="none" stroke="#C23D19" stroke-opacity="0.4" stroke-width="0.8"/>
+      <text x="108.0" y="463" fill="#C23D19" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">LOCAL</text>
+      <text x="240.0" y="480.0" fill="#C23D19" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">David · Gemma 4 E2B + LoRA</text>
+      <text x="240.0" y="496.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Ollama · genlingo-2026-10-e2b-f16</text>
+      <text x="240.0" y="508.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">glosario: EmbeddingGemma + terms.jsonl</text>
+      <rect x="600" y="160" width="320" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="160" width="320" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="608" y="166" width="28" height="12" rx="2" fill="none" stroke="#2d3142" stroke-opacity="0.4" stroke-width="0.8"/>
+      <text x="622.0" y="175" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">WEB</text>
+      <text x="760.0" y="194.0" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">App de la audiencia</text>
+      <text x="760.0" y="210.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Cloud Run · us-central1 · min 1</text>
+      <rect x="600" y="272" width="320" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="272" width="320" height="64" rx="6" fill="#2d3142" fill-opacity="0.05" stroke="#4f5d75" stroke-width="1"/>
+      <rect x="608" y="278" width="24" height="12" rx="2" fill="none" stroke="#4f5d75" stroke-opacity="0.4" stroke-width="0.8"/>
+      <text x="620.0" y="287" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DB</text>
+      <text x="760.0" y="306.0" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Firestore · base genlingo</text>
+      <text x="760.0" y="322.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">frases · rondas · votos · pares</text>
+      <rect x="600" y="384" width="320" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="384" width="320" height="64" rx="6" fill="#2d3142" fill-opacity="0.03" stroke="#2d3142" stroke-opacity="0.30" stroke-width="1"/>
+      <rect x="608" y="390" width="28" height="12" rx="2" fill="none" stroke="#4f5d75" stroke-opacity="0.4" stroke-width="0.8"/>
+      <text x="622.0" y="399" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">API</text>
+      <text x="760.0" y="418.0" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Goliath · Gemini</text>
+      <text x="760.0" y="434.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Vertex AI · GEMINI_MODEL · global</text>
+      <rect x="600" y="496" width="320" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="496" width="320" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="608" y="502" width="28" height="12" rx="2" fill="none" stroke="#2d3142" stroke-opacity="0.4" stroke-width="0.8"/>
+      <text x="622.0" y="511" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">JOB</text>
+      <text x="760.0" y="530.0" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Entrenamiento mensual</text>
+      <text x="760.0" y="546.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Cloud Run Job · 1× L4 · europe-west4</text>
+      <line x1="40" y1="624" x2="960" y2="624" stroke="#2d3142" stroke-opacity="0.10" stroke-width="0.8"/>
+      <text x="40" y="646" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="start" letter-spacing="0.18em">LEYENDA</text>
+      <rect x="40" y="660" width="16" height="10" rx="2" fill="#c23d19" fill-opacity="0.08" stroke="#C23D19" stroke-width="1"/>
+      <text x="64" y="669" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">David (foco)</text>
+      <rect x="190" y="660" width="16" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="214" y="669" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Servicio</text>
+      <rect x="310" y="660" width="16" height="10" rx="2" fill="#2d3142" fill-opacity="0.05" stroke="#4f5d75" stroke-width="1"/>
+      <text x="334" y="669" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Almacén</text>
+      <rect x="420" y="660" width="16" height="10" rx="2" fill="#2d3142" fill-opacity="0.03" stroke="#2d3142" stroke-opacity="0.30" stroke-width="1"/>
+      <text x="444" y="669" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Modelo en la nube</text>
+      <rect x="580" y="660" width="16" height="10" rx="2" fill="#4f5d75" fill-opacity="0.10" stroke="#7a8399" stroke-width="1"/>
+      <text x="604" y="669" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Público</text>
+      <rect x="700" y="660" width="16" height="10" rx="2" fill="#c23d19" fill-opacity="0.05" stroke="#c23d19" stroke-opacity="0.50" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="724" y="669" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Frontera sin internet</text>
+      <line x1="40" y1="686" x2="68" y2="686" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+      <text x="76" y="689" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Opcional o periódico (feed del público, modelo del mes)</text>
+      <line x1="420" y1="686" x2="448" y2="686" stroke="#2e5aa8" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-link)"/>
+      <text x="456" y="689" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Llamada a la nube (Goliath sale «sin conexión» si no hay red)</text>
+    </svg>
