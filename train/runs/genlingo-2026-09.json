@@ -1,0 +1,28 @@
+{
+  "tag": "genlingo-2026-09",
+  "app": "genlingo",
+  "where": "cloud",
+  "region": "europe-west4",
+  "image": "us-central1-docker.pkg.dev/ai-experiments-487722/charlas2027/genlingo-train:e508ea992fd4",
+  "base_model": "gemma-4-E2B-it",
+  "weights_uri": "hf://google",
+  "data_uri": "gs://ai-experiments-487722-train-eu/genlingo/data/genlingo-2026-09/train.jsonl",
+  "data_date": "2026-09",
+  "examples": 1000,
+  "output_uri": "gs://ai-experiments-487722-genlingo-models/genlingo-2026-09/",
+  "state": "JOB_STATE_FAILED",
+  "runtime": "cloud-run-job",
+  "job": "genlingo-train",
+  "execution": "genlingo-train-nv5r5",
+  "machine": "Cloud Run Job: 1x NVIDIA L4 (no zonal redundancy), 8 vCPU, 32 GiB",
+  "rates_usd_per_s": {
+    "gpu_l4": 0.0001867,
+    "vcpu": 1.8e-05,
+    "gib": 2e-06
+  },
+  "start_time": "2026-09-30T22:41:37.120115Z",
+  "end_time": "2026-09-30T22:52:28.192539Z",
+  "duration_s": 651.1,
+  "estimated_cost_usd": 0.26,
+  "error": "Task genlingo-train-nv5r5-task0 failed with exit code: 1 and message: The container exited with an error."
+}
