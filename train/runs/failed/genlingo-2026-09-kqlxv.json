@@ -10,7 +10,7 @@
   "data_date": "2026-09",
   "examples": 1000,
   "output_uri": "gs://ai-experiments-487722-genlingo-models/genlingo-2026-09/",
-  "state": "PENDING",
+  "state": "JOB_STATE_CANCELLED",
   "runtime": "cloud-run-job",
   "job": "genlingo-train",
   "execution": "genlingo-train-kqlxv",
@@ -19,5 +19,6 @@
     "gpu_l4": 0.0001867,
     "vcpu": 1.8e-05,
     "gib": 2e-06
-  }
+  },
+  "note": "Cancelled at ~28 min: GGUF conversion read the merged model from the bucket mount at ~3 MB/s and would have hit the 1 h limit."
 }
