@@ -40,6 +40,8 @@ class Settings:
     gemini_input_usd_per_m: float = field(default_factory=lambda: _float("GEMINI_INPUT_USD_PER_M", 0.0))
     gemini_output_usd_per_m: float = field(default_factory=lambda: _float("GEMINI_OUTPUT_USD_PER_M", 0.0))
     david_tag: str = field(default_factory=lambda: _env("LOCAL_MODEL_TAG"))
+    # Last month's David, for the "last month vs this month" duel on stage.
+    david_previous_tag: str = field(default_factory=lambda: _env("DAVID_PREVIOUS_TAG"))
     # Prompt styles (v1 | v2 | v2+glossary). David's comes from his run file when it has one;
     # Goliath gets no glossary by default (the term bank is David's data), set it to compare.
     david_prompt_style: str = field(default_factory=lambda: _env("DAVID_PROMPT_STYLE", "v1"))

@@ -58,6 +58,7 @@ export interface Health {
   ollama: boolean;
   mock: boolean;
   david_tag: string;
+  david_tags?: string[];
   goliath_model: string;
   audience_feed: boolean;
 }
@@ -85,11 +86,13 @@ export class DuelClient {
   }
 
   health = () => this.call<Health>("/health");
-  scoreboard = () => this.call<Scoreboard>("/scoreboard");
+  scoreboard = (davidTag?: string) =>
+    this.call<Scoreboard>(`/scoreboard${davidTag ? `?david_tag=${encodeURIComponent(davidTag)}` : ""}`);
   queue = () => this.call<QueuedPhrase[]>("/queue");
   latest = () => this.call<Round[]>("/rounds?limit=1").then((r) => r[0] ?? null);
-  duel = (body: { phrase: string; direction: Direction; country: string; phrase_id?: string }) => this.call<Round>("/duel", body);
-  evaluation = () => this.call<Round>("/rounds/evaluation", {});
+  duel = (body: { phrase: string; direction: Direction; country: string; phrase_id?: string; david_tag?: string }) =>
+    this.call<Round>("/duel", body);
+  evaluation = (davidTag?: string) => this.call<Round>("/rounds/evaluation", davidTag ? { david_tag: davidTag } : {});
   votes = (id: string) => this.call<{ david: number; goliath: number; live: boolean }>(`/rounds/${id}/votes`);
   close = (id: string) => this.call<Round>(`/rounds/${id}/close`, {});
 }

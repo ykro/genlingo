@@ -612,3 +612,13 @@
   border: 1.5px solid var(--rule);
   border-radius: var(--r-pill);
 }
+
+.previousChip {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.chipNote {
+  font-size: 20px;
+  opacity: 0.8;
+}

@@ -26,5 +26,20 @@
   "end_time": "2026-10-01T16:25:06.100113Z",
   "duration_s": 2479.0,
   "estimated_cost_usd": 0.98,
-  "error": "Task genlingo-train-c58ts-task0 failed with exit code: 0 and message: The configured memory limit was reached."
+  "error": "Task genlingo-train-c58ts-task0 failed with exit code: 0 and message: The configured memory limit was reached.",
+  "finish": {
+    "tag": "genlingo-2026-10-e4b",
+    "base_model": "gemma-4-E4B-it",
+    "where_merged": "laptop",
+    "download_s": 580.1,
+    "merge_s": 56.7,
+    "gguf_f16": "genlingo-2026-10-e4b-f16.gguf",
+    "gguf_intermediate": "genlingo-2026-10-e4b-f16.gguf",
+    "gguf_quant": "genlingo-2026-10-e4b-q4_k_m.gguf",
+    "quant": "Q4_K_M",
+    "f16_bytes": 14942972256,
+    "quant_bytes": 5302274400,
+    "gguf_s": 120.6
+  },
+  "note": "Trained on the Cloud Run L4 (282 steps, 24.7 min); the job was OOM-killed (32 GiB) while writing the 16 GB merged checkpoint, after the LoRA adapter was saved to the bucket. Merge + GGUF finished on the laptop (make train-finish). Cost = the cloud job only."
 }

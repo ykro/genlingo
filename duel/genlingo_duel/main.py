@@ -114,6 +114,7 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
             "online": await arena.is_online(),
             "ollama": ollama_up,
             "david_tag": s.david_tag,
+            "david_tags": [t for t in (s.david_tag, s.david_previous_tag) if t],
             "goliath_model": s.gemini_model,
             "event": s.event_id,
             "audience_feed": feed is not None,

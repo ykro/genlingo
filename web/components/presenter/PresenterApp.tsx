@@ -109,8 +109,15 @@ function Duel({ config }: { config: PublicConfig }) {
   const [running, setRunning] = useState<{ phrase: string; direction: Direction; startedAt: number } | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const [composer, setComposer] = useState(false);
+  // "Last month vs this month": M switches which David duels (tags from the duel service).
+  const [tagIndex, setTagIndex] = useState(0);
+  const davidTags = health?.david_tags?.length ? health.david_tags : health?.david_tag ? [health.david_tag] : [];
+  const activeTag = davidTags[tagIndex % Math.max(1, davidTags.length)];
 
-  const refreshBoard = useCallback(() => client.scoreboard().then(setBoard).catch(() => undefined), [client]);
+  const refreshBoard = useCallback(
+    () => client.scoreboard(activeTag).then(setBoard).catch(() => undefined),
+    [client, activeTag],
+  );
 
   // Initial state + health (every 3 s: the offline indicator must react to Wi-Fi going away).
   useEffect(() => {
@@ -171,12 +178,14 @@ function Duel({ config }: { config: PublicConfig }) {
     const next = queue[0];
     if (!next) return setProblem("No hay frases aprobadas en la fila.");
     setQueue((q) => q.slice(1));
-    run({ phrase: next.text, direction: next.direction }, () => client.duel({ phrase: next.text, direction: next.direction, country: next.country, phrase_id: next.phrase_id }));
-  }, [queue, run, client]);
+    run({ phrase: next.text, direction: next.direction }, () =>
+      client.duel({ phrase: next.text, direction: next.direction, country: next.country, phrase_id: next.phrase_id, david_tag: activeTag }),
+    );
+  }, [queue, run, client, activeTag]);
 
   const evaluation = useCallback(
-    () => run({ phrase: "Frase del set de prueba…", direction: "genz_to_parent" }, () => client.evaluation()),
-    [run, client],
+    () => run({ phrase: "Frase del set de prueba…", direction: "genz_to_parent" }, () => client.evaluation(activeTag)),
+    [run, client, activeTag],
   );
 
   const closeVotes = useCallback(async () => {
@@ -202,10 +211,11 @@ function Duel({ config }: { config: PublicConfig }) {
         setComposer(true);
       }
       else if (key === "f") document.documentElement.requestFullscreen?.().catch(() => undefined);
+      else if (key === "m" && davidTags.length > 1) setTagIndex((i) => (i + 1) % davidTags.length);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [composer, evaluation, nextFromAudience, closeVotes]);
+  }, [composer, evaluation, nextFromAudience, closeVotes, davidTags.length]);
 
   if (down && !health) {
     return (
@@ -218,7 +228,8 @@ function Duel({ config }: { config: PublicConfig }) {
   }
 
   const online = health?.online ?? true;
-  const davidTag = board?.david_tag ?? health?.david_tag ?? "";
+  const davidTag = round?.david_tag && !running ? round.david_tag : activeTag ?? "";
+  const previous = davidTags.length > 1 && activeTag !== davidTags[0];
   return (
     <div className={s.layout}>
       <header className={s.top}>
@@ -232,8 +243,9 @@ function Duel({ config }: { config: PublicConfig }) {
               <b className="tabular">{queue.length}</b> {queue.length === 1 ? "frase del público" : "frases del público"} en fila
             </span>
           )}
-          <span className={s.chip}>
+          <span className={`${s.chip} ${previous ? s.previousChip : ""}`}>
             David · <b>{davidTag || "sin modelo"}</b>
+            {previous && <span className={s.chipNote}>el del mes pasado</span>}
           </span>
           <span className={`${s.chip} ${online ? s.online : s.offline}`} aria-live="polite">
             <span className={s.dot} aria-hidden />
@@ -253,6 +265,7 @@ function Duel({ config }: { config: PublicConfig }) {
       <ScoreBand board={board} round={round} votes={votes} voting={voting} audienceUrl={config.audienceUrl} />
 
       <ControlBar
+        canSwitch={davidTags.length > 1}
         queue={queue}
         problem={problem}
         voting={voting}
@@ -260,7 +273,7 @@ function Duel({ config }: { config: PublicConfig }) {
         onCloseComposer={() => setComposer(false)}
         onCompose={(phrase, direction) => {
           setComposer(false);
-          run({ phrase, direction }, () => client.duel({ phrase, direction, country: config.country }));
+          run({ phrase, direction }, () => client.duel({ phrase, direction, country: config.country, david_tag: activeTag }));
         }}
       />
     </div>
@@ -522,6 +535,7 @@ function ScoreBand({
 }
 
 function ControlBar({
+  canSwitch,
   queue,
   problem,
   voting,
@@ -529,6 +543,7 @@ function ControlBar({
   onCompose,
   onCloseComposer,
 }: {
+  canSwitch: boolean;
   queue: QueuedPhrase[];
   problem: string | null;
   voting: boolean;
@@ -571,7 +586,7 @@ function ControlBar({
         </span>
       )}
       <span className={s.keys}>
-        <kbd>E</kbd> set de prueba <kbd>↵</kbd> siguiente del público {voting && (<><kbd>V</kbd> cerrar votos</>)} <kbd>/</kbd> escribir <kbd>F</kbd> pantalla completa
+        <kbd>E</kbd> set de prueba <kbd>↵</kbd> siguiente del público {voting && (<><kbd>V</kbd> cerrar votos</>)} <kbd>/</kbd> escribir {canSwitch && (<><kbd>M</kbd> mes pasado / este mes</>)} <kbd>F</kbd> pantalla completa
       </span>
     </footer>
   );

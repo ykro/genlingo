@@ -45,7 +45,8 @@ def _mock_responder(table: dict[str, str]):
 
 def prompt_style_for(settings: Settings, david_tag: str) -> str:
     """Each David is prompted the way its training data was rendered (recorded in its run file)."""
-    path = settings.runs_dir / f"{david_tag}.json"
+    run_tag = david_tag.removesuffix("-f16")  # the f16 export shares its run (and prompt) with the Q4 one
+    path = settings.runs_dir / f"{run_tag}.json"
     if path.exists():
         style = json.loads(path.read_text()).get("prompt_style")
         if style in STYLES:

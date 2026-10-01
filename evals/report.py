@@ -75,7 +75,7 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path) -> list[st
         return sum(xs) / len(xs) if xs else 0.0
 
     # On-stage David: the David variant that resolves the most slang, within the latency budget.
-    candidates = [n for n, sm in summary.items() if sm["role"] in ("david", "david_alt")
+    candidates = [n for n, sm in summary.items() if sm["role"] in ("david", "david_alt", "david_f16", "david_alt_f16")
                   and sm["p50"] is not None and sm["p50"] < P50_BUDGET_MS]
     david = max(candidates, key=lambda n: (round(handled_total(computed[n]), 3), summary[n]["chrf"] or 0), default=None)
     if david:
@@ -118,6 +118,25 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path) -> list[st
                       "Compáralo con Goliath + glosario para separar lo que aporta el modelo de lo que aporta el dato.", ""]
         else:
             lines += ["**Lectura honesta:** resultado mixto: cada uno gana en una de las dos métricas de jerga.", ""]
+        gg = next((n for n, sm in summary.items() if sm["role"] == "goliath_glossary"), None)
+        if gg:
+            better = handled_total(computed[gg]) > handled_total(cd)
+            lines += [
+                f"Con el mismo glosario, Goliath resuelve {100 * handled_total(computed[gg]):.0f} % de la jerga frente al "
+                f"{100 * handled_total(cd):.0f} % de David: "
+                + ("la ventaja de David viene de **sus datos** (el banco de términos), no de ser mejor modelo; "
+                   "y esos datos los tiene él, no Goliath." if better else "David sigue por delante incluso con el glosario compartido."),
+                "",
+            ]
+        q4 = david.removesuffix(" + glosario").removesuffix("-f16")
+        q4 = next((n for n in summary if n.startswith(q4) and "-f16" not in n), None)
+        if q4 and q4 != david and david in computed and q4 in computed:
+            lines += [
+                f"Compresión y jerga: `{q4}` (Q4, {_gb(summary[q4].get('size_bytes'))}) resuelve "
+                f"{100 * handled_total(computed[q4]):.0f} % frente al {100 * handled_total(computed[david]):.0f} % de `{david}` "
+                f"({_gb(summary[david].get('size_bytes'))}). Cuantizar cuesta jerga, no solo chrF++.",
+                "",
+            ]
     return lines
 
 P50_BUDGET_MS = 1000  # David must answer in under a second on the stage laptop
