@@ -12,6 +12,101 @@ sys.path.insert(0, str(ROOT / "duel"))
 
 from duel_core import chrf_pp, corpus_chrf_pp, percentile  # noqa: E402
 
+sys.path.insert(0, str(ROOT / "evals"))
+from term_accuracy import TermBank, change_recall, foreign_slang, slang_handled  # noqa: E402
+
+DATA = ROOT / "data"
+
+
+def _jsonl(path: Path) -> list[dict]:
+    return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()] if path.exists() else []
+
+
+def term_section(raw: dict, summary: dict[str, dict], data_dir: Path) -> list[str]:
+    """Slang-level metrics, so a win is about meaning and not surface overlap (see term_accuracy)."""
+    terms = _jsonl(data_dir / "terms.jsonl")
+    if not terms:
+        return []
+    bank = TermBank(terms)
+    linked = {u["id"]: u.get("term_ids", []) for u in _jsonl(data_dir / "raw" / "web_usage.jsonl")}
+    pairs = {p["id"]: p for p in raw["pairs"]}
+    outputs = {"copiar la frase (línea base)": {pid: p["source"] for pid, p in pairs.items()}}
+    for name, sm in summary.items():
+        outputs[name] = {pid: text for pid, (_, text) in sm["sentence"].items()}
+
+    def scores(hyps: dict[str, str]) -> dict:
+        res = {"genz_to_parent": [], "parent_to_genz": [], "recall": []}
+        for pid, hyp in hyps.items():
+            p = pairs[pid]
+            ok = slang_handled(bank, p, linked.get(p["provenance"].get("usage_id"), []), hyp)
+            if ok is not None:
+                res[p["direction"]].append(ok)
+            r = change_recall(p["source"], p["target"], hyp)
+            if r is not None:
+                res["recall"].append(r)
+        return res
+
+    def pct(xs):
+        return f"{100 * sum(xs) / len(xs):.0f} % (n={len(xs)})" if xs else "—"
+
+    computed = {name: scores(h) for name, h in outputs.items()}
+    rows = [
+        [name, pct(c["genz_to_parent"]), pct(c["parent_to_genz"]), pct(c["genz_to_parent"] + c["parent_to_genz"]),
+         f"{100 * sum(c['recall']) / len(c['recall']):.0f} %" if c["recall"] else "—"]
+        for name, c in computed.items()
+    ]
+    lines = [
+        "## ¿Tradujo la jerga?",
+        "",
+        "chrF++ premia parecerse a la referencia, y una reescritura de registro conserva casi todas las palabras: "
+        "por eso copiar la frase ya saca ~50. Estas dos métricas miran solo lo que tenía que cambiar "
+        "(detalle en `evals/term_accuracy.py`):",
+        "",
+        "- **Jerga resuelta**: Gen Z → papás, no queda en la salida ningún término Gen Z del banco que tenía la frase; "
+        "papás → Gen Z, la salida usa al menos un término Gen Z del banco del país. Mide que cambió el registro, no que el significado sea correcto.",
+        "- **Cambios acertados**: de las palabras que la referencia humana cambió respecto al original, cuántas aparecen en la salida. "
+        "Mide significado, pero solo con palabras exactas: un sinónimo válido cuenta como fallo para todos.",
+        "",
+        table(["modelo", "jerga resuelta Gen Z → papás", "jerga resuelta papás → Gen Z", "jerga resuelta total", "cambios acertados"], rows),
+        "",
+    ]
+    david = next((n for n, sm in summary.items() if sm["role"] == "david"), None)
+    goliath = next((n for n, sm in summary.items() if sm["role"] == "goliath"), None)
+    if david and goliath:
+        only_d = only_g = 0
+        for pid in set(outputs[david]) & set(outputs[goliath]):
+            p = pairs[pid]
+            ids = linked.get(p["provenance"].get("usage_id"), [])
+            d, g = slang_handled(bank, p, ids, outputs[david][pid]), slang_handled(bank, p, ids, outputs[goliath][pid])
+            if d is None or g is None:
+                continue
+            only_d += d and not g
+            only_g += g and not d
+        cd, cg = computed[david], computed[goliath]
+        rate = lambda c: sum(c["genz_to_parent"] + c["parent_to_genz"]) / max(1, len(c["genz_to_parent"] + c["parent_to_genz"]))  # noqa: E731
+        recall = lambda c: sum(c["recall"]) / max(1, len(c["recall"]))  # noqa: E731
+        p2g = [pid for pid, p in pairs.items() if p["direction"] == "parent_to_genz"]
+        foreign = {n: sum(foreign_slang(bank, pairs[pid], outputs[n].get(pid, "")) for pid in p2g) for n in (david, goliath)}
+        lines += [
+            f"Cara a cara en jerga resuelta: David la resuelve y Goliath no en **{only_d}** frases; al revés en **{only_g}**.",
+            "",
+            f"Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): "
+            f"David {foreign[david]} de {len(p2g)}, Goliath {foreign[goliath]} de {len(p2g)}.",
+            "",
+        ]
+        if rate(cg) > rate(cd) and recall(cg) > recall(cd):
+            lines += [
+                "**Lectura honesta:** en jerga gana Goliath. La ventaja de David en chrF++ viene sobre todo de quedarse "
+                "cerca de la frase original, como la referencia, no de traducir mejor el término. El próximo David necesita "
+                "datos que cambien la jerga de verdad (sobre todo papás → Gen Z) y del país correcto.",
+                "",
+            ]
+        elif rate(cd) >= rate(cg) and recall(cd) >= recall(cg):
+            lines += ["**Lectura honesta:** David también gana en jerga, no solo en parecido de superficie.", ""]
+        else:
+            lines += ["**Lectura honesta:** resultado mixto: cada modelo gana en una de las dos métricas de jerga.", ""]
+    return lines
+
 P50_BUDGET_MS = 1000  # David must answer in under a second on the stage laptop
 ROLE_LABEL = {"base": "base (sin ajuste)", "david": "David (LoRA, Q4)", "david_f16": "David (LoRA, f16)", "goliath": "Goliath"}
 
@@ -100,7 +195,7 @@ def slice_table(summary, key, title):
     return f"### chrF++ por {title}\n\n" + table(["modelo", *groups], rows)
 
 
-def write_report(raw: dict, path: Path, runs_dir: Path | None = None) -> str:
+def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: Path = DATA) -> str:
     summary = summarize(raw)
     pairs = {p["id"]: p for p in raw["pairs"]}
     n_pairs = len(raw["pairs"])
@@ -159,6 +254,8 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None) -> str:
     skipped = [m for m in raw["models"] if m.get("skip")]
     if skipped:
         lines += ["Sin evaluar: " + "; ".join(f"`{m['name']}` ({m['skip']})" for m in skipped) + ".", ""]
+
+    lines += term_section(raw, summary, data_dir)
 
     lines += [slice_table(summary, "by_origin", "origen"), "", slice_table(summary, "by_direction", "dirección"), "",
               slice_table(summary, "by_country", "país"), ""]
