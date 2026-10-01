@@ -8,7 +8,7 @@ round down; it just reports its status.
 from __future__ import annotations
 
 import asyncio
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Any, Literal
 
 from .cost import Price, cost_usd
@@ -41,6 +41,7 @@ class ContenderResult:
     chrf: float | None = None
     error: str | None = None
     price: dict[str, Any] | None = None  # the per-million prices used for cost_usd, with their date
+    extra: dict[str, Any] = field(default_factory=dict)  # app-specific details (prompt style, context used…)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -73,10 +74,13 @@ async def _run_one(c: Contender, messages: list[Message], online: bool, referenc
 
 async def run_duel(
     contenders: list[Contender],
-    messages: list[Message],
+    messages: list[Message] | dict[str, list[Message]],
     *,
     reference: str | None = None,
     online: bool = True,
 ) -> dict[str, ContenderResult]:
-    results = await asyncio.gather(*(_run_one(c, messages, online, reference) for c in contenders))
+    """`messages` is one prompt for everyone (the default, fairest duel) or a prompt per contender
+    name, e.g. when one side gets retrieved context the other doesn't; the app makes that visible."""
+    per = messages if isinstance(messages, dict) else {c.name: messages for c in contenders}
+    results = await asyncio.gather(*(_run_one(c, per[c.name], online, reference) for c in contenders))
     return {r.name: r for r in results}

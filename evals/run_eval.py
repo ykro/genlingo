@@ -27,51 +27,90 @@ sys.path.insert(0, str(ROOT / "evals"))
 
 from duel_core import GeminiClient, MockClient, OllamaClient, Price, clean_translation, cost_usd  # noqa: E402
 from genlingo_duel.dataset import test_pairs  # noqa: E402
-from genlingo_duel.prompts import translation_messages  # noqa: E402
+from genlingo_duel.glossary import render as render_glossary  # noqa: E402
+from genlingo_duel.prompts import COUNTRIES, translation_messages  # noqa: E402
 from genlingo_duel.settings import get_settings, goliath_prices  # noqa: E402
 from report import write_report  # noqa: E402
 
 
 def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str]) -> list[dict]:
+    """Every variant is (model, prompt style). Labels are what the report shows.
+
+    - base models (BASE_MODEL_TAGS) with the plain v2 prompt; the first one also with the glossary,
+      to separate "the glossary helps" from "fine-tuning helps";
+    - Davids (DAVID_TAGS, default LOCAL_MODEL_TAG), each with the prompt style he was trained on,
+      plus <tag>-f16 when it was pulled;
+    - Goliath plain and Goliath with the same glossary David gets: the fair comparison.
+    """
     import os
 
-    plan = []
-    for tag in [t.strip() for t in os.environ.get("BASE_MODEL_TAGS", "").split(",") if t.strip()]:
-        plan.append({"name": tag, "role": "base", "kind": "ollama"})
-    if s.david_tag:
-        plan.append({"name": s.david_tag, "role": "david", "kind": "ollama", "quant": "Q4_K_M"})
-        plan.append({"name": f"{s.david_tag}-f16", "role": "david_f16", "kind": "ollama", "quant": "F16"})
+    from genlingo_duel.arena import prompt_style_for
+
+    def add(name, role, kind, style, **kw):
+        label = name + (" + glosario" if style == "v2+glossary" else "")
+        plan.append({"name": name, "label": label, "role": role, "kind": kind, "style": style, **kw})
+
+    plan: list[dict] = []
+    bases = [t.strip() for t in os.environ.get("BASE_MODEL_TAGS", "").split(",") if t.strip()]
+    for i, tag in enumerate(bases):
+        add(tag, "base", "ollama", "v2")
+        if i == 0:
+            add(tag, "base", "ollama", "v2+glossary")
+    davids = [t.strip() for t in os.environ.get("DAVID_TAGS", s.david_tag).split(",") if t.strip()]
+    for tag in davids:
+        role = "david" if tag == s.david_tag else "david_alt"
+        add(tag, role, "ollama", prompt_style_for(s, tag), quant="Q4_K_M")
+        add(f"{tag}-f16", "david_f16" if role == "david" else "david_alt_f16", "ollama", prompt_style_for(s, tag), quant="F16")
     if with_goliath and s.gemini_model:
-        plan.append({"name": s.gemini_model, "role": "goliath", "kind": "gemini"})
+        add(s.gemini_model, "goliath", "gemini", "v2")
+        add(s.gemini_model, "goliath_glossary", "gemini", "v2+glossary")
     if only:
-        plan = [m for m in plan if m["name"] in only or m["role"] in only]
+        plan = [m for m in plan if m["name"] in only or m["role"] in only or m["label"] in only]
     for m in plan:
         if m["kind"] == "ollama" and available is not None and not ({m["name"], f"{m['name']}:latest"} & available):
             m["skip"] = "no está en Ollama (make pull-model)"
     return plan
 
 
-async def run_model(m: dict, client, pairs, price: Price, concurrency: int) -> list[dict]:
+async def run_model(m: dict, client, pairs, price: Price, concurrency: int, context: dict) -> list[dict]:
     sem = asyncio.Semaphore(concurrency)
+    use_glossary = m["style"] == "v2+glossary"
 
     async def one(p):
-        msgs = translation_messages(p.source, p.direction, p.country)
+        block, retrieval_ms = context.get(p.id, ("", 0.0)) if use_glossary else ("", 0.0)
+        msgs = translation_messages(p.source, p.direction, p.country, m["style"], block)
         async with sem:
             try:
                 c = await client.complete(msgs, model=m["name"])
             except Exception as exc:
-                return {"pair_id": p.id, "model": m["name"], "error": f"{type(exc).__name__}: {exc}"[:200]}
+                return {"pair_id": p.id, "model": m["label"], "error": f"{type(exc).__name__}: {exc}"[:200]}
         return {
             "pair_id": p.id,
-            "model": m["name"],
+            "model": m["label"],
             "text": clean_translation(c.text),
-            "latency_ms": round(c.latency_ms, 1),
+            # Retrieval is part of the answer: its time counts, as on stage.
+            "latency_ms": round(c.latency_ms + retrieval_ms, 1),
             "input_tokens": c.input_tokens,
             "output_tokens": c.output_tokens,
             "cost_usd": cost_usd(price, c.input_tokens, c.output_tokens),
         }
 
     return list(await asyncio.gather(*(one(p) for p in pairs)))
+
+
+async def glossary_context(s, pairs) -> dict:
+    """Glossary block + retrieval time per test pair, computed once and shared by all variants."""
+    from genlingo_duel.arena import Arena
+
+    arena = Arena.from_settings(s)
+    g = await arena.get_glossary()
+    await g.embed(["calentamiento"])  # load the embedding model before timing
+    out = {}
+    for p in pairs:
+        t0 = time.perf_counter()
+        entries = await g.entries(p.source, p.direction, p.country)
+        out[p.id] = (render_glossary(entries, COUNTRIES[p.country]), (time.perf_counter() - t0) * 1000)
+    return out
 
 
 async def main_async(args) -> None:
@@ -95,11 +134,12 @@ async def main_async(args) -> None:
         sizes = {x["name"]: x.get("size") for x in models}
     only = [x.strip() for x in args.models.split(",")] if args.models else None
     plan = model_plan(s, only, not args.no_goliath, available)
+    context = await glossary_context(s, pairs) if any(m["style"] == "v2+glossary" and not m.get("skip") for m in plan) else {}
 
     results, meta = [], []
     for m in plan:
         if m.get("skip"):
-            print(f"-- {m['name']}: {m['skip']}")
+            print(f"-- {m['label']}: {m['skip']}")
             meta.append(m)
             continue
         if m["kind"] == "gemini":
@@ -117,10 +157,10 @@ async def main_async(args) -> None:
                 await ollama.warm_up(m["name"])
             m["size_bytes"] = sizes.get(m["name"]) or sizes.get(f"{m['name']}:latest")
         t0 = time.time()
-        rows = await run_model(m, client, pairs, price, conc)
+        rows = await run_model(m, client, pairs, price, conc, context)
         m["wall_s"] = round(time.time() - t0, 1)
         errors = sum(1 for r in rows if "error" in r)
-        print(f"-- {m['name']}: {len(rows) - errors} ok, {errors} errors, {m['wall_s']} s")
+        print(f"-- {m['label']}: {len(rows) - errors} ok, {errors} errors, {m['wall_s']} s")
         results += rows
         meta.append(m)
 

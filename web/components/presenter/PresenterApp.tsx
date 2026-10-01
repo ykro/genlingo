@@ -402,6 +402,12 @@ function Column({
       <p className={`display ${s.answer}`} style={{ fontSize: answerSize(result.text) }}>
         {result.text}
       </p>
+      {!!result.extra?.glossary?.length && (
+        // Retrieval over our own term bank: shown, because it's part of why David answers well.
+        <p className={s.glossary}>
+          <span className="eyebrow">Glosario</span> {result.extra.glossary.join(" · ")}
+        </p>
+      )}
       <dl className={s.stats}>
         <div>
           <dt className="eyebrow">Latencia</dt>

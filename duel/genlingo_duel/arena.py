@@ -6,6 +6,8 @@ Goliath = Gemini on Vertex AI (paid per token, needs internet).
 
 from __future__ import annotations
 
+import json
+import time
 from dataclasses import dataclass
 
 from duel_core import (
@@ -20,8 +22,12 @@ from duel_core import (
     run_duel,
 )
 
-from .prompts import Direction, translation_messages
+from .dataset import read_jsonl
+from .glossary import Glossary, hashing_embedder
+from .glossary import render as render_glossary
+from .prompts import COUNTRIES, STYLES, Direction, prompt_version, translation_messages
 from .settings import Settings, goliath_prices
+from .terms import TermBank
 
 # Mock answers: David "knows" the slang, Goliath answers almost literally, so rehearsals show
 # a plausible duel without network or GPU.
@@ -37,12 +43,40 @@ def _mock_responder(table: dict[str, str]):
     return respond
 
 
+def prompt_style_for(settings: Settings, david_tag: str) -> str:
+    """Each David is prompted the way its training data was rendered (recorded in its run file)."""
+    path = settings.runs_dir / f"{david_tag}.json"
+    if path.exists():
+        style = json.loads(path.read_text()).get("prompt_style")
+        if style in STYLES:
+            return style
+    return settings.david_prompt_style
+
+
 @dataclass
 class Arena:
     settings: Settings
     david_client: ModelClient
     goliath_client: ModelClient
     connectivity: Connectivity
+    glossary: Glossary | None = None
+
+    async def get_glossary(self) -> Glossary:
+        """The term-bank glossary (embeddings computed once and cached on disk; works offline)."""
+        if self.glossary is None:
+            s = self.settings
+            bank = TermBank(read_jsonl(s.data_dir / "terms.jsonl"))
+            if s.mock_ai or not s.embedding_model:
+                self.glossary = await Glossary(bank, hashing_embedder()).load()
+            else:
+                client = self.david_client  # Ollama: the same local server David runs on
+                self.glossary = await Glossary(
+                    bank,
+                    lambda texts: client.embed(texts, model=s.embedding_model),  # type: ignore[attr-defined]
+                    cache=s.data_dir / ".cache" / "term_embeddings.json",
+                    model=s.embedding_model,
+                ).load()
+        return self.glossary
 
     @classmethod
     def from_settings(cls, s: Settings) -> "Arena":
@@ -87,6 +121,27 @@ class Arena:
         david_tag: str | None = None,
         reference: str | None = None,
     ) -> dict[str, ContenderResult]:
-        messages = translation_messages(phrase, direction, country)
+        s = self.settings
+        tag = david_tag or s.david_tag
+        styles = {"david": prompt_style_for(s, tag), "goliath": s.goliath_prompt_style}
+        entries: list[dict] = []
+        retrieval_ms = 0.0
+        if "v2+glossary" in styles.values():
+            t0 = time.perf_counter()
+            entries = await (await self.get_glossary()).entries(phrase, direction, country)
+            retrieval_ms = (time.perf_counter() - t0) * 1000
+        block = render_glossary(entries, COUNTRIES[country])
+        messages = {name: translation_messages(phrase, direction, country, style, block) for name, style in styles.items()}
         online = await self.is_online()
-        return await run_duel(self.contenders(david_tag), messages, reference=reference, online=online)
+        results = await run_duel(self.contenders(tag), messages, reference=reference, online=online)
+        for name, res in results.items():
+            used = styles[name] == "v2+glossary"
+            # Retrieval is part of the answer: its time counts in the latency the audience sees.
+            if used and res.latency_ms is not None:
+                res.latency_ms = round(res.latency_ms + retrieval_ms, 1)
+            res.extra = {
+                "prompt": prompt_version(styles[name]),
+                "glossary": [e["term"] for e in entries] if used else [],
+                "retrieval_ms": round(retrieval_ms, 1) if used else 0.0,
+            }
+        return results

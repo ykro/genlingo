@@ -98,3 +98,21 @@ def test_goliath_cost_uses_the_price_in_force_today(settings):
         r = c.post("/duel", json={"phrase": "x", "direction": "genz_to_parent", "country": "MX"}).json()
     assert r["goliath"]["price"] == {"input_per_million": 1.0, "output_per_million": 10.0, "effective_from": "2020-01-01"}
     assert r["david"]["price"]["input_per_million"] == 0
+
+
+def test_david_gets_his_glossary_goliath_the_plain_v2_prompt(settings):
+    import json as _json
+
+    (settings.runs_dir / "genlingo-glossary.json").write_text(_json.dumps({"tag": "genlingo-glossary", "prompt_style": "v2+glossary"}))
+    with client(settings) as c:
+        r = c.post("/duel", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent", "country": "MX",
+                                  "david_tag": "genlingo-glossary"}).json()
+    assert r["david"]["extra"]["prompt"] == "translate-v2+glossary"
+    assert "mid" in r["david"]["extra"]["glossary"]
+    assert r["goliath"]["extra"] == {"prompt": "translate-v2", "glossary": [], "retrieval_ms": 0.0}
+
+
+def test_last_months_david_keeps_his_old_prompt(settings):
+    with client(settings) as c:
+        r = c.post("/duel", json={"phrase": "x", "direction": "genz_to_parent", "country": "MX"}).json()
+    assert r["david"]["extra"]["prompt"] == "translate-v1"

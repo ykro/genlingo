@@ -55,8 +55,8 @@ export: ## Pull presenter-approved audience pairs from Firestore into data/pairs
 train-data: ## Render approved training pairs into chat JSONL
 	$(UV) python scripts/build_train_set.py
 
-train: train-data ## Fine-tune on a Cloud Run GPU job (L4, europe-west4) and record cost: make train TAG=genlingo-2027-03
-	$(UV) python train/submit_job.py --app genlingo --tag $(TAG) --data data/train/chat.jsonl
+train: train-data ## Fine-tune on a Cloud Run GPU job (L4): make train TAG=genlingo-2027-03 [GEMMA_BASE_MODEL=…] [TRAIN_ARGS=…]
+	$(UV) python train/submit_job.py --app genlingo --tag $(TAG) --data data/train/chat.jsonl -- $(TRAIN_ARGS)
 
 train-local: train-data ## Same training on this Mac (MPS), for experiments
 	uv run --python 3.12 --with-requirements train/requirements.txt --with torch==2.14.0 \

@@ -1,15 +1,21 @@
-"""Generate synthetic TRAINING pairs with Gemini, anchored on the real-slang term bank.
+"""Generate synthetic TRAINING pairs with Gemini, built from the term bank (pairs-v3).
 
-    uv run --project duel python scripts/generate_pairs.py [--target 1000] [--seed 2027]
+    uv run --project duel python scripts/generate_pairs.py [--target 1500] [--seed 2027]
 
-Why anchored: asked cold, a model invents slang that sounds like an ad ("¡qué épico, bro!").
-Each call gets one real term with its meaning, a real usage example and the country, so the
-synthetic sentences use slang people actually say. Why synthetic only for training: a test set
-written by Gemini would reward Gemini (Goliath) for sounding like itself; the test set comes
-from real web usage instead (scripts/build_test_set.py).
+History, because the talk shows it:
+- pairs-v1 let Gemini paraphrase freely: David learned to add "mijo" and extra clauses.
+- pairs-v2 asked for minimal edits: chrF++ went up, but the term-level eval showed David often
+  left the slang alone or borrowed another country's slang.
+- pairs-v3 (this file) makes every pair a *term substitution* checked against the term bank:
+    * each call names the slang term AND its counterpart in the other generation, same country;
+    * rebalanced toward papás -> Gen Z (the direction David was worst at);
+    * hard negatives: "in Mexico it's «feria», not «pisto» (Guatemala)";
+    * every pair is validated against the term bank; the reasons for rejection are counted.
 
-Every pair records model, prompt version and seed. Balanced by direction by construction:
-calls alternate genz_to_parent / parent_to_genz.
+Counterparts and traps are found with EmbeddingGemma over the term meanings (local, Ollama).
+Why synthetic only for training: a test set written by Gemini would reward Gemini (Goliath) for
+sounding like itself; the test set comes from real web usage instead (scripts/build_test_set.py).
+Every pair records model, prompt version, seed and the term ids it was built from.
 """
 
 from __future__ import annotations
@@ -18,6 +24,8 @@ import argparse
 import asyncio
 import hashlib
 import json
+import math
+import random
 import re
 import sys
 import time
@@ -25,37 +33,35 @@ import unicodedata
 from pathlib import Path
 
 from _common import ROOT  # noqa: F401  (puts duel/ on sys.path)
-from duel_core import cost_usd  # noqa: E402
+from duel_core import OllamaClient, cost_usd  # noqa: E402
 from genlingo_duel.dataset import Pair, read_jsonl, write_jsonl  # noqa: E402
+from genlingo_duel.glossary import Glossary, hashing_embedder  # noqa: E402
 from genlingo_duel.prompts import COUNTRIES  # noqa: E402
 from genlingo_duel.settings import get_settings, goliath_prices  # noqa: E402
+from genlingo_duel.terms import TermBank  # noqa: E402
 
-# pairs-v1 let Gemini paraphrase freely; David learned to add "mijo", extra clauses and length,
-# and scored below the base model on real test pairs. pairs-v2 asks for minimal edits: change
-# only the generational words, keep everything else. That is what a translation of register is.
-PROMPT_VERSION = "pairs-v2"
-PAIRS_PER_CALL = 5
+PROMPT_VERSION = "pairs-v3"
+PAIRS_PER_CALL = 4
 MAX_WORDS = 30
+# Share of calls per kind (p2g = papás -> Gen Z, g2p = Gen Z -> papás). 60 % p2g.
+MIX = {"p2g_genz": 0.30, "p2g_parent": 0.15, "p2g_trap": 0.15, "g2p_genz": 0.25, "g2p_parent": 0.15}
 
 SYSTEM = """Eres lingüista y conoces cómo habla la gente en {country_name}.
-Escribes pares de frases para entrenar un traductor generacional:
+Escribes pares de frases para entrenar un traductor generacional del español de {country_name}:
 - Habla Gen Z: jóvenes de 16 a 24 años de {country_name}, como escriben en chats y redes.
-- Habla de papás: adultos de 45 a 60 años de {country_name}, registro coloquial de su generación, sin slang juvenil.
-Cada par dice lo mismo en las dos formas de hablar. Frases cotidianas y variadas (escuela, trabajo,
-familia, comida, fiestas, dinero, redes, noviazgo), de 4 a {max_words} palabras, sin groserías fuertes
-ni contenido sexual, sin nombres de personas reales.
-Reglas del "target" (es una traducción de registro, no una paráfrasis):
-- Cambia solo las palabras y expresiones generacionales; conserva el resto de palabras, el orden y la puntuación.
-- No agregues vocativos que no estén en el "source" (mijo, hijo, bro, mano, parce…), ni explicaciones, ni información nueva.
-- Misma longitud aproximada (±3 palabras) y misma persona gramatical."""
+- Habla de papás: adultos de 45 a 60 años de {country_name}, registro coloquial de su generación, sin jerga juvenil.
+Cada par dice lo mismo en las dos formas de hablar. La diferencia entre "source" y "target" es la jerga:
+el término indicado se sustituye por su equivalente de la otra generación; el resto de la frase cambia lo mínimo.
+Frases cotidianas y variadas (escuela, trabajo, familia, comida, fiestas, dinero, redes, noviazgo), de 4 a
+{max_words} palabras, sin groserías fuertes ni contenido sexual, sin nombres de personas reales.
+Solo expresiones de {country_name} o del español neutro: nada de jerga de otros países. No agregues vocativos
+(mijo, bro, mano, parce) que no estén en la otra frase."""
 
-USER = """Término real: «{term}» ({generation_label})
-Significado: {meaning}
-Ejemplo real de uso: «{example}»
-
-Escribe {n} pares distintos en dirección {direction_label}.
-{usage_rule}
-No copies el ejemplo; inventa situaciones nuevas.
+USER = """Dirección: {direction_label}.
+En "source" usa: {source_rule}
+En "target" usa: {target_rule}
+{trap_rule}
+Escribe {n} pares distintos con situaciones distintas. Puedes conjugar el término o cambiarle género y número.
 Devuelve solo JSON: una lista de objetos con "source" y "target"."""
 
 DIRECTION_LABEL = {
@@ -64,77 +70,135 @@ DIRECTION_LABEL = {
 }
 
 
-def usage_rule(generation: str, direction: str) -> str:
-    side = {
-        ("genz", "genz_to_parent"): "source",
-        ("genz", "parent_to_genz"): "target",
-        ("parent", "genz_to_parent"): "target",
-        ("parent", "parent_to_genz"): "source",
-    }[(generation, direction)]
-    return f"El término «{{term}}» debe aparecer (o una variante natural) en el lado \"{side}\"; el otro lado no lo usa."
-
-
 def normalize(text: str) -> str:
     text = unicodedata.normalize("NFKD", text.lower())
     text = "".join(c for c in text if not unicodedata.combining(c))
     return re.sub(r"[^a-z0-9ñ ]+", "", re.sub(r"\s+", " ", text)).strip()
 
 
-def plan_calls(terms: list[dict], target: int, seed: int) -> list[dict]:
-    """Round-robin over countries so no variant dominates; directions alternate per call."""
-    by_country: dict[str, list[dict]] = {}
-    for t in sorted(terms, key=lambda t: t["id"]):
-        by_country.setdefault(t["country"], []).append(t)
-    order = [c for c in COUNTRIES if c in by_country]
+def _cos(a: list[float], b: list[float]) -> float:
+    na, nb = math.sqrt(sum(x * x for x in a)), math.sqrt(sum(x * x for x in b))
+    return sum(x * y for x, y in zip(a, b)) / (na * nb) if na and nb else 0.0
+
+
+def nearest(vectors: dict[str, list[float]], tid: str, candidates: list[str]) -> str | None:
+    cands = [c for c in candidates if c != tid and c in vectors]
+    return max(cands, key=lambda c: _cos(vectors[tid], vectors[c]), default=None) if tid in vectors else None
+
+
+def plan_calls(bank: TermBank, vectors: dict[str, list[float]], target: int, seed: int) -> list[dict]:
+    """Round-robin over countries and terms; each call = one kind, one anchor term, its counterpart."""
+    rng = random.Random(seed)
     n_calls = -(-target // PAIRS_PER_CALL)
-    calls, cursor = [], {c: 0 for c in order}
+    kinds = [k for k, share in MIX.items() for _ in range(round(share * 20))]
+    rng.shuffle(kinds)  # interleave kinds, so any prefix of the plan keeps the mix
+    calls = []
+    countries = list(COUNTRIES)
+    cursors = {}
     for i in range(n_calls):
-        country = order[i % len(order)]
-        bucket = by_country[country]
-        term = bucket[cursor[country] % len(bucket)]
-        cursor[country] += 1
-        direction = "genz_to_parent" if i % 2 == 0 else "parent_to_genz"
-        calls.append({"i": i, "term": term, "direction": direction, "seed": seed + i})
+        kind = kinds[i % len(kinds)]
+        country = countries[i % len(countries)]
+        anchor_gen = "parent" if kind.endswith("_parent") else "genz"
+        pool = sorted(bank.ids(anchor_gen, [country])) or sorted(bank.ids(anchor_gen, ["LATAM"]))
+        key = (kind, country)
+        cursors[key] = cursors.get(key, rng.randrange(len(pool)))
+        anchor = pool[cursors[key] % len(pool)]
+        cursors[key] += 1
+        other_gen = "genz" if anchor_gen == "parent" else "parent"
+        counterpart = nearest(vectors, anchor, bank.ids(other_gen, [country, "LATAM"]))
+        trap = None
+        if kind == "p2g_trap":
+            foreign = [t for t in bank.ids("genz") if bank.terms[t]["country"] not in (country, "LATAM")]
+            trap = nearest(vectors, anchor, foreign)
+        direction = "parent_to_genz" if kind.startswith("p2g") else "genz_to_parent"
+        calls.append({"i": i, "kind": kind, "country": country, "direction": direction, "anchor": anchor,
+                      "counterpart": counterpart, "trap": trap, "seed": seed + i})
     return calls
 
 
-def render(call: dict) -> tuple[str, str]:
-    t = call["term"]
-    system = SYSTEM.format(country_name=COUNTRIES[t["country"]], max_words=MAX_WORDS)
-    user = USER.format(
-        term=t["term"],
-        generation_label="habla Gen Z" if t["generation"] == "genz" else "habla de papás",
-        meaning=t["meaning"],
-        example=t["example"],
-        n=PAIRS_PER_CALL,
-        direction_label=DIRECTION_LABEL[call["direction"]],
-        usage_rule=usage_rule(t["generation"], call["direction"]).format(term=t["term"]),
-    )
+def _term(bank: TermBank, tid: str | None) -> str:
+    t = bank.terms[tid]
+    return f"«{t['term']}» ({t['meaning']})"
+
+
+def render(bank: TermBank, call: dict) -> tuple[str, str]:
+    country = call["country"]
+    a, cp = call["anchor"], call["counterpart"]
+    plain_parent = "español coloquial de papás, sin ninguna jerga juvenil"
+    if call["kind"] in ("p2g_genz", "p2g_trap"):  # parent source (plain or counterpart) -> genz target with anchor
+        source_rule = f"{plain_parent}" + (f"; si encaja, la expresión de papás {_term(bank, cp)}" if cp else "")
+        target_rule = f"el término Gen Z {_term(bank, a)}"
+    elif call["kind"] == "p2g_parent":  # parent anchor in source -> genz counterpart in target
+        source_rule = f"la expresión de papás {_term(bank, a)}"
+        target_rule = f"el término Gen Z {_term(bank, cp)}" if cp else "jerga Gen Z de " + COUNTRIES[country]
+    elif call["kind"] == "g2p_genz":  # genz anchor in source -> plain/parent target
+        source_rule = f"el término Gen Z {_term(bank, a)}"
+        target_rule = plain_parent + (f"; si encaja, la expresión de papás {_term(bank, cp)}" if cp else "")
+    else:  # g2p_parent: genz counterpart in source -> parent anchor in target
+        source_rule = f"el término Gen Z {_term(bank, cp)}" if cp else "jerga Gen Z de " + COUNTRIES[country]
+        target_rule = f"la expresión de papás {_term(bank, a)}"
+    trap_rule = ""
+    if call["trap"]:
+        tr = bank.terms[call["trap"]]
+        trap_rule = (f"Ojo: en {COUNTRIES[country]} NO se dice «{tr['term']}» (eso es de {COUNTRIES[tr['country']]}); "
+                     f"usa «{bank.terms[a]['term']}».")
+    system = SYSTEM.format(country_name=COUNTRIES[country], max_words=MAX_WORDS)
+    user = USER.format(direction_label=DIRECTION_LABEL[call["direction"]], source_rule=source_rule,
+                       target_rule=target_rule, trap_rule=trap_rule, n=PAIRS_PER_CALL)
     return system, user
 
 
-def mock_generate(call: dict) -> list[dict]:
-    t = call["term"]
-    return [
-        {"source": f"{t['term']} ejemplo {k} de {call['i']}", "target": f"significa {t['meaning']} ({k}/{call['i']})"}
-        for k in range(PAIRS_PER_CALL)
-    ]
+def expected_terms(call: dict) -> tuple[str | None, str | None]:
+    """(term that must be in source, term that must be in target), when the call fixes them."""
+    k, a, cp = call["kind"], call["anchor"], call["counterpart"]
+    return {
+        "p2g_genz": (None, a),
+        "p2g_trap": (None, a),
+        "p2g_parent": (a, cp),
+        "g2p_genz": (a, None),
+        "g2p_parent": (cp, a),
+    }[k]
 
 
-async def gemini_generate(client, model: str, call: dict, usage: dict) -> list[dict]:
+def validate(bank: TermBank, call: dict, pair: dict) -> str | None:
+    """Reason to reject a pair, or None. All checks are against the term bank."""
+    src, tgt, country = pair["source"], pair["target"], pair["country"]
+    must_src, must_tgt = expected_terms(call)
+    if must_src and not bank.found(must_src, src):
+        return "source_missing_term"
+    if must_tgt and not bank.found(must_tgt, tgt):
+        return "target_missing_term"
+    if bank.foreign_in(tgt, country) or bank.foreign_in(src, country):
+        return "foreign_term"
+    if call["direction"] == "genz_to_parent":
+        if bank.found_in(tgt, bank.ids("genz")):
+            return "slang_left_in_target"  # parents' speech must not keep Gen Z slang
+    else:
+        if not bank.found_in(tgt, bank.ids("genz", [country, "LATAM"])):
+            return "target_without_genz_slang"
+        if bank.found_in(src, bank.ids("genz")):
+            return "genz_slang_in_source"
+        if must_src is None and bank.found(call["anchor"], src):
+            return "term_not_substituted"
+        if [t for t in bank.found_in(src, bank.ids("parent")) if bank.found(t, tgt)]:
+            return "parent_term_left_in_target"  # the parents' expression must be replaced too
+    return None
+
+
+def mock_generate(bank: TermBank, call: dict) -> list[dict]:
+    must_src, must_tgt = expected_terms(call)
+    s = bank.terms[must_src]["term"].split("/")[0].strip(" ¡!¿?") if must_src else "qué cosa"
+    t = bank.terms[must_tgt]["term"].split("/")[0].strip(" ¡!¿?") if must_tgt else "qué cosa"
+    return [{"source": f"{s} en la escuela {k} {call['i']}", "target": f"{t} en la escuela {k} {call['i']}"} for k in range(PAIRS_PER_CALL)]
+
+
+async def gemini_generate(client, model: str, system: str, user: str, seed: int, usage: dict) -> list[dict]:
     from google.genai import types
 
-    system, user = render(call)
-    schema = {
-        "type": "ARRAY",
-        "items": {"type": "OBJECT", "properties": {"source": {"type": "STRING"}, "target": {"type": "STRING"}}, "required": ["source", "target"]},
-    }
+    schema = {"type": "ARRAY", "items": {"type": "OBJECT", "properties": {"source": {"type": "STRING"}, "target": {"type": "STRING"}},
+                                         "required": ["source", "target"]}}
     cfg = types.GenerateContentConfig(
-        system_instruction=system,
-        temperature=1.0,  # variety matters more than determinism here; the seed makes it repeatable
-        seed=call["seed"],
-        response_mime_type="application/json",
-        response_schema=schema,
+        system_instruction=system, temperature=1.0, seed=seed, response_mime_type="application/json", response_schema=schema,
         thinking_config=types.ThinkingConfig(thinking_level="low"),
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
     )
@@ -145,76 +209,58 @@ async def gemini_generate(client, model: str, call: dict, usage: dict) -> list[d
             usage["input"] += u.prompt_token_count or 0
             usage["output"] += (u.candidates_token_count or 0) + (u.thoughts_token_count or 0)
             return json.loads(res.text)
-        except Exception as exc:  # 429s, timeouts and the occasional bad JSON: back off and retry
+        except Exception as exc:  # 429s, timeouts, bad JSON: back off and retry
             if attempt == 4:
-                print(f"  call {call['i']} failed: {type(exc).__name__}: {str(exc)[:120]}", file=sys.stderr)
+                print(f"  call failed: {type(exc).__name__}: {str(exc)[:120]}", file=sys.stderr)
                 return []
             await asyncio.sleep(2 ** (attempt + 1))
     return []
 
 
 def to_pairs(call: dict, raw: list[dict], model: str) -> list[dict]:
-    t = call["term"]
     out = []
     for k, r in enumerate(raw[:PAIRS_PER_CALL]):
         src, tgt = str(r.get("source", "")).strip(), str(r.get("target", "")).strip()
-        pid = "syn-" + hashlib.sha1(f"{call['seed']}|{k}|{src}".encode()).hexdigest()[:10]
-        out.append(
-            {
-                "id": pid,
-                "direction": call["direction"],
-                "source": src,
-                "target": tgt,
-                "country": t["country"],
-                "age_range": "16-24",
-                "split": "train",
-                # Synthetic pairs are auto-approved after the automatic checks below; people only
-                # review the test set and audience pairs.
-                "status": "approved",
-                "origin": "synthetic",
-                "provenance": {
-                    "model": model,
-                    "prompt_version": PROMPT_VERSION,
-                    "seed": call["seed"],
-                    "term_id": t["id"],
-                    "item": k,
-                },
-            }
-        )
+        out.append({
+            "id": "syn-" + hashlib.sha1(f"{call['seed']}|{k}|{src}".encode()).hexdigest()[:10],
+            "direction": call["direction"], "source": src, "target": tgt, "country": call["country"],
+            "age_range": "16-24", "split": "train",
+            "status": "approved",  # auto-approved only after validate() and filter_pairs() pass
+            "origin": "synthetic",
+            "provenance": {"model": model, "prompt_version": PROMPT_VERSION, "seed": call["seed"], "item": k,
+                           "kind": call["kind"], "term_id": call["anchor"], "counterpart_id": call["counterpart"],
+                           "trap_id": call["trap"]},
+        })
     return out
 
 
-def filter_pairs(pairs: list[dict], forbidden: set[str]) -> tuple[list[dict], dict[str, int]]:
-    """Automatic checks: schema, length, not identical, no duplicates, no test-set leakage."""
-    kept, seen, dropped = [], set(), {"schema": 0, "length": 0, "identical": 0, "duplicate": 0, "leak": 0}
+def filter_pairs(bank: TermBank, calls_by_seed: dict[int, dict], pairs: list[dict], forbidden: set[str]):
+    """Schema, length, duplicates, test leakage, then the term-bank validation."""
+    kept, seen, dropped = [], set(), {}
     for p in pairs:
+        reason = None
         try:
             Pair.model_validate(p)
         except Exception:
-            dropped["schema"] += 1
-            continue
+            reason = "schema"
         s, t = normalize(p["source"]), normalize(p["target"])
-        if len(p["source"].split()) > MAX_WORDS or len(p["target"].split()) > MAX_WORDS + 10 or len(s) < 3:
-            dropped["length"] += 1
-        elif s == t:
-            dropped["identical"] += 1
-        elif s in seen:
-            dropped["duplicate"] += 1
-        elif s in forbidden or t in forbidden:
-            dropped["leak"] += 1
+        if reason is None:
+            if len(p["source"].split()) > MAX_WORDS or len(p["target"].split()) > MAX_WORDS + 10 or len(s) < 3:
+                reason = "length"
+            elif s == t:
+                reason = "identical"
+            elif s in seen:
+                reason = "duplicate"
+            elif s in forbidden or t in forbidden:
+                reason = "test_leak"
+            else:
+                reason = validate(bank, calls_by_seed[p["provenance"]["seed"]], p)
+        if reason:
+            dropped[reason] = dropped.get(reason, 0) + 1
         else:
             seen.add(s)
             kept.append(p)
     return kept, dropped
-
-
-def balance(pairs: list[dict], target: int) -> list[dict]:
-    """Same number of pairs per direction (target/2 each), keeping generation order."""
-    per_dir = target // 2
-    by_dir = {d: [p for p in pairs if p["direction"] == d] for d in DIRECTION_LABEL}
-    n = min(per_dir, *(len(v) for v in by_dir.values()))
-    keep = {p["id"] for v in by_dir.values() for p in v[:n]}
-    return [p for p in pairs if p["id"] in keep]
 
 
 def test_sentences(data_dir: Path) -> set[str]:
@@ -231,59 +277,56 @@ def test_sentences(data_dir: Path) -> set[str]:
 async def main_async(args: argparse.Namespace) -> None:
     s = get_settings()
     data = s.data_dir
-    terms = list(read_jsonl(data / "terms.jsonl"))
-    if not terms:
-        sys.exit("data/terms.jsonl is empty: build the term bank first")
-    forbidden = test_sentences(data)
-    # The generator sees the term-bank example; it must not be a test sentence.
-    terms = [t for t in terms if normalize(t["example"]) not in forbidden]
-    # Over-generate ~10% because the automatic checks drop some pairs, then trim to balance.
-    calls = plan_calls(terms, int(args.target * 1.1), args.seed)
+    bank = TermBank(read_jsonl(data / "terms.jsonl"))
+    if s.mock_ai:
+        glossary = await Glossary(bank, hashing_embedder()).load()
+    else:
+        ollama = OllamaClient(s.ollama_url)
+        glossary = await Glossary(bank, lambda texts: ollama.embed(texts, model=s.embedding_model),
+                                  cache=data / ".cache" / "term_embeddings.json", model=s.embedding_model).load()
+    # Over-generate: validation against the term bank is strict and rejects a good share.
+    calls = plan_calls(bank, glossary.vectors, int(args.target * 1.8), args.seed)
     model = "mock" if s.mock_ai else s.gemini_model
     usage = {"input": 0, "output": 0}
     t0 = time.time()
-
     if s.mock_ai:
-        raws = [mock_generate(c) for c in calls]
+        raws = [mock_generate(bank, c) for c in calls]
     else:
         from google import genai
 
         client = genai.Client(vertexai=True, project=s.project, location=s.location)
         sem = asyncio.Semaphore(args.concurrency)
-
-        async def one(c):
-            async with sem:
-                return await gemini_generate(client, model, c, usage)
-
         done = 0
 
-        async def tracked(c):
+        async def one(c):
             nonlocal done
-            out = await one(c)
+            async with sem:
+                system, user = render(bank, c)
+                out = await gemini_generate(client, model, system, user, c["seed"], usage)
             done += 1
-            if done % 20 == 0:
+            if done % 50 == 0:
                 print(f"  {done}/{len(calls)} calls", flush=True)
             return out
 
-        raws = await asyncio.gather(*(tracked(c) for c in calls))
+        raws = await asyncio.gather(*(one(c) for c in calls))
 
     pairs = [p for c, raw in zip(calls, raws) for p in to_pairs(c, raw, model)]
-    kept, dropped = filter_pairs(pairs, forbidden)
-    kept = balance(kept, args.target)
+    kept, dropped = filter_pairs(bank, {c["seed"]: c for c in calls}, pairs, test_sentences(data))
+    # Rebalance: 60 % papás -> Gen Z, 40 % Gen Z -> papás, up to the target.
+    p2g = [p for p in kept if p["direction"] == "parent_to_genz"][: round(args.target * 0.6)]
+    g2p = [p for p in kept if p["direction"] == "genz_to_parent"][: args.target - len(p2g)]
+    final = p2g + g2p
     out = Path(args.out) if args.out else data / "pairs" / "synthetic.jsonl"
-    write_jsonl(out, kept)
+    write_jsonl(out, final)
+    kinds = {}
+    for p in final:
+        kinds[p["provenance"]["kind"]] = kinds.get(p["provenance"]["kind"], 0) + 1
     meta = {
-        "model": model,
-        "prompt_version": PROMPT_VERSION,
-        "base_seed": args.seed,
-        "calls": len(calls),
-        "generated": len(pairs),
-        "kept": len(kept),
-        "dropped": dropped,
-        "tokens": usage,
+        "model": model, "prompt_version": PROMPT_VERSION, "base_seed": args.seed, "calls": len(calls),
+        "generated": len(pairs), "valid": len(kept), "kept": len(final), "dropped": dropped, "kinds": kinds,
+        "embedding_model": "mock" if s.mock_ai else s.embedding_model, "tokens": usage,
         "cost_usd": round(cost_usd(goliath_prices(s).at(), usage["input"], usage["output"]), 4),
-        "duration_s": round(time.time() - t0, 1),
-        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+        "duration_s": round(time.time() - t0, 1), "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
     }
     out.with_suffix(".meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n")
     print(json.dumps(meta, ensure_ascii=False))
@@ -291,7 +334,7 @@ async def main_async(args: argparse.Namespace) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--target", type=int, default=int(__import__("os").environ.get("SYNTHETIC_PAIRS_TARGET", 1000)))
+    ap.add_argument("--target", type=int, default=int(__import__("os").environ.get("SYNTHETIC_PAIRS_TARGET", 1500)))
     ap.add_argument("--seed", type=int, default=2027)
     ap.add_argument("--concurrency", type=int, default=8)
     ap.add_argument("--out", default=None)

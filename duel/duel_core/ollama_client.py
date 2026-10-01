@@ -65,6 +65,13 @@ class OllamaClient:
             output_tokens=int(data.get("eval_count") or 0),
         )
 
+    async def embed(self, texts: list[str], *, model: str) -> list[list[float]]:
+        """Sentence embeddings (e.g. EmbeddingGemma) for local retrieval: works offline too."""
+        res = await self._http.post("/api/embed", json={"model": model, "input": texts, "keep_alive": self.keep_alive})
+        if res.status_code != 200:
+            raise OllamaError(f"Ollama embed {res.status_code}: {res.text[:200]}")
+        return res.json()["embeddings"]
+
     async def is_up(self) -> bool:
         try:
             return (await self._http.get("/api/version", timeout=1.5)).status_code == 200

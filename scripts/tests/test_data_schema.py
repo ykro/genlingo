@@ -62,9 +62,18 @@ def test_no_test_sentence_leaks_into_training():
 
 
 @needs("pairs/synthetic.jsonl")
-def test_synthetic_is_balanced_by_direction_and_traceable():
+def test_synthetic_v3_leans_to_parent_to_genz_and_every_pair_passes_the_term_bank():
+    from generate_pairs import validate
+    from genlingo_duel.terms import TermBank
+
     syn = [p for p in load_pairs(DATA) if p.origin == "synthetic"]
     c = Counter(p.direction for p in syn)
-    assert abs(c["genz_to_parent"] - c["parent_to_genz"]) <= 0.05 * len(syn)
+    assert 0.55 <= c["parent_to_genz"] / len(syn) <= 0.65
     meta = json.loads((DATA / "pairs" / "synthetic.meta.json").read_text())
     assert all(p.provenance["model"] == meta["model"] and "seed" in p.provenance for p in syn)
+    bank = TermBank(read_jsonl(DATA / "terms.jsonl"))
+    for p in syn:
+        prov = p.provenance
+        call = {"kind": prov["kind"], "anchor": prov["term_id"], "counterpart": prov.get("counterpart_id"),
+                "trap": prov.get("trap_id"), "direction": p.direction}
+        assert validate(bank, call, p.model_dump()) is None, p.id

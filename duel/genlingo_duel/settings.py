@@ -40,7 +40,13 @@ class Settings:
     gemini_input_usd_per_m: float = field(default_factory=lambda: _float("GEMINI_INPUT_USD_PER_M", 0.0))
     gemini_output_usd_per_m: float = field(default_factory=lambda: _float("GEMINI_OUTPUT_USD_PER_M", 0.0))
     david_tag: str = field(default_factory=lambda: _env("LOCAL_MODEL_TAG"))
+    # Prompt styles (v1 | v2 | v2+glossary). David's comes from his run file when it has one;
+    # Goliath gets no glossary by default (the term bank is David's data), set it to compare.
+    david_prompt_style: str = field(default_factory=lambda: _env("DAVID_PROMPT_STYLE", "v1"))
+    goliath_prompt_style: str = field(default_factory=lambda: _env("GOLIATH_PROMPT_STYLE", "v2"))
     ollama_url: str = field(default_factory=lambda: _env("OLLAMA_URL", "http://127.0.0.1:11434"))
+    # Local sentence-embedding model (Ollama) for the term-bank glossary retrieval.
+    embedding_model: str = field(default_factory=lambda: _env("EMBEDDING_MODEL"))
     mock_ai: bool = field(default_factory=lambda: _flag("MOCK_AI"))
     force_offline: bool = field(default_factory=lambda: _flag("FORCE_OFFLINE"))
     db_path: Path = field(default_factory=lambda: REPO_ROOT / _env("DUEL_DB_PATH", "duel/state/genlingo.sqlite"))

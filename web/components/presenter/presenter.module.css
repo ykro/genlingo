@@ -598,3 +598,17 @@
   color: color-mix(in oklch, var(--ink) 45%, var(--paper));
   transition: color 400ms 300ms var(--ease-out);
 }
+
+.glossary {
+  font-size: 26px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.glossary :global(.eyebrow) {
+  font-size: 20px;
+  margin-right: 8px;
+  padding: 1px 10px;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-pill);
+}

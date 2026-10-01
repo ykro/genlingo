@@ -70,45 +70,67 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path) -> list[st
         table(["modelo", "jerga resuelta Gen Z → papás", "jerga resuelta papás → Gen Z", "jerga resuelta total", "cambios acertados"], rows),
         "",
     ]
-    david = next((n for n, sm in summary.items() if sm["role"] == "david"), None)
-    goliath = next((n for n, sm in summary.items() if sm["role"] == "goliath"), None)
-    if david and goliath:
+    def handled_total(c):
+        xs = c["genz_to_parent"] + c["parent_to_genz"]
+        return sum(xs) / len(xs) if xs else 0.0
+
+    # On-stage David: the David variant that resolves the most slang, within the latency budget.
+    candidates = [n for n, sm in summary.items() if sm["role"] in ("david", "david_alt")
+                  and sm["p50"] is not None and sm["p50"] < P50_BUDGET_MS]
+    david = max(candidates, key=lambda n: (round(handled_total(computed[n]), 3), summary[n]["chrf"] or 0), default=None)
+    if david:
+        lines += [
+            f"**David en escena:** `{david}` — la variante de David con más jerga resuelta "
+            f"({100 * handled_total(computed[david]):.0f} %) que cumple p50 < 1 s (p50 {_ms(summary[david]['p50'])}).",
+            "",
+        ]
+    for gname in [n for n, sm in summary.items() if sm["role"] in ("goliath", "goliath_glossary")]:
+        if not david:
+            break
         only_d = only_g = 0
-        for pid in set(outputs[david]) & set(outputs[goliath]):
+        for pid in set(outputs[david]) & set(outputs[gname]):
             p = pairs[pid]
             ids = linked.get(p["provenance"].get("usage_id"), [])
-            d, g = slang_handled(bank, p, ids, outputs[david][pid]), slang_handled(bank, p, ids, outputs[goliath][pid])
+            d, g = slang_handled(bank, p, ids, outputs[david][pid]), slang_handled(bank, p, ids, outputs[gname][pid])
             if d is None or g is None:
                 continue
             only_d += d and not g
             only_g += g and not d
+        lines += [f"Cara a cara con `{gname}` en jerga resuelta: David la resuelve y Goliath no en **{only_d}** frases; al revés en **{only_g}**.", ""]
+
+    goliath = next((n for n, sm in summary.items() if sm["role"] == "goliath"), None)
+    if david and goliath:
         cd, cg = computed[david], computed[goliath]
-        rate = lambda c: sum(c["genz_to_parent"] + c["parent_to_genz"]) / max(1, len(c["genz_to_parent"] + c["parent_to_genz"]))  # noqa: E731
         recall = lambda c: sum(c["recall"]) / max(1, len(c["recall"]))  # noqa: E731
         p2g = [pid for pid, p in pairs.items() if p["direction"] == "parent_to_genz"]
-        foreign = {n: sum(foreign_slang(bank, pairs[pid], outputs[n].get(pid, "")) for pid in p2g) for n in (david, goliath)}
+        names = [n for n in summary if summary[n]["role"] in ("david", "david_alt", "goliath", "goliath_glossary", "base")]
+        foreign = {n: sum(foreign_slang(bank, pairs[pid], outputs[n].get(pid, "")) for pid in p2g) for n in names}
         lines += [
-            f"Cara a cara en jerga resuelta: David la resuelve y Goliath no en **{only_d}** frases; al revés en **{only_g}**.",
-            "",
-            f"Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): "
-            f"David {foreign[david]} de {len(p2g)}, Goliath {foreign[goliath]} de {len(p2g)}.",
+            "Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): "
+            + ", ".join(f"{n} {foreign[n]}" for n in names) + f" (de {len(p2g)}).",
             "",
         ]
-        if rate(cg) > rate(cd) and recall(cg) > recall(cd):
-            lines += [
-                "**Lectura honesta:** en jerga gana Goliath. La ventaja de David en chrF++ viene sobre todo de quedarse "
-                "cerca de la frase original, como la referencia, no de traducir mejor el término. El próximo David necesita "
-                "datos que cambien la jerga de verdad (sobre todo papás → Gen Z) y del país correcto.",
-                "",
-            ]
-        elif rate(cd) >= rate(cg) and recall(cd) >= recall(cg):
-            lines += ["**Lectura honesta:** David también gana en jerga, no solo en parecido de superficie.", ""]
+        if handled_total(cg) > handled_total(cd) and recall(cg) > recall(cd):
+            lines += ["**Lectura honesta:** en jerga gana Goliath, incluso frente al mejor David. La ventaja de David en chrF++ "
+                      "viene sobre todo de quedarse cerca de la frase original, no de traducir mejor el término.", ""]
+        elif handled_total(cd) >= handled_total(cg) and recall(cd) >= recall(cg):
+            lines += ["**Lectura honesta:** David gana también en jerga, no solo en parecido de superficie, frente a Goliath sin glosario. "
+                      "Compáralo con Goliath + glosario para separar lo que aporta el modelo de lo que aporta el dato.", ""]
         else:
-            lines += ["**Lectura honesta:** resultado mixto: cada modelo gana en una de las dos métricas de jerga.", ""]
+            lines += ["**Lectura honesta:** resultado mixto: cada uno gana en una de las dos métricas de jerga.", ""]
     return lines
 
 P50_BUDGET_MS = 1000  # David must answer in under a second on the stage laptop
-ROLE_LABEL = {"base": "base (sin ajuste)", "david": "David (LoRA, Q4)", "david_f16": "David (LoRA, f16)", "goliath": "Goliath"}
+ROLE_LABEL = {
+    "base": "base (sin ajuste)",
+    "david": "David (LoRA, Q4)",
+    "david_f16": "David (LoRA, f16)",
+    "david_alt": "David candidato (LoRA, Q4)",
+    "david_alt_f16": "David candidato (LoRA, f16)",
+    "goliath": "Goliath",
+    "goliath_glossary": "Goliath con el glosario de David",
+}
+PROMPT_LABEL = {"v1": "v1", "v2": "v2", "v2+glossary": "v2 + glosario"}
 
 
 def _n(x, d=1):
@@ -145,7 +167,8 @@ def summarize(raw: dict) -> dict[str, dict]:
     for m in raw["models"]:
         if m.get("skip"):
             continue
-        rows = by_model[m["name"]]
+        key = m.get("label", m["name"])
+        rows = by_model[key]
         ok = [r for r in rows if "error" not in r]
         hyps = [r["text"] for r in ok]
         refs = [pairs[r["pair_id"]]["target"] for r in ok]
@@ -159,7 +182,7 @@ def summarize(raw: dict) -> dict[str, dict]:
             return {g: (corpus_chrf_pp(h, rf), len(h)) for g, (h, rf) in sorted(groups.items())}
 
         cost = sum(r["cost_usd"] for r in ok)
-        out[m["name"]] = {
+        out[key] = {
             **m,
             "n": len(rows),
             "errors": len(rows) - len(ok),
@@ -178,7 +201,7 @@ def summarize(raw: dict) -> dict[str, dict]:
 
 def pick_base(summary: dict[str, dict]) -> tuple[str | None, str]:
     """Smallest base model with p50 < 1 s and the best chrF++ (ties -> smaller)."""
-    bases = [s for s in summary.values() if s["role"] == "base" and s["chrf"] is not None]
+    bases = [s for s in summary.values() if s["role"] == "base" and s.get("style", "v2") != "v2+glossary" and s["chrf"] is not None]
     fast = [s for s in bases if s["p50"] is not None and s["p50"] < P50_BUDGET_MS]
     if not fast:
         return None, "Ningún modelo base cumple p50 < 1 s."
@@ -191,7 +214,7 @@ def pick_base(summary: dict[str, dict]) -> tuple[str | None, str]:
 
 def slice_table(summary, key, title):
     groups = sorted({g for s in summary.values() for g in s[key]})
-    rows = [[s["name"], *[f"{_n(s[key][g][0])} (n={s[key][g][1]})" if g in s[key] else "—" for g in groups]] for s in summary.values()]
+    rows = [[name, *[f"{_n(s[key][g][0])} (n={s[key][g][1]})" if g in s[key] else "—" for g in groups]] for name, s in summary.items()]
     return f"### chrF++ por {title}\n\n" + table(["modelo", *groups], rows)
 
 
@@ -221,16 +244,16 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
         "con el modelo ya cargado; los modelos locales corren uno a la vez en la laptop del escenario.",
         "",
         table(
-            ["modelo", "rol", "chrF++", "p50", "p95", "costo total", "costo / 1,000 frases", "tamaño", "errores"],
+            ["modelo", "rol", "prompt", "chrF++", "p50", "p95", "costo total", "costo / 1,000 frases", "tamaño", "errores"],
             [
-                [s["name"], ROLE_LABEL.get(s["role"], s["role"]), _n(s["chrf"]), _ms(s["p50"]), _ms(s["p95"]),
+                [name, ROLE_LABEL.get(s["role"], s["role"]), PROMPT_LABEL.get(s.get("style", "v1"), "v1"), _n(s["chrf"]), _ms(s["p50"]), _ms(s["p95"]),
                  _usd(s["cost"]), _usd(s["cost_per_1k"]), _gb(s.get("size_bytes")), s["errors"]]
-                for s in summary.values()
+                for name, s in summary.items()
             ],
         ),
         "",
     ]
-    goliath_meta = next((m for m in raw["models"] if m.get("role") == "goliath" and m.get("price")), None)
+    goliath_meta = next((m for m in raw["models"] if m.get("role") == "goliath" and m.get("price") and not m.get("skip")), None)
     if goliath_meta:
         pr = goliath_meta["price"]
         since = f" (vigente desde {pr['effective_from']})" if pr.get("effective_from") else ""
@@ -238,7 +261,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
                   f"${pr['output_per_million']:.2f} salida por millón de tokens{since}."]
         nxt = goliath_meta.get("next_price")
         if nxt:
-            rows = [r for r in raw["results"] if r["model"] == goliath_meta["name"] and "error" not in r]
+            rows = [r for r in raw["results"] if r["model"] in (goliath_meta.get("label", goliath_meta["name"]), goliath_meta["name"]) and "error" not in r]
             later = sum((r["input_tokens"] * nxt["input_per_million"] + r["output_tokens"] * nxt["output_per_million"]) / 1e6 for r in rows)
             lines += [f"Con la tarifa desde {nxt['effective_from']} (${nxt['input_per_million']:.2f} / ${nxt['output_per_million']:.2f}), "
                       f"este mismo eval costaría {_usd(later)} ({_usd(later / len(rows) * 1000) if rows else '—'} por 1,000 frases)."]
@@ -253,7 +276,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
     ]
     skipped = [m for m in raw["models"] if m.get("skip")]
     if skipped:
-        lines += ["Sin evaluar: " + "; ".join(f"`{m['name']}` ({m['skip']})" for m in skipped) + ".", ""]
+        lines += ["Sin evaluar: " + "; ".join(f"`{m.get('label', m['name'])}` ({m['skip']})" for m in skipped) + ".", ""]
 
     lines += term_section(raw, summary, data_dir)
 

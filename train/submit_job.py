@@ -212,11 +212,15 @@ def main() -> None:
         "base_model": env("GEMMA_BASE_MODEL"),
         "weights_uri": env("GEMMA_WEIGHTS_URI"),
         "data_uri": data_uri,
-        "data_date": (m.group(0) if (m := re.search(r"\d{4}-\d{2}$", args.tag)) else None),
+        "data_date": (m.group(0) if (m := re.search(r"\d{4}-\d{2}", args.tag)) else None),
         "examples": n_examples,
         "output_uri": f"{env('MODELS_BUCKET').rstrip('/')}/{args.tag}/",
         "state": "PENDING",
     }
+    meta_path = Path(args.data).with_name(Path(args.data).stem + ".meta.json")
+    if meta_path.exists():  # how the data was prompted: the duel prompts this David the same way
+        meta = json.loads(meta_path.read_text())
+        run.update(prompt_style=meta.get("prompt_style"), prompt_version=meta.get("prompt_version"))
     if runtime == "vertex":
         run = run_vertex(args, image, data_uri, region, project, run, out)
     else:

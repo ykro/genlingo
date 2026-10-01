@@ -162,3 +162,20 @@ def test_price_schedule_picks_the_price_in_force():
 def test_duel_result_records_the_price_used():
     res = asyncio.run(run_duel(_contenders(), [{"role": "user", "content": "x"}]))
     assert res["goliath"].price == {"input_per_million": 1.0, "output_per_million": 10.0, "effective_from": None}
+
+
+def test_ollama_embed():
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        assert request.url.path == "/api/embed" and body["input"] == ["a", "b"]
+        return httpx.Response(200, json={"embeddings": [[1.0, 0.0], [0.0, 1.0]]})
+
+    vecs = asyncio.run(OllamaClient(transport=httpx.MockTransport(handler)).embed(["a", "b"], model="emb"))
+    assert vecs == [[1.0, 0.0], [0.0, 1.0]]
+
+
+def test_duel_with_a_prompt_per_contender():
+    cs = _contenders()
+    res = asyncio.run(run_duel(cs, {"david": [{"role": "user", "content": "a"}], "goliath": [{"role": "user", "content": "b"}]}))
+    assert cs[0].client.calls[0][1][0]["content"] == "a" and cs[1].client.calls[0][1][0]["content"] == "b"
+    assert res["david"].status == "ok"

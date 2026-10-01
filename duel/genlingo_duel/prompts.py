@@ -40,13 +40,45 @@ TRANSLATE = PromptTemplate(
     user="{phrase}",
 )
 
+# v2: the country comes first and is explicit (no slang from other countries), and an optional
+# glossary from our term bank closes the system prompt.
+TRANSLATE_V2 = PromptTemplate(
+    version="translate-v2",
+    system=(
+        "Variante: español de {country_name}. Usa solo expresiones de {country_name}; "
+        "no mezcles jerga de otros países.\n"
+        "Reescribe la frase del habla de {source_gen} al habla de {target_gen}: cambia la jerga por "
+        "su equivalente de la otra generación, conserva el significado, el tono y más o menos la "
+        "misma longitud. Responde solo con la frase traducida, en una línea, sin comillas ni explicaciones."
+        "{glossary}"
+    ),
+    user="{phrase}",
+)
 
-def translation_messages(phrase: str, direction: Direction, country: str) -> list[Message]:
+# Prompt styles: the duel uses, for each David tag, the style its training data was rendered
+# with (train/runs/<tag>.json); base models and Goliath can use any of them.
+STYLES = ("v1", "v2", "v2+glossary")
+
+
+def translation_messages(
+    phrase: str,
+    direction: Direction,
+    country: str,
+    style: str = "v1",
+    glossary: str = "",
+) -> list[Message]:
     if direction not in DIRECTION_TEXT:
         raise ValueError(f"dirección desconocida: {direction}")
     if country not in COUNTRIES:
         raise ValueError(f"país desconocido: {country}")
+    if style not in STYLES:
+        raise ValueError(f"estilo de prompt desconocido: {style}")
     source_gen, target_gen = DIRECTION_TEXT[direction]
-    return TRANSLATE.render(
-        country_name=COUNTRIES[country], source_gen=source_gen, target_gen=target_gen, phrase=phrase.strip()
-    )
+    fields = dict(country_name=COUNTRIES[country], source_gen=source_gen, target_gen=target_gen, phrase=phrase.strip())
+    if style == "v1":
+        return TRANSLATE.render(**fields)
+    return TRANSLATE_V2.render(**fields, glossary=glossary if style == "v2+glossary" else "")
+
+
+def prompt_version(style: str) -> str:
+    return {"v1": TRANSLATE.version, "v2": TRANSLATE_V2.version, "v2+glossary": TRANSLATE_V2.version + "+glossary"}[style]

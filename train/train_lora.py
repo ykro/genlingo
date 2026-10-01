@@ -248,22 +248,26 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
 # ---------------------------------------------------------------------------------------------
 # GGUF + Modelfile
 # ---------------------------------------------------------------------------------------------
-def to_gguf(merged_dir: Path, out_dir: Path, tag: str, llama_cpp: Path, quant: str, drop_merged: bool = False) -> dict:
+def to_gguf(merged_dir: Path, out_dir: Path, tag: str, llama_cpp: Path, quant: str, drop_merged: bool = False,
+            intermediate: str = "f16") -> dict:
     """f16 GGUF (the "uncompressed" reference) and a quantized one (what the laptop runs).
-    Q4_K_M keeps ~4.5 bits per weight with mixed precision on the most sensitive tensors."""
+    Q4_K_M keeps ~4.5 bits per weight with mixed precision on the most sensitive tensors.
+    `intermediate="q8_0"` halves the peak disk/RAM for bigger bases (E4B on a 32 GiB Cloud Run job)
+    at the cost of not publishing an f16 reference."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    f16 = out_dir / f"{tag}-f16.gguf"
+    f16 = out_dir / f"{tag}-{intermediate}.gguf"
     q = out_dir / f"{tag}-{quant.lower()}.gguf"
     t0 = time.time()
     subprocess.run(
-        [sys.executable, str(llama_cpp / "convert_hf_to_gguf.py"), str(merged_dir), "--outtype", "f16", "--outfile", str(f16)],
+        [sys.executable, str(llama_cpp / "convert_hf_to_gguf.py"), str(merged_dir), "--outtype", intermediate, "--outfile", str(f16)],
         check=True,
     )
     if drop_merged:
         shutil.rmtree(merged_dir, ignore_errors=True)
     quantize = shutil.which("llama-quantize") or str(llama_cpp / "llama-quantize")
-    subprocess.run([quantize, str(f16), str(q), quant], check=True)
-    return {"gguf_f16": f16.name, "gguf_quant": q.name, "quant": quant, "f16_bytes": f16.stat().st_size,
+    requant = ["--allow-requantize"] if intermediate != "f16" else []
+    subprocess.run([quantize, *requant, str(f16), str(q), quant], check=True)
+    return {"gguf_f16": f16.name if intermediate == "f16" else None, "gguf_intermediate": f16.name, "gguf_quant": q.name, "quant": quant, "f16_bytes": f16.stat().st_size if intermediate == "f16" else None,
             "quant_bytes": q.stat().st_size, "gguf_s": round(time.time() - t0, 1)}
 
 
@@ -296,6 +300,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     # GGUF writers do many small writes, which are very slow on a Cloud Storage volume.
     ap.add_argument("--out-dir", default=env("OUT_DIR", ""))
     ap.add_argument("--merged-dir", default=env("MERGED_DIR", ""))
+    ap.add_argument("--gguf-intermediate", default="f16", choices=["f16", "q8_0"])
     ap.add_argument("--drop-merged", action="store_true", default=env("DROP_MERGED", "") == "1",
                     help="delete the merged checkpoint once converted (frees ~10 GB of in-memory disk)")
     ap.add_argument("--llama-cpp", default=env("LLAMA_CPP_DIR", "/opt/llama.cpp"))
@@ -309,7 +314,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--max-steps", type=int, default=-1)
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--grad-accum", type=int, default=2)
-    ap.add_argument("--max-length", type=int, default=256)
+    ap.add_argument("--max-length", type=int, default=384)  # system prompt + glossary + phrase + answer
     ap.add_argument("--seed", type=int, default=2027)
     ap.add_argument("--skip-gguf", action="store_true", help="stop after merge (no llama.cpp available)")
     args = ap.parse_args(argv)
@@ -345,9 +350,13 @@ def main(argv: list[str] | None = None) -> dict:
     shutil.make_archive(str(out / f"{args.tag}-adapter"), "zip", metrics.pop("adapter_dir"))
 
     if not args.skip_gguf:
-        metrics.update(to_gguf(Path(metrics["merged_dir"]), out, args.tag, Path(args.llama_cpp), args.quant, args.drop_merged))
+        metrics.update(to_gguf(Path(metrics["merged_dir"]), out, args.tag, Path(args.llama_cpp), args.quant,
+                               args.drop_merged, args.gguf_intermediate))
         write_modelfile(out, metrics["gguf_quant"], args.ollama_renderer, args.temperature)
-        write_modelfile(out, metrics["gguf_f16"], args.ollama_renderer, args.temperature)
+        if metrics["gguf_f16"]:
+            write_modelfile(out, metrics["gguf_f16"], args.ollama_renderer, args.temperature)
+        else:
+            (out / metrics["gguf_intermediate"]).unlink()  # q8_0 was only a stepping stone
 
     metrics["total_s"] = round(time.time() - t_all, 1)
     (out / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
