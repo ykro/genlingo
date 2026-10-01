@@ -42,3 +42,4 @@ yarn-error.log*
 next-env.d.ts
 e2e/shots/
 .env.local
+*-debug.log
