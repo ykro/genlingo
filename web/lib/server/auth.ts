@@ -31,11 +31,14 @@ export async function requireUser(req: Request) {
   }
 }
 
-/** The presenter signs in with email; admins are listed in ADMIN_EMAILS or carry admin=true. */
+/** The presenter signs in with email; admins carry the admin=true claim (scripts/set-admin.mjs)
+ * or are listed in ADMIN_EMAILS with a verified email. */
 export async function requireAdmin(req: Request) {
   const user = await requireUser(req);
   const admins = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
-  const isAdmin = user.admin === true || (user.email && admins.includes(user.email.toLowerCase()));
+  // ADMIN_EMAILS only counts for verified emails: anyone can sign up with someone else's address.
+  const listed = !!user.email && user.email_verified === true && admins.includes(user.email.toLowerCase());
+  const isAdmin = user.admin === true || listed;
   if (!isAdmin) throw new AuthError(403, "Solo el presentador puede hacer esto.");
   return user;
 }

@@ -37,7 +37,7 @@ def main() -> None:
     t0 = time.time()
     Scoreboard(s.db_path).reset()
     msg = "local: rondas, cola y marcador en cero"
-    if s.audience_feed and not s.mock_ai:
+    if s.audience_feed:
         try:
             msg += f"; {reset_firestore(s)}"
         except Exception as exc:  # offline on stage: local reset is what matters

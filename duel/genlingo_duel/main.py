@@ -7,6 +7,7 @@ The presenter view calls this API; it never talks to Gemini or Ollama directly.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import random
@@ -63,7 +64,7 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
     s = settings or get_settings()
     board = Scoreboard(s.db_path)
     arena = arena or Arena.from_settings(s)
-    if feed is None and s.audience_feed and not s.mock_ai:
+    if feed is None and s.audience_feed:  # also in MOCK_AI rehearsals: models mocked, audience real
         feed = AudienceFeed(board, project=s.project, database=s.firestore_database, event_id=s.event_id)
 
     @asynccontextmanager
@@ -165,6 +166,20 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
         if rnd is None:
             raise HTTPException(404, "Ronda no encontrada.")
         return rnd
+
+    @app.get("/rounds/{round_id}/votes")
+    async def live_votes(round_id: str) -> dict:
+        """Live tally while phones vote (read from Firestore); stored tally when offline."""
+        rnd = board.get_round(round_id)
+        if rnd is None:
+            raise HTTPException(404, "Ronda no encontrada.")
+        if feed is not None:
+            try:
+                d, g = await asyncio.to_thread(feed.tally, round_id)
+                return {"david": d, "goliath": g, "live": True}
+            except Exception:
+                pass
+        return {"david": rnd["votes_david"], "goliath": rnd["votes_goliath"], "live": False}
 
     @app.post("/rounds/{round_id}/close")
     async def close_round(round_id: str) -> dict:

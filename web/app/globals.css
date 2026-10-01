@@ -1,0 +1,109 @@
+/*
+ * Genlingo · A — Marcador. Light theme only (design/tokens.json).
+ * The duel is a sporting event: broadcast scoreboard, two team colours, huge figures.
+ */
+:root {
+  --paper: #f6f3ec;
+  --surface: #fffdf8;
+  --ink: #16181d;
+  --muted: #5a5e66;
+  --david: #c23d19;
+  --goliath: #2b4acb;
+  --rule: #d9d4c7;
+  --david-wash: color-mix(in oklch, var(--david) 9%, var(--paper));
+  --goliath-wash: color-mix(in oklch, var(--goliath) 8%, var(--paper));
+  --ink-wash: color-mix(in oklch, var(--ink) 6%, var(--paper));
+  --ok: #2f6b3a;
+
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-pill: 999px;
+
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 72px;
+  --s9: 112px;
+
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1); /* ease-out-quart */
+  --display: var(--font-display), "Arial Narrow", sans-serif;
+  --body: var(--font-body), system-ui, sans-serif;
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.display {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  line-height: 1.02;
+}
+
+.eyebrow {
+  font-family: var(--display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

@@ -1,0 +1,593 @@
+/* Presenter view: a fixed 1920×1080 stage, read from the back row. Body copy >= 32 px. */
+.viewport {
+  position: fixed;
+  inset: 0;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center;
+  background: var(--paper);
+}
+
+.layout {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 104px minmax(0, 1fr) 212px 52px;
+}
+
+.boot {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+/* ---- top bar ------------------------------------------------------------------------------ */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 72px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wordmark {
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.chips {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 28px;
+  padding: 8px 22px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+
+.chip b {
+  font-weight: 700;
+}
+
+.queueChip {
+  border-color: var(--rule);
+  background: var(--surface);
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.online {
+  color: var(--ok);
+  border-color: currentColor;
+}
+
+.offline {
+  color: var(--surface);
+  background: var(--david);
+  border-color: var(--david);
+}
+
+/* ---- round -------------------------------------------------------------------------------- */
+.round {
+  display: flex;
+  flex-direction: column;
+  padding: 36px 72px 24px;
+  min-height: 0;
+}
+
+.eyebrow {
+  font-size: 32px;
+  color: var(--muted);
+}
+
+.phrase {
+  margin-top: 8px;
+  font-weight: 600;
+  line-height: 1;
+  text-wrap: balance;
+  max-width: 1776px;
+  animation: rise 320ms var(--ease-out);
+}
+
+.reference {
+  margin-top: 14px;
+  font-size: 32px;
+  color: var(--muted);
+}
+
+.reference :global(.eyebrow) {
+  font-size: 24px;
+  margin-right: 8px;
+  padding: 2px 10px;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-pill);
+}
+
+.columns {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 28px;
+  min-height: 0;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 64px;
+  min-height: 0;
+  animation: rise 360ms var(--ease-out) both;
+}
+
+.column + .column {
+  padding: 0 0 0 64px;
+  border-left: 2px solid var(--rule);
+  animation-delay: 60ms;
+}
+
+.side {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  font-size: 64px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.side > span:first-child {
+  position: relative;
+}
+
+.sideMeta {
+  font-family: var(--body);
+  font-size: 26px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.david,
+.davidText {
+  color: var(--david);
+}
+
+.goliath,
+.goliathText {
+  color: var(--goliath);
+}
+
+/* The winning column gets an underline drawn left to right. */
+.winner::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 8px;
+  background: currentColor;
+  transform-origin: left;
+  animation: draw 520ms 200ms var(--ease-out) both;
+}
+
+.answer {
+  font-weight: 600;
+  line-height: 1.04;
+  text-wrap: balance;
+  color: var(--ink);
+}
+
+.stats {
+  margin-top: auto;
+  display: flex;
+  gap: 56px;
+}
+
+.stats dt {
+  font-size: 26px;
+  color: var(--muted);
+}
+
+.figure {
+  font-size: 80px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.thinking {
+  font-size: 64px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.ellipsis::after {
+  content: "…";
+  animation: blink 1s steps(2) infinite;
+}
+
+.out .outTitle {
+  font-size: 72px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.outText {
+  font-size: 34px;
+  line-height: 1.35;
+  color: var(--muted);
+  max-width: 24ch;
+}
+
+/* ---- welcome (before the first round) ------------------------------------------------------ */
+.welcome {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 96px;
+  padding: 40px 72px 32px;
+  min-height: 0;
+}
+
+.welcomeText {
+  display: grid;
+  gap: 24px;
+  animation: rise 420ms var(--ease-out);
+}
+
+.welcomeTitle {
+  font-size: 104px;
+  font-weight: 700;
+  line-height: 0.96;
+  text-transform: uppercase;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+
+.welcomeLead {
+  font-size: 40px;
+  line-height: 1.3;
+  color: var(--muted);
+  max-width: 28ch;
+}
+
+.welcomeQr {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 24px;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: var(--r-md);
+}
+
+.qr {
+  display: block;
+}
+
+.qr :global(svg) {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.qrUrl {
+  font-size: 30px;
+  font-weight: 600;
+}
+
+/* ---- score band --------------------------------------------------------------------------- */
+.band {
+  margin: 0 40px;
+  display: grid;
+  grid-template-columns: 330px 1fr 560px;
+  align-items: center;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: var(--r-md);
+  padding: 0 40px;
+}
+
+.wins {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.bigScore {
+  font-family: var(--display);
+  font-size: 148px;
+  font-weight: 800;
+  line-height: 1;
+  min-width: 1ch;
+  text-align: center;
+}
+
+.winsRule {
+  width: 2px;
+  height: 120px;
+  background: var(--rule);
+}
+
+.stat {
+  border-collapse: collapse;
+  font-size: 34px;
+  width: 100%;
+}
+
+.stat th,
+.stat td {
+  text-align: left;
+  padding: 2px 24px 2px 0;
+  white-space: nowrap;
+}
+
+.stat thead th {
+  font-size: 22px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.stat tbody th {
+  font-size: 40px;
+  font-weight: 700;
+  text-transform: uppercase;
+  width: 190px;
+}
+
+.stat td {
+  font-weight: 600;
+}
+
+.amortized {
+  display: block;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.voteBox {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+  border-left: 2px solid var(--rule);
+  padding-left: 32px;
+  height: 160px;
+}
+
+.voteBox > :global(.eyebrow) {
+  font-size: 22px;
+  color: var(--muted);
+}
+
+.voteBox:has(.bar) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+.bar {
+  flex: 1 1 100%;
+  display: flex;
+  height: 56px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--surface);
+  order: 2;
+}
+
+.voteBox:has(.miniQr) .bar {
+  flex-basis: 260px;
+}
+
+.barDavid {
+  background: var(--david);
+  display: flex;
+  align-items: center;
+  padding-left: 14px;
+  transition: width 400ms var(--ease-out);
+}
+
+.barGoliath {
+  flex: 1;
+  background: var(--goliath);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 14px;
+}
+
+.voteHint {
+  font-size: 28px;
+  color: var(--muted);
+}
+
+.miniQr {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  order: 3;
+}
+
+.miniQrText {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* ---- control bar (presenter-facing, quiet) ------------------------------------------------- */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 72px;
+  font-size: 20px;
+  color: var(--muted);
+}
+
+.next {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.next b {
+  color: var(--ink);
+}
+
+.problem {
+  color: var(--david);
+  font-weight: 600;
+}
+
+.keys {
+  white-space: nowrap;
+}
+
+.keys kbd {
+  font-family: var(--body);
+  font-size: 16px;
+  font-weight: 700;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-sm);
+  padding: 1px 7px;
+  margin: 0 6px 0 14px;
+  color: var(--ink);
+}
+
+.dirToggle {
+  border: 1.5px solid var(--ink);
+  background: var(--surface);
+  border-radius: var(--r-pill);
+  padding: 4px 16px;
+  font-size: 20px;
+  white-space: nowrap;
+}
+
+.composer {
+  flex: 1;
+  font-size: 24px;
+  padding: 6px 14px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+/* ---- fatal -------------------------------------------------------------------------------- */
+.fatal {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 0 160px;
+}
+
+.fatalTitle {
+  font-size: 96px;
+  font-weight: 700;
+  text-transform: uppercase;
+  max-width: 16ch;
+  line-height: 1;
+}
+
+.fatalHint {
+  font-size: 40px;
+  color: var(--muted);
+}
+
+.fatalButton {
+  font-family: var(--display);
+  font-size: 36px;
+  font-weight: 600;
+  border: 2px solid var(--ink);
+  background: var(--surface);
+  border-radius: var(--r-md);
+  padding: 10px 32px;
+}
+
+/* ---- motion ------------------------------------------------------------------------------- */
+.roll {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.rollInner {
+  display: inline-block;
+  animation: roll 240ms var(--ease-out);
+}
+
+@keyframes roll {
+  from {
+    transform: translateY(60%);
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+
+@keyframes draw {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.barEmpty {
+  flex: 1;
+  background: var(--ink-wash);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--body);
+  font-size: 22px;
+  font-weight: 500;
+}

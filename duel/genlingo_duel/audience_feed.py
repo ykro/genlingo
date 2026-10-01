@@ -128,6 +128,7 @@ class AudienceFeed:
                     "david": rnd["david"].get("text", ""),
                     "goliath": rnd["goliath"].get("text", ""),
                     "roundType": rnd["round_type"],
+                    "number": rnd.get("number"),
                     "status": "voting",
                     "createdAt": firestore.SERVER_TIMESTAMP,
                 },

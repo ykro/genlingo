@@ -73,3 +73,18 @@ def test_bad_country_and_direction_rejected(settings):
     with client(settings) as c:
         assert c.post("/duel", json={"phrase": "x", "direction": "genz_to_parent", "country": "AR"}).status_code == 422
         assert c.post("/duel", json={"phrase": "x", "direction": "sideways", "country": "MX"}).status_code == 422
+
+
+def test_rounds_are_numbered(settings):
+    with client(settings) as c:
+        a = c.post("/duel", json={"phrase": "x", "direction": "genz_to_parent", "country": "MX"}).json()
+        b = c.post("/duel", json={"phrase": "y", "direction": "genz_to_parent", "country": "MX"}).json()
+        assert (a["number"], b["number"]) == (1, 2)
+        assert c.get("/rounds").json()[0]["number"] == 2
+
+
+def test_live_votes_without_feed_returns_stored_tally(settings):
+    with client(settings) as c:
+        rid = c.post("/duel", json={"phrase": "x", "direction": "genz_to_parent", "country": "MX"}).json()["id"]
+        c.post(f"/rounds/{rid}/votes", json={"david": 3, "goliath": 1})
+        assert c.get(f"/rounds/{rid}/votes").json() == {"david": 3, "goliath": 1, "live": False}

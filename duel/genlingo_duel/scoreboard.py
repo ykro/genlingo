@@ -129,15 +129,23 @@ class Scoreboard:
     @staticmethod
     def _row(r: sqlite3.Row) -> dict[str, Any]:
         d = dict(r)
+        d["number"] = d.pop("n", None)
         d["david"], d["goliath"] = json.loads(d["david"]), json.loads(d["goliath"])
         return d
 
     def get_round(self, round_id: str) -> dict[str, Any] | None:
-        r = self.db.execute("SELECT * FROM rounds WHERE id = ?", (round_id,)).fetchone()
+        r = self.db.execute(
+            "SELECT *, (SELECT COUNT(*) FROM rounds r2 WHERE r2.created_at <= rounds.created_at) AS n FROM rounds WHERE id = ?",
+            (round_id,),
+        ).fetchone()
         return self._row(r) if r else None
 
     def list_rounds(self, limit: int = 50) -> list[dict[str, Any]]:
-        rows = self.db.execute("SELECT * FROM rounds ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
+        rows = self.db.execute(
+            "SELECT *, (SELECT COUNT(*) FROM rounds r2 WHERE r2.created_at <= rounds.created_at) AS n"
+            " FROM rounds ORDER BY created_at DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
         return [self._row(r) for r in rows]
 
     def used_pair_ids(self) -> set[str]:

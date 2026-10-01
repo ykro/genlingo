@@ -13,20 +13,15 @@ DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
 help:
 	@grep -hE '^[a-z-]+:.*## ' Makefile | awk -F':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
 
-up: ## Start Ollama + warm David + duel service (works with Wi-Fi off)
-	@curl -sf http://127.0.0.1:11434/api/version >/dev/null || (ollama serve >/tmp/genlingo-ollama.log 2>&1 &) ; \
-	  for i in $$(seq 1 20); do curl -sf http://127.0.0.1:11434/api/version >/dev/null && break; sleep 0.5; done
-	@[ "$(MOCK_AI)" = 1 ] || curl -sf http://127.0.0.1:11434/api/chat -d '{"model":"$(LOCAL_MODEL_TAG)","messages":[],"keep_alive":"30m"}' >/dev/null \
-	  || echo "!! David ($(LOCAL_MODEL_TAG)) no está en Ollama: make pull-model TAG=$(LOCAL_MODEL_TAG)"
-	@echo "Duel service on $(DUEL_URL) (presenter view: Phase 2)"
-	cd duel && uv run uvicorn genlingo_duel.main:create_app --factory --host 127.0.0.1 --port $(DUEL_PORT)
+up: ## Start Ollama + warm David + duel service + presenter view (works with Wi-Fi off)
+	@scripts/up.sh
 
 reset: ## Clear rounds, votes and scoreboard (local + this event's Firestore rounds)
 	@$(UV) python scripts/reset.py
 
 test: ## Run all tests (no network: MOCK_AI in tests)
 	cd duel && MOCK_AI=1 uv run pytest -q
-	@if [ -d web/node_modules ]; then cd web && npm test --silent; else echo "(web: npm install first to run its tests)"; fi
+	@if [ -d web/node_modules ]; then cd web && npm test --silent && npx tsc --noEmit && npx eslint . ; else echo "(web: npm install first to run its tests)"; fi
 
 eval: ## Test set through base models, David and Goliath -> evals/report.md
 	$(UV) python evals/run_eval.py $(EVAL_ARGS)
@@ -65,5 +60,6 @@ train-local: train-data ## Same training on this Mac (MPS), for experiments
 pull-model: ## Download a trained David into Ollama: make pull-model TAG=... [FP16=1]
 	MODELS_BUCKET=$(MODELS_BUCKET) train/pull_model.sh $(TAG)
 
-deploy: ## Deploy the audience web app to Cloud Run (Phase 2)
-	@echo "deploy: the audience app (web/) is deployed in Phase 2 with infra/env.sh deploy_run"
+deploy: ## Deploy the audience web app to Cloud Run (min-instances=1)
+	bash infra/04-web-service-account.sh
+	bash infra/05-deploy-web.sh
