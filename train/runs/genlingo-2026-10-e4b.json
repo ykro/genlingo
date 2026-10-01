@@ -10,7 +10,7 @@
   "data_date": "2026-10",
   "examples": 1500,
   "output_uri": "gs://ai-experiments-487722-genlingo-models/genlingo-2026-10-e4b/",
-  "state": "PENDING",
+  "state": "JOB_STATE_FAILED",
   "prompt_style": "v2+glossary",
   "prompt_version": "translate-v2+glossary",
   "runtime": "cloud-run-job",
@@ -21,5 +21,10 @@
     "gpu_l4": 0.0001867,
     "vcpu": 1.8e-05,
     "gib": 2e-06
-  }
+  },
+  "start_time": "2026-10-01T15:43:47.139517Z",
+  "end_time": "2026-10-01T16:25:06.100113Z",
+  "duration_s": 2479.0,
+  "estimated_cost_usd": 0.98,
+  "error": "Task genlingo-train-c58ts-task0 failed with exit code: 0 and message: The configured memory limit was reached."
 }

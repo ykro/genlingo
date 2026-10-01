@@ -32,7 +32,7 @@ def main() -> None:
     run_path = HERE / "runs" / f"{tag}.json"
     run = json.loads(run_path.read_text()) if run_path.exists() else {}
     base_model = run.get("base_model") or os.environ["GEMMA_BASE_MODEL"]
-    weights_uri = run.get("weights_uri") or os.environ.get("GEMMA_WEIGHTS_URI", "hf://google")
+    weights_uri = run.get("weights_uri") or os.environ["GEMMA_WEIGHTS_URI"]
     staging = os.environ["STAGING_BUCKET"].rstrip("/")
     models = os.environ["MODELS_BUCKET"].rstrip("/")
     work = HERE.parent / "models" / ".work" / tag
@@ -71,7 +71,7 @@ def main() -> None:
     os.environ["PATH"] = f"{llama_cpp / 'bin'}:{os.environ['PATH']}"  # prebuilt llama-quantize
     metrics.update(train_lora.to_gguf(merged_dir, out, tag, llama_cpp, "Q4_K_M", drop_merged=True, outtype="f16"))
     (out / f"{tag}-f16.gguf").unlink(missing_ok=True)  # the laptop only needs the quantized model
-    train_lora.write_modelfile(out, metrics["gguf_quant"], os.environ.get("OLLAMA_RENDERER", "gemma4"), 0.2)
+    train_lora.write_modelfile(out, metrics["gguf_quant"], os.environ["OLLAMA_RENDERER"], 0.2)
     (out / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
     train_lora.publish(out, f"{models}/{tag}")
     if run:  # the run file keeps the cloud cost and adds where/how long the merge took
