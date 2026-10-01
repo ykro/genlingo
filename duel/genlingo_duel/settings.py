@@ -9,6 +9,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from duel_core import Price, PriceSchedule
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(REPO_ROOT / ".env")
 
@@ -32,6 +34,9 @@ class Settings:
     location: str = field(default_factory=lambda: _env("GOOGLE_CLOUD_LOCATION", "global"))
     gemini_model: str = field(default_factory=lambda: _env("GEMINI_MODEL"))
     gemini_thinking_level: str = field(default_factory=lambda: _env("GEMINI_THINKING_LEVEL", "low"))
+    # Dated USD-per-million prices: "2026-01-01:0.75/3.75,2027-01-01:1.50/7.50".
+    gemini_price_schedule: str = field(default_factory=lambda: _env("GEMINI_PRICE_SCHEDULE"))
+    # Single-price fallback when no schedule is configured.
     gemini_input_usd_per_m: float = field(default_factory=lambda: _float("GEMINI_INPUT_USD_PER_M", 0.0))
     gemini_output_usd_per_m: float = field(default_factory=lambda: _float("GEMINI_OUTPUT_USD_PER_M", 0.0))
     david_tag: str = field(default_factory=lambda: _env("LOCAL_MODEL_TAG"))
@@ -47,6 +52,13 @@ class Settings:
     # Evaluation rounds may use test pairs still pending review (useful before the presenter
     # has reviewed them); on stage set it to 0 so only approved references are shown.
     allow_unreviewed_test: bool = field(default_factory=lambda: _flag("ALLOW_UNREVIEWED_TEST"))
+
+
+def goliath_prices(s: "Settings") -> PriceSchedule:
+    """The price list for Goliath; the duel and the eval pick the price in force on their date."""
+    if s.gemini_price_schedule:
+        return PriceSchedule.parse(s.gemini_price_schedule)
+    return PriceSchedule.single(Price(s.gemini_input_usd_per_m, s.gemini_output_usd_per_m))
 
 
 def get_settings() -> Settings:

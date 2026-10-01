@@ -88,3 +88,13 @@ def test_live_votes_without_feed_returns_stored_tally(settings):
         rid = c.post("/duel", json={"phrase": "x", "direction": "genz_to_parent", "country": "MX"}).json()["id"]
         c.post(f"/rounds/{rid}/votes", json={"david": 3, "goliath": 1})
         assert c.get(f"/rounds/{rid}/votes").json() == {"david": 3, "goliath": 1, "live": False}
+
+
+def test_goliath_cost_uses_the_price_in_force_today(settings):
+    from datetime import date
+
+    settings.gemini_price_schedule = f"2020-01-01:1.0/10.0,{date.today().replace(year=date.today().year + 1)}:99/99"
+    with client(settings) as c:
+        r = c.post("/duel", json={"phrase": "x", "direction": "genz_to_parent", "country": "MX"}).json()
+    assert r["goliath"]["price"] == {"input_per_million": 1.0, "output_per_million": 10.0, "effective_from": "2020-01-01"}
+    assert r["david"]["price"]["input_per_million"] == 0

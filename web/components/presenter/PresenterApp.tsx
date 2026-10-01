@@ -475,7 +475,14 @@ function ScoreBand({
             <th scope="row" className={`display ${s.goliathText}`}>Goliath</th>
             <td className="tabular"><Roll value={chrf(board?.goliath.avg_chrf)} /></td>
             <td className="tabular"><Roll value={seconds(board?.goliath.p50_latency_ms)} /></td>
-            <td className="tabular"><Roll value={usd(board?.goliath.cost_usd ?? 0)} /></td>
+            <td className="tabular">
+              <Roll value={usd(board?.goliath.cost_usd ?? 0)} />
+              {round?.goliath.price && (
+                <span className={s.amortized}>
+                  tarifa: ${round.goliath.price.input_per_million.toFixed(2)} / ${round.goliath.price.output_per_million.toFixed(2)} por M tokens
+                </span>
+              )}
+            </td>
           </tr>
         </tbody>
       </table>

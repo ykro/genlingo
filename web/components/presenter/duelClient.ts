@@ -14,6 +14,7 @@ export interface ContenderResult {
   cost_usd: number;
   chrf: number | null;
   error: string | null;
+  price: { input_per_million: number; output_per_million: number; effective_from: string | null } | null;
 }
 
 export interface Round {

@@ -21,7 +21,7 @@ from duel_core import (
 )
 
 from .prompts import Direction, translation_messages
-from .settings import Settings
+from .settings import Settings, goliath_prices
 
 # Mock answers: David "knows" the slang, Goliath answers almost literally, so rehearsals show
 # a plausible duel without network or GPU.
@@ -68,7 +68,7 @@ class Arena:
                 "goliath",
                 self.goliath_client,
                 s.gemini_model,
-                Price(s.gemini_input_usd_per_m, s.gemini_output_usd_per_m),
+                goliath_prices(s).at(),  # the price in force today
                 requires_network=True,
             ),
         ]

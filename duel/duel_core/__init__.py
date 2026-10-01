@@ -6,7 +6,7 @@ and Tzij (Spanish <-> K'iche'). Vendored with `_base/sync.sh`, never imported fr
 """
 
 from .connectivity import Connectivity
-from .cost import Price, cost_usd
+from .cost import Price, PriceSchedule, cost_usd
 from .duel import Contender, ContenderResult, run_duel
 from .gemini_client import GeminiClient
 from .metrics import chrf_pp, corpus_chrf_pp
@@ -28,6 +28,7 @@ __all__ = [
     "OfflineError",
     "OllamaClient",
     "Price",
+    "PriceSchedule",
     "PromptTemplate",
     "chrf_pp",
     "clean_translation",

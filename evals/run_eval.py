@@ -28,7 +28,7 @@ sys.path.insert(0, str(ROOT / "evals"))
 from duel_core import GeminiClient, MockClient, OllamaClient, Price, clean_translation, cost_usd  # noqa: E402
 from genlingo_duel.dataset import test_pairs  # noqa: E402
 from genlingo_duel.prompts import translation_messages  # noqa: E402
-from genlingo_duel.settings import get_settings  # noqa: E402
+from genlingo_duel.settings import get_settings, goliath_prices  # noqa: E402
 from report import write_report  # noqa: E402
 
 
@@ -104,7 +104,13 @@ async def main_async(args) -> None:
             continue
         if m["kind"] == "gemini":
             client = MockClient() if s.mock_ai else GeminiClient(s.project, s.location, temperature=0.0, thinking_level=s.gemini_thinking_level or None, timeout_s=60)
-            price, conc = Price(s.gemini_input_usd_per_m, s.gemini_output_usd_per_m), 4
+            price, conc = goliath_prices(s).at(), 4  # price in force on the eval date
+            m["price"] = {"input_per_million": price.input_per_million, "output_per_million": price.output_per_million,
+                          "effective_from": price.effective_from}
+            nxt = goliath_prices(s).next_after()
+            if nxt:
+                m["next_price"] = {"input_per_million": nxt.input_per_million, "output_per_million": nxt.output_per_million,
+                                   "effective_from": nxt.effective_from}
         else:
             client, price, conc = ollama, Price.free(), 1  # one at a time: latency as on stage
             if not s.mock_ai:

@@ -25,10 +25,10 @@ import unicodedata
 from pathlib import Path
 
 from _common import ROOT  # noqa: F401  (puts duel/ on sys.path)
-from duel_core import Price, cost_usd  # noqa: E402
+from duel_core import cost_usd  # noqa: E402
 from genlingo_duel.dataset import Pair, read_jsonl, write_jsonl  # noqa: E402
 from genlingo_duel.prompts import COUNTRIES  # noqa: E402
-from genlingo_duel.settings import get_settings  # noqa: E402
+from genlingo_duel.settings import get_settings, goliath_prices  # noqa: E402
 
 # pairs-v1 let Gemini paraphrase freely; David learned to add "mijo", extra clauses and length,
 # and scored below the base model on real test pairs. pairs-v2 asks for minimal edits: change
@@ -281,7 +281,7 @@ async def main_async(args: argparse.Namespace) -> None:
         "kept": len(kept),
         "dropped": dropped,
         "tokens": usage,
-        "cost_usd": round(cost_usd(Price(s.gemini_input_usd_per_m, s.gemini_output_usd_per_m), usage["input"], usage["output"]), 4),
+        "cost_usd": round(cost_usd(goliath_prices(s).at(), usage["input"], usage["output"]), 4),
         "duration_s": round(time.time() - t0, 1),
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
     }

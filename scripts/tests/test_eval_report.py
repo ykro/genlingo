@@ -12,7 +12,9 @@ def raw():
         {"name": "big", "role": "base", "kind": "ollama", "size_bytes": 6e9},
         {"name": "david", "role": "david", "kind": "ollama", "size_bytes": 3e9},
         {"name": "david-f16", "role": "david_f16", "kind": "ollama", "skip": "no está en Ollama"},
-        {"name": "gemini", "role": "goliath", "kind": "gemini"},
+        {"name": "gemini", "role": "goliath", "kind": "gemini",
+         "price": {"input_per_million": 0.75, "output_per_million": 3.75, "effective_from": "2026-09-30"},
+         "next_price": {"input_per_million": 1.5, "output_per_million": 7.5, "effective_from": "2027-01-01"}},
     ]
     texts = {"small": ("está mid", 400), "big": ("está regular", 1500), "david": ("está regular", 300), "gemini": ("está mediocre", 1200)}
     results = [
@@ -34,3 +36,4 @@ def test_report_has_all_sections(tmp_path):
     for section in ("## Resumen", "copiar la frase", "por origen", "E2B vs E4B", "f16 vs Q4", "Dónde pierde David", "Ensayo"):
         assert section in text
     assert "`david-f16`" in text
+    assert "vigente desde 2026-09-30" in text and "desde 2027-01-01" in text

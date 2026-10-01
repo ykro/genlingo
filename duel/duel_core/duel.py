@@ -40,20 +40,22 @@ class ContenderResult:
     cost_usd: float = 0.0
     chrf: float | None = None
     error: str | None = None
+    price: dict[str, Any] | None = None  # the per-million prices used for cost_usd, with their date
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 
 async def _run_one(c: Contender, messages: list[Message], online: bool, reference: str | None) -> ContenderResult:
+    price = asdict(c.price)
     if c.requires_network and not online:
-        return ContenderResult(c.name, c.model, "offline", error="sin conexión")
+        return ContenderResult(c.name, c.model, "offline", error="sin conexión", price=price)
     try:
         comp = await c.client.complete(messages, model=c.model)
     except OfflineError as exc:
-        return ContenderResult(c.name, c.model, "offline", error=str(exc)[:200])
+        return ContenderResult(c.name, c.model, "offline", error=str(exc)[:200], price=price)
     except Exception as exc:  # a failing contender must not break the round
-        return ContenderResult(c.name, c.model, "error", error=f"{type(exc).__name__}: {str(exc)[:200]}")
+        return ContenderResult(c.name, c.model, "error", error=f"{type(exc).__name__}: {str(exc)[:200]}", price=price)
     text = clean_translation(comp.text)
     return ContenderResult(
         name=c.name,
@@ -65,6 +67,7 @@ async def _run_one(c: Contender, messages: list[Message], online: bool, referenc
         output_tokens=comp.output_tokens,
         cost_usd=cost_usd(c.price, comp.input_tokens, comp.output_tokens),
         chrf=round(chrf_pp(text, reference), 2) if reference else None,
+        price=price,
     )
 
 

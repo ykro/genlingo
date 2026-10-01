@@ -12,6 +12,7 @@ from duel_core import (
     MockClient,
     OllamaClient,
     Price,
+    PriceSchedule,
     PromptTemplate,
     chrf_pp,
     clean_translation,
@@ -145,3 +146,19 @@ def test_connectivity_forced_offline_and_unreachable_host():
     assert asyncio.run(Connectivity(force_offline=True).is_online()) is False
     # Port 9 on localhost (discard) is closed on dev machines: must answer False fast, not hang.
     assert asyncio.run(Connectivity(host="127.0.0.1", port=9, timeout_s=0.3).is_online()) is False
+
+
+def test_price_schedule_picks_the_price_in_force():
+    from datetime import date
+
+    s = PriceSchedule.parse("2027-01-01:1.50/7.50, 2026-01-01:0.75/3.75")
+    assert s.at(date(2026, 10, 1)) == Price(0.75, 3.75, "2026-01-01")
+    assert s.at(date(2027, 3, 15)).output_per_million == 7.50
+    assert s.at(date(2025, 1, 1)) == Price.free()
+    assert s.next_after(date(2026, 10, 1)).effective_from == "2027-01-01"
+    assert s.next_after(date(2027, 2, 1)) is None
+
+
+def test_duel_result_records_the_price_used():
+    res = asyncio.run(run_duel(_contenders(), [{"role": "user", "content": "x"}]))
+    assert res["goliath"].price == {"input_per_million": 1.0, "output_per_million": 10.0, "effective_from": None}

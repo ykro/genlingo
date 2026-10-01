@@ -135,6 +135,19 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None) -> str:
         ),
         "",
     ]
+    goliath_meta = next((m for m in raw["models"] if m.get("role") == "goliath" and m.get("price")), None)
+    if goliath_meta:
+        pr = goliath_meta["price"]
+        since = f" (vigente desde {pr['effective_from']})" if pr.get("effective_from") else ""
+        lines += [f"Costo de Goliath con la tarifa del día del eval: ${pr['input_per_million']:.2f} entrada / "
+                  f"${pr['output_per_million']:.2f} salida por millón de tokens{since}."]
+        nxt = goliath_meta.get("next_price")
+        if nxt:
+            rows = [r for r in raw["results"] if r["model"] == goliath_meta["name"] and "error" not in r]
+            later = sum((r["input_tokens"] * nxt["input_per_million"] + r["output_tokens"] * nxt["output_per_million"]) / 1e6 for r in rows)
+            lines += [f"Con la tarifa desde {nxt['effective_from']} (${nxt['input_per_million']:.2f} / ${nxt['output_per_million']:.2f}), "
+                      f"este mismo eval costaría {_usd(later)} ({_usd(later / len(rows) * 1000) if rows else '—'} por 1,000 frases)."]
+        lines += [""]
     ids = [p["id"] for p in raw["pairs"]]
     copy = corpus_chrf_pp([pairs[i]["source"] for i in ids], [pairs[i]["target"] for i in ids])
     lines += [
