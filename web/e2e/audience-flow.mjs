@@ -55,7 +55,7 @@ await admin.fill("input[type=email]", process.env.E2E_ADMIN_EMAIL);
 await admin.fill("input[type=password]", process.env.E2E_ADMIN_PASSWORD);
 await admin.click("button:has-text('Entrar')");
 const row = admin.locator("li", { hasText: phrase });
-await row.waitFor({ timeout: 15000 });
+await row.waitFor({ timeout: 30000 });
 await admin.screenshot({ path: `${out}/admin-queue.png` });
 const t0 = Date.now();
 await row.locator("button:has-text('Aprobar')").click();

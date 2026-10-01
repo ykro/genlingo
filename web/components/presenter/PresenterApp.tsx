@@ -293,7 +293,7 @@ function phraseSize(text: string) {
 }
 function answerSize(text: string) {
   const n = text.length;
-  return n <= 40 ? 76 : n <= 70 ? 64 : n <= 110 ? 54 : 46;
+  return n <= 40 ? 88 : n <= 70 ? 72 : n <= 110 ? 58 : 48;
 }
 
 function RoundView({ round, live, online = true }: { round?: Round; live?: { phrase: string; direction: Direction; startedAt: number }; online?: boolean }) {
@@ -319,7 +319,16 @@ function RoundView({ round, live, online = true }: { round?: Round; live?: { phr
       )}
       <div className={s.columns}>
         {(["david", "goliath"] as const).map((side) => (
-          <Column key={side} side={side} result={round?.[side]} startedAt={live?.startedAt} winner={round?.winner === side} evaluation={round?.round_type === "evaluation"} online={online} />
+          <Column
+            key={side}
+            side={side}
+            result={round?.[side]}
+            startedAt={live?.startedAt}
+            winner={round?.winner === side}
+            loser={!!round?.winner && round.winner !== "draw" && round.winner !== side}
+            evaluation={round?.round_type === "evaluation"}
+            online={online}
+          />
         ))}
       </div>
     </section>
@@ -342,6 +351,7 @@ function Column({
   result,
   startedAt,
   winner,
+  loser,
   evaluation,
   online,
 }: {
@@ -349,6 +359,7 @@ function Column({
   result?: ContenderResult;
   startedAt?: number;
   winner: boolean;
+  loser: boolean;
   evaluation: boolean;
   online: boolean;
 }) {
@@ -386,7 +397,7 @@ function Column({
     );
   }
   return (
-    <article className={s.column}>
+    <article className={`${s.column} ${loser ? s.loser : ""}`}>
       {label}
       <p className={`display ${s.answer}`} style={{ fontSize: answerSize(result.text) }}>
         {result.text}

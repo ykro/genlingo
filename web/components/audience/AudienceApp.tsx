@@ -187,7 +187,7 @@ function RoundCard({
           return (
             <button
               key={side}
-              className={`${s.vote} ${s[side]} ${chosen ? s.chosen : ""} ${myVote && !chosen ? s.notChosen : ""}`}
+              className={`${s.vote} ${s[side]} ${chosen ? s.chosen : ""} ${(myVote || closed) && !chosen ? s.notChosen : ""}`}
               disabled={closed || !!myVote || !!pending}
               aria-pressed={chosen}
               onClick={() => vote(side)}

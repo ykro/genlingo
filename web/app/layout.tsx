@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Big_Shoulders, Figtree } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
 import "./globals.css";
 
-// Fonts are downloaded at build time and served by the app itself: the presenter view keeps
-// its typography with Wi-Fi off.
-const display = Big_Shoulders({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-display" });
-const body = Figtree({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-body" });
+// Fonts live in the repo (app/fonts, OFL) and are served by the app itself: the presenter view
+// keeps its typography with Wi-Fi off, and builds never depend on fetching fonts.
+const display = localFont({ src: "./fonts/BigShoulders-latin.woff2", weight: "500 800", variable: "--font-display", display: "swap" });
+const body = localFont({ src: "./fonts/Figtree-latin.woff2", weight: "400 700", variable: "--font-body", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Genlingo",

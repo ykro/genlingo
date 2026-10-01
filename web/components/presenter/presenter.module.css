@@ -591,3 +591,10 @@
   font-size: 22px;
   font-weight: 500;
 }
+
+/* Once a round is decided, the losing column steps back so the back row sees who won. */
+.loser .answer,
+.loser .figure {
+  color: color-mix(in oklch, var(--ink) 45%, var(--paper));
+  transition: color 400ms 300ms var(--ease-out);
+}
