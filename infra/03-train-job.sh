@@ -14,9 +14,10 @@ IMAGE="${IMAGE:-$(bash "$INFRA_DIR/02-train-image.sh")}"
 
 # GPU jobs: tasks may run at most 1 h. L4 minimums on Cloud Run: 4 vCPU / 16 GiB. We use 8 / 32 GiB: loading, merging and converting a
 # 5B-parameter checkpoint is CPU- and RAM-heavy. Cloud Run's filesystem lives in memory, so the
-# bulky checkpoints (base weights ~10 GB, merged model) go to a Cloud Storage volume at /mnt/work
-# in the same region as the GPU (cached for the next retrain); GGUFs (~13 GB) are written to the
-# in-memory disk, because the GGUF writers do many small writes that a bucket mount handles badly.
+# base weights (~10 GB, read once) go to a Cloud Storage volume at /mnt/work
+# in the same region as the GPU (cached for the next retrain). The merged model and the GGUFs go to the
+# in-memory disk: the converter does many small random reads and writes that a bucket mount handles
+# at ~3 MB/s. The merged model is deleted once converted to keep peak memory under 32 GiB.
 say "Cloud Run Job ${JOB} (${TRAIN_REGION}, 1x L4)"
 verb=(create)
 exists gcloud run jobs describe "$JOB" --region "$TRAIN_REGION" && verb=(update --clear-volumes --clear-volume-mounts)
@@ -29,6 +30,6 @@ gcloud run jobs "${verb[@]}" "$JOB" \
   --service-account "$SA_EMAIL" \
   --add-volume "name=work,type=cloud-storage,bucket=${STAGING_BUCKET#gs://}" \
   --add-volume-mount "volume=work,mount-path=/mnt/work" \
-  --set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID},CACHE_DIR=/mnt/work/${APP}/base-cache,OUT_DIR=/tmp/out" \
+  --set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID},CACHE_DIR=/mnt/work/${APP}/base-cache,OUT_DIR=/tmp/out,MERGED_DIR=/tmp/merged,DROP_MERGED=1" \
   --quiet
 echo "$JOB"
