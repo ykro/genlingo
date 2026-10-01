@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "test:rules": "firebase emulators:exec --only firestore --project demo-genlingo 'vitest run -c vitest.rules.config.ts'"
+    "test:rules": "firebase emulators:exec --only firestore --project demo-genlingo 'vitest run -c vitest.rules.config.mts'"
   },
   "dependencies": {
     "firebase": "^12.19.0",

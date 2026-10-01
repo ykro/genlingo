@@ -6,6 +6,8 @@ UV      := uv run --project duel
 TAG     ?= genlingo-$(shell date +%Y-%m)
 DUEL_PORT ?= 8787
 DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
+# JDK 21 for the Firestore emulator (rules tests), only inside make: brew install openjdk@21
+JAVA21    := $(shell brew --prefix openjdk@21 2>/dev/null)/libexec/openjdk.jdk/Contents/Home
 
 .PHONY: help up duel reset test eval train train-local train-data pull-model export review-test review-test-apply \
         test-set pairs datasheet data deploy
@@ -22,6 +24,9 @@ reset: ## Clear rounds, votes and scoreboard (local + this event's Firestore rou
 test: ## Run all tests (no network: MOCK_AI in tests)
 	cd duel && MOCK_AI=1 uv run pytest -q
 	@if [ -d web/node_modules ]; then cd web && npm test --silent && npx tsc --noEmit && npx eslint . ; else echo "(web: npm install first to run its tests)"; fi
+	@if [ -x "$(JAVA21)/bin/java" ] && [ -d web/node_modules ]; then \
+	  cd web && JAVA_HOME="$(JAVA21)" PATH="$(JAVA21)/bin:$$PATH" npm run --silent test:rules; \
+	else echo "(rules: brew install openjdk@21 to run the Firestore rules tests)"; fi
 
 eval: ## Test set through base models, David and Goliath -> evals/report.md
 	$(UV) python evals/run_eval.py $(EVAL_ARGS)
