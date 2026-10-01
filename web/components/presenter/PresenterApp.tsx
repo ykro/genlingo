@@ -27,7 +27,7 @@ const seconds = (ms: number | null | undefined) =>
 function usd(x: number | null | undefined) {
   if (x == null) return "—";
   if (x === 0) return "$0";
-  if (x >= 1) return `$${x.toFixed(2)}`;
+  if (x >= 0.1) return `$${x.toFixed(2)}`;
   if (x >= 0.01) return `$${x.toFixed(3)}`;
   return `$${x.toPrecision(2)}`;
 }

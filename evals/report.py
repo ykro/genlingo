@@ -29,7 +29,11 @@ def _gb(b):
 
 
 def _usd(x):
-    return "—" if x is None else ("$0" if x == 0 else f"${x:.4f}" if x < 1 else f"${x:,.2f}")
+    if x is None:
+        return "—"
+    if x == 0:
+        return "$0"
+    return f"${x:,.2f}" if x >= 0.1 else f"${x:.4f}"
 
 
 def table(head, rows):
@@ -177,7 +181,12 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None) -> str:
                   _usd(run.get("estimated_cost_usd")), f"{_n(met.get('train_loss_first'), 2)} → {_n(met.get('train_loss_last'), 2)}"]],
             ),
             "",
-            f"Costo = duración × tarifa por hora estimada (${run.get('hourly_usd')}/h). La inferencia de David cuesta $0: corre en la laptop.",
+            (
+                "Costo = segundos facturados × tarifas por segundo de Cloud Run (GPU L4 sin redundancia zonal + vCPU + memoria)."
+                if run.get("rates_usd_per_s")
+                else f"Costo = duración × tarifa por hora estimada (${run.get('hourly_usd', 0)}/h)."
+            )
+            + " Un reentrenamiento mensual cuesta eso; la inferencia de David cuesta $0 porque corre en la laptop.",
             "",
         ]
     else:
