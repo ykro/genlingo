@@ -26,6 +26,6 @@ COPY --from=llama /opt/llama.cpp/convert_hf_to_gguf.py /opt/llama.cpp/convert_hf
 COPY --from=llama /opt/llama.cpp/conversion /opt/llama.cpp/conversion
 COPY --from=llama /opt/llama.cpp/gguf-py /opt/llama.cpp/gguf-py
 COPY --from=llama /opt/llama.cpp/models /opt/llama.cpp/models
-COPY train_lora.py finish.py /app/
+COPY train_lora.py finish.py preference.py /app/
 ENV LLAMA_CPP_DIR=/opt/llama.cpp WORK_DIR=/tmp/train_lora PYTHONUNBUFFERED=1 HF_HUB_DISABLE_TELEMETRY=1
 ENTRYPOINT ["python", "/app/train_lora.py"]

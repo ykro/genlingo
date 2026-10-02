@@ -86,6 +86,33 @@ set; los números de su momento (sobre sets anteriores) están en el historial d
 - **Resultado:** 4 pares de prueba fuera (403 → 399). Se quitaron del set de prueba, no del entrenamiento,
   porque David ya estaba entrenado. Todos los números de esta bitácora son del set limpio.
 
+## 8 · El error de las contrapartes (callejón sin salida descubierto tarde)
+
+- **Qué:** una revisión de los datos encontró que `pairs-v3` elegía la contraparte de cada término como
+  su vecino más cercano por *embedding* del texto «término: significado», que pesa más la forma de la
+  palabra que su significado. **175 de los 217 enlaces** término → contraparte tenían coseno < 0.6 y
+  significaban otra cosa («brainrot → patatús», «luca → crush», «slay → tener el tupé»), y cubrían
+  **1,065 de los 1,375** pares sintéticos. David llegó al 82 % aprendiendo, en parte, sustituciones con el
+  significado equivocado. Además, en el entrenamiento el término correcto estaba en el glosario solo el
+  45 % de las veces.
+- **Qué cambió:**
+  1. **Contrapartes validadas por significado** (`data/counterparts.jsonl`): vecinos mutuos con coseno
+     ≥ 0.65, o la elección de Gemini entre los 5 candidatos confirmada por una palabra de significado
+     compartida. Solo 63 de 382 términos tienen contraparte: la mayoría de las expresiones de papás no
+     tiene un equivalente Gen Z en el banco, y es mejor decir el significado que inventar uno.
+  2. **`pairs-v5`** (1,500 pares, $0.71) y **pares de varios términos** (800, $0.51) generados solo con
+     esos enlaces; sin contraparte, el lado de papás dice el significado con palabras normales.
+  3. **Glosario de léxico** (`v2+lex`): cada término de la frase con su contraparte validada, términos
+     cercanos y un término de otro país marcado como «NO de aquí»; en el entrenamiento, la respuesta
+     está en el glosario en el 85 % de los ejemplos.
+  4. **Etapa de preferencias (ORPO)** en el mismo job: 8 respuestas por frase, ordenadas con el banco;
+     los pares viejos con el significado equivocado son las respuestas rechazadas.
+  5. **N-best**: varias respuestas en paralelo y el banco elige.
+  6. **Un set de desarrollo** (73 pares reales, 20 % de los reales de entrenamiento) para decidir, y
+     métricas que miran el significado (jerga correcta), registradas antes de calcularlas.
+- **Resultado:** pendiente de la próxima corrida; se anota aquí con los números de desarrollo primero
+  y del set de prueba una sola vez.
+
 ## Dónde gana David hoy, y dónde no
 
 Nichos definidos antes de mirar resultados ([evals/niche.md](../evals/niche.md)); IC 95 % por bootstrap

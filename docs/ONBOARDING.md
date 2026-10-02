@@ -107,6 +107,8 @@ FIREBASE_APP_ID=$FIREBASE_APP_ID bash infra/06-app-check.sh   # imprime site key
 EVENT_ID=gdg-guate-2027-03 EVENT_COUNTRY=GT RECAPTCHA_SITE_KEY=<site key> make deploy
 ```
 
+> **La llave de navegador es solo de Genlingo.** La app web usa la llave `Browser key (auto created by Firebase)` (`FIREBASE_API_KEY`), restringida por referente HTTP a `https://genlingo-611681112050.us-central1.run.app/*`, `https://genlingo-z63pqhhmxq-uc.a.run.app/*`, `localhost`/`127.0.0.1` en los puertos 3000 y 3100, y a cinco APIs (Identity Toolkit, Secure Token, Firestore, App Check, Installations). Ninguna otra app del proyecto debe usarla: una app nueva crea su propia llave. Antes de cambiar llaves, App Check o IAM del proyecto, avisa a quien coordina las demos de `ai-experiments-487722`: son recursos compartidos. `web/e2e/appcheck-firestore.sh` manda el `Referer` de Cloud Run por esa restricción.
+
 > **App Check en Firestore es por proyecto.** `ENFORCE_FIRESTORE=1` obliga a *todas* las apps cliente de *todas* las bases de Firestore de `ai-experiments-487722` a mandar tokens de App Check. El Admin SDK y el acceso por IAM no se ven afectados. Revisa las otras demos del proyecto antes de activarlo. `web/e2e/appcheck-firestore.sh` demuestra el efecto: sin token, 403; con token, 200.
 
 ### Tokens de depuración de App Check

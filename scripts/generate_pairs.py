@@ -1,4 +1,4 @@
-"""Generate synthetic TRAINING pairs with Gemini, built from the term bank (pairs-v3).
+"""Generate synthetic TRAINING pairs with Gemini, built from the term bank (pairs-v5).
 
     uv run --project duel python scripts/generate_pairs.py [--target 1500] [--seed 2027]
 
@@ -11,8 +11,13 @@ History, because the talk shows it:
     * rebalanced toward papás -> Gen Z (the direction David was worst at);
     * hard negatives: "in Mexico it's «feria», not «pisto» (Guatemala)";
     * every pair is validated against the term bank; the reasons for rejection are counted.
+- pairs-v5 (this file now): v3 found each counterpart as the embedding-nearest term, and 175 of its 217
+  links meant something else ("brainrot -> patatús"). Counterparts now come only from the
+  meaning-validated table (data/counterparts.jsonl, scripts/build_counterparts.py). Without a
+  validated counterpart, the parents' side says the term's MEANING in plain words, and calls that
+  need a parents' term (p2g_parent, g2p_parent) are skipped. v3 lives in data/pairs/archive/.
 
-Counterparts and traps are found with EmbeddingGemma over the term meanings (local, Ollama).
+Traps (hard negatives) are the foreign term nearest by embedding (cached vectors, no model call).
 Why synthetic only for training: a test set written by Gemini would reward Gemini (Goliath) for
 sounding like itself; the test set comes from real web usage instead (scripts/build_test_set.py).
 Every pair records model, prompt version, seed and the term ids it was built from.
@@ -33,7 +38,7 @@ import unicodedata
 from pathlib import Path
 
 from _common import ROOT  # noqa: F401  (puts duel/ on sys.path)
-from duel_core import OllamaClient, cost_usd  # noqa: E402
+from duel_core import cost_usd  # noqa: E402
 from genlingo_duel.dataset import Pair, read_jsonl, write_jsonl  # noqa: E402
 from genlingo_duel.glossary import Glossary, hashing_embedder  # noqa: E402
 from genlingo_duel.overlap import TextIndex  # noqa: E402
@@ -41,7 +46,7 @@ from genlingo_duel.prompts import COUNTRIES  # noqa: E402
 from genlingo_duel.settings import get_settings, goliath_prices  # noqa: E402
 from genlingo_duel.terms import TermBank  # noqa: E402
 
-PROMPT_VERSION = "pairs-v3"
+PROMPT_VERSION = "pairs-v5"
 PAIRS_PER_CALL = 4
 MAX_WORDS = 30
 # Share of calls per kind (p2g = papás -> Gen Z, g2p = Gen Z -> papás). 60 % p2g.
@@ -87,8 +92,15 @@ def nearest(vectors: dict[str, list[float]], tid: str, candidates: list[str]) ->
     return max(cands, key=lambda c: _cos(vectors[tid], vectors[c]), default=None) if tid in vectors else None
 
 
-def plan_calls(bank: TermBank, vectors: dict[str, list[float]], target: int, seed: int) -> list[dict]:
-    """Round-robin over countries and terms; each call = one kind, one anchor term, its counterpart."""
+def load_counterparts(data_dir: Path) -> dict[str, str | None]:
+    """term_id -> meaning-validated counterpart id (or None). Missing table = no counterparts at all."""
+    return {r["term_id"]: r["counterpart_id"] for r in read_jsonl(data_dir / "counterparts.jsonl")}
+
+
+def plan_calls(bank: TermBank, vectors: dict[str, list[float]], target: int, seed: int,
+               counterparts: dict[str, str | None] | None = None) -> list[dict]:
+    """Round-robin over countries and terms; each call = one kind, one anchor term, its validated counterpart."""
+    counterparts = counterparts or {}
     rng = random.Random(seed)
     n_calls = -(-target // PAIRS_PER_CALL)
     kinds = [k for k, share in MIX.items() for _ in range(round(share * 20))]
@@ -105,8 +117,9 @@ def plan_calls(bank: TermBank, vectors: dict[str, list[float]], target: int, see
         cursors[key] = cursors.get(key, rng.randrange(len(pool)))
         anchor = pool[cursors[key] % len(pool)]
         cursors[key] += 1
-        other_gen = "genz" if anchor_gen == "parent" else "parent"
-        counterpart = nearest(vectors, anchor, bank.ids(other_gen, [country, "LATAM"]))
+        counterpart = counterparts.get(anchor)
+        if kind in ("p2g_parent", "g2p_parent") and not counterpart:
+            continue  # needs a parents' term with the same meaning: no validated link, no call
         trap = None
         if kind == "p2g_trap":
             foreign = [t for t in bank.ids("genz") if bank.terms[t]["country"] not in (country, "LATAM")]
@@ -126,15 +139,16 @@ def render(bank: TermBank, call: dict) -> tuple[str, str]:
     country = call["country"]
     a, cp = call["anchor"], call["counterpart"]
     plain_parent = "español coloquial de papás, sin ninguna jerga juvenil"
-    if call["kind"] in ("p2g_genz", "p2g_trap"):  # parent source (plain or counterpart) -> genz target with anchor
-        source_rule = f"{plain_parent}" + (f"; si encaja, la expresión de papás {_term(bank, cp)}" if cp else "")
+    meaning = f"la idea de «{bank.terms[a]['term']}» dicha con palabras normales ({bank.terms[a]['meaning']})"
+    if call["kind"] in ("p2g_genz", "p2g_trap"):  # parent source (meaning or counterpart) -> genz target with anchor
+        source_rule = f"{plain_parent}: {meaning}" + (f"; si encaja, la expresión de papás {_term(bank, cp)}" if cp else "")
         target_rule = f"el término Gen Z {_term(bank, a)}"
     elif call["kind"] == "p2g_parent":  # parent anchor in source -> genz counterpart in target
         source_rule = f"la expresión de papás {_term(bank, a)}"
         target_rule = f"el término Gen Z {_term(bank, cp)}" if cp else "jerga Gen Z de " + COUNTRIES[country]
-    elif call["kind"] == "g2p_genz":  # genz anchor in source -> plain/parent target
+    elif call["kind"] == "g2p_genz":  # genz anchor in source -> its meaning (or validated counterpart) in target
         source_rule = f"el término Gen Z {_term(bank, a)}"
-        target_rule = plain_parent + (f"; si encaja, la expresión de papás {_term(bank, cp)}" if cp else "")
+        target_rule = (f"{plain_parent}: la expresión de papás {_term(bank, cp)}" if cp else f"{plain_parent}: {meaning}")
     else:  # g2p_parent: genz counterpart in source -> parent anchor in target
         source_rule = f"el término Gen Z {_term(bank, cp)}" if cp else "jerga Gen Z de " + COUNTRIES[country]
         target_rule = f"la expresión de papás {_term(bank, a)}"
@@ -279,13 +293,11 @@ async def main_async(args: argparse.Namespace) -> None:
     data = s.data_dir
     bank = TermBank(read_jsonl(data / "terms.jsonl"))
     if s.mock_ai:
-        glossary = await Glossary(bank, hashing_embedder()).load()
-    else:
-        ollama = OllamaClient(s.ollama_url)
-        glossary = await Glossary(bank, lambda texts: ollama.embed(texts, model=s.embedding_model),
-                                  cache=data / ".cache" / "term_embeddings.json", model=s.embedding_model).load()
+        vectors = (await Glossary(bank, hashing_embedder()).load()).vectors
+    else:  # cached EmbeddingGemma vectors, used only to pick traps (no model call)
+        vectors = json.loads((data / ".cache" / "term_embeddings.json").read_text())["vectors"]
     # Over-generate: validation against the term bank is strict and rejects a good share.
-    calls = plan_calls(bank, glossary.vectors, int(args.target * 1.8), args.seed)
+    calls = plan_calls(bank, vectors, int(args.target * 2.2), args.seed, load_counterparts(data))
     model = "mock" if s.mock_ai else s.gemini_model
     usage = {"input": 0, "output": 0}
     t0 = time.time()
@@ -324,7 +336,7 @@ async def main_async(args: argparse.Namespace) -> None:
     meta = {
         "model": model, "prompt_version": PROMPT_VERSION, "base_seed": args.seed, "calls": len(calls),
         "generated": len(pairs), "valid": len(kept), "kept": len(final), "dropped": dropped, "kinds": kinds,
-        "embedding_model": "mock" if s.mock_ai else s.embedding_model, "tokens": usage,
+        "counterparts": "data/counterparts.jsonl", "tokens": usage,
         "cost_usd": round(cost_usd(goliath_prices(s).at(), usage["input"], usage["output"]), 4),
         "duration_s": round(time.time() - t0, 1), "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
     }

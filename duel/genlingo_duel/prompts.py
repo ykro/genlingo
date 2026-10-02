@@ -57,7 +57,12 @@ TRANSLATE_V2 = PromptTemplate(
 
 # Prompt styles: the duel uses, for each David tag, the style its training data was rendered
 # with (train/runs/<tag>.json); base models and Goliath can use any of them.
-STYLES = ("v1", "v2", "v2+glossary")
+# v2+glossary: glossary = slang found in the phrase + nearest terms by embedding.
+# v2+lex: glossary from the meaning-validated lexicon: each slang term found in the phrase WITH its
+# counterpart in the other generation, nearest terms to fill, and one term from another country
+# marked as such (k=6). David trained on v2+lex sees the answer when the lexicon has it.
+STYLES = ("v1", "v2", "v2+glossary", "v2+lex")
+GLOSSARY_STYLES = {"v2+glossary": "embed", "v2+lex": "lex"}
 
 
 def translation_messages(
@@ -77,8 +82,9 @@ def translation_messages(
     fields = dict(country_name=COUNTRIES[country], source_gen=source_gen, target_gen=target_gen, phrase=phrase.strip())
     if style == "v1":
         return TRANSLATE.render(**fields)
-    return TRANSLATE_V2.render(**fields, glossary=glossary if style == "v2+glossary" else "")
+    return TRANSLATE_V2.render(**fields, glossary=glossary if style in GLOSSARY_STYLES else "")
 
 
 def prompt_version(style: str) -> str:
-    return {"v1": TRANSLATE.version, "v2": TRANSLATE_V2.version, "v2+glossary": TRANSLATE_V2.version + "+glossary"}[style]
+    return {"v1": TRANSLATE.version, "v2": TRANSLATE_V2.version, "v2+glossary": TRANSLATE_V2.version + "+glossary",
+            "v2+lex": TRANSLATE_V2.version + "+lex"}[style]

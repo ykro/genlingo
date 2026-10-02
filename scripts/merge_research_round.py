@@ -1,29 +1,32 @@
-"""Fold a research round (data/raw/*_v2) into the term bank and SOURCES.md.
+"""Fold a research round (data/raw/*_vN) into the term bank and SOURCES.md.
 
-    uv run --project duel python scripts/merge_research_round.py
+    uv run --project duel python scripts/merge_research_round.py [v2|v3]
 
-- terms_v2.jsonl -> appended to terms.jsonl (skipping a term already present for the same country);
-- sources_v2.md  -> its table rows appended to the SOURCES.md table, its notes under "Round 2".
-web_usage_v2.jsonl stays in data/raw/: scripts/real_usage.py splits it between test and training.
+- terms_vN.jsonl -> appended to terms.jsonl (skipping a term already present for the same country);
+- sources_vN.md  -> its table rows appended to the SOURCES.md table, its notes under "Round 2".
+web_usage_vN.jsonl stays in data/raw/: scripts/real_usage.py splits it (v2: test/train; v3: train/dev).
 Idempotent: running it twice adds nothing.
 """
 
 from __future__ import annotations
 
 import re
+import sys
 
 from _common import DATA
 from genlingo_duel.dataset import read_jsonl, write_jsonl
 from genlingo_duel.terms import normalize
 
 RAW = DATA / "raw"
+ROUND = sys.argv[1] if len(sys.argv) > 1 else "v2"
+ROUND_TITLE = {"v2": "Round 2 (2026-10-01)", "v3": "Round 3 (2026-10-02)"}
 
 
 def merge_terms() -> int:
     terms = list(read_jsonl(DATA / "terms.jsonl"))
     have = {(normalize(t["term"]), t["country"]) for t in terms} | {t["id"] for t in terms}
     added = 0
-    for t in read_jsonl(RAW / "terms_v2.jsonl"):
+    for t in read_jsonl(RAW / f"terms_{ROUND}.jsonl"):
         if t["id"] in have or (normalize(t["term"]), t["country"]) in have:
             continue
         terms.append(t)
@@ -36,7 +39,7 @@ def merge_terms() -> int:
 def merge_sources() -> int:
     path = DATA / "SOURCES.md"
     text = path.read_text(encoding="utf-8")
-    new = (RAW / "sources_v2.md").read_text(encoding="utf-8")
+    new = (RAW / f"sources_{ROUND}.md").read_text(encoding="utf-8")
     have = set(re.findall(r"^\|\s*(S\d+)\s*\|", text, flags=re.M))
     rows = [ln for ln in new.splitlines() if re.match(r"^\|\s*S\d+\s*\|", ln) and re.match(r"^\|\s*(S\d+)", ln).group(1) not in have]
     if not rows:
@@ -45,8 +48,9 @@ def merge_sources() -> int:
     last = max(i for i, ln in enumerate(lines) if re.match(r"^\|\s*S\d+\s*\|", ln))
     lines[last + 1:last + 1] = rows
     notes = [ln for ln in new.splitlines() if ln.strip() and not ln.startswith("|") and not ln.startswith("#")]
-    if notes and "## Round 2" not in text:
-        lines += ["", "## Round 2 (2026-10-01): sources checked", "", *notes]
+    title = ROUND_TITLE.get(ROUND, ROUND)
+    if notes and f"## {title}" not in text:
+        lines += ["", f"## {title}: sources checked", "", *notes]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return len(rows)
 

@@ -1,0 +1,36 @@
+{
+  "model": "gemini-3.8-flash",
+  "prompt_version": "pairs-v5-multi",
+  "base_seed": 2028,
+  "calls": 390,
+  "generated": 1560,
+  "valid": 919,
+  "kept": 800,
+  "dropped": {
+    "source_missing_term": 293,
+    "target_missing_counterpart": 201,
+    "parent_term_left_in_target": 17,
+    "foreign_term": 101,
+    "genz_slang_in_source": 7,
+    "test_leak": 9,
+    "duplicate": 11,
+    "slang_left_in_target": 2
+  },
+  "kinds": {
+    "p2g_multi": 321,
+    "p2g_plain": 239,
+    "g2p_multi": 240
+  },
+  "countries": {
+    "GT": 435,
+    "CO": 211,
+    "MX": 154
+  },
+  "tokens": {
+    "input": 212554,
+    "output": 94207
+  },
+  "cost_usd": 0.5127,
+  "duration_s": 338.9,
+  "generated_at": "2026-10-02T11:05:46-0600"
+}

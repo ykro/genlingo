@@ -26,14 +26,15 @@ sys.path.insert(0, str(ROOT / "duel"))
 sys.path.insert(0, str(ROOT / "evals"))
 
 from duel_core import GeminiClient, MockClient, OllamaClient, Price, clean_translation, cost_usd  # noqa: E402
-from genlingo_duel.dataset import test_pairs  # noqa: E402
+from genlingo_duel.dataset import load_pairs, test_pairs  # noqa: E402
 from genlingo_duel.glossary import render as render_glossary  # noqa: E402
-from genlingo_duel.prompts import COUNTRIES, translation_messages  # noqa: E402
+from genlingo_duel.prompts import COUNTRIES, GLOSSARY_STYLES, translation_messages  # noqa: E402
+from genlingo_duel.rerank import NBestClient, term_bank_scorer  # noqa: E402
 from genlingo_duel.settings import get_settings, goliath_prices  # noqa: E402
 from report import write_report  # noqa: E402
 
 
-def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str]) -> list[dict]:
+def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str], nbest: int = 1) -> list[dict]:
     """Every variant is (model, prompt style). Labels are what the report shows.
 
     - base models (BASE_MODEL_TAGS) with the plain v2 prompt; the first one also with the glossary,
@@ -47,24 +48,31 @@ def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str
     from genlingo_duel.arena import prompt_style_for
 
     def add(name, role, kind, style, **kw):
-        label = name + (" + glosario" if style == "v2+glossary" else "")
+        label = name + {"v2+glossary": " + glosario", "v2+lex": " + léxico"}.get(style, "") + kw.pop("suffix", "")
         plan.append({"name": name, "label": label, "role": role, "kind": kind, "style": style, **kw})
+
+    # The glossary everyone else gets is the one the stage David uses (v2+lex or v2+glossary).
+    stage_style = prompt_style_for(s, s.david_tag)
+    gstyle = stage_style if stage_style in GLOSSARY_STYLES else "v2+glossary"
 
     plan: list[dict] = []
     bases = [t.strip() for t in os.environ.get("BASE_MODEL_TAGS", "").split(",") if t.strip()]
     for i, tag in enumerate(bases):
         add(tag, "base", "ollama", "v2")
         if i == 0:
-            add(tag, "base", "ollama", "v2+glossary")
+            add(tag, "base", "ollama", gstyle)
     davids = [t.strip() for t in os.environ.get("DAVID_TAGS", s.david_tag).split(",") if t.strip()]
     for tag in davids:
         role = "david" if tag == s.david_tag else "david_alt"
         add(tag, role, "ollama", prompt_style_for(s, tag), quant=quant_of(s, tag))
+        if nbest > 1 and prompt_style_for(s, tag) in GLOSSARY_STYLES:  # same David, N candidates reranked
+            add(tag, role + "_nbest", "ollama", prompt_style_for(s, tag), quant=quant_of(s, tag), nbest=nbest,
+                suffix=f" · N-best {nbest}")
         if available is None or {f"{tag}-f16", f"{tag}-f16:latest"} & available:  # only if it was pulled
             add(f"{tag}-f16", "david_f16" if role == "david" else "david_alt_f16", "ollama", prompt_style_for(s, tag), quant="F16")
     if with_goliath and s.gemini_model:
         add(s.gemini_model, "goliath", "gemini", "v2")
-        add(s.gemini_model, "goliath_glossary", "gemini", "v2+glossary")
+        add(s.gemini_model, "goliath_glossary", "gemini", gstyle)
     if only:
         plan = [m for m in plan if m["name"] in only or m["role"] in only or m["label"] in only]
     for m in plan:
@@ -86,16 +94,19 @@ def quant_of(s, tag: str) -> str:
     return run.get("quant") or (run.get("finish") or {}).get("quant") or (run.get("metrics") or {}).get("quant") or "Q4_K_M"
 
 
-async def run_model(m: dict, client, pairs, price: Price, concurrency: int, context: dict) -> list[dict]:
+async def run_model(m: dict, client, pairs, price: Price, concurrency: int, context: dict, bank=None) -> list[dict]:
     sem = asyncio.Semaphore(concurrency)
-    use_glossary = m["style"] == "v2+glossary"
+    ctx = context.get(m["style"], {})
 
     async def one(p):
-        block, retrieval_ms = context.get(p.id, ("", 0.0)) if use_glossary else ("", 0.0)
+        block, retrieval_ms, entries = ctx.get(p.id, ("", 0.0, []))
         msgs = translation_messages(p.source, p.direction, p.country, m["style"], block)
+        c_client = client
+        if m.get("nbest", 1) > 1:
+            c_client = NBestClient(client, m["nbest"], term_bank_scorer(bank, p.source, p.direction, p.country, entries))
         async with sem:
             try:
-                c = await client.complete(msgs, model=m["name"])
+                c = await c_client.complete(msgs, model=m["name"])
             except Exception as exc:
                 return {"pair_id": p.id, "model": m["label"], "error": f"{type(exc).__name__}: {exc}"[:200]}
         return {
@@ -112,24 +123,32 @@ async def run_model(m: dict, client, pairs, price: Price, concurrency: int, cont
     return list(await asyncio.gather(*(one(p) for p in pairs)))
 
 
-async def glossary_context(s, pairs) -> dict:
-    """Glossary block + retrieval time per test pair, computed once and shared by all variants."""
+async def glossary_context(s, pairs, styles: set[str]) -> tuple[dict, object]:
+    """Per glossary style: (block, retrieval ms, entries) per pair, computed once and shared by all variants."""
     from genlingo_duel.arena import Arena
 
     arena = Arena.from_settings(s)
     g = await arena.get_glossary()
     await g.embed(["calentamiento"])  # load the embedding model before timing
-    out = {}
-    for p in pairs:
-        t0 = time.perf_counter()
-        entries = await g.entries(p.source, p.direction, p.country)
-        out[p.id] = (render_glossary(entries, COUNTRIES[p.country]), (time.perf_counter() - t0) * 1000)
-    return out
+    out: dict[str, dict] = {}
+    for style in styles:
+        out[style] = {}
+        for p in pairs:
+            t0 = time.perf_counter()
+            if GLOSSARY_STYLES[style] == "lex":
+                entries = await g.lex_entries(p.source, p.direction, p.country)
+            else:
+                entries = await g.entries(p.source, p.direction, p.country)
+            out[style][p.id] = (render_glossary(entries, COUNTRIES[p.country]), (time.perf_counter() - t0) * 1000, entries)
+    return out, g.bank
 
 
 async def main_async(args) -> None:
     s = get_settings()
-    pairs = test_pairs(s.data_dir)
+    if args.split == "dev":  # data decisions are made here; the test set is touched once per round
+        pairs = [p for p in load_pairs(s.data_dir, ["pairs/dev_real.jsonl"]) if p.status in ("auto_validated", "approved")]
+    else:
+        pairs = test_pairs(s.data_dir)
     reviewed = True
     if not pairs:  # before validate_test_set ran: rehearsal numbers, clearly labelled
         pairs, reviewed = test_pairs(s.data_dir, include_pending=True), False
@@ -147,8 +166,9 @@ async def main_async(args) -> None:
         available = {x["name"] for x in models} | {x["model"] for x in models}
         sizes = {x["name"]: x.get("size") for x in models}
     only = [x.strip() for x in args.models.split(",")] if args.models else None
-    plan = model_plan(s, only, not args.no_goliath, available)
-    context = await glossary_context(s, pairs) if any(m["style"] == "v2+glossary" and not m.get("skip") for m in plan) else {}
+    plan = model_plan(s, only, not args.no_goliath, available, nbest=args.nbest)
+    gstyles = {m["style"] for m in plan if m["style"] in GLOSSARY_STYLES and not m.get("skip")}
+    context, bank = await glossary_context(s, pairs, gstyles) if gstyles else ({}, None)
 
     results, meta = [], []
     for m in plan:
@@ -171,7 +191,7 @@ async def main_async(args) -> None:
                 await ollama.warm_up(m["name"])
             m["size_bytes"] = sizes.get(m["name"]) or sizes.get(f"{m['name']}:latest")
         t0 = time.time()
-        rows = await run_model(m, client, pairs, price, conc, context)
+        rows = await run_model(m, client, pairs, price, conc, context, bank)
         m["wall_s"] = round(time.time() - t0, 1)
         errors = sum(1 for r in rows if "error" in r)
         print(f"-- {m['label']}: {len(rows) - errors} ok, {errors} errors, {m['wall_s']} s")
@@ -203,9 +223,12 @@ async def main_async(args) -> None:
         raw["models"] = kept + raw["models"]
         raw["results"] = [r for r in prev["results"] if r["model"] not in new_labels] + raw["results"]
         raw["merged_from"] = Path(args.merge_with).name
-    (out_dir / f"{stamp}.json").write_text(json.dumps(raw, ensure_ascii=False, indent=1))
-    report = write_report(raw, ROOT / "evals" / "report.md", runs_dir=s.runs_dir)
-    print(f"report -> evals/report.md ({len(report)} chars), raw -> evals/results/{stamp}.json")
+    raw["split"] = args.split
+    name = f"{stamp}.json" if args.split == "test" else f"dev-{stamp}.json"
+    (out_dir / name).write_text(json.dumps(raw, ensure_ascii=False, indent=1))
+    report_path = ROOT / "evals" / ("report.md" if args.split == "test" else "report_dev.md")
+    report = write_report(raw, report_path, runs_dir=s.runs_dir)
+    print(f"report -> {report_path.relative_to(ROOT)} ({len(report)} chars), raw -> evals/results/{name}")
 
 
 def main() -> None:
@@ -214,6 +237,9 @@ def main() -> None:
     ap.add_argument("--models", default="")
     ap.add_argument("--no-goliath", action="store_true")
     ap.add_argument("--merge-with", default="", help="earlier raw results to merge these variants into")
+    ap.add_argument("--split", choices=["test", "dev"], default="test", help="dev: data decisions; test: once per round")
+    ap.add_argument("--nbest", type=int, default=int(__import__("os").environ.get("EVAL_NBEST", "1")),
+                    help="also run each glossary-trained David with N candidates reranked by the term bank")
     asyncio.run(main_async(ap.parse_args()))
 
 

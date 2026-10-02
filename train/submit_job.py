@@ -70,6 +70,8 @@ def train_args(args, data_uri: str, work_dir: str | None = None) -> list[str]:
     ]
     if work_dir:
         out.append(f"--work-dir={work_dir}")
+    if getattr(args, "pref_uri", None):
+        out.append(f"--pref-data={args.pref_uri}")
     return out + list(args.extra)
 
 
@@ -225,6 +227,7 @@ def main() -> None:
     ap.add_argument("--tag", required=True)
     ap.add_argument("--data", required=True, help="local chat JSONL")
     ap.add_argument("--no-wait", action="store_true")
+    ap.add_argument("--pref", default="", help="preference prompts JSONL for the ORPO stage (optional)")
     ap.add_argument("--quant", default=os.environ.get("QUANT"), required=not os.environ.get("QUANT"),
                     help="GGUF quantization of the finished model (env QUANT, e.g. Q5_K_M)")
     ap.add_argument("--keep-f16", action="store_true", default=os.environ.get("KEEP_F16", "1") == "1",
@@ -240,6 +243,11 @@ def main() -> None:
 
     print(f"==> uploading {n_examples} examples to {data_uri}", flush=True)
     sh("gcloud", "storage", "cp", args.data, data_uri, "--quiet")
+    args.pref_uri = None
+    if args.pref:
+        args.pref_uri = f"{staging}/{args.app}/data/{args.tag}/pref.jsonl"
+        print(f"==> uploading preference prompts to {args.pref_uri}", flush=True)
+        sh("gcloud", "storage", "cp", args.pref, args.pref_uri, "--quiet")
     print("==> training image (Cloud Build, cached by content hash)", flush=True)
     image = sh("bash", str(REPO / "infra" / "02-train-image.sh")).splitlines()[-1]
 

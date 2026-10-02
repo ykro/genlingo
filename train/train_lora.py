@@ -8,7 +8,9 @@ End to end, one command (runs inside the Cloud Run GPU job, in Colab Enterprise,
 
 Stages (each timed in metrics.json):
   1. weights   download the base checkpoint (Hugging Face; token from Secret Manager when it exists)
-  2. train     LoRA with TRL + PEFT: only ~0.5% of the weights learn; the rest stay frozen
+  2. train     LoRA with TRL + PEFT (rank-stabilized): only ~1% of the weights learn; the rest stay frozen
+  2b. prefer   optional (--pref-data): sample N answers per prompt, rank them with the term bank,
+               and continue the same adapter with ORPO (train/preference.py)
   3. merge     fold the adapter back into the base weights -> a normal checkpoint
   4. gguf      llama.cpp: convert to GGUF f16, then quantize to QUANT (Q5_K_M: ~2.6x smaller)
   5. publish   Modelfile + GGUFs + adapter + metrics to gs://<bucket>/<tag>/
@@ -30,6 +32,7 @@ import time
 from pathlib import Path
 
 WEIGHT_SUFFIXES = (".safetensors", ".bin", ".pt")
+START = time.time()
 
 
 def log(msg: str) -> None:
@@ -181,7 +184,8 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
 
     lora = LoraConfig(
         r=args.lora_r,  # rank of the update matrices: capacity of what the adapter can learn
-        lora_alpha=args.lora_alpha,  # scale of the update (alpha/r = 2 is a common, stable choice)
+        lora_alpha=args.lora_alpha,  # scale of the update: alpha/sqrt(r) with rsLoRA, alpha/r without
+        use_rslora=args.rslora,  # rank-stabilized scaling keeps higher ranks from learning too slowly
         lora_dropout=0.05,
         # Only the text decoder learns. Gemma 4 small models also carry vision/audio towers;
         # translating slang doesn't need them, so they stay frozen and untouched.
@@ -215,7 +219,10 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
     losses = [h["loss"] for h in trainer.state.log_history if "loss" in h]
 
     adapter_dir = work / "adapter"  # on Cloud Run: the bucket volume, so it survives the job
-    trainer.model.save_pretrained(adapter_dir)
+    trainer.model.save_pretrained(adapter_dir)  # the SFT adapter first: if the preference stage fails, it stays
+    pref_stats = {}
+    if args.pref_data:
+        pref_stats = preference_stage(args, trainer.model, tokenizer, work, adapter_dir)
     stats = {
         "examples": len(dataset),
         "trainable_params": trainable,
@@ -227,6 +234,8 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
         "device": device,
         "train_s": round(train_s, 1),
         "adapter_dir": str(adapter_dir),
+        "lora": {"r": args.lora_r, "alpha": args.lora_alpha, "rslora": args.rslora},
+        **pref_stats,
     }
     if args.adapter_only:  # Cloud Run: merge + GGUF run in the next job (finish.py), not in GPU memory
         return {**stats, "merge_s": 0.0, "merged_dir": None}
@@ -253,6 +262,28 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
             shutil.copy2(f, merged_dir / f.name)
     merge_s = time.time() - t1
     return {**stats, "merge_s": round(merge_s, 1), "merged_dir": str(merged_dir)}
+
+
+def preference_stage(args, model, tokenizer, work: Path, adapter_dir: Path) -> dict:
+    """Sample, rank with the term bank, ORPO on the same adapter; skipped if the job is short on time."""
+    import preference
+
+    t0 = time.time()
+    rows = preference.load_rows(fetch(args.pref_data, work / "pref.jsonl"))[: args.pref_max]
+    preference.sample(model, tokenizer, rows, n=args.pref_samples, batch_prompts=args.pref_batch,
+                      max_new_tokens=64, temperature=0.8)
+    pairs, stats = preference.build_pairs(rows)
+    stats["sample_s"] = round(time.time() - t0, 1)
+    log(f"preference pairs: {json.dumps(stats)}")
+    left = args.deadline_s - (time.time() - START)
+    if left < args.orpo_min_s or not pairs:
+        log(f"skipping ORPO: {left:.0f}s left, {len(pairs)} pairs")
+        return {"pref": {**stats, "orpo": "skipped"}}
+    stats.update(preference.orpo(model, tokenizer, pairs, work / "orpo", lr=args.orpo_lr, beta=args.orpo_beta,
+                                 epochs=args.orpo_epochs, batch_size=4, grad_accum=4, max_length=args.max_length + 64,
+                                 seed=args.seed, max_steps=args.max_steps))
+    model.save_pretrained(adapter_dir)  # SFT + ORPO
+    return {"pref": stats}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -327,8 +358,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--ollama-renderer", default=env("OLLAMA_RENDERER"), required=not env("OLLAMA_RENDERER"),
                     help="Ollama RENDERER/PARSER of the base family, e.g. the one its Modelfile uses (env OLLAMA_RENDERER)")
     ap.add_argument("--temperature", type=float, default=0.2)
-    ap.add_argument("--lora-r", type=int, default=16)
-    ap.add_argument("--lora-alpha", type=int, default=32)
+    ap.add_argument("--lora-r", type=int, default=32)
+    ap.add_argument("--lora-alpha", type=int, default=16)
+    ap.add_argument("--rslora", action=argparse.BooleanOptionalAction, default=True)
+    # Preference stage (ORPO) after SFT, in the same job; off without --pref-data.
+    ap.add_argument("--pref-data", default=env("PREF_DATA", ""), help="preference prompts JSONL (local or gs://)")
+    ap.add_argument("--pref-samples", type=int, default=8)
+    ap.add_argument("--pref-max", type=int, default=400)
+    ap.add_argument("--pref-batch", type=int, default=8, help="prompts per generation batch (x samples)")
+    ap.add_argument("--orpo-lr", type=float, default=5e-5)
+    ap.add_argument("--orpo-beta", type=float, default=0.1)
+    ap.add_argument("--orpo-epochs", type=float, default=1)
+    ap.add_argument("--orpo-min-s", type=float, default=600, help="skip ORPO if less time than this is left")
+    ap.add_argument("--deadline-s", type=float, default=float(env("DEADLINE_S", "3300")), help="job time budget")
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--epochs", type=float, default=3)
     ap.add_argument("--max-steps", type=int, default=-1)

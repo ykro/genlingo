@@ -24,9 +24,10 @@ from duel_core import (
 )
 
 from .dataset import read_jsonl
-from .glossary import Glossary, hashing_embedder
+from .glossary import Glossary, hashing_embedder, load_counterparts
 from .glossary import render as render_glossary
-from .prompts import COUNTRIES, STYLES, Direction, prompt_version, translation_messages
+from .rerank import NBestClient, term_bank_scorer
+from .prompts import COUNTRIES, GLOSSARY_STYLES, STYLES, Direction, prompt_version, translation_messages
 from .runs import load_run
 from .settings import Settings, goliath_prices
 from .terms import TermBank
@@ -68,8 +69,9 @@ class Arena:
         if self.glossary is None:
             s = self.settings
             bank = TermBank(read_jsonl(s.data_dir / "terms.jsonl"))
+            counterparts = load_counterparts(s.data_dir / "counterparts.jsonl")
             if s.mock_ai or not s.embedding_model:
-                self.glossary = await Glossary(bank, hashing_embedder()).load()
+                self.glossary = await Glossary(bank, hashing_embedder(), counterparts=counterparts).load()
             else:
                 client = self.david_client  # Ollama: the same local server David runs on
                 self.glossary = await Glossary(
@@ -77,6 +79,7 @@ class Arena:
                     lambda texts: client.embed(texts, model=s.embedding_model),  # type: ignore[attr-defined]
                     cache=s.data_dir / ".cache" / "term_embeddings.json",
                     model=s.embedding_model,
+                    counterparts=counterparts,
                 ).load()
         return self.glossary
 
@@ -96,10 +99,10 @@ class Arena:
             Connectivity(force_offline=s.force_offline),
         )
 
-    def contenders(self, david_tag: str | None = None) -> list[Contender]:
+    def contenders(self, david_tag: str | None = None, david_client: ModelClient | None = None) -> list[Contender]:
         s = self.settings
         return [
-            Contender("david", self.david_client, david_tag or s.david_tag, Price.free()),
+            Contender("david", david_client or self.david_client, david_tag or s.david_tag, Price.free()),
             Contender(
                 "goliath",
                 self.goliath_client,
@@ -126,31 +129,48 @@ class Arena:
         s = self.settings
         tag = david_tag or s.david_tag
         styles = {"david": prompt_style_for(s, tag), "goliath": s.goliath_prompt_style}
-        entries: list[dict] = []
-        retrieval_ms = 0.0
-        glossary_error = None
-        if "v2+glossary" in styles.values():
-            t0 = time.perf_counter()
-            try:
-                entries = await (await self.get_glossary()).entries(phrase, direction, country)
-            except Exception as exc:  # embedding model missing or Ollama hiccup: duel without glossary, never a 500
-                log.warning("glossary unavailable, continuing without it: %s", exc)
-                glossary_error = f"{type(exc).__name__}: {exc}"[:200]
-            retrieval_ms = (time.perf_counter() - t0) * 1000
-        block = render_glossary(entries, COUNTRIES[country])
-        messages = {name: translation_messages(phrase, direction, country, style, block) for name, style in styles.items()}
+        glossaries: dict[str, tuple[list[dict], float, str | None]] = {}
+        for style in {st for st in styles.values() if st in GLOSSARY_STYLES}:
+            glossaries[style] = await self.glossary_entries(style, phrase, direction, country)
+        messages = {
+            name: translation_messages(phrase, direction, country, style,
+                                       render_glossary(glossaries[style][0], COUNTRIES[country]) if style in glossaries else "")
+            for name, style in styles.items()
+        }
         online = await self.is_online()
-        results = await run_duel(self.contenders(tag), messages, reference=reference, online=online)
+        david_client = None
+        if s.david_nbest > 1 and styles["david"] in glossaries:
+            g = await self.get_glossary()
+            scorer = term_bank_scorer(g.bank, phrase, direction, country, glossaries[styles["david"]][0])
+            david_client = NBestClient(self.david_client, s.david_nbest, scorer)
+        results = await run_duel(self.contenders(tag, david_client), messages, reference=reference, online=online)
         for name, res in results.items():
-            used = styles[name] == "v2+glossary"
+            entries, retrieval_ms, glossary_error = glossaries.get(styles[name], ([], 0.0, None))
+            used = styles[name] in glossaries
             # Retrieval is part of the answer: its time counts in the latency the audience sees.
             if used and res.latency_ms is not None:
                 res.latency_ms = round(res.latency_ms + retrieval_ms, 1)
             res.extra = {
                 "prompt": prompt_version(styles[name]),
-                "glossary": [e["term"] for e in entries] if used else [],
+                "glossary": [e["term"] for e in entries if e.get("role") != "foreign"] if used else [],
                 "retrieval_ms": round(retrieval_ms, 1) if used else 0.0,
             }
             if used and glossary_error:
                 res.extra["glossary_error"] = glossary_error
+            if name == "david" and david_client is not None:
+                res.extra["nbest"] = [{"text": t, "score": sc} for t, sc in david_client.last]
         return results
+
+    async def glossary_entries(self, style: str, phrase: str, direction: Direction, country: str) -> tuple[list[dict], float, str | None]:
+        """(entries, retrieval ms, error) for a glossary prompt style. A failure means no glossary, never a 500."""
+        t0 = time.perf_counter()
+        try:
+            g = await self.get_glossary()
+            if GLOSSARY_STYLES[style] == "lex":
+                entries = await g.lex_entries(phrase, direction, country)
+            else:
+                entries = await g.entries(phrase, direction, country)
+            return entries, (time.perf_counter() - t0) * 1000, None
+        except Exception as exc:  # embedding model missing or Ollama hiccup
+            log.warning("glossary unavailable, continuing without it: %s", exc)
+            return [], (time.perf_counter() - t0) * 1000, f"{type(exc).__name__}: {exc}"[:200]

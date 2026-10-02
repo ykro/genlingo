@@ -63,6 +63,8 @@ class Settings:
     allow_unreviewed_test: bool = field(default_factory=lambda: _flag("ALLOW_UNREVIEWED_TEST"))
     # Specialty rounds (key G): niche 1 of evals/niche.md (GT test pairs), in a fixed seeded order.
     specialty_seed: int = field(default_factory=lambda: int(_env("SPECIALTY_SEED", "2027")))
+    # David's N-best: candidates generated in parallel and reranked with the term bank (1 = off).
+    david_nbest: int = field(default_factory=lambda: int(_env("DAVID_NBEST", "1")))
 
 
 def goliath_prices(s: "Settings") -> PriceSchedule:

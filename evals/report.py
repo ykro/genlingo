@@ -13,7 +13,15 @@ sys.path.insert(0, str(ROOT / "duel"))
 from duel_core import chrf_pp, corpus_chrf_pp, percentile  # noqa: E402
 
 sys.path.insert(0, str(ROOT / "evals"))
-from term_accuracy import TermBank, change_recall, foreign_slang, slang_handled  # noqa: E402
+from term_accuracy import (  # noqa: E402
+    TermBank,
+    change_recall,
+    change_recall_synonyms,
+    correct_slang,
+    foreign_slang,
+    slang_handled,
+)
+from genlingo_duel.glossary import load_counterparts  # noqa: E402
 
 DATA = ROOT / "data"
 
@@ -41,8 +49,10 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
     for name, sm in summary.items():
         outputs[name] = {pid: text for pid, (_, text) in sm["sentence"].items()}
 
+    cps = load_counterparts(data_dir / "counterparts.jsonl")
+
     def scores(hyps: dict[str, str]) -> dict:
-        res = {"genz_to_parent": [], "parent_to_genz": [], "recall": []}
+        res = {"genz_to_parent": [], "parent_to_genz": [], "recall": [], "correct": [], "recall_syn": []}
         for pid, hyp in hyps.items():
             p = pairs[pid]
             ok = slang_handled(bank, p, linked.get(p["provenance"].get("usage_id"), []), hyp)
@@ -51,15 +61,23 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
             r = change_recall(p["source"], p["target"], hyp)
             if r is not None:
                 res["recall"].append(r)
+            if cps:  # Amendment 1 (niche.md): meaning-aware metrics
+                c = correct_slang(bank, cps, p, hyp)
+                if c is not None:
+                    res["correct"].append(c)
+                rs = change_recall_synonyms(bank, cps, p, hyp)
+                if rs is not None:
+                    res["recall_syn"].append(rs)
         return res
 
     def pct(xs):
         return f"{100 * sum(xs) / len(xs):.0f} % (n={len(xs)})" if xs else "—"
 
     computed = {name: scores(h) for name, h in outputs.items()}
+    mean = lambda xs: f"{100 * sum(xs) / len(xs):.0f} %" if xs else "—"  # noqa: E731
     rows = [
         [name, pct(c["genz_to_parent"]), pct(c["parent_to_genz"]), pct(c["genz_to_parent"] + c["parent_to_genz"]),
-         f"{100 * sum(c['recall']) / len(c['recall']):.0f} %" if c["recall"] else "—"]
+         mean(c["recall"]), pct(c["correct"]), mean(c["recall_syn"])]
         for name, c in computed.items()
     ]
     lines = [
@@ -74,7 +92,12 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
         "- **Cambios acertados**: de las palabras que la referencia humana cambió respecto al original, cuántas aparecen en la salida. "
         "Mide significado, pero solo con palabras exactas: un sinónimo válido cuenta como fallo para todos.",
         "",
-        table(["modelo", "jerga resuelta Gen Z → papás", "jerga resuelta papás → Gen Z", "jerga resuelta total", "cambios acertados"], rows),
+        "- **Jerga correcta** y **cambios acertados con sinónimos** (enmienda 1 de `evals/niche.md`): el término "
+        "producido tiene que significar lo mismo, según la tabla de contrapartes validada por significado "
+        "(`data/counterparts.jsonl`); con sinónimos, una palabra cuenta si coincide la raíz o es un término enlazado.",
+        "",
+        table(["modelo", "jerga resuelta Gen Z → papás", "jerga resuelta papás → Gen Z", "jerga resuelta total", "cambios acertados",
+               "jerga correcta", "cambios acertados (sinónimos)"], rows),
         "",
     ]
     def handled_total(c):
@@ -342,10 +365,14 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
     summary = summarize(raw)
     pairs = {p["id"]: p for p in raw["pairs"]}
     n_pairs = len(raw["pairs"])
+    dev = raw.get("split") == "dev"
     lines = [
-        "# Genlingo — evaluación",
+        "# Genlingo — evaluación" + (" en desarrollo" if dev else ""),
         "",
-        f"Generado por `make eval` el {raw['created_at']}. {n_pairs} pares de prueba "
+        *(["> **Set de desarrollo** (`data/pairs/dev_real.jsonl`): para decidir rondas de datos. Los Davids "
+           "entrenados antes del 2026-10-02 vieron estos pares al entrenar, así que su número aquí es optimista.", ""]
+          if dev else []),
+        f"Generado por `make eval` el {raw['created_at']}. {n_pairs} pares de {'desarrollo' if dev else 'prueba'} "
         f"({', '.join(sorted({p['origin'] for p in raw['pairs']}))}; nunca sintéticos), "
         + ", ".join(f"{v} {k}" for k, v in sorted(Counter(p["status"] for p in raw["pairs"]).items())) + ". "
         "`auto_validated` = validada automáticamente contra el banco de términos (`scripts/validate_test_set.py`).",

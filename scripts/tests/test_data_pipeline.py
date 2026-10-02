@@ -15,6 +15,8 @@ BANK = TermBank([
     {"id": "la-p1", "term": "qué pena", "meaning": "vergüenza", "generation": "parent", "country": "LATAM"},
 ])
 VEC = {tid: [1.0, float(i % 3)] for i, tid in enumerate(BANK.terms)}
+# Meaning-validated links (data/counterparts.jsonl): only these may be used as counterparts.
+CP = {"mx-g1": "mx-p1", "mx-p1": "mx-g1", "gt-g1": "gt-p1", "gt-p1": "gt-g1", "la-g1": "la-p1", "la-p1": "la-g1"}
 
 
 def call(kind, country="MX", anchor="mx-g1", counterpart="mx-p1", trap=None, direction=None):
@@ -27,9 +29,9 @@ def pair(c, source, target):
 
 
 def test_plan_leans_to_parent_to_genz_and_stays_in_country():
-    calls = plan_calls(BANK, VEC, 400, seed=3)
+    calls = plan_calls(BANK, VEC, 400, seed=3, counterparts=CP)
     p2g = sum(c["direction"] == "parent_to_genz" for c in calls)
-    assert 0.55 <= p2g / len(calls) <= 0.65
+    assert 0.55 <= p2g / len(calls) <= 0.70
     for c in calls:
         assert BANK.terms[c["anchor"]]["country"] in (c["country"], "LATAM")
         if c["counterpart"]:
@@ -37,6 +39,13 @@ def test_plan_leans_to_parent_to_genz_and_stays_in_country():
         if c["trap"]:
             assert BANK.terms[c["trap"]]["country"] not in (c["country"], "LATAM")
     assert len({c["seed"] for c in calls}) == len(calls)
+    assert all(c["counterpart"] in (None, CP.get(c["anchor"])) for c in calls)  # never an unvalidated neighbour
+
+
+def test_without_a_validated_counterpart_parent_anchored_calls_are_skipped():
+    calls = plan_calls(BANK, VEC, 400, seed=3, counterparts={})
+    assert calls and all(c["counterpart"] is None for c in calls)
+    assert not [c for c in calls if c["kind"] in ("p2g_parent", "g2p_parent")]
 
 
 def test_render_names_term_counterpart_and_trap():
@@ -64,10 +73,10 @@ def test_validate_genz_to_parent_removes_slang():
 
 
 def test_filter_counts_reasons_and_mock_pairs_validate():
-    calls = plan_calls(BANK, VEC, 40, seed=1)
+    calls = plan_calls(BANK, VEC, 40, seed=1, counterparts=CP)
     pairs = [p for c in calls for p in to_pairs(c, mock_generate(BANK, c), "mock")]
     kept, dropped = filter_pairs(BANK, {c["seed"]: c for c in calls}, pairs, TextIndex([]))
-    assert kept and all(p["provenance"]["prompt_version"] == "pairs-v3" for p in kept)
+    assert kept and all(p["provenance"]["prompt_version"] == "pairs-v5" for p in kept)
     assert all(isinstance(v, int) for v in dropped.values())
 
 

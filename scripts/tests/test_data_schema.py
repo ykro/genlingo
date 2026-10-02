@@ -54,10 +54,15 @@ def test_all_pairs_valid_and_test_split_never_synthetic():
 
 
 @needs("pairs/synthetic.jsonl")
-def test_no_test_sentence_leaks_into_training():
+def test_no_test_or_dev_sentence_leaks_into_training():
+    """Also as a substring (a test sentence quoted inside a longer training sentence counts)."""
+    from genlingo_duel.overlap import TextIndex
+
     pairs = load_pairs(DATA)
-    test_text = {normalize(x) for p in pairs if p.split == "test" for x in (p.source, p.target)}
-    leaks = [p.id for p in pairs if p.split == "train" and (normalize(p.source) in test_text or normalize(p.target) in test_text)]
+    train = TextIndex(x for p in pairs if p.split == "train" for x in (p.source, p.target))
+    usable = {"auto_validated", "approved"}
+    leaks = [p.id for p in pairs if p.split in ("test", "dev") and p.status in usable
+             and (train.overlaps(p.source) or train.overlaps(p.target))]
     assert not leaks, leaks[:5]
 
 
@@ -66,7 +71,7 @@ def test_synthetic_v3_leans_to_parent_to_genz_and_every_pair_passes_the_term_ban
     from generate_pairs import validate
     from genlingo_duel.terms import TermBank
 
-    syn = [p for p in load_pairs(DATA) if p.origin == "synthetic"]
+    syn = load_pairs(DATA, ["pairs/synthetic.jsonl"])  # pairs-v3 only; later versions have their own file
     c = Counter(p.direction for p in syn)
     assert 0.55 <= c["parent_to_genz"] / len(syn) <= 0.65
     meta = json.loads((DATA / "pairs" / "synthetic.meta.json").read_text())

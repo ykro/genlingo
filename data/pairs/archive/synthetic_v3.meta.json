@@ -1,0 +1,44 @@
+{
+  "model": "gemini-3.8-flash",
+  "prompt_version": "pairs-v3",
+  "base_seed": 2027,
+  "calls": 675,
+  "generated": 2700,
+  "valid": 1848,
+  "kept": 1500,
+  "dropped": {
+    "foreign_term": 260,
+    "source_missing_term": 179,
+    "parent_term_left_in_target": 170,
+    "target_missing_term": 183,
+    "slang_left_in_target": 17,
+    "genz_slang_in_source": 12,
+    "duplicate": 31
+  },
+  "kinds": {
+    "p2g_parent": 216,
+    "p2g_genz": 425,
+    "p2g_trap": 259,
+    "g2p_parent": 202,
+    "g2p_genz": 398
+  },
+  "embedding_model": "embeddinggemma",
+  "tokens": {
+    "input": 314833,
+    "output": 149402
+  },
+  "cost_usd": 0.7964,
+  "duration_s": 360.6,
+  "generated_at": "2026-10-01T01:04:38-0600",
+  "refiltered": {
+    "terms": 406,
+    "dropped": {
+      "parent_term_left_in_target": 7,
+      "genz_slang_in_source": 67,
+      "foreign_term": 20,
+      "slang_left_in_target": 31
+    },
+    "kept": 1375,
+    "at": "2026-10-01T20:34:02-0600"
+  }
+}

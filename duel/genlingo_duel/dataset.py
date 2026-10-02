@@ -13,7 +13,8 @@ from pydantic import BaseModel, Field, model_validator
 from .prompts import COUNTRIES
 
 Origin = Literal["web", "synthetic", "human"]
-Split = Literal["train", "test"]
+# dev: real pairs held out from training to make data decisions, so the test set is touched once per round.
+Split = Literal["train", "dev", "test"]
 # auto_validated: passed the automatic term-bank checks (scripts/validate_test_set.py); no human needed.
 Status = Literal["pending_review", "auto_validated", "approved", "rejected"]
 
@@ -22,6 +23,8 @@ PAIR_FILES = {
     "test_web": "pairs/test_web.jsonl",
     "human": "pairs/human.jsonl",
     "real_train": "pairs/real_train.jsonl",
+    "dev_real": "pairs/dev_real.jsonl",
+    "synthetic_v4": "pairs/synthetic_v4.jsonl",
 }
 
 
@@ -51,8 +54,8 @@ class Pair(BaseModel):
         if missing:
             raise ValueError(f"{self.origin} pair {self.id} missing provenance {missing}")
         # Synthetic references written by Gemini would bias chrF++ toward Gemini (Goliath).
-        if self.split == "test" and self.origin == "synthetic":
-            raise ValueError(f"synthetic pair {self.id} cannot be in the test split")
+        if self.split in ("test", "dev") and self.origin == "synthetic":
+            raise ValueError(f"synthetic pair {self.id} cannot be in the {self.split} split")
         if self.source.strip() == self.target.strip():
             raise ValueError(f"pair {self.id}: source equals target")
         return self

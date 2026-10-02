@@ -38,12 +38,13 @@ class OllamaClient:
         self.keep_alive, self.think = keep_alive, think
         self._http = httpx.AsyncClient(base_url=self.base_url, timeout=timeout_s, transport=transport)
 
-    async def complete(self, messages: list[Message], *, model: str) -> Completion:
+    async def complete(self, messages: list[Message], *, model: str, options: dict[str, Any] | None = None) -> Completion:
+        """`options` overrides the client's defaults for this call (e.g. temperature and seed for N-best)."""
         body: dict[str, Any] = {
             "model": model,
             "messages": messages,
             "stream": False,
-            "options": self.options,
+            "options": {**self.options, **(options or {})},
             "keep_alive": self.keep_alive,
             "think": self.think,
         }

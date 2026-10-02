@@ -9,7 +9,7 @@ DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
 # JDK 21 for the Firestore emulator (rules tests), only inside make: brew install openjdk@21
 JAVA21    := $(shell brew --prefix openjdk@21 2>/dev/null)/libexec/openjdk.jdk/Contents/Home
 
-.PHONY: help up reset test eval train train-local train-finish train-data quant-sweep pull-model export review-test review-test-apply \
+.PHONY: help up reset test eval eval-dev niches counterparts train train-local train-finish train-data quant-sweep pull-model export review-test review-test-apply \
         test-set real-pairs ambiguous-terms pairs datasheet data deploy
 
 help:
@@ -31,8 +31,14 @@ test: ## Run all tests (no network: MOCK_AI in tests). SKIP_WEB=1 / SKIP_RULES=1
 	elif [ "$(SKIP_RULES)" = 1 ] || [ "$(SKIP_WEB)" = 1 ]; then echo "!! Firestore rules tests NOT run"; \
 	else echo "!! Firestore rules tests can't run: brew install openjdk@21, or SKIP_RULES=1 to skip them on purpose" >&2; exit 1; fi
 
-eval: ## Test set through base models, David and Goliath -> evals/report.md
+eval: ## Test set through base models, David and Goliath -> evals/report.md (once per data round)
 	$(UV) python evals/run_eval.py $(EVAL_ARGS)
+
+eval-dev: ## Dev set (data decisions, ablations) -> evals/report_dev.md: make eval-dev [EVAL_ARGS="--nbest 4"]
+	$(UV) python evals/run_eval.py --split dev $(EVAL_ARGS)
+
+niches: ## Pre-registered niches (evals/niche.md) from the latest test eval -> evals/niche_report.md
+	$(UV) python evals/niche_report.py
 
 test-set: ## Build test pairs from real web usage examples and validate them against the term bank
 	$(UV) python scripts/build_test_set.py
@@ -43,11 +49,15 @@ ambiguous-terms: ## Flag term-bank entries that are also ordinary words (general
 	@[ -f $(STT_CORPUS) ] || curl -sL https://huggingface.co/datasets/shraavb/spanish-slang-stt-data/resolve/main/splits/all.json -o $(STT_CORPUS)
 	$(UV) python scripts/flag_ambiguous_terms.py $(STT_CORPUS)
 
-real-pairs: ## Training pairs anchored in real web sentences (both directions), validated against the term bank
+real-pairs: ## Training pairs anchored in real web sentences (both directions), validated against the term bank; 20 % to dev
 	$(UV) python scripts/build_real_pairs.py
 
-pairs: ## Generate synthetic training pairs with GEMINI_MODEL (paid, ~1,500 pairs)
+counterparts: ## Term -> counterpart table validated by meaning (mutual nearest + Gemini top-5 check) -> data/counterparts.jsonl
+	$(UV) python scripts/build_counterparts.py
+
+pairs: ## Generate synthetic training pairs with GEMINI_MODEL from validated counterparts (paid, ~1,500 + 800 multi-term)
 	$(UV) python scripts/generate_pairs.py
+	$(UV) python scripts/generate_multi_pairs.py
 
 datasheet: ## Recount data/DATASHEET.md
 	$(UV) python scripts/datasheet.py
@@ -64,11 +74,13 @@ export: ## Pull presenter-approved audience pairs from Firestore into data/pairs
 	$(UV) python scripts/export_human.py
 	$(UV) python scripts/datasheet.py
 
-train-data: ## Render approved training pairs into chat JSONL
+train-data: ## Render training pairs into chat JSONL (v2+lex glossary) + preference prompts for ORPO
 	$(UV) python scripts/build_train_set.py
+	$(UV) python scripts/build_pref_set.py
 
 train: train-data ## Fine-tune in the cloud (L4 job trains, CPU job merges + GGUF): make train TAG=genlingo-2027-03 [QUANT=Q5_K_M] [TRAIN_ARGS=…]
-	$(UV) python train/submit_job.py --app genlingo --tag $(TAG) --data data/train/chat.jsonl -- $(TRAIN_ARGS)
+	$(UV) python train/submit_job.py --app genlingo --tag $(TAG) --data data/train/chat.jsonl \
+	  $(if $(wildcard data/train/pref.jsonl),--pref data/train/pref.jsonl) -- $(TRAIN_ARGS)
 
 train-local: train-data ## Same training on this Mac (MPS), for experiments
 	uv run --python 3.12 --with-requirements train/requirements.txt --with torch==2.14.0 \
