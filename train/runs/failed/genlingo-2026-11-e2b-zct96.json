@@ -1,0 +1,43 @@
+{
+  "tag": "genlingo-2026-11-e2b",
+  "app": "genlingo",
+  "where": "cloud",
+  "region": "europe-west4",
+  "image": "us-central1-docker.pkg.dev/ai-experiments-487722/charlas2027/genlingo-train:228de78773fd",
+  "base_model": "gemma-4-E2B-it",
+  "weights_uri": "hf://google",
+  "data_uri": "gs://ai-experiments-487722-train-eu/genlingo/data/genlingo-2026-11-e2b/train.jsonl",
+  "data_date": "2026-11",
+  "examples": 1709,
+  "output_uri": "gs://ai-experiments-487722-genlingo-models/genlingo-2026-11-e2b/",
+  "state": "JOB_STATE_FAILED",
+  "prompt_style": "v2+glossary",
+  "prompt_version": "translate-v2+glossary",
+  "runtime": "cloud-run-job",
+  "job": "genlingo-train",
+  "execution": "genlingo-train-zct96",
+  "machine": "Cloud Run Job: 1x NVIDIA L4 (no zonal redundancy), 8 vCPU, 32 GiB",
+  "rates_usd_per_s": {
+    "gpu_l4": 0.0001867,
+    "vcpu": 1.8e-05,
+    "gib": 2e-06
+  },
+  "start_time": "2026-10-02T06:57:46.138172Z",
+  "end_time": "2026-10-02T07:24:31.272783Z",
+  "duration_s": 1605.1,
+  "estimated_cost_usd": 0.63,
+  "error": "Task genlingo-train-zct96-task0 failed with exit code: 1 and message: The container exited with an error.",
+  "note": "Training finished (1,709 examples, train_loss 0.4523, loss 2.627 -> 0.156, train_runtime 1045 s) and the adapter was saved to the bucket, then the task was OOM-killed (SIGKILL) converting the merged checkpoint to GGUF f16: Cloud Run's in-memory filesystem held the merged checkpoint and the f16 file on top of the training process. Fix: train and finish became two jobs (genlingo-train + genlingo-finish). The laptop fallback (make train-finish, Q5_K_M, KEEP_F16=1) merged this adapter fine; its upload was stopped because the end-to-end cloud rerun replaces this model.",
+  "finish": {
+    "where_merged": "laptop",
+    "download_s": 2.4,
+    "merge_s": 33.9,
+    "gguf_f16": "genlingo-2026-11-e2b-f16.gguf",
+    "gguf_quant": "genlingo-2026-11-e2b-q5_k_m.gguf",
+    "quant": "Q5_K_M",
+    "f16_bytes": 9273528288,
+    "quant_bytes": 3616709600,
+    "gguf_s": 80.3,
+    "published": false
+  }
+}
