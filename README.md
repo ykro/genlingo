@@ -73,6 +73,8 @@ make up       # Ollama + David precalentado + duelo (:8787) + vista del presenta
 
 Ensayo sin red ni GPU: pon `MOCK_AI=1` en `.env` y corre `make up` (modelos simulados y deterministas).
 
+El guion de la demo en escena, pantalla por pantalla (teclas, frases, qué decir, tiempos y qué hacer si algo falla), está en [docs/DEMO.md](docs/DEMO.md).
+
 ## Comandos `make`
 
 | Comando | Qué hace |

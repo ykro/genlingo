@@ -73,6 +73,8 @@ make up       # Ollama + warmed-up David + duel (:8787) + presenter view (:3000/
 
 Rehearsal with no network or GPU: set `MOCK_AI=1` in `.env` and run `make up` (simulated, deterministic models).
 
+The on-stage demo script, screen by screen (keys, phrases, talking points, timings and what to do if something fails), is in [docs/DEMO.md](docs/DEMO.md) (Spanish).
+
 ## `make` commands
 
 | Command | What it does |

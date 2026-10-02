@@ -602,12 +602,19 @@ function ControlBar({
           if (text.trim()) onCompose(text.trim(), direction);
           setText("");
         }}
-        onKeyDown={(e) => e.key === "Escape" && onCloseComposer()}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") onCloseComposer();
+          else if (e.key === "Tab") {
+            // Tab flips the direction, so the whole round can be typed without the mouse.
+            e.preventDefault();
+            setDirection((d) => (d === "genz_to_parent" ? "parent_to_genz" : "genz_to_parent"));
+          }
+        }}
       >
         <button type="button" className={s.dirToggle} onClick={() => setDirection((d) => (d === "genz_to_parent" ? "parent_to_genz" : "genz_to_parent"))}>
           {DIRECTION[direction]}
         </button>
-        <input ref={input} className={s.composer} value={text} onChange={(e) => setText(e.target.value)} placeholder="Escribe una frase y pulsa Enter · Esc para cancelar" maxLength={240} />
+        <input ref={input} className={s.composer} value={text} onChange={(e) => setText(e.target.value)} placeholder="Escribe una frase y pulsa Enter · Tab cambia la dirección · Esc cancela" maxLength={240} />
       </form>
     );
   }
