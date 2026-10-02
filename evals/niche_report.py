@@ -20,7 +20,8 @@ sys.path.insert(0, str(ROOT / "evals"))
 
 from duel_core import corpus_chrf_pp, percentile  # noqa: E402
 from report import eval_terms_path  # noqa: E402
-from term_accuracy import TermBank, slang_handled  # noqa: E402
+from term_accuracy import TermBank, correct_slang, slang_handled  # noqa: E402
+from genlingo_duel.glossary import load_counterparts  # noqa: E402
 
 DATA = ROOT / "data"
 RESAMPLES, SEED = 10_000, 2027
@@ -61,7 +62,8 @@ def verdict(lo: float, hi: float) -> str:
     return "**empate estadístico**"
 
 
-def compare(pairs: dict, rows: dict, bank: TermBank, linked: dict, david: str, rival: str, keep) -> dict | None:
+def compare(pairs: dict, rows: dict, bank: TermBank, linked: dict, david: str, rival: str, keep, metric=None) -> dict | None:
+    """metric(pair, hypothesis) -> bool | None; default: jerga resuelta (slang handled)."""
     d_ok, g_ok, d_txt, g_txt, refs, d_lat, g_lat = [], [], [], [], [], [], []
     for pid, p in pairs.items():
         if not keep(p) or pid not in rows[david] or pid not in rows[rival]:
@@ -70,7 +72,10 @@ def compare(pairs: dict, rows: dict, bank: TermBank, linked: dict, david: str, r
         if "error" in dr or "error" in gr:
             continue
         ids = linked.get(p["provenance"].get("usage_id"), [])
-        ds, gs = slang_handled(bank, p, ids, dr["text"]), slang_handled(bank, p, ids, gr["text"])
+        if metric is None:
+            ds, gs = slang_handled(bank, p, ids, dr["text"]), slang_handled(bank, p, ids, gr["text"])
+        else:
+            ds, gs = metric(p, dr["text"]), metric(p, gr["text"])
         d_txt.append(dr["text"])
         g_txt.append(gr["text"])
         refs.append(p["target"])
@@ -122,7 +127,10 @@ def main() -> None:
     for r in raw["results"]:
         rows.setdefault(r["model"], {})[r["pair_id"]] = r
     role = {m.get("role"): m.get("label", m["name"]) for m in raw["models"] if not m.get("skip")}
-    david, goliath, gg = role["david"], role["goliath"], role.get("goliath_glossary")
+    david_role = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--david-role=")), "david")
+    david, goliath, gg = role[david_role], role["goliath"], role.get("goliath_glossary")
+    cps = load_counterparts(DATA / "counterparts.jsonl")
+    correct = lambda p, hyp: correct_slang(bank, cps, p, hyp)  # noqa: E731  (Amendment 1 of niche.md)
 
     out = [
         "# Nichos: David contra Goliath",
@@ -136,16 +144,25 @@ def main() -> None:
         "",
     ]
     summary = {}
-    for rival, title in ((goliath, "Contra Goliath (rival del nicho)"), (gg, "Contra Goliath con el mismo glosario (referencia, no decide)")):
-        if not rival:
-            continue
-        rws = []
-        for name, keep in {**NICHES, **CONTEXT}.items():
-            c = compare(pairs, rows, bank, linked, david, rival, keep)
-            rws.append(fmt_row(name, c))
-            if c:
-                summary[f"{name} | {rival}"] = {k: (list(v) if isinstance(v, tuple) else v) for k, v in c.items()}
-        out += [f"## {title}", "", table(HEAD, rws), ""]
+    for mname, metric in (("jerga resuelta", None), ("jerga correcta", correct)):
+        for rival, title in ((goliath, "contra Goliath (rival del nicho)"), (gg, "contra Goliath con el mismo glosario (referencia, no decide)")):
+            if not rival:
+                continue
+            rws = []
+            for name, keep in {**NICHES, **CONTEXT}.items():
+                c = compare(pairs, rows, bank, linked, david, rival, keep, metric)
+                rws.append(fmt_row(name, c))
+                if c:
+                    summary[f"{mname} | {name} | {rival}"] = {k: (list(v) if isinstance(v, tuple) else v) for k, v in c.items()}
+            out += [f"## {mname.capitalize()}, {title}", "", table(HEAD, rws), ""]
+    out += [
+        "## Slang reciente",
+        "",
+        "Sin veredicto: el nicho pide la primera fecha de publicación de cada término, y ni `SOURCES.md` ni el banco "
+        "la registran (solo la fecha de consulta). Califican 0 frases, menos de las 30 que exige la regla: "
+        "n insuficiente, y el nicho se deja de reportar.",
+        "",
+    ]
     (ROOT / "evals" / "niche_report.md").write_text("\n".join(out) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=1, ensure_ascii=False))
 

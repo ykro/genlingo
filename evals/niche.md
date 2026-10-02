@@ -84,6 +84,8 @@ tabla de contrapartes.
   publicado para `GEMINI_MODEL` en su ficha del modelo. El corte y la fuente se anotan aquí al calcular el
   nicho por primera vez, sin cambiar la regla.
 - Si califican menos de 30 frases, el nicho se reporta como «n insuficiente», sin veredicto.
+- **Resultado (2026-10-02):** ni `SOURCES.md` ni el banco registran la primera fecha de publicación de los
+  términos (solo la fecha de consulta), así que califican 0 frases: n insuficiente. El nicho se deja de reportar.
 
 ### Regla de victoria
 

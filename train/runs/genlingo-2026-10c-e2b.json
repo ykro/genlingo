@@ -1,0 +1,25 @@
+{
+  "tag": "genlingo-2026-10c-e2b",
+  "app": "genlingo",
+  "where": "cloud",
+  "region": "europe-west4",
+  "image": "us-central1-docker.pkg.dev/ai-experiments-487722/charlas2027/genlingo-train:3e9220c19554",
+  "base_model": "gemma-4-E2B-it",
+  "weights_uri": "hf://google",
+  "data_uri": "gs://ai-experiments-487722-train-eu/genlingo/data/genlingo-2026-10c-e2b/train.jsonl",
+  "data_date": "2026-10",
+  "examples": 2972,
+  "output_uri": "gs://ai-experiments-487722-genlingo-models/genlingo-2026-10c-e2b/",
+  "state": "PENDING",
+  "prompt_style": "lexicon",
+  "prompt_version": "translate-country+lexicon",
+  "runtime": "cloud-run-jobs",
+  "quant": "Q5_K_M",
+  "machine": "Cloud Run Jobs: 1x NVIDIA L4 + 8 vCPU/32 GiB (train), 8 vCPU/32 GiB (merge + GGUF)",
+  "rates_usd_per_s": {
+    "gpu_l4": 0.0001867,
+    "vcpu": 1.8e-05,
+    "gib": 2e-06
+  },
+  "stages": {}
+}
