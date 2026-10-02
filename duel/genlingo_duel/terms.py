@@ -74,4 +74,5 @@ class TermBank:
     def foreign_in(self, text: str, country: str) -> list[str]:
         """Terms of another country (LATAM is neutral: allowed everywhere; a LATAM phrase allows no country slang)."""
         allowed = {country, "LATAM"}
-        return [t for t, v in self.terms.items() if v["country"] not in allowed and self.found(t, text)]
+        # Ambiguous entries are ordinary words too ("cámara", "alta"): never evidence of foreign slang.
+        return [t for t, v in self.terms.items() if v["country"] not in allowed and not v.get("ambiguous") and self.found(t, text)]

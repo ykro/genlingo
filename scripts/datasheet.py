@@ -37,6 +37,9 @@ def main() -> None:
     sources = sum(1 for line in (DATA / "SOURCES.md").read_text().splitlines() if line.startswith("| S"))
 
     split_origin = lambda p: f"{p.split} · {p.origin}"  # noqa: E731
+    rf = meta.get("refiltered")
+    refilter_text = (f"Re-validated against the grown term bank ({rf['terms']} terms): {rf['kept']} kept, dropped "
+                     + ", ".join(f"{k} {v}" for k, v in rf["dropped"].items()) + ".") if rf else ""
     kinds_text = ", ".join(f"`{k}` {v}" for k, v in sorted(meta.get("kinds", {}).items())) or "—"
     dropped_text = ", ".join(f"{k} {v}" for k, v in sorted(meta.get("dropped", {}).items(), key=lambda kv: -kv[1])) or "—"
     term_tab = Counter((t["country"], t["generation"]) for t in terms)
@@ -109,6 +112,7 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
    test-set leakage. Last run: {meta.get("generated", 0)} generated, {meta.get("valid", 0)} valid,
    {meta.get("kept", 0)} kept after rebalancing; rejected by reason: {dropped_text}. Cost
    ≈ ${meta.get("cost_usd", 0)} in {meta.get("duration_s", "?")} s.
+   {refilter_text}
    History: `pairs-v1` (free paraphrase) and `pairs-v2` (minimal edits) are in git history; their
    Davids are kept as `train/runs/experiments/` and `genlingo-2026-09`.
 4. **Test pairs** (`origin=web`, `split=test`). The source is a real sentence from the web; the
@@ -120,7 +124,17 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
    Gen Z slang of the country; no other-country terms; sane length; no overlap with training.
    Passing pairs are `auto_validated`, failing ones `rejected` with the reason. A human pass
    (`make review-test`) is optional and overrides the automatic decision.
-5. **Audience pairs** (`origin=human`). Submitted at each event from the audience app, approved
+5. **Real-anchored training pairs** (`origin=web`, `split=train`, `data/pairs/real_train.jsonl`). A second
+   research round (`data/raw/web_usage_v2.jsonl`, sources S41+) is split by a stable hash of the id:
+   half becomes test pairs, half becomes training pairs built from the **real sentence** and the
+   curator's rewrite, in both directions (real -> rewrite and rewrite -> real, so papás -> Gen Z also
+   learns to produce real Gen Z speech). Same automatic term-bank checks as the test set; a sentence is
+   never in both splits.
+6. **Ambiguous terms.** Some term-bank entries are also ordinary words ("cámara", "servir", "alta").
+   `scripts/flag_ambiguous_terms.py` counts their matches in ~39k sentences of general speech
+   (transcripts; only counts are kept, no text) and marks the ones with ≥ 15 matches
+   `ambiguous: true`; metrics and test validation ignore them, the glossary still explains them.
+7. **Audience pairs** (`origin=human`). Submitted at each event from the audience app, approved
    by the presenter in `/admin`, pulled with `make export`. 20% go to the test split (stable
    hash of the id).
 

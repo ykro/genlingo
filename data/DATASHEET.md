@@ -25,36 +25,39 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 
 |  | genz_to_parent | parent_to_genz | total |
 | --- | --- | --- | --- |
-| test · web | 164 | 155 | 319 |
-| train · synthetic | 600 | 900 | 1500 |
-| **total** | 764 | 1055 | 1819 |
+| test · web | 294 | 228 | 522 |
+| train · synthetic | 562 | 813 | 1375 |
+| train · web | 166 | 168 | 334 |
+| **total** | 1022 | 1209 | 2231 |
 
 ### Pairs by split and origin × country
 
 |  | MX | GT | CO | LATAM | total |
 | --- | --- | --- | --- | --- | --- |
-| test · web | 88 | 73 | 88 | 70 | 319 |
-| train · synthetic | 321 | 366 | 383 | 430 | 1500 |
-| **total** | 409 | 439 | 471 | 500 | 1819 |
+| test · web | 101 | 150 | 185 | 86 | 522 |
+| train · synthetic | 278 | 333 | 358 | 406 | 1375 |
+| train · web | 17 | 112 | 179 | 26 | 334 |
+| **total** | 396 | 595 | 722 | 518 | 2231 |
 
 ### Pairs by split and origin × status
 
 |  | approved | pending_review | rejected | total |
 | --- | --- | --- | --- | --- |
-| test · web | 0 | 0 | 71 | 71 |
-| train · synthetic | 1500 | 0 | 0 | 1500 |
-| **total** | 1500 | 0 | 71 | 1819 |
+| test · web | 0 | 0 | 119 | 119 |
+| train · synthetic | 1375 | 0 | 0 | 1375 |
+| train · web | 0 | 0 | 0 | 0 |
+| **total** | 1375 | 0 | 119 | 2231 |
 
 ### Term bank (`data/terms.jsonl`)
 
-260 terms from 35 sources (see `SOURCES.md`).
+406 terms from 57 sources (see `SOURCES.md`).
 
 | country | genz | parent | total |
 | --- | --- | --- | --- |
-| MX | 40 | 31 | 71 |
-| GT | 30 | 29 | 59 |
-| CO | 46 | 20 | 66 |
-| LATAM | 44 | 20 | 64 |
+| MX | 42 | 39 | 81 |
+| GT | 67 | 43 | 110 |
+| CO | 101 | 45 | 146 |
+| LATAM | 49 | 20 | 69 |
 
 ### Web usage examples (`data/raw/web_usage.jsonl`, source of the test set)
 
@@ -87,6 +90,7 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
    test-set leakage. Last run: 2700 generated, 1848 valid,
    1500 kept after rebalancing; rejected by reason: foreign_term 260, target_missing_term 183, source_missing_term 179, parent_term_left_in_target 170, duplicate 31, slang_left_in_target 17, genz_slang_in_source 12. Cost
    ≈ $0.7964 in 360.6 s.
+   Re-validated against the grown term bank (406 terms): 1375 kept, dropped parent_term_left_in_target 7, genz_slang_in_source 67, foreign_term 20, slang_left_in_target 31.
    History: `pairs-v1` (free paraphrase) and `pairs-v2` (minimal edits) are in git history; their
    Davids are kept as `train/runs/experiments/` and `genlingo-2026-09`.
 4. **Test pairs** (`origin=web`, `split=test`). The source is a real sentence from the web; the
@@ -98,7 +102,17 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
    Gen Z slang of the country; no other-country terms; sane length; no overlap with training.
    Passing pairs are `auto_validated`, failing ones `rejected` with the reason. A human pass
    (`make review-test`) is optional and overrides the automatic decision.
-5. **Audience pairs** (`origin=human`). Submitted at each event from the audience app, approved
+5. **Real-anchored training pairs** (`origin=web`, `split=train`, `data/pairs/real_train.jsonl`). A second
+   research round (`data/raw/web_usage_v2.jsonl`, sources S41+) is split by a stable hash of the id:
+   half becomes test pairs, half becomes training pairs built from the **real sentence** and the
+   curator's rewrite, in both directions (real -> rewrite and rewrite -> real, so papás -> Gen Z also
+   learns to produce real Gen Z speech). Same automatic term-bank checks as the test set; a sentence is
+   never in both splits.
+6. **Ambiguous terms.** Some term-bank entries are also ordinary words ("cámara", "servir", "alta").
+   `scripts/flag_ambiguous_terms.py` counts their matches in ~39k sentences of general speech
+   (transcripts; only counts are kept, no text) and marks the ones with ≥ 15 matches
+   `ambiguous: true`; metrics and test validation ignore them, the glossary still explains them.
+7. **Audience pairs** (`origin=human`). Submitted at each event from the audience app, approved
    by the presenter in `/admin`, pulled with `make export`. 20% go to the test split (stable
    hash of the id).
 

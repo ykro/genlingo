@@ -29,5 +29,16 @@
   },
   "cost_usd": 0.7964,
   "duration_s": 360.6,
-  "generated_at": "2026-10-01T01:04:38-0600"
+  "generated_at": "2026-10-01T01:04:38-0600",
+  "refiltered": {
+    "terms": 406,
+    "dropped": {
+      "parent_term_left_in_target": 7,
+      "genz_slang_in_source": 67,
+      "foreign_term": 20,
+      "slang_left_in_target": 31
+    },
+    "kept": 1375,
+    "at": "2026-10-01T20:34:02-0600"
+  }
 }
