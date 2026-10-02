@@ -28,7 +28,7 @@
     <h1>Datos → entrenar → evaluar → escena, cada mes</h1>
     <svg viewBox="0 0 1040 752" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ciclo-mensual-title ciclo-mensual-desc">
       <title id="ciclo-mensual-title">El ciclo mensual de David</title>
-      <desc id="ciclo-mensual-desc">Ciclo mensual de Genlingo: investigar jerga en la web, generar pares sintéticos validados, entrenar LoRA en Cloud Run, evaluar con métricas de términos, duelo en escena sin internet y pares del público, que vuelven al banco de datos fechado del que sale el David del mes siguiente.</desc>
+      <desc id="ciclo-mensual-desc">Ciclo mensual de Genlingo: investigar jerga y oraciones reales en la web, generar y validar pares sin intervención humana, entrenar LoRA en Cloud Run (L4 para entrenar, CPU para fusionar y cuantizar), evaluar con métricas de términos, duelo en escena sin internet y pares del público, que vuelven al banco de datos fechado del que sale el David del mes siguiente.</desc>
       <defs>
       <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
       <marker id="arrow-start" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto-start-reverse"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
@@ -55,13 +55,13 @@
       <text x="480" y="472" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">REPORTE</text>
       <rect x="440" y="68" width="160" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1"/>
       <text x="520" y="96" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Investigar la web</text>
-      <text x="520" y="114" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">terms.jsonl · SOURCES.md</text>
+      <text x="520" y="114" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">banco · oraciones reales</text>
       <rect x="648" y="188" width="160" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1"/>
-      <text x="728" y="216" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Pares sintéticos</text>
-      <text x="728" y="234" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">make pairs · validados</text>
+      <text x="728" y="216" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Pares validados</text>
+      <text x="728" y="234" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">sintéticos + reales · auto</text>
       <rect x="648" y="428" width="160" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1"/>
       <text x="728" y="456" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Entrenar LoRA</text>
-      <text x="728" y="474" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">make train · L4 · &lt; $1</text>
+      <text x="728" y="474" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">make train · L4 + CPU · &lt; $1</text>
       <rect x="440" y="548" width="160" height="64" rx="6" fill="rgba(194,61,25,0.08)" stroke="#C23D19" stroke-width="1.2"/>
       <text x="520" y="576" fill="#C23D19" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Evaluar</text>
       <text x="520" y="594" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">make eval · jerga resuelta</text>
@@ -79,7 +79,7 @@
       <line x1="40" y1="664" x2="1000" y2="664" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
       <text x="40" y="686" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="start" letter-spacing="0.18em">LEYENDA</text>
       <rect x="40" y="700" width="16" height="10" rx="2" fill="rgba(194,61,25,0.08)" stroke="#C23D19" stroke-width="1"/>
-      <text x="64" y="709" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Compuerta: el eval elige al David de escena (más jerga resuelta, p50 &lt; 1 s)</text>
+      <text x="64" y="709" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Compuerta: el eval elige al David (el más chico a ≤ 2 pts del f16, p50 &lt; 1 s)</text>
       <line x1="440" y1="705" x2="468" y2="705" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
       <text x="476" y="708" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="start">Paso del ciclo</text>
       <line x1="600" y1="705" x2="628" y2="705" stroke="#7a8399" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>

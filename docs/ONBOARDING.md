@@ -33,10 +33,11 @@ make test                                 # 55 pruebas de Python, 12 de Vitest, 
 | Modelo | Cómo se obtiene | Para qué |
 | --- | --- | --- |
 | `embeddinggemma` | `ollama pull embeddinggemma` | Glosario del banco de términos (`EMBEDDING_MODEL`). Necesario en escena. |
-| `genlingo-2026-10-e2b-q5_k_m` | `make pull-model TAG=genlingo-2026-10-e2b-q5_k_m` | David de escena (`LOCAL_MODEL_TAG`): Q5_K_M, 3.62 GB, elegido por el barrido de cuantización. |
-| `genlingo-2026-10-e2b` y `-e2b-f16` | `make pull-model TAG=genlingo-2026-10-e2b FP16=1` | El mismo David en Q4 y f16, para el eval de compresión (`make quant-sweep` parte del f16). |
-| `genlingo-2026-09` | `make pull-model TAG=genlingo-2026-09` (agrega `FP16=1` para el eval de compresión) | David del mes pasado (`DAVID_PREVIOUS_TAG`, tecla `M`). |
-| `genlingo-2026-10-e4b` | `make pull-model TAG=genlingo-2026-10-e4b` (sin `FP16`: `make train-finish` publica solo el Q4) | Candidato E4B para `make eval`. |
+| `genlingo-2026-11-e2b` y `-e2b-f16` | `make pull-model TAG=genlingo-2026-11-e2b FP16=1` | David de escena (`LOCAL_MODEL_TAG`): Q5_K_M, 3.62 GB, entrenado y cuantizado en la nube (`make train` publica `QUANT` bajo el tag sin sufijo). El f16 es la referencia de compresión. |
+| `genlingo-2026-10-e2b-q5_k_m` | `make pull-model TAG=genlingo-2026-10-e2b-q5_k_m` | David del mes pasado (`DAVID_PREVIOUS_TAG`, tecla `M`): Q5_K_M del barrido de cuantización. |
+| `genlingo-2026-10-e2b` y `-e2b-f16` | `make pull-model TAG=genlingo-2026-10-e2b FP16=1` | El David de 2026-10 en Q4 y f16, para el barrido de compresión (`make quant-sweep` parte del f16). |
+| `genlingo-2026-09` | `make pull-model TAG=genlingo-2026-09` (agrega `FP16=1` para el eval de compresión) | David de 2026-09 (prompt v1), en `DAVID_TAGS` para mostrar la evolución. |
+| `genlingo-2026-10-e4b` | `make pull-model TAG=genlingo-2026-10-e4b` (sin `FP16`: `make train-finish` publica solo el Q4) | Candidato E4B (agrégalo a `DAVID_TAGS` para evaluarlo; quedó fuera del eval final: 67 %, p50 836 ms). |
 | `gemma4:e2b-it-qat`, `gemma4:e4b` | `ollama pull gemma4:e2b-it-qat`, `ollama pull gemma4:e4b` | Modelos base sin afinar (`BASE_MODEL_TAGS`) para `make eval`. |
 
 `make pull-model` (`train/pull_model.sh`) copia de `gs://ai-experiments-487722-genlingo-models/<tag>/` el `Modelfile`, el GGUF que ese Modelfile nombra y `metrics.json` (más `Modelfile.f16` y el GGUF f16 con `FP16=1`) a `models/<tag>/` y corre `ollama create`. El Modelfile usa `RENDERER gemma4` / `PARSER gemma4` (`OLLAMA_RENDERER`), así que el modelo afinado recibe el prompt igual que su base.
