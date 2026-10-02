@@ -1,6 +1,6 @@
 """Fallback: finish a cloud fine-tune on this Mac (adapter from the bucket -> merge -> GGUF -> models bucket).
 
-    QUANT=Q5_K_M KEEP_F16=1 make train-finish TAG=genlingo-2026-11-e2b
+    QUANT=Q5_K_M KEEP_F16=1 make train-finish TAG=genlingo-2026-10b-e2b
 
 `make train` already does this in the cloud (the `${APP}-finish` Cloud Run Job, finish.py). Use this
 only when that job can't run, or to re-quantize an existing adapter without paying for a job. Same
@@ -38,7 +38,7 @@ def main() -> None:
         renderer=os.environ["OLLAMA_RENDERER"],
         work=HERE.parent / "models" / ".work" / tag,
         out=HERE.parent / "models" / tag,
-        quant=os.environ.get("QUANT", "Q4_K_M"),  # Q5_K_M: the best size/slang trade-off of the quant sweep
+        quant=os.environ["QUANT"],  # .env: Q5_K_M, the quant sweep's pick (smallest within 2 points of f16)
         keep_f16=os.environ.get("KEEP_F16") == "1",
         llama_cpp=llama_cpp,
         output_uri=os.environ["MODELS_BUCKET"],

@@ -10,7 +10,7 @@ Stages (each timed in metrics.json):
   1. weights   download the base checkpoint (Hugging Face; token from Secret Manager when it exists)
   2. train     LoRA with TRL + PEFT: only ~0.5% of the weights learn; the rest stay frozen
   3. merge     fold the adapter back into the base weights -> a normal checkpoint
-  4. gguf      llama.cpp: convert to GGUF f16, then quantize to Q4_K_M (~4x smaller)
+  4. gguf      llama.cpp: convert to GGUF f16, then quantize to QUANT (Q5_K_M: ~2.6x smaller)
   5. publish   Modelfile + GGUFs + adapter + metrics to gs://<bucket>/<tag>/
 
 The data file is chat-formatted JSONL: {"messages": [system, user, assistant]}. The app renders
@@ -261,7 +261,7 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
 def to_gguf(merged_dir: Path, out_dir: Path, tag: str, llama_cpp: Path, quant: str, drop_merged: bool = False,
             outtype: str = "f16", f16_dir: Path | None = None) -> dict:
     """f16 GGUF (the "uncompressed" reference) and a quantized one (what the laptop runs).
-    Q4_K_M keeps ~4.5 bits per weight with mixed precision on the most sensitive tensors.
+    K-quants (Q4_K_M, Q5_K_M…) keep ~4.5-5.5 bits per weight with more precision on the most sensitive tensors.
     `outtype="q8_0"` halves the intermediate file for bigger bases, at the cost of not publishing
     an f16 reference (the q8_0 file is deleted once quantized). `f16_dir` puts the intermediate
     file elsewhere (on Cloud Run: a disk volume instead of the in-memory filesystem)."""
@@ -322,7 +322,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--drop-merged", action="store_true", default=env("DROP_MERGED", "") == "1",
                     help="delete the merged checkpoint once converted (frees ~10 GB of in-memory disk)")
     ap.add_argument("--llama-cpp", default=env("LLAMA_CPP_DIR", "/opt/llama.cpp"))
-    ap.add_argument("--quant", default="Q4_K_M")
+    ap.add_argument("--quant", default=env("QUANT"), required=not env("QUANT") and env("ADAPTER_ONLY", "") != "1",
+                    help="GGUF quantization, e.g. Q5_K_M (env QUANT); not needed with --adapter-only")
     ap.add_argument("--ollama-renderer", default=env("OLLAMA_RENDERER"), required=not env("OLLAMA_RENDERER"),
                     help="Ollama RENDERER/PARSER of the base family, e.g. the one its Modelfile uses (env OLLAMA_RENDERER)")
     ap.add_argument("--temperature", type=float, default=0.2)

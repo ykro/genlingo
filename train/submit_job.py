@@ -225,7 +225,8 @@ def main() -> None:
     ap.add_argument("--tag", required=True)
     ap.add_argument("--data", required=True, help="local chat JSONL")
     ap.add_argument("--no-wait", action="store_true")
-    ap.add_argument("--quant", default=os.environ.get("QUANT", "Q4_K_M"), help="GGUF quantization of the finished model")
+    ap.add_argument("--quant", default=os.environ.get("QUANT"), required=not os.environ.get("QUANT"),
+                    help="GGUF quantization of the finished model (env QUANT, e.g. Q5_K_M)")
     ap.add_argument("--keep-f16", action="store_true", default=os.environ.get("KEEP_F16", "1") == "1",
                     help="also publish the f16 GGUF (the uncompressed reference for the compression eval)")
     ap.add_argument("extra", nargs="*", help="extra args for train_lora.py (after --)")

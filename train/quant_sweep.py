@@ -37,7 +37,10 @@ def gemma_chat_text(messages: list[dict]) -> str:
 
 def calibration_file(out: Path, seed: int = 2027) -> Path:
     rows = [json.loads(line) for line in (ROOT / "data" / "train" / "chat.jsonl").read_text().splitlines() if line.strip()]
-    assert all(r["id"].startswith(("syn-", "hum-")) for r in rows), "calibration must come from training pairs only"
+    # Training pairs only (synthetic, real-anchored, audience), never the test set: that would inflate the eval.
+    test_ids = {json.loads(line)["id"] for line in (ROOT / "data" / "pairs" / "test_web.jsonl").read_text().splitlines() if line.strip()}
+    assert all(r["id"].startswith(("syn-", "real-", "hum-")) and r["id"] not in test_ids for r in rows), \
+        "calibration must come from training pairs only"
     random.Random(seed).shuffle(rows)
     out.write_text("\n".join(gemma_chat_text(r["messages"]) for r in rows[:CALIBRATION_EXAMPLES]), encoding="utf-8")
     return out

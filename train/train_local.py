@@ -3,7 +3,7 @@
     make train-local TAG=genlingo-2027-03
 
 For experiments without the cloud GPU: identical script, identical
-outputs (GGUF Q4 + f16, Modelfile, uploaded to the models bucket), so `make pull-model` and the
+outputs (GGUF QUANT + f16, Modelfile, uploaded to the models bucket), so `make pull-model` and the
 eval don't care where David was trained. The run file says where and how long it took; the cost
 is 0 because the laptop is already paid for, but compare the duration with a cloud L4.
 """
@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import os
 import platform
+import re
 import subprocess
 import sys
 import time
@@ -42,7 +43,7 @@ def record(tag: str, metrics: dict, duration_s: float) -> dict:
         "machine": machine(),
         "region": "laptop",
         "base_model": metrics["base_model"],
-        "data_date": tag[-7:],
+        "data_date": (m.group(0) if (m := re.search(r"\d{4}-\d{2}", tag)) else None),
         "examples": metrics["examples"],
         "output_uri": f"{bucket}/{tag}/" if bucket else None,
         "hourly_usd": 0.0,

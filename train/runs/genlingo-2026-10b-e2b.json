@@ -1,15 +1,15 @@
 {
-  "tag": "genlingo-2026-11-e2b",
+  "tag": "genlingo-2026-10b-e2b",
   "app": "genlingo",
   "where": "cloud",
   "region": "europe-west4",
   "image": "us-central1-docker.pkg.dev/ai-experiments-487722/charlas2027/genlingo-train:7508c1aefcb6",
   "base_model": "gemma-4-E2B-it",
   "weights_uri": "hf://google",
-  "data_uri": "gs://ai-experiments-487722-train-eu/genlingo/data/genlingo-2026-11-e2b/train.jsonl",
-  "data_date": "2026-11",
+  "data_uri": "gs://ai-experiments-487722-train-eu/genlingo/data/genlingo-2026-10b-e2b/train.jsonl",
+  "data_date": "2026-10",
   "examples": 1709,
-  "output_uri": "gs://ai-experiments-487722-genlingo-models/genlingo-2026-11-e2b/",
+  "output_uri": "gs://ai-experiments-487722-genlingo-models/genlingo-2026-10b-e2b/",
   "state": "JOB_STATE_SUCCEEDED",
   "prompt_style": "v2+glossary",
   "prompt_version": "translate-v2+glossary",
@@ -51,7 +51,7 @@
   "estimated_cost_usd": 0.71,
   "error": null,
   "metrics": {
-    "tag": "genlingo-2026-11-e2b",
+    "tag": "genlingo-2026-10b-e2b",
     "base_model": "gemma-4-E2B-it",
     "weights_uri": "hf://google",
     "hyperparams": {
@@ -81,13 +81,15 @@
     "where_merged": "cloud-run",
     "quant": "Q5_K_M",
     "download_s": 155.1,
-    "gguf_f16": "genlingo-2026-11-e2b-f16.gguf",
-    "gguf_intermediate": "genlingo-2026-11-e2b-f16.gguf",
-    "gguf_quant": "genlingo-2026-11-e2b-q5_k_m.gguf",
+    "gguf_f16": "genlingo-2026-10b-e2b-f16.gguf",
+    "gguf_intermediate": "genlingo-2026-10b-e2b-f16.gguf",
+    "gguf_quant": "genlingo-2026-10b-e2b-q5_k_m.gguf",
     "f16_bytes": 9273528288,
     "quant_bytes": 3616709600,
     "gguf_s": 80.8,
     "finish_s": 293.6
   },
-  "note": "First end-to-end run of the two-job pipeline (genlingo-train on the L4, then genlingo-finish on CPU). The finish job ran a rebuilt image (760c4a17d442) that copies the base weights from the bucket mount before loading them; a test of the first image loaded them at ~5 MB/s through memory-mapped reads and was cancelled. Finish stage: copy base 155 s, merge 57 s, GGUF f16 + Q5_K_M 81 s, publish 233 s; Cloud Monitoring memory peak (1-min p99) ~10 GiB of 32. Replaces the failed single-job run zct96 (train/runs/failed/)."
+  "note": "First end-to-end run of the two-job pipeline (genlingo-train on the L4, then genlingo-finish on CPU). The finish job ran a rebuilt image (760c4a17d442) that copies the base weights from the bucket mount before loading them; a test of the first image loaded them at ~5 MB/s through memory-mapped reads and was cancelled. Finish stage: copy base 155 s, merge 57 s, GGUF f16 + Q5_K_M 81 s, publish 233 s; Cloud Monitoring memory peak (1-min p99) ~10 GiB of 32. Replaces the failed single-job run zct96 (train/runs/failed/).",
+  "renamed_from": "genlingo-2026-11-e2b",
+  "rename_note": "Tags carry the data date: this David was trained on the second research round (collected 2026-10-01), so it is 2026-10b, not 2026-11. Artifacts, Ollama tags and paths were renamed after the run; execution names are unchanged."
 }

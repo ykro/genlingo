@@ -1,15 +1,15 @@
 {
-  "tag": "genlingo-2026-11-e2b",
+  "tag": "genlingo-2026-10b-e2b",
   "app": "genlingo",
   "where": "cloud",
   "region": "europe-west4",
   "image": "us-central1-docker.pkg.dev/ai-experiments-487722/charlas2027/genlingo-train:228de78773fd",
   "base_model": "gemma-4-E2B-it",
   "weights_uri": "hf://google",
-  "data_uri": "gs://ai-experiments-487722-train-eu/genlingo/data/genlingo-2026-11-e2b/train.jsonl",
-  "data_date": "2026-11",
+  "data_uri": "gs://ai-experiments-487722-train-eu/genlingo/data/genlingo-2026-10b-e2b/train.jsonl",
+  "data_date": "2026-10",
   "examples": 1709,
-  "output_uri": "gs://ai-experiments-487722-genlingo-models/genlingo-2026-11-e2b/",
+  "output_uri": "gs://ai-experiments-487722-genlingo-models/genlingo-2026-10b-e2b/",
   "state": "JOB_STATE_FAILED",
   "prompt_style": "v2+glossary",
   "prompt_version": "translate-v2+glossary",
@@ -32,12 +32,14 @@
     "where_merged": "laptop",
     "download_s": 2.4,
     "merge_s": 33.9,
-    "gguf_f16": "genlingo-2026-11-e2b-f16.gguf",
-    "gguf_quant": "genlingo-2026-11-e2b-q5_k_m.gguf",
+    "gguf_f16": "genlingo-2026-10b-e2b-f16.gguf",
+    "gguf_quant": "genlingo-2026-10b-e2b-q5_k_m.gguf",
     "quant": "Q5_K_M",
     "f16_bytes": 9273528288,
     "quant_bytes": 3616709600,
     "gguf_s": 80.3,
     "published": false
-  }
+  },
+  "renamed_from": "genlingo-2026-11-e2b",
+  "rename_note": "Tags carry the data date: this David was trained on the second research round (collected 2026-10-01), so it is 2026-10b, not 2026-11. Artifacts, Ollama tags and paths were renamed after the run; execution names are unchanged."
 }

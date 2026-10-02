@@ -63,7 +63,7 @@ def _merge(base_dir: str, adapter: str, merged_dir: str, drop_base_weights: bool
 
 def finish(*, tag: str, adapter_uri: str, base_model: str, weights_uri: str, renderer: str, work: Path, out: Path,
            f16_dir: Path | None = None, cache_dir: Path | None = None, local_base_dir: Path | None = None,
-           quant: str = "Q4_K_M", keep_f16: bool = False,
+           quant: str, keep_f16: bool = False,
            llama_cpp: Path, output_uri: str = "", where: str = "cloud-run", temperature: float = 0.2) -> dict:
     work.mkdir(parents=True, exist_ok=True)
     out.mkdir(parents=True, exist_ok=True)
@@ -152,7 +152,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--cache-dir", default=env("CACHE_DIR", ""))
     ap.add_argument("--local-base-dir", default=env("LOCAL_BASE_DIR", ""),
                     help="copy the cached base weights here before loading (when the cache is a bucket mount); deleted once loaded")
-    ap.add_argument("--quant", default=env("QUANT", "Q4_K_M"))
+    ap.add_argument("--quant", default=env("QUANT"), required=not env("QUANT"),
+                    help="GGUF quantization, e.g. Q5_K_M (env QUANT; no default: it is a decision from the quant sweep)")
     ap.add_argument("--keep-f16", action="store_true", default=env("KEEP_F16", "") == "1")
     ap.add_argument("--llama-cpp", default=env("LLAMA_CPP_DIR", "/opt/llama.cpp"))
     return ap.parse_args(argv)
