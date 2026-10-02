@@ -10,7 +10,7 @@ DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
 JAVA21    := $(shell brew --prefix openjdk@21 2>/dev/null)/libexec/openjdk.jdk/Contents/Home
 
 .PHONY: help up reset test eval train train-local train-finish train-data quant-sweep pull-model export review-test review-test-apply \
-        test-set pairs datasheet data deploy
+        test-set real-pairs pairs datasheet data deploy
 
 help:
 	@grep -hE '^[a-z-]+:.*## ' Makefile | awk -F':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
@@ -35,13 +35,16 @@ test-set: ## Build test pairs from real web usage examples and validate them aga
 	$(UV) python scripts/build_test_set.py
 	$(UV) python scripts/validate_test_set.py
 
+real-pairs: ## Training pairs anchored in real web sentences (both directions), validated against the term bank
+	$(UV) python scripts/build_real_pairs.py
+
 pairs: ## Generate synthetic training pairs with GEMINI_MODEL (paid, ~1,500 pairs)
 	$(UV) python scripts/generate_pairs.py
 
 datasheet: ## Recount data/DATASHEET.md
 	$(UV) python scripts/datasheet.py
 
-data: test-set pairs datasheet ## Rebuild all data (test set, synthetic pairs, datasheet)
+data: test-set real-pairs pairs datasheet ## Rebuild all data (test set, synthetic pairs, datasheet)
 
 review-test: ## (Optional) export the test set to a CSV for a human pass over the automatic validation
 	$(UV) python scripts/review_test.py export

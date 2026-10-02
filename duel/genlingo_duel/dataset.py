@@ -21,6 +21,7 @@ PAIR_FILES = {
     "synthetic": "pairs/synthetic.jsonl",
     "test_web": "pairs/test_web.jsonl",
     "human": "pairs/human.jsonl",
+    "real_train": "pairs/real_train.jsonl",
 }
 
 
@@ -91,4 +92,4 @@ def test_pairs(data_dir: Path, *, include_pending: bool = False) -> list[Pair]:
 
 
 def train_pairs(data_dir: Path) -> list[Pair]:
-    return [p for p in load_pairs(data_dir) if p.split == "train" and p.status == "approved"]
+    return [p for p in load_pairs(data_dir) if p.split == "train" and p.status in ("approved", "auto_validated")]

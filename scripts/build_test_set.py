@@ -18,6 +18,7 @@ import re
 
 from _common import DATA
 from genlingo_duel.dataset import Pair, read_jsonl, write_jsonl
+from real_usage import usage_rows
 
 AGE = {"genz": "16-24", "parent": "45-60"}
 
@@ -62,13 +63,15 @@ def build(usage_rows: list[dict], licenses: dict[str, dict[str, str]], previous:
         prev = previous.get(pid)
         if prev and prev["status"] != "pending_review":
             pair["status"], pair["target"] = prev["status"], prev["target"]  # keep review decisions
+            if "validation" in prev.get("provenance", {}):
+                pair["provenance"]["validation"] = prev["provenance"]["validation"]
         Pair.model_validate(pair)
         pairs.append(pair)
     return pairs
 
 
 def main() -> None:
-    usage = list(read_jsonl(DATA / "raw" / "web_usage.jsonl"))
+    usage = usage_rows("test")  # round 1 + the test half of round 2 (scripts/real_usage.py)
     licenses = source_licenses((DATA / "SOURCES.md").read_text(encoding="utf-8"))
     out = DATA / "pairs" / "test_web.jsonl"
     previous = {r["id"]: r for r in read_jsonl(out)}

@@ -1,0 +1,57 @@
+"""Training pairs anchored in REAL sentences (round-2 web usage, training half).
+
+    uv run --project duel python scripts/build_real_pairs.py
+
+Each real sentence gives two pairs: the real sentence -> the curator's rewrite into the other
+generation, and the rewrite -> the real sentence (so papás -> Gen Z also learns to *produce* real
+Gen Z speech). Every pair passes the same term-bank checks as the test set
+(scripts/validate_test_set.py) and never overlaps a test sentence. Origin is `web`: the sentence
+is real and attributed; the rewrite is the curator's (never Gemini's).
+"""
+
+from __future__ import annotations
+
+from collections import Counter
+
+from _common import DATA
+from build_test_set import source_licenses
+from genlingo_duel.dataset import Pair, read_jsonl, write_jsonl
+from genlingo_duel.terms import TermBank
+from real_usage import usage_rows
+from validate_test_set import check, norm
+
+OUT = DATA / "pairs" / "real_train.jsonl"
+
+
+def main() -> None:
+    bank = TermBank(read_jsonl(DATA / "terms.jsonl"))
+    licenses = source_licenses((DATA / "SOURCES.md").read_text(encoding="utf-8"))
+    test_text = {norm(x) for r in read_jsonl(DATA / "pairs" / "test_web.jsonl") for x in (r["source"], r["target"])}
+    seen: set[str] = set()
+    pairs, reasons = [], Counter()
+    for row in usage_rows("train"):
+        real, rewrite = row["example"].strip(), row["rewrite"].strip()
+        forward = "genz_to_parent" if row["generation"] == "genz" else "parent_to_genz"
+        backward = "parent_to_genz" if forward == "genz_to_parent" else "genz_to_parent"
+        lic = licenses.get(row["source_id"], {})
+        for direction, source, target, kind in ((forward, real, rewrite, "real_source"), (backward, rewrite, real, "real_target")):
+            pair = {
+                "id": f"real-{row['id']}-{'f' if kind == 'real_source' else 'b'}",
+                "direction": direction, "source": source, "target": target, "country": row["country"],
+                "age_range": "16-24", "split": "train", "status": "auto_validated", "origin": "web",
+                "provenance": {"url": row["source_url"], "license": lic.get("license") or "see data/SOURCES.md",
+                               "source_id": row["source_id"], "owner": lic.get("owner"), "usage_id": row["id"],
+                               "example_origin": row.get("example_origin", "source"), "kind": kind, "reference_by": "curator"},
+            }
+            reason = check(bank, pair, row.get("term_ids", []), test_text, seen)
+            seen.add(norm(source))
+            reasons[reason or "ok"] += 1
+            if reason is None:
+                Pair.model_validate(pair)
+                pairs.append(pair)
+    n = write_jsonl(OUT, pairs)
+    print(f"{n} real training pairs -> {OUT.relative_to(DATA.parent)}; checks: {dict(reasons)}")
+
+
+if __name__ == "__main__":
+    main()
