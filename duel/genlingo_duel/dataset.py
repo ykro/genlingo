@@ -14,7 +14,8 @@ from .prompts import COUNTRIES
 
 Origin = Literal["web", "synthetic", "human"]
 Split = Literal["train", "test"]
-Status = Literal["pending_review", "approved", "rejected"]
+# auto_validated: passed the automatic term-bank checks (scripts/validate_test_set.py); no human needed.
+Status = Literal["pending_review", "auto_validated", "approved", "rejected"]
 
 PAIR_FILES = {
     "synthetic": "pairs/synthetic.jsonl",
@@ -85,7 +86,7 @@ def load_pairs(data_dir: Path, files: Iterable[str] | None = None) -> list[Pair]
 
 def test_pairs(data_dir: Path, *, include_pending: bool = False) -> list[Pair]:
     """Test pairs for evaluation rounds and `make eval`: web + human only, never synthetic."""
-    ok = {"approved", "pending_review"} if include_pending else {"approved"}
+    ok = {"approved", "auto_validated", "pending_review"} if include_pending else {"approved", "auto_validated"}
     return [p for p in load_pairs(data_dir) if p.split == "test" and p.status in ok]
 
 

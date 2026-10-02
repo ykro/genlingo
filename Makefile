@@ -9,7 +9,7 @@ DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
 # JDK 21 for the Firestore emulator (rules tests), only inside make: brew install openjdk@21
 JAVA21    := $(shell brew --prefix openjdk@21 2>/dev/null)/libexec/openjdk.jdk/Contents/Home
 
-.PHONY: help up duel reset test eval train train-local train-finish train-data quant-sweep pull-model export review-test review-test-apply \
+.PHONY: help up reset test eval train train-local train-finish train-data quant-sweep pull-model export review-test review-test-apply \
         test-set pairs datasheet data deploy
 
 help:
@@ -31,10 +31,11 @@ test: ## Run all tests (no network: MOCK_AI in tests)
 eval: ## Test set through base models, David and Goliath -> evals/report.md
 	$(UV) python evals/run_eval.py $(EVAL_ARGS)
 
-test-set: ## Build test pairs (pending_review) from real web usage examples
+test-set: ## Build test pairs from real web usage examples and validate them against the term bank
 	$(UV) python scripts/build_test_set.py
+	$(UV) python scripts/validate_test_set.py
 
-pairs: ## Generate synthetic training pairs with GEMINI_MODEL (paid, ~1,000 pairs)
+pairs: ## Generate synthetic training pairs with GEMINI_MODEL (paid, ~1,500 pairs)
 	$(UV) python scripts/generate_pairs.py
 
 datasheet: ## Recount data/DATASHEET.md
@@ -42,7 +43,7 @@ datasheet: ## Recount data/DATASHEET.md
 
 data: test-set pairs datasheet ## Rebuild all data (test set, synthetic pairs, datasheet)
 
-review-test: ## Export the test set to data/review/test_review.csv for the presenter
+review-test: ## (Optional) export the test set to a CSV for a human pass over the automatic validation
 	$(UV) python scripts/review_test.py export
 
 review-test-apply: ## Apply the decisions from data/review/test_review.csv

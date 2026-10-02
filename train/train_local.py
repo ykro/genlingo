@@ -2,7 +2,7 @@
 
     make train-local TAG=genlingo-2027-03
 
-Fallback for when the Vertex AI job can't run (e.g. no GPU quota): identical script, identical
+For experiments without the cloud GPU: identical script, identical
 outputs (GGUF Q4 + f16, Modelfile, uploaded to the models bucket), so `make pull-model` and the
 eval don't care where David was trained. The run file says where and how long it took; the cost
 is 0 because the laptop is already paid for, but compare the duration with a cloud L4.

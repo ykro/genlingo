@@ -26,6 +26,7 @@ export interface Round {
   direction: Direction;
   country: string;
   reference: string | null;
+  phrase_id: string | null;
   david_tag: string;
   david: ContenderResult;
   goliath: ContenderResult;

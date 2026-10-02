@@ -1,13 +1,13 @@
 """Fine-tune a small Gemma with LoRA, merge, quantize to GGUF and publish it for Ollama.
 
-End to end, one command (runs inside the Vertex AI Custom Job, in Colab, or locally):
+End to end, one command (runs inside the Cloud Run GPU job, in Colab Enterprise, or locally):
 
     python train_lora.py --data gs://…/train.jsonl --tag genlingo-2027-03 \
         --base-model $GEMMA_BASE_MODEL --weights-uri $GEMMA_WEIGHTS_URI --ollama-renderer $OLLAMA_RENDERER \
         --output-uri gs://ai-experiments-487722-genlingo-models
 
 Stages (each timed in metrics.json):
-  1. weights   download the base checkpoint (Model Garden public bucket: no Hugging Face token)
+  1. weights   download the base checkpoint (Hugging Face; token from Secret Manager when it exists)
   2. train     LoRA with TRL + PEFT: only ~0.5% of the weights learn; the rest stay frozen
   3. merge     fold the adapter back into the base weights -> a normal checkpoint
   4. gguf      llama.cpp: convert to GGUF f16, then quantize to Q4_K_M (~4x smaller)
@@ -126,7 +126,7 @@ def hf_token_from_secret_manager(project: str | None, secret: str = "hf-token") 
 
 
 def base_weights(base_model: str, weights_uri: str, work: Path) -> Path:
-    """Model Garden (gs://…/<name>) by default; Hugging Face (hf://org) only if asked, with HF_TOKEN."""
+    """hf://<org> (Hugging Face, with HF_TOKEN when set), gs://<bucket>/<prefix> (a copy of the checkpoint) or a local dir."""
     if weights_uri.startswith("hf://"):
         from huggingface_hub import snapshot_download
 

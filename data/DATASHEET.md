@@ -41,9 +41,9 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 
 |  | approved | pending_review | rejected | total |
 | --- | --- | --- | --- | --- |
-| test · web | 0 | 319 | 0 | 319 |
+| test · web | 0 | 0 | 71 | 71 |
 | train · synthetic | 1500 | 0 | 0 | 1500 |
-| **total** | 1500 | 319 | 0 | 1819 |
+| **total** | 1500 | 0 | 71 | 1819 |
 
 ### Term bank (`data/terms.jsonl`)
 
@@ -92,8 +92,12 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 4. **Test pairs** (`origin=web`, `split=test`). The source is a real sentence from the web; the
    reference is the curator's rewrite into the other generation's speech, based on the meaning
    the source gives. **Never synthetic:** a reference written by Gemini would bias chrF++ toward
-   Gemini (Goliath). Every test pair starts as `pending_review`; the presenter approves or
-   corrects it with `make review-test`.
+   Gemini (Goliath). Every candidate is **validated automatically against the term bank**
+   (`scripts/validate_test_set.py`, no human needed): Gen Z → papás sources must contain a Gen Z
+   term of their country and the reference must replace it; papás → Gen Z references must contain
+   Gen Z slang of the country; no other-country terms; sane length; no overlap with training.
+   Passing pairs are `auto_validated`, failing ones `rejected` with the reason. A human pass
+   (`make review-test`) is optional and overrides the automatic decision.
 5. **Audience pairs** (`origin=human`). Submitted at each event from the audience app, approved
    by the presenter in `/admin`, pulled with `make export`. 20% go to the test split (stable
    hash of the id).

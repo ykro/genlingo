@@ -144,7 +144,9 @@ function Duel({ config }: { config: PublicConfig }) {
   }, [client]);
 
   // Live votes while an audience round is open.
-  const voting = round?.round_type === "audience" && round.win_reason === null;
+  // Votes only exist when the audience app is connected; the talk works without any audience.
+  const audience = health?.audience_feed ?? false;
+  const voting = audience && round?.round_type === "audience" && round.win_reason === null;
   useEffect(() => {
     if (!round || !voting) return;
     const t = setInterval(() => client.votes(round.id).then((v) => setLiveVotes({ roundId: round.id, ...v })).catch(() => undefined), 1500);
@@ -262,7 +264,7 @@ function Duel({ config }: { config: PublicConfig }) {
         <Welcome audienceUrl={config.audienceUrl} />
       )}
 
-      <ScoreBand board={board} round={round} votes={votes} voting={voting} audienceUrl={config.audienceUrl} />
+      <ScoreBand board={board} round={round} votes={votes} voting={voting} audience={audience} audienceUrl={config.audienceUrl} />
 
       <ControlBar
         canSwitch={davidTags.length > 1}
@@ -315,7 +317,7 @@ function RoundView({ round, live, online = true }: { round?: Round; live?: { phr
   const eyebrow = [
     round?.number ? `Ronda ${round.number}` : live ? "Nueva ronda" : null,
     DIRECTION[direction],
-    round ? (round.round_type === "evaluation" ? "Set de prueba" : "Frase del público") : null,
+    round ? (round.round_type === "evaluation" ? "Set de prueba" : round.phrase_id ? "Frase del público" : "Frase en vivo") : null,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -446,19 +448,21 @@ function ScoreBand({
   round,
   votes,
   voting,
+  audience,
   audienceUrl,
 }: {
   board: Scoreboard | null;
   round: Round | null;
   votes: { david: number; goliath: number } | null;
   voting: boolean;
+  audience: boolean;
   audienceUrl: string;
 }) {
   const training = board?.david_training?.estimated_cost_usd ?? null;
   const perRound = training != null && board?.rounds ? training / board.rounds : null;
   const total = votes ? votes.david + votes.goliath : 0;
   const pct = total ? Math.round((votes!.david / total) * 100) : 50;
-  const showVotes = round?.round_type === "audience";
+  const showVotes = audience && round?.round_type === "audience";
   return (
     <section className={s.band} aria-label="Marcador">
       <div className={s.wins}>
@@ -523,7 +527,7 @@ function ScoreBand({
         ) : (
           <span className={s.voteHint}>{board?.rounds ? `${board.rounds} ${board.rounds === 1 ? "ronda" : "rondas"} · ${board.draws} ${board.draws === 1 ? "empate" : "empates"}` : "Sin rondas todavía"}</span>
         )}
-        {audienceUrl && round && (
+        {audience && audienceUrl && round && (
           <span className={s.miniQr}>
             <Qr url={audienceUrl} size={104} />
             <span className={s.miniQrText}>Vota<br />aquí</span>

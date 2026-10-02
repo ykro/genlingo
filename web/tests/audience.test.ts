@@ -92,6 +92,17 @@ describe("votes", () => {
   });
 });
 
+describe("auto-approve (no moderator needed)", () => {
+  it("approves blocklist-clean phrases at once and still blocks the rest", async () => {
+    const store = new MemoryStore();
+    const ok = await submitPhrase({ ...ctx(store), autoApprove: true }, phrase);
+    expect(ok.body.status).toBe("approved");
+    expect(store.phrases.get(ok.body.id as string)?.approvedAt).toBe(1_000_000);
+    const bad = await submitPhrase({ ...ctx(store, 1_030_000), autoApprove: true }, { ...phrase, text: "qué pendejo" });
+    expect(bad.status).toBe(422);
+  });
+});
+
 describe("presenter review", () => {
   it("approving moves a phrase out of the pending queue", async () => {
     const store = new MemoryStore();

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -330,15 +330,17 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
         "# Genlingo — evaluación",
         "",
         f"Generado por `make eval` el {raw['created_at']}. {n_pairs} pares de prueba "
-        f"({', '.join(sorted({p['origin'] for p in raw['pairs']}))}; nunca sintéticos).",
+        f"({', '.join(sorted({p['origin'] for p in raw['pairs']}))}; nunca sintéticos), "
+        + ", ".join(f"{v} {k}" for k, v in sorted(Counter(p["status"] for p in raw["pairs"]).items())) + ". "
+        "`auto_validated` = validada automáticamente contra el banco de términos (`scripts/validate_test_set.py`).",
         "",
     ]
     if raw.get("mock"):
         lines += ["> **MOCK_AI=1**: números de ensayo con modelos simulados, no reales.", ""]
     if not raw["reviewed"]:
         lines += [
-            "> **Ensayo:** las referencias de prueba aún están en `pending_review` (sin revisión del "
-            "presentador). Los números cambiarán al aprobar/corregir el set con `make review-test`.",
+            "> **Ensayo:** este eval incluyó referencias sin validar (`pending_review`); "
+            "corre `make test-set` para validarlas automáticamente.",
             "",
         ]
     lines += [
@@ -451,9 +453,12 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
     lines += [
         "## Metodología",
         "",
-        "- Mismo prompt para todos (`duel/genlingo_duel/prompts.py`), temperatura 0.",
+        "- Prompts en `duel/genlingo_duel/prompts.py`, temperatura 0. Cada variante declara su prompt en la tabla: cada David "
+        "con el prompt con el que se entrenó; los modelos base y Goliath con v2, y también con el glosario de David "
+        "(«+ glosario») para que la comparación con los datos de David sea justa y visible.",
+        "- Glosario: entradas del banco de términos recuperadas con EmbeddingGemma local; su tiempo cuenta en la latencia.",
         "- chrF++ = sacrebleu CHRF con `word_order=2`, a nivel de corpus.",
-        "- Costo de Goliath = tokens × precio por millón configurado (`GEMINI_*_USD_PER_M`); los tokens de razonamiento se cobran como salida.",
+        "- Costo de Goliath = tokens × precio por millón vigente el día del eval (`GEMINI_PRICE_SCHEDULE`); los tokens de razonamiento se cobran como salida.",
         "- Resultados por frase en `evals/results/`.",
         "",
     ]

@@ -13,6 +13,8 @@ export interface Ctx {
   uid: string;
   event: string;
   now: number;
+  /** Phrases that pass the blocklist go straight to the stage queue (no human needed). */
+  autoApprove?: boolean;
 }
 
 export type Result = { status: number; body: Record<string, unknown> };
@@ -32,6 +34,10 @@ export function submitPhrase(ctx: Ctx, body: Record<string, unknown>): Promise<R
     // Rate limit after validation: a typo shouldn't cost you 20 seconds.
     const slot = await ctx.store.claimSubmission(ctx.uid, ctx.now);
     if (!slot.ok) return { status: 429, body: { error: retryMessage(slot.retryAfterMs), retryAfterMs: slot.retryAfterMs } };
+    if (ctx.autoApprove) {
+      const id = await ctx.store.addPhrase({ ...p, uid: ctx.uid, event: ctx.event, status: "approved", createdAt: ctx.now, approvedAt: ctx.now });
+      return { status: 201, body: { id, status: "approved", message: "¡Lista! Puede salir en la pantalla en cualquier ronda." } };
+    }
     const id = await ctx.store.addPhrase({ ...p, uid: ctx.uid, event: ctx.event, status: "pending", createdAt: ctx.now });
     return { status: 201, body: { id, status: "pending", message: "¡Listo! Tu frase espera aprobación." } };
   });

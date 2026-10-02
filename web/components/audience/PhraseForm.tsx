@@ -27,10 +27,10 @@ export function PhraseForm({ user, country }: { user: User; country: string }) {
     setBusy(true);
     setStatus(null);
     try {
-      await api(user, "/api/phrases", { text, direction, country });
+      const res = await api<{ status: string; message: string }>(user, "/api/phrases", { text, direction, country });
       setText("");
       cooldown.start(WINDOW_MS);
-      setStatus({ kind: "ok", text: "En la fila. Si el presentador la aprueba, sale en la pantalla." });
+      setStatus({ kind: "ok", text: res.message });
     } catch (err) {
       const apiErr = err instanceof ApiError ? err : null;
       if (apiErr?.retryAfterMs) cooldown.start(apiErr.retryAfterMs);

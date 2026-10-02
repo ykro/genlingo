@@ -22,7 +22,11 @@ export class FirestoreStore implements AudienceStore {
   }
 
   async addPhrase(doc: PhraseDoc) {
-    const ref = await this.db.collection(COLLECTIONS.phrases).add({ ...doc, createdAt: Timestamp.fromMillis(doc.createdAt) });
+    const ref = await this.db.collection(COLLECTIONS.phrases).add({
+      ...doc,
+      createdAt: Timestamp.fromMillis(doc.createdAt),
+      ...(doc.approvedAt ? { approvedAt: Timestamp.fromMillis(doc.approvedAt) } : {}),
+    });
     return ref.id;
   }
 
