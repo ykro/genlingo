@@ -232,6 +232,10 @@ function Duel({ config }: { config: PublicConfig }) {
   const online = health?.online ?? true;
   const davidTag = round?.david_tag && !running ? round.david_tag : activeTag ?? "";
   const previous = davidTags.length > 1 && activeTag !== davidTags[0];
+  const model = health?.david_models?.[davidTag];
+  const modelNote = model?.quant
+    ? `${model.quant}${model.size_bytes ? ` · ${(model.size_bytes / 1e9).toFixed(1)} GB` : ""}`
+    : null;
   return (
     <div className={s.layout}>
       <header className={s.top}>
@@ -247,6 +251,7 @@ function Duel({ config }: { config: PublicConfig }) {
           )}
           <span className={`${s.chip} ${previous ? s.previousChip : ""}`}>
             David · <b>{davidTag || "sin modelo"}</b>
+            {modelNote && <span className={`${s.chipNote} tabular`}>{modelNote}</span>}
             {previous && <span className={s.chipNote}>el del mes pasado</span>}
           </span>
           <span className={`${s.chip} ${online ? s.online : s.offline}`} aria-live="polite">

@@ -60,6 +60,8 @@ export interface Health {
   mock: boolean;
   david_tag: string;
   david_tags?: string[];
+  /** Quantization and GGUF size of each David, from Ollama (empty in MOCK_AI). */
+  david_models?: Record<string, { quant?: string | null; size_bytes?: number | null }>;
   goliath_model: string;
   audience_feed: boolean;
 }

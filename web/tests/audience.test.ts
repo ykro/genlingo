@@ -4,6 +4,7 @@ import { castVote, listQueue, reviewItem, submitPair, submitPhrase } from "../li
 import { blockedReason, normalize } from "../lib/server/blocklist";
 import { decide } from "../lib/server/rate-limit";
 import { MemoryStore } from "../lib/server/store";
+import { parseDocId, ValidationError } from "../lib/server/validation";
 
 const ctx = (store: MemoryStore, now = 1_000_000, uid = "u1") => ({ store, uid, event: "gdg", now });
 const phrase = { text: "no manches, está bien mid", direction: "genz_to_parent", country: "MX" };
@@ -48,6 +49,29 @@ describe("blocklist", () => {
     expect(blockedReason("qué pena con usted, el perro se comió la pera")).toBeNull();
   });
 
+  it("blocks spaced letters, leetspeak, v/u/b and k/c swaps", () => {
+    expect(blockedReason("eres un p u t o")).toBe("lenguaje");
+    expect(blockedReason("p.e.n.d.e.j.o")).toBe("lenguaje");
+    expect(blockedReason("m-i-e-r-d-a")).toBe("lenguaje");
+    expect(blockedReason("pvto el que lo lea")).toBe("lenguaje");
+    expect(blockedReason("qué berga")).toBe("lenguaje");
+    expect(blockedReason("kabron")).toBe("lenguaje");
+    expect(blockedReason("1d10t4 y est!pido")).toBe("lenguaje");
+    expect(blockedReason("m13rd4")).toBe("lenguaje");
+  });
+
+  it("blocks the common abbreviations as whole words", () => {
+    for (const a of ["hdp", "HDP", "ctm", "ptm", "alv", "hpta", "mmgv", "csm"]) expect(blockedReason(`ya ${a} vos`)).toBe("lenguaje");
+  });
+
+  it("does not block ordinary phrases that look close", () => {
+    expect(blockedReason("por no ir a la fiesta me quedé sin plan")).toBeNull();
+    expect(blockedReason("nos vemos a las 5 pm en la u")).toBeNull();
+    expect(blockedReason("a y o son vocales")).toBeNull();
+    expect(blockedReason("qué vacilón, la vuelta estuvo chévere")).toBeNull();
+    expect(blockedReason("el queso de la tienda")).toBeNull();
+  });
+
   it("blocks personal data on the public screen", () => {
     expect(blockedReason("sígueme en @fulanito")).toBe("usuario");
     expect(blockedReason("mira www.ejemplo.com")).toBe("enlace");
@@ -71,6 +95,14 @@ describe("validation", () => {
     const r = await submitPhrase(ctx(new MemoryStore()), { ...phrase, text: Array(31).fill("x").join(" ") });
     expect(r.status).toBe(400);
     expect(r.body.error).toMatch(/30 palabras/);
+  });
+
+  it("rejects document ids that are not plain Firestore ids", async () => {
+    expect(parseDocId("Ab3_x-9")).toBe("Ab3_x-9");
+    expect(() => parseDocId("../rounds/x")).toThrow(ValidationError);
+    expect(() => parseDocId("a".repeat(65))).toThrow(ValidationError);
+    const store = new MemoryStore();
+    expect((await castVote(ctx(store), { roundId: "rounds/../x", choice: "david" })).status).toBe(400);
   });
 
   it("rejects identical pairs", async () => {

@@ -43,8 +43,17 @@ export function parsePair(body: Body) {
   return out;
 }
 
+/** Firestore document ids we accept: auto-ids (20 chars) and the duel's round ids (12 hex). No paths. */
+export const DOC_ID = /^[A-Za-z0-9_-]{1,64}$/;
+
+export function parseDocId(id: unknown, label = "el id"): string {
+  if (typeof id !== "string" || !DOC_ID.test(id)) throw new ValidationError(`${label[0].toUpperCase()}${label.slice(1)} no es válido.`);
+  return id;
+}
+
 export function parseVote(body: Body) {
   if (typeof body.roundId !== "string" || !body.roundId) throw new ValidationError("Falta la ronda.");
+  parseDocId(body.roundId, "la ronda");
   if (body.choice !== "david" && body.choice !== "goliath") throw new ValidationError("Vota por David o por Goliat.");
   return { roundId: body.roundId, choice: body.choice as "david" | "goliath" };
 }
