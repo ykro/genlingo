@@ -49,10 +49,15 @@ class PriceSchedule:
         return cls((price,))
 
     def at(self, day: date | None = None) -> Price:
-        """The price in force on `day` (today by default); free if nothing applies yet."""
+        """The price in force on `day` (today by default). An empty schedule is free (a local
+        model); a day before the first entry is an error, never a silent $0."""
         iso = (day or date.today()).isoformat()
+        if not self.prices:
+            return Price.free()
         current = [p for p in self.prices if (p.effective_from or "") <= iso]
-        return current[-1] if current else Price.free()
+        if not current:
+            raise ValueError(f"no price in force on {iso}: the schedule starts on {self.prices[0].effective_from}")
+        return current[-1]
 
     def next_after(self, day: date | None = None) -> Price | None:
         iso = (day or date.today()).isoformat()
