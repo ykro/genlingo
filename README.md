@@ -183,6 +183,7 @@ Los precios cambian, y eso es parte de la historia. `GEMINI_PRICE_SCHEDULE=2026-
 ### Quién gana una ronda
 
 - **Ronda de evaluación** (frase del set de prueba, tecla `E`): gana el chrF++ más alto; diferencias menores a 0.5 son empate. Usa pares `auto_validated` (o aprobados por una persona), listos sin revisión humana.
+- **Ronda de especialidad: slang chapín** (tecla `G`): igual, pero con la siguiente frase guatemalteca del set de prueba en un orden fijo con semilla (`SPECIALTY_SEED`), el nicho 1 de [evals/niche.md](evals/niche.md). Nadie elige la frase. El país por defecto del escenario es `GT`.
 - **Frase en vivo** (escrita con `/`) o **del público** (desde un teléfono): con la app del público conectada (`AUDIENCE_FEED=1`) decide el voto (`V` cierra la votación); sin público, la ronda muestra las dos traducciones sin ganador. La charla completa funciona sin público: rondas `E` y frases escritas.
 - Las frases del público que pasan la blocklist van directo a la cola de la pantalla (`AUTO_APPROVE_PHRASES=1`, por defecto); con `0`, el presentador las aprueba en `/admin`.
 - Si Goliath no tiene red o falla, David gana por presentarse.

@@ -172,8 +172,9 @@ Teclas de la vista del presentador:
 | Tecla | Acción |
 | --- | --- |
 | `E` | Ronda de evaluación: frase del set de prueba sin usar, con referencia y chrF++ en vivo. |
+| `G` | Ronda de especialidad: slang chapín. La siguiente frase guatemalteca del set de prueba (nicho 1 de `evals/niche.md`) en un orden fijo (barajado con `SPECIALTY_SEED`, 2027), nunca elegida a mano. |
 | `Enter` / `N` / `AvPág` | Siguiente frase aprobada del público. |
-| `/` | Escribir una frase (el botón alterna la dirección; `Esc` cancela). Usa el país `EVENT_COUNTRY`. |
+| `/` | Escribir una frase (el botón alterna la dirección; `Esc` cancela). Usa el país `EVENT_COUNTRY` (`GT` por defecto: la charla es en Guatemala). |
 | `V` | Cerrar la votación de la ronda del público. |
 | `M` | Alternar entre el David de este mes y el del mes pasado (`DAVID_PREVIOUS_TAG`). |
 | `F` | Pantalla completa. |

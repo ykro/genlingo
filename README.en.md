@@ -183,6 +183,7 @@ Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:
 ### Who wins a round
 
 - **Evaluation round** (test-set phrase, `E` key): the higher chrF++ wins; gaps under 0.5 are a draw. It uses `auto_validated` pairs (or ones a person approved), ready with no human review.
+- **Specialty round: chapín slang** (`G` key): the same, but with the next Guatemalan test phrase in a fixed seeded order (`SPECIALTY_SEED`), niche 1 of [evals/niche.md](evals/niche.md). Nobody picks the phrase. The stage's default country is `GT`.
 - **Live phrase** (typed with `/`) or **audience phrase** (from a phone): with the audience app connected (`AUDIENCE_FEED=1`) the vote decides (`V` closes voting); without an audience the round shows both translations with no winner. The whole talk works without an audience: `E` rounds and typed phrases.
 - Audience phrases that pass the blocklist go straight to the screen queue (`AUTO_APPROVE_PHRASES=1`, the default); with `0` the presenter approves them in `/admin`.
 - If Goliath has no network or fails, David wins by showing up.

@@ -186,7 +186,10 @@ function Duel({ config }: { config: PublicConfig }) {
   }, [queue, run, client, activeTag]);
 
   const evaluation = useCallback(
-    () => run({ phrase: "Frase del set de prueba…", direction: "genz_to_parent" }, () => client.evaluation(activeTag)),
+    (specialty = false) =>
+      run({ phrase: specialty ? "Frase chapín del set de prueba…" : "Frase del set de prueba…", direction: "genz_to_parent" }, () =>
+        client.evaluation(activeTag, specialty),
+      ),
     [run, client, activeTag],
   );
 
@@ -206,6 +209,7 @@ function Duel({ config }: { config: PublicConfig }) {
       if (composer || e.metaKey || e.ctrlKey || e.altKey) return;
       const key = e.key.toLowerCase();
       if (key === "e") evaluation();
+      else if (key === "g") evaluation(true); // specialty round: GT test pairs, fixed seeded order
       else if (key === "enter" || key === "n" || key === "pagedown") nextFromAudience();
       else if (key === "v") closeVotes();
       else if (key === "/") {
@@ -346,7 +350,7 @@ function RoundView({ round, live, online = true }: { round?: Round; live?: { phr
   const eyebrow = [
     round?.number ? `Ronda ${round.number}` : live ? "Nueva ronda" : null,
     DIRECTION[direction],
-    round ? (round.round_type === "evaluation" ? "Set de prueba" : round.phrase_id ? "Frase del público" : "Frase en vivo") : null,
+    round ? (round.label ?? (round.round_type === "evaluation" ? "Set de prueba" : round.phrase_id ? "Frase del público" : "Frase en vivo")) : null,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -617,7 +621,7 @@ function ControlBar({
         </span>
       )}
       <span className={s.keys}>
-        <kbd>E</kbd> set de prueba <kbd>↵</kbd> siguiente del público {voting && (<><kbd>V</kbd> cerrar votos</>)} <kbd>/</kbd> escribir {canSwitch && (<><kbd>M</kbd> mes pasado / este mes</>)} <kbd>F</kbd> pantalla completa
+        <kbd>E</kbd> set de prueba <kbd>G</kbd> especialidad chapín <kbd>↵</kbd> siguiente del público {voting && (<><kbd>V</kbd> cerrar votos</>)} <kbd>/</kbd> escribir {canSwitch && (<><kbd>M</kbd> mes pasado / este mes</>)} <kbd>F</kbd> pantalla completa
       </span>
     </footer>
   );

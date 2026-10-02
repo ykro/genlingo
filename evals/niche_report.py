@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT / "duel"))
 sys.path.insert(0, str(ROOT / "evals"))
 
 from duel_core import corpus_chrf_pp, percentile  # noqa: E402
+from report import eval_terms_path  # noqa: E402
 from term_accuracy import TermBank, slang_handled  # noqa: E402
 
 DATA = ROOT / "data"
@@ -114,7 +115,7 @@ def table(head, rows):
 def main() -> None:
     path = Path(sys.argv[1]) if len(sys.argv) > 1 else sorted((ROOT / "evals" / "results").glob("*.json"))[-1]
     raw = json.loads(path.read_text())
-    bank = TermBank(_jsonl(DATA / "terms.jsonl"), ignore_ambiguous=True)
+    bank = TermBank(_jsonl(eval_terms_path(DATA)), ignore_ambiguous=True)  # frozen with the test set
     linked = {u["id"]: u.get("term_ids", []) for u in _jsonl(DATA / "raw" / "web_usage.jsonl")}
     pairs = {p["id"]: p for p in raw["pairs"] if p.get("status") in USABLE}
     rows: dict[str, dict] = {}

@@ -62,7 +62,10 @@ def check(bank: TermBank, pair: dict, linked: list[str], other: TextIndex, seen:
 
 
 def main() -> None:
-    bank = TermBank(read_jsonl(DATA / "terms.jsonl"), ignore_ambiguous=True)
+    # The test set is validated with the bank frozen alongside it (data/eval/terms_test.jsonl), so later
+    # rounds that grow the bank don't silently change which test pairs exist.
+    frozen = DATA / "eval" / "terms_test.jsonl"
+    bank = TermBank(read_jsonl(frozen if frozen.exists() else DATA / "terms.jsonl"), ignore_ambiguous=True)
     linked = {u["id"]: u.get("term_ids", []) for u in read_jsonl(DATA / "raw" / "web_usage.jsonl")}
     train_text = training_index()
     rows, seen, reasons = list(read_jsonl(TEST)), set(), Counter()

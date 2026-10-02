@@ -22,6 +22,8 @@ export interface Round {
   id: string;
   number: number | null;
   round_type: "evaluation" | "audience";
+  /** e.g. "Ronda de especialidad: slang chapín" (niche 1 of evals/niche.md). */
+  label?: string | null;
   phrase: string;
   direction: Direction;
   country: string;
@@ -95,7 +97,8 @@ export class DuelClient {
   latest = () => this.call<Round[]>("/rounds?limit=1").then((r) => r[0] ?? null);
   duel = (body: { phrase: string; direction: Direction; country: string; phrase_id?: string; david_tag?: string }) =>
     this.call<Round>("/duel", body);
-  evaluation = (davidTag?: string) => this.call<Round>("/rounds/evaluation", davidTag ? { david_tag: davidTag } : {});
+  evaluation = (davidTag?: string, specialty = false) =>
+    this.call<Round>("/rounds/evaluation", { ...(davidTag ? { david_tag: davidTag } : {}), ...(specialty ? { specialty: true } : {}) });
   votes = (id: string) => this.call<{ david: number; goliath: number; live: boolean }>(`/rounds/${id}/votes`);
   close = (id: string) => this.call<Round>(`/rounds/${id}/close`, {});
 }

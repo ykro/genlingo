@@ -45,11 +45,17 @@ class DuelRequest(BaseModel):
     round_type: Literal["evaluation", "audience"] | None = None
     pair_id: str | None = None
     phrase_id: str | None = None
+    label: str | None = Field(default=None, max_length=80)
+
+
+# The specialty round draws from niche 1 of evals/niche.md: the GT test pairs ("slang chapín").
+SPECIALTY = {"country": "GT", "label": "Ronda de especialidad: slang chapín"}
 
 
 class EvaluationRequest(BaseModel):
     direction: Direction | None = None
     country: str | None = None
+    specialty: bool = False
     david_tag: str | None = Field(default=None, pattern=TAG_PATTERN)
 
 
@@ -122,6 +128,7 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
             pair_id=req.pair_id,
             phrase_id=req.phrase_id,
             david_tag=req.david_tag or s.david_tag,
+            label=req.label,
         )
         if feed is not None and await arena.is_online():  # offline: the round stays local
             fire_and_forget(feed.publish_round, rnd)
@@ -168,17 +175,26 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
 
     @app.post("/rounds/evaluation")
     async def evaluation_round(req: EvaluationRequest) -> dict:
-        """Next unused test-set phrase, with its reference, so chrF++ can be shown live."""
+        """Next unused test-set phrase, with its reference, so chrF++ can be shown live.
+        Specialty rounds take the next GT pair in a fixed order (seeded shuffle), never a pick by hand."""
+        country = SPECIALTY["country"] if req.specialty else req.country
+        used = board.used_pair_ids()
         pool = [
             p
             for p in test_pairs(s.data_dir, include_pending=s.allow_unreviewed_test)
-            if p.id not in board.used_pair_ids()
+            if p.id not in used
             and (req.direction is None or p.direction == req.direction)
-            and (req.country is None or p.country == req.country)
+            and (country is None or p.country == country)
         ]
         if not pool:
             raise HTTPException(404, "No quedan frases de prueba para esa combinación.")
-        pair = random.choice(pool)
+        if req.specialty:
+            # One fixed order over the whole niche (same seed, same order at every event); take the next unused.
+            order = sorted(test_pairs(s.data_dir, include_pending=s.allow_unreviewed_test), key=lambda p: p.id)
+            random.Random(s.specialty_seed).shuffle(order)
+            pair = next(p for p in order if p in pool)
+        else:
+            pair = random.choice(pool)
         return await run_round(
             DuelRequest(
                 phrase=pair.source,
@@ -188,6 +204,7 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
                 round_type="evaluation",
                 pair_id=pair.id,
                 david_tag=req.david_tag,
+                label=SPECIALTY["label"] if req.specialty else None,
             )
         )
 

@@ -40,7 +40,8 @@ CREATE TABLE IF NOT EXISTS rounds (
     winner TEXT,
     win_reason TEXT,
     votes_david INTEGER NOT NULL DEFAULT 0,
-    votes_goliath INTEGER NOT NULL DEFAULT 0
+    votes_goliath INTEGER NOT NULL DEFAULT 0,
+    label TEXT
 );
 CREATE TABLE IF NOT EXISTS audience_queue (
     phrase_id TEXT PRIMARY KEY,
@@ -79,6 +80,10 @@ class Scoreboard:
         self.db = sqlite3.connect(db_path, check_same_thread=False)
         self.db.row_factory = sqlite3.Row
         self.db.executescript(SCHEMA)
+        cols = {r[1] for r in self.db.execute("PRAGMA table_info(rounds)")}
+        if "label" not in cols:  # scoreboards created before round labels existed
+            self.db.execute("ALTER TABLE rounds ADD COLUMN label TEXT")
+            self.db.commit()
 
     # ---- rounds -------------------------------------------------------------------------
     def record_round(
@@ -93,6 +98,7 @@ class Scoreboard:
         pair_id: str | None = None,
         phrase_id: str | None = None,
         david_tag: str | None = None,
+        label: str | None = None,
     ) -> dict[str, Any]:
         david, goliath = results["david"], results["goliath"]
         winner, reason = None, None
@@ -101,10 +107,10 @@ class Scoreboard:
         rid = uuid.uuid4().hex[:12]
         self.db.execute(
             "INSERT INTO rounds (id, created_at, round_type, phrase, direction, country, reference, pair_id,"
-            " phrase_id, david_tag, david, goliath, winner, win_reason) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " phrase_id, david_tag, david, goliath, winner, win_reason, label) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 rid, time.time(), round_type, phrase, direction, country, reference, pair_id, phrase_id,
-                david_tag or david.model, json.dumps(david.to_dict()), json.dumps(goliath.to_dict()), winner, reason,
+                david_tag or david.model, json.dumps(david.to_dict()), json.dumps(goliath.to_dict()), winner, reason, label,
             ),
         )
         if phrase_id:

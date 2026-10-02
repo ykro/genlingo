@@ -61,6 +61,8 @@ class Settings:
     # after build_test_set); on stage keep it 0: only auto-validated pairs (or ones a person
     # approved in the optional human pass) are shown.
     allow_unreviewed_test: bool = field(default_factory=lambda: _flag("ALLOW_UNREVIEWED_TEST"))
+    # Specialty rounds (key G): niche 1 of evals/niche.md (GT test pairs), in a fixed seeded order.
+    specialty_seed: int = field(default_factory=lambda: int(_env("SPECIALTY_SEED", "2027")))
 
 
 def goliath_prices(s: "Settings") -> PriceSchedule:

@@ -17,7 +17,7 @@ export async function GET() {
     database: process.env.FIRESTORE_DATABASE ?? "genlingo",
     recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY ?? "",
     event: process.env.EVENT_ID ?? "ensayo",
-    country: process.env.EVENT_COUNTRY ?? "LATAM",
+    country: process.env.EVENT_COUNTRY ?? "GT", // the talk is in Guatemala
     audienceUrl: process.env.AUDIENCE_URL ?? "",
     duelUrl: process.env.DUEL_URL ?? "http://127.0.0.1:8787",
   });

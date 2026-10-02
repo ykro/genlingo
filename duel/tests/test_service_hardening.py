@@ -104,3 +104,19 @@ def test_ids_and_tags_are_validated(settings):
         assert c.get("/rounds/not-a-round-id").status_code == 422
         assert c.post("/rounds/zzzzzzzzzzzz/close").status_code == 422
         assert c.post("/duel", json={**DUEL, "david_tag": "bad tag; rm -rf"}).status_code == 422
+
+
+def test_specialty_rounds_take_gt_pairs_in_a_fixed_seeded_order(settings, make_pair):
+    import json
+
+    rows = [{**make_pair(i), "country": "GT" if i % 2 else "MX", "status": "auto_validated"} for i in range(1, 9)]
+    (settings.data_dir / "pairs" / "test_web.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+
+    def run():
+        with TestClient(create_app(dataclasses.replace(settings, db_path=settings.db_path.with_name(f"s{time.time_ns()}.sqlite")))) as c:
+            return [c.post("/rounds/evaluation", json={"specialty": True}).json() for _ in range(3)]
+
+    first, second = run(), run()
+    assert [r["pair_id"] for r in first] == [r["pair_id"] for r in second]  # same seed, same order
+    assert all(r["country"] == "GT" and r["label"] == "Ronda de especialidad: slang chapín" for r in first)
+    assert len({r["pair_id"] for r in first}) == 3

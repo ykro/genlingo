@@ -22,9 +22,16 @@ def _jsonl(path: Path) -> list[dict]:
     return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()] if path.exists() else []
 
 
+def eval_terms_path(data_dir: Path) -> Path:
+    """Term metrics on the test set use the bank as it was when the test set and the niches were frozen
+    (data/eval/terms_test.jsonl), so a growing bank can't move the goalposts between rounds."""
+    frozen = data_dir / "eval" / "terms_test.jsonl"
+    return frozen if frozen.exists() else data_dir / "terms.jsonl"
+
+
 def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dict | None = None) -> list[str]:
     """Slang-level metrics, so a win is about meaning and not surface overlap (see term_accuracy)."""
-    terms = _jsonl(data_dir / "terms.jsonl")
+    terms = _jsonl(eval_terms_path(data_dir))
     if not terms:
         return []
     bank = TermBank(terms, ignore_ambiguous=True)  # ordinary-word terms would inflate the metric
