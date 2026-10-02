@@ -1,11 +1,13 @@
-"""Presenter review of the test set, as a spreadsheet round-trip.
+"""Optional human pass over the test set, as a spreadsheet round-trip.
+
+The demo needs no human: scripts/validate_test_set.py marks every pair `auto_validated` or
+`rejected`. This pass only exists to correct or veto those decisions; when used, it wins.
 
     make review-test                     # export data/review/test_review.csv
     make review-test-apply               # apply the decisions back to data/pairs/test_web.jsonl
 
 In the CSV, fill `decision` with `a` (approve) or `r` (reject), and optionally write a better
-reference in `corrected_target`. Blank decision = still pending. Only approved pairs are used
-on stage and in the headline eval numbers.
+reference in `corrected_target`. Blank decision = keep the automatic decision.
 """
 
 from __future__ import annotations
@@ -46,9 +48,11 @@ def apply() -> None:
         choice = (d.get("decision") or "").strip().lower()
         if choice in {"a", "approve", "approved", "si", "sí"}:
             r["status"] = "approved"
+            r["provenance"]["validation"] = {"by": "human", "reason": None}  # validate_test_set keeps it
             counts["approved"] += 1
         elif choice in {"r", "reject", "rejected", "no"}:
             r["status"] = "rejected"
+            r["provenance"]["validation"] = {"by": "human", "reason": "rejected_by_reviewer"}
             counts["rejected"] += 1
         else:
             counts["unchanged"] += 1

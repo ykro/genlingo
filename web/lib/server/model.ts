@@ -1,7 +1,7 @@
 /**
  * Firestore data model of the audience app (database `genlingo`).
  *
- *   phrases/{id}              a phrase sent from a phone; the presenter approves it in /admin
+ *   phrases/{id}              a phrase sent from a phone; auto-approved after the blocklist (or approved in /admin)
  *   rounds/{id}               a duel on screen, published by the duel service; phones vote on it
  *   rounds/{id}/votes/{uid}   one vote per person (the doc id is the voter's uid)
  *   pairs/{id}                a Gen Z <-> parents pair contributed by the audience (origin=human)

@@ -5,10 +5,11 @@
 The source side is a sentence someone actually wrote (found on the web, see SOURCES.md). The
 reference is the dataset curator's rewrite of that sentence into the other generation's speech,
 based on the meaning the source gives. Gemini never writes a test reference: if it did, chrF++
-would reward Goliath for sounding like himself. The presenter reviews every pair before it is
-used on stage (`make review-test`).
+would reward Goliath for sounding like himself. scripts/validate_test_set.py then validates every
+pair automatically against the term bank (`auto_validated` or `rejected`, no human needed); a
+human pass with `make review-test` is optional.
 
-Existing review decisions are kept: re-running never resets a pair the presenter already
+Existing decisions are kept: re-running never resets a pair that was already validated,
 approved or rejected.
 """
 

@@ -131,7 +131,7 @@ async def main_async(args) -> None:
     s = get_settings()
     pairs = test_pairs(s.data_dir)
     reviewed = True
-    if not pairs:  # before the presenter's review: rehearsal numbers, clearly labelled
+    if not pairs:  # before validate_test_set ran: rehearsal numbers, clearly labelled
         pairs, reviewed = test_pairs(s.data_dir, include_pending=True), False
     if args.limit:
         # Deterministic, stratified-ish sample: every k-th pair keeps country/direction mix.

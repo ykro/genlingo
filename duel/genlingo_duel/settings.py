@@ -57,8 +57,9 @@ class Settings:
     firestore_database: str = field(default_factory=lambda: _env("FIRESTORE_DATABASE", "genlingo"))
     audience_feed: bool = field(default_factory=lambda: _flag("AUDIENCE_FEED"))
     event_id: str = field(default_factory=lambda: _env("EVENT_ID", "ensayo"))
-    # Evaluation rounds may use test pairs still pending review (useful before the presenter
-    # has reviewed them); on stage set it to 0 so only approved references are shown.
+    # Evaluation rounds may also use test pairs not validated yet (pending_review, e.g. right
+    # after build_test_set); on stage keep it 0: only auto-validated pairs (or ones a person
+    # approved in the optional human pass) are shown.
     allow_unreviewed_test: bool = field(default_factory=lambda: _flag("ALLOW_UNREVIEWED_TEST"))
 
 

@@ -14,7 +14,7 @@ narrow task — and to evaluate that claim honestly.
 
 Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), `source`,
 `target`, `country`, `age_range`, `split` (`train` | `test`), `status`
-(`pending_review` | `approved` | `rejected`), `origin` (`web` | `synthetic` | `human`) and
+(`pending_review` | `auto_validated` | `approved` | `rejected`), `origin` (`web` | `synthetic` | `human`) and
 `provenance`.
 
 - `age_range` is the age range of the Gen Z side (16-24 by default; audience pairs carry the
@@ -41,16 +41,17 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 
 ### Pairs by split and origin × status
 
-|  | approved | pending_review | rejected | total |
-| --- | --- | --- | --- | --- |
-| test · web | 0 | 0 | 119 | 119 |
-| train · synthetic | 1375 | 0 | 0 | 1375 |
-| train · web | 0 | 0 | 0 | 0 |
-| **total** | 1375 | 0 | 119 | 2231 |
+|  | auto_validated | approved | pending_review | rejected | total |
+| --- | --- | --- | --- | --- | --- |
+| test · web | 399 | 0 | 0 | 123 | 522 |
+| train · synthetic | 0 | 1375 | 0 | 0 | 1375 |
+| train · web | 334 | 0 | 0 | 0 | 334 |
+| **total** | 733 | 1375 | 0 | 123 | 2231 |
 
 ### Term bank (`data/terms.jsonl`)
 
-406 terms from 57 sources (see `SOURCES.md`).
+406 terms from 57 web sources (see `SOURCES.md`; S63 there is a general-speech corpus used only to
+count ambiguous terms, not a source of terms or sentences).
 
 | country | genz | parent | total |
 | --- | --- | --- | --- |
@@ -118,8 +119,10 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 
 ## Uses
 
-Training David (`split=train`, `status=approved`), duel evaluation rounds and `make eval`
-(`split=test`, `status=approved`; `pending_review` only in rehearsal reports, labelled as such).
+Training David (`split=train`, status `auto_validated` or `approved`), duel evaluation rounds and
+`make eval` (`split=test`, status `auto_validated`: validated automatically, no human needed; a
+human pass with `make review-test` is optional and its `approved`/`rejected` decisions win).
+`pending_review` pairs are used only in rehearsal reports, labelled as such.
 
 ## Known limitations
 

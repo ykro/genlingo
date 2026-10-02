@@ -34,7 +34,11 @@ def main() -> None:
     usage = list(read_jsonl(DATA / "raw" / "web_usage.jsonl"))
     meta_path = DATA / "pairs" / "synthetic.meta.json"
     meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
-    sources = sum(1 for line in (DATA / "SOURCES.md").read_text().splitlines() if line.startswith("| S"))
+    # Sources the data actually uses (terms + real sentences of both rounds); SOURCES.md also lists
+    # S63, a general-speech corpus used only to count ambiguous terms.
+    used = {r.get("source_id") for f in ("terms.jsonl", "raw/web_usage.jsonl", "raw/web_usage_v2.jsonl")
+            for r in read_jsonl(DATA / f)} - {None}
+    sources = len(used)
 
     split_origin = lambda p: f"{p.split} · {p.origin}"  # noqa: E731
     rf = meta.get("refiltered")
@@ -61,7 +65,7 @@ narrow task — and to evaluate that claim honestly.
 
 Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), `source`,
 `target`, `country`, `age_range`, `split` (`train` | `test`), `status`
-(`pending_review` | `approved` | `rejected`), `origin` (`web` | `synthetic` | `human`) and
+(`pending_review` | `auto_validated` | `approved` | `rejected`), `origin` (`web` | `synthetic` | `human`) and
 `provenance`.
 
 - `age_range` is the age range of the Gen Z side (16-24 by default; audience pairs carry the
@@ -78,11 +82,12 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 
 ### Pairs by split and origin × status
 
-{crosstab(pairs, split_origin, lambda p: p.status, ["approved", "pending_review", "rejected"])}
+{crosstab(pairs, split_origin, lambda p: p.status, ["auto_validated", "approved", "pending_review", "rejected"])}
 
 ### Term bank (`data/terms.jsonl`)
 
-{len(terms)} terms from {sources} sources (see `SOURCES.md`).
+{len(terms)} terms from {sources} web sources (see `SOURCES.md`; S63 there is a general-speech corpus used only to
+count ambiguous terms, not a source of terms or sentences).
 
 {table(["country", "genz", "parent", "total"], [[c, term_tab[(c, "genz")], term_tab[(c, "parent")], term_tab[(c, "genz")] + term_tab[(c, "parent")]] for c in COUNTRY_ORDER])}
 
@@ -140,8 +145,10 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 
 ## Uses
 
-Training David (`split=train`, `status=approved`), duel evaluation rounds and `make eval`
-(`split=test`, `status=approved`; `pending_review` only in rehearsal reports, labelled as such).
+Training David (`split=train`, status `auto_validated` or `approved`), duel evaluation rounds and
+`make eval` (`split=test`, status `auto_validated`: validated automatically, no human needed; a
+human pass with `make review-test` is optional and its `approved`/`rejected` decisions win).
+`pending_review` pairs are used only in rehearsal reports, labelled as such.
 
 ## Known limitations
 

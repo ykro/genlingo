@@ -1,6 +1,7 @@
 """Bridge between the audience app (Firestore, in the cloud) and the duel service (laptop).
 
-Phones write phrases to Firestore; the presenter approves them in /admin; this feed listens
+Phones write phrases to Firestore; the web app approves them automatically once they pass the
+blocklist (AUTO_APPROVE_PHRASES=1, the default) or the presenter does in /admin; this feed listens
 for approved phrases and drops them into the local queue the presenter view reads. It uses a
 Firestore snapshot listener (push, well under the 3 s budget) and falls back to polling.
 

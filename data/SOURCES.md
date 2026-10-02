@@ -16,7 +16,8 @@ sources by `source_id` (exact per-entry URL in the record). Accessed 2026-09-30.
 - **Curator-written sentences:** where a source gives a term but no usable example, the curator
   wrote a minimal example and marked it `example_origin=curator` (under 30% of test candidates).
 - **Test references** (`rewrite`) are written by the dataset curator from the meaning the source
-  gives, never by Gemini, and are reviewed by the presenter (`make review-test`).
+  gives, never by Gemini. They are validated automatically against the term bank (`auto_validated`,
+  `scripts/validate_test_set.py`); a human pass (`make review-test`) is optional.
 
 ## Sources
 
