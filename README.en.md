@@ -62,7 +62,7 @@ cp .env.example .env                                  # models, prices and paths
 gcloud auth application-default login                 # Goliath (Vertex AI) and model downloads
 
 ollama pull embeddinggemma                            # glossary retrieval
-make pull-model TAG=genlingo-2026-10-e2b FP16=1       # on-stage David (creates -e2b and -e2b-f16)
+make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # on-stage David (Q5_K_M, 3.62 GB)
 make pull-model TAG=genlingo-2026-09                  # last month's David (M key)
 
 make up       # Ollama + warmed-up David + duel (:8787) + presenter view (:3000/presenter)
@@ -75,21 +75,24 @@ Rehearsal with no network or GPU: set `MOCK_AI=1` in `.env` and run `make up` (s
 | Command | What it does |
 | --- | --- |
 | `make help` | Lists the commands with their description. |
-| `make up` | Starts Ollama, warms up David, brings up the duel service and the presenter view. Works with Wi-Fi off. |
+| `make up` | Starts Ollama (with `OLLAMA_MAX_LOADED_MODELS=4`), preloads the three stage models (David, last month's David, EmbeddingGemma), brings up the duel service and the presenter view (rebuilt if its code changed). Works with Wi-Fi off and without an audience. |
 | `make reset` | Zeroes local rounds, votes, queue and scoreboard; with `AUDIENCE_FEED=1` and network, also deletes the event's rounds in Firestore. |
 | `make test` | Python tests (`MOCK_AI=1`), Vitest, `tsc`, ESLint and, with JDK 21, the Firestore rules on the emulator. |
 | `make eval` | Runs the test set through the base models, every David and Goliath (with and without glossary) and writes `evals/report.md`. Accepts `EVAL_ARGS="--limit 50 --no-goliath"`. |
-| `make test-set` | Builds the test pairs (`pending_review`) from real web usage examples. |
+| `make test-set` | Builds the test pairs from real web sentences and validates them against the term bank (`auto_validated` or `rejected`, no human involved). |
+| `make real-pairs` | Training pairs anchored in real sentences (both directions), validated against the term bank. |
+| `make ambiguous-terms` | Flags term-bank entries that are also ordinary words («cámara», «servir») so metrics ignore them. |
 | `make pairs` | Generates the synthetic training pairs with `GEMINI_MODEL` (paid; `SYNTHETIC_PAIRS_TARGET`, currently 1,500). |
 | `make datasheet` | Recounts `data/DATASHEET.md`. |
 | `make data` | `test-set` + `pairs` + `datasheet`. |
-| `make review-test` | Exports the test set to `data/review/test_review.csv` for the presenter to review. |
+| `make review-test` | (Optional) exports the test set to a CSV for a human pass over the automatic validation. |
 | `make review-test-apply` | Applies the CSV decisions (`a` approve, `r` reject, optional corrected reference). |
 | `make export` | Pulls the audience pairs approved in `/admin` from Firestore into `data/pairs/human.jsonl` and recounts the datasheet. |
 | `make train-data` | Renders the approved pairs into chat JSONL with the duel's exact prompt (and glossary). |
 | `make train` | Trains on a Cloud Run Job with one L4: `make train TAG=genlingo-2027-03 [GEMMA_BASE_MODEL=…] [TRAIN_ARGS=…]`. Writes `train/runs/<tag>.json`. |
 | `make train-finish` | Merges and exports to GGUF on the laptop an adapter trained in the cloud, and publishes it: `make train-finish TAG=…`. |
 | `make train-local` | The same training on the Mac (MPS), for experiments. |
+| `make quant-sweep` | From a David's f16 GGUF: Q5_K_M, Q6_K, Q8_0 and imatrix-calibrated Q4/Q5 (calibrated on training pairs), registered in Ollama. |
 | `make pull-model` | Downloads a David from the bucket and registers it in Ollama: `make pull-model TAG=… [FP16=1]`. |
 | `make deploy` | Creates the web service account and deploys the audience app to Cloud Run (`min-instances=1`). |
 
@@ -159,7 +162,7 @@ A reference written by Gemini would reward Goliath for sounding like itself. The
 
 ### Dated Gemini price schedule
 
-Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` is a list of prices by date: every round and every eval uses the price in force that day and records which one it used. The report also shows what the same eval would cost at the 2027 price ($2.21 per 1,000 phrases instead of $1.10). Thinking tokens are billed as output. David's inference costs $0; the presenter view shows his training cost amortized per round when it finds `train/runs/<tag>.json` for the active tag (today it finds it for `genlingo-2026-09`, but not for the on-stage `-f16` tag).
+Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` is a list of prices by date: every round and every eval uses the price in force that day and records which one it used. The report also shows what the same eval would cost at the 2027 price ($2.21 per 1,000 phrases instead of $1.10). Thinking tokens are billed as output. David's inference costs $0; the presenter view shows his training cost amortized per round. Exports of one training run (`-f16`, `-q5_k_m`, `-iq-q4_k_m`…) share its `train/runs/<tag>.json`.
 
 ### App Check enforcement is project-wide
 
@@ -167,8 +170,9 @@ Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:
 
 ### Who wins a round
 
-- **Evaluation round** (test-set phrase, `E` key): the higher chrF++ wins; gaps under 0.5 are a draw. Only approved pairs are used, unless `ALLOW_UNREVIEWED_TEST=1`.
-- **Audience round** (a phrase from a phone or typed with `/`): the audience vote decides (`V` closes voting).
+- **Evaluation round** (test-set phrase, `E` key): the higher chrF++ wins; gaps under 0.5 are a draw. It uses `auto_validated` pairs (or ones a person approved), ready with no human review.
+- **Live phrase** (typed with `/`) or **audience phrase** (from a phone): with the audience app connected (`AUDIENCE_FEED=1`) the vote decides (`V` closes voting); without an audience the round shows both translations with no winner. The whole talk works without an audience: `E` rounds and typed phrases.
+- Audience phrases that pass the blocklist go straight to the screen queue (`AUTO_APPROVE_PHRASES=1`, the default); with `0` the presenter approves them in `/admin`.
 - If Goliath has no network or fails, David wins by showing up.
 
 ## Results
