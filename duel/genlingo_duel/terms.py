@@ -45,8 +45,12 @@ def _pattern(variant: str) -> re.Pattern:
 
 
 class TermBank:
-    def __init__(self, terms: Iterable[dict]):
-        self.terms = {t["id"]: t for t in terms}
+    def __init__(self, terms: Iterable[dict], *, ignore_ambiguous: bool = False):
+        """`ignore_ambiguous=True` skips terms flagged as ambiguous (they also mean something ordinary,
+        e.g. "cámara", "servir", "alta"; see scripts/flag_ambiguous_terms.py). Metrics and test-set
+        validation use it; the generator doesn't need it (it asks for the term explicitly)."""
+        terms = list(terms)
+        self.terms = {t["id"]: t for t in terms if not (ignore_ambiguous and t.get("ambiguous"))}
         self._patterns = {tid: [_pattern(v) for v in variants(t["term"])] for tid, t in self.terms.items()}
 
     def found(self, term_id: str, text: str) -> bool:

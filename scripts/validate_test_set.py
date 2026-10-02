@@ -57,7 +57,7 @@ def check(bank: TermBank, pair: dict, linked: list[str], train_text: set[str], s
 
 
 def main() -> None:
-    bank = TermBank(read_jsonl(DATA / "terms.jsonl"))
+    bank = TermBank(read_jsonl(DATA / "terms.jsonl"), ignore_ambiguous=True)
     linked = {u["id"]: u.get("term_ids", []) for u in read_jsonl(DATA / "raw" / "web_usage.jsonl")}
     train_text = {norm(x) for f in ("synthetic.jsonl", "human.jsonl") for r in read_jsonl(DATA / "pairs" / f)
                   if r.get("split") == "train" for x in (r["source"], r["target"])}

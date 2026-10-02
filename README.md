@@ -62,7 +62,7 @@ cp .env.example .env                                  # modelos, precios y rutas
 gcloud auth application-default login                 # Goliath (Vertex AI) y descarga de modelos
 
 ollama pull embeddinggemma                            # recuperación del glosario
-make pull-model TAG=genlingo-2026-10-e2b FP16=1       # David de escena (crea -e2b y -e2b-f16)
+make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # David de escena (Q5_K_M, 3.62 GB)
 make pull-model TAG=genlingo-2026-09                  # David del mes pasado (tecla M)
 
 make up       # Ollama + David precalentado + duelo (:8787) + vista del presentador (:3000/presenter)
@@ -75,21 +75,24 @@ Ensayo sin red ni GPU: pon `MOCK_AI=1` en `.env` y corre `make up` (modelos simu
 | Comando | Qué hace |
 | --- | --- |
 | `make help` | Lista los comandos con su descripción. |
-| `make up` | Arranca Ollama, precalienta a David, levanta el servicio del duelo y la vista del presentador. Funciona sin Wi-Fi. |
+| `make up` | Arranca Ollama (con `OLLAMA_MAX_LOADED_MODELS=4`), precarga los tres modelos de escena (David, el del mes pasado y EmbeddingGemma), levanta el duelo y la vista del presentador (la recompila si cambió su código). Funciona sin Wi-Fi y sin público. |
 | `make reset` | Pone en cero rondas, votos, cola y marcador locales; con `AUDIENCE_FEED=1` y red, también borra las rondas del evento en Firestore. |
 | `make test` | Pruebas de Python (`MOCK_AI=1`), Vitest, `tsc`, ESLint y, con JDK 21, las reglas de Firestore en el emulador. |
 | `make eval` | Pasa el set de prueba por los modelos base, cada David y Goliath (con y sin glosario) y escribe `evals/report.md`. Acepta `EVAL_ARGS="--limit 50 --no-goliath"`. |
-| `make test-set` | Construye los pares de prueba (`pending_review`) a partir de ejemplos reales de la web. |
+| `make test-set` | Construye los pares de prueba a partir de oraciones reales de la web y los valida contra el banco de términos (`auto_validated` o `rejected`, sin intervención humana). |
+| `make real-pairs` | Pares de entrenamiento anclados en oraciones reales (las dos direcciones), validados contra el banco. |
+| `make ambiguous-terms` | Marca los términos del banco que también son palabras comunes («cámara», «servir»), para que las métricas no los cuenten. |
 | `make pairs` | Genera los pares sintéticos de entrenamiento con `GEMINI_MODEL` (de pago; `SYNTHETIC_PAIRS_TARGET`, hoy 1,500). |
 | `make datasheet` | Recuenta `data/DATASHEET.md`. |
 | `make data` | `test-set` + `pairs` + `datasheet`. |
-| `make review-test` | Exporta el set de prueba a `data/review/test_review.csv` para que lo revise el presentador. |
+| `make review-test` | (Opcional) exporta el set de prueba a un CSV para una pasada humana sobre la validación automática. |
 | `make review-test-apply` | Aplica las decisiones del CSV (`a` aprobar, `r` rechazar, referencia corregida opcional). |
 | `make export` | Baja de Firestore los pares del público aprobados en `/admin` a `data/pairs/human.jsonl` y recuenta el datasheet. |
 | `make train-data` | Renderiza los pares aprobados al JSONL de chat con el mismo prompt (y glosario) del duelo. |
 | `make train` | Entrena en un Cloud Run Job con una L4: `make train TAG=genlingo-2027-03 [GEMMA_BASE_MODEL=…] [TRAIN_ARGS=…]`. Escribe `train/runs/<tag>.json`. |
 | `make train-finish` | Fusiona y exporta a GGUF en la laptop un adaptador entrenado en la nube y lo publica: `make train-finish TAG=…`. |
 | `make train-local` | El mismo entrenamiento en la Mac (MPS), para experimentos. |
+| `make quant-sweep` | Desde el GGUF f16 de un David: Q5_K_M, Q6_K, Q8_0 y Q4/Q5 calibrados con imatrix (pares de entrenamiento), registrados en Ollama. |
 | `make pull-model` | Descarga un David del bucket y lo registra en Ollama: `make pull-model TAG=… [FP16=1]`. |
 | `make deploy` | Crea la cuenta de servicio web y despliega la app del público en Cloud Run (`min-instances=1`). |
 
@@ -159,7 +162,7 @@ Una referencia escrita por Gemini premiaría a Goliath por sonar como él mismo.
 
 ### Tarifas de Gemini con fecha
 
-Los precios cambian, y eso es parte de la historia. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` es una lista de tarifas por fecha: cada ronda y cada eval usan la tarifa vigente ese día y registran cuál usaron. El reporte muestra además lo que costaría el mismo eval con la tarifa de 2027 ($2.21 por 1,000 frases en vez de $1.10). Los tokens de razonamiento se cobran como salida. La inferencia de David cuesta $0; el presentador muestra su costo de entrenamiento amortizado por ronda cuando encuentra `train/runs/<tag>.json` para el tag activo (hoy lo encuentra para `genlingo-2026-09`, pero no para el tag `-f16` de escena).
+Los precios cambian, y eso es parte de la historia. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` es una lista de tarifas por fecha: cada ronda y cada eval usan la tarifa vigente ese día y registran cuál usaron. El reporte muestra además lo que costaría el mismo eval con la tarifa de 2027 ($2.21 por 1,000 frases en vez de $1.10). Los tokens de razonamiento se cobran como salida. La inferencia de David cuesta $0; el presentador muestra su costo de entrenamiento amortizado por ronda. Las exportaciones de una misma corrida (`-f16`, `-q5_k_m`, `-iq-q4_k_m`…) comparten su `train/runs/<tag>.json`.
 
 ### App Check se aplica a todo el proyecto
 
@@ -167,8 +170,9 @@ Los precios cambian, y eso es parte de la historia. `GEMINI_PRICE_SCHEDULE=2026-
 
 ### Quién gana una ronda
 
-- **Ronda de evaluación** (frase del set de prueba, tecla `E`): gana el chrF++ más alto; diferencias menores a 0.5 son empate. Solo usa pares aprobados, salvo con `ALLOW_UNREVIEWED_TEST=1`.
-- **Ronda del público** (frase de un teléfono o escrita con `/`): decide el voto del público (`V` cierra la votación).
+- **Ronda de evaluación** (frase del set de prueba, tecla `E`): gana el chrF++ más alto; diferencias menores a 0.5 son empate. Usa pares `auto_validated` (o aprobados por una persona), listos sin revisión humana.
+- **Frase en vivo** (escrita con `/`) o **del público** (desde un teléfono): con la app del público conectada (`AUDIENCE_FEED=1`) decide el voto (`V` cierra la votación); sin público, la ronda muestra las dos traducciones sin ganador. La charla completa funciona sin público: rondas `E` y frases escritas.
+- Las frases del público que pasan la blocklist van directo a la cola de la pantalla (`AUTO_APPROVE_PHRASES=1`, por defecto); con `0`, el presentador las aprueba en `/admin`.
 - Si Goliath no tiene red o falla, David gana por presentarse.
 
 ## Resultados

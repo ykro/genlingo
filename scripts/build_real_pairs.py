@@ -24,7 +24,7 @@ OUT = DATA / "pairs" / "real_train.jsonl"
 
 
 def main() -> None:
-    bank = TermBank(read_jsonl(DATA / "terms.jsonl"))
+    bank = TermBank(read_jsonl(DATA / "terms.jsonl"), ignore_ambiguous=True)
     licenses = source_licenses((DATA / "SOURCES.md").read_text(encoding="utf-8"))
     test_text = {norm(x) for r in read_jsonl(DATA / "pairs" / "test_web.jsonl") for x in (r["source"], r["target"])}
     seen: set[str] = set()

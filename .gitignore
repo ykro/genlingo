@@ -21,3 +21,4 @@ evals/results/
 train/.ipynb_checkpoints/
 CLAUDE.md
 *.tsbuildinfo
+data/.cache/stt_*

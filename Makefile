@@ -10,7 +10,7 @@ DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
 JAVA21    := $(shell brew --prefix openjdk@21 2>/dev/null)/libexec/openjdk.jdk/Contents/Home
 
 .PHONY: help up reset test eval train train-local train-finish train-data quant-sweep pull-model export review-test review-test-apply \
-        test-set real-pairs pairs datasheet data deploy
+        test-set real-pairs ambiguous-terms pairs datasheet data deploy
 
 help:
 	@grep -hE '^[a-z-]+:.*## ' Makefile | awk -F':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
@@ -34,6 +34,11 @@ eval: ## Test set through base models, David and Goliath -> evals/report.md
 test-set: ## Build test pairs from real web usage examples and validate them against the term bank
 	$(UV) python scripts/build_test_set.py
 	$(UV) python scripts/validate_test_set.py
+
+STT_CORPUS := data/.cache/stt_all.json
+ambiguous-terms: ## Flag term-bank entries that are also ordinary words (general-speech corpus, CC BY 4.0)
+	@[ -f $(STT_CORPUS) ] || curl -sL https://huggingface.co/datasets/shraavb/spanish-slang-stt-data/resolve/main/splits/all.json -o $(STT_CORPUS)
+	$(UV) python scripts/flag_ambiguous_terms.py $(STT_CORPUS)
 
 real-pairs: ## Training pairs anchored in real web sentences (both directions), validated against the term bank
 	$(UV) python scripts/build_real_pairs.py

@@ -27,7 +27,7 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
     terms = _jsonl(data_dir / "terms.jsonl")
     if not terms:
         return []
-    bank = TermBank(terms)
+    bank = TermBank(terms, ignore_ambiguous=True)  # ordinary-word terms would inflate the metric
     linked = {u["id"]: u.get("term_ids", []) for u in _jsonl(data_dir / "raw" / "web_usage.jsonl")}
     pairs = {p["id"]: p for p in raw["pairs"]}
     outputs = {"copiar la frase (línea base)": {pid: p["source"] for pid, p in pairs.items()}}
