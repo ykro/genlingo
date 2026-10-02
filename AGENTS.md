@@ -8,67 +8,68 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
 
 | Principle | Where |
 | --- | --- |
-| Own, quality data | `origin` per pair, `data/DATASHEET.md`, manual approval, non-synthetic test set |
-| Efficient fine-tuning in the cloud | `train/` (commented LoRA), Vertex AI Custom Job, cost and duration in `evals/report.md` |
-| Compress to run on a laptop | report compares fp16 vs Q4 size and latency |
-| Honest evals | chrF++, results per `origin`, David's losses shown |
-| Big models age | model tags by data date (`genlingo-2027-03`), `david_tag` duel last month vs this month |
+| Own, quality data | `origin` per pair, `data/DATASHEET.md`, term bank, real sentences, automatic validation against the bank, non-synthetic test set |
+| Efficient fine-tuning in the cloud | `train/` (commented LoRA), two Cloud Run Jobs (L4 trains, CPU merges + GGUF), cost and duration per stage in `train/runs/<tag>.json` and `evals/report.md` |
+| Compress to run on a laptop | quantization sweep (Q4_K_M, Q5_K_M, Q6_K, Q8_0, imatrix) vs f16: size, latency and slang lost |
+| Honest evals | chrF++ plus a copy-the-phrase baseline, slang handled and reference-change recall, Goliath with and without David's glossary, David's losses shown |
+| Big models age | model tags by data date (`genlingo-2026-10b-e2b`), `david_tag` duel last month vs this month |
 
 ## Components
 
 | Component | Stack | Runs on | Why |
 | --- | --- | --- | --- |
-| Audience web app (`web/`) | Next.js, Firebase Auth (anonymous), Firestore db `genlingo`, App Check | Cloud Run | Phones must reach it |
-| Admin (`web/` route `/admin`) | Same app, email auth for the presenter | Cloud Run | Approve contributed pairs and live phrases |
-| Training (`train/`) | TRL + PEFT LoRA, merge, llama.cpp GGUF Q4 + Modelfile | Vertex AI Custom Job (L4, europe-west4); notebook for Colab | CUDA stack, real billed cost, reproducible |
-| David | Ollama with custom Modelfile | Laptop | The thesis: runs offline on your laptop |
-| Duel service (`duel/`) | Python, FastAPI, Ollama client, `google-genai`, `sacrebleu` | Laptop | Must work with Wi-Fi off; latency measured on stage hardware |
-| Presenter view (`presenter/` or `web/` route served locally) | Next.js calling the duel service | Laptop | Offline mode |
+| Audience web app (`web/`) | Next.js, Firebase Auth (anonymous), Firestore db `genlingo`, App Check (reCAPTCHA Enterprise) | Cloud Run | Phones must reach it |
+| Admin (`web/` route `/admin`) | Same app, email auth for the presenter | Cloud Run | Optional: moderate phrases when auto-approve is off, approve contributed pairs |
+| Training (`train/`) | TRL + PEFT LoRA (`train_lora.py`), merge + llama.cpp GGUF `QUANT` (Q5_K_M) + f16 + Modelfile (`finish.py`) | Cloud Run Jobs in europe-west4: `genlingo-train` (1× L4) then `genlingo-finish` (CPU); notebook for Colab; `make train-finish` on the laptop as fallback | Serverless GPU billed per second; the split keeps each job within 32 GiB |
+| David | Ollama with custom Modelfile, EmbeddingGemma glossary | Laptop | The thesis: runs offline on your laptop |
+| Duel service (`duel/`) | Python, FastAPI, Ollama client, `google-genai`, `sacrebleu`, SQLite scoreboard | Laptop | Must work with Wi-Fi off; latency measured on stage hardware |
+| Presenter view (`web/` route `/presenter`, served locally) | Next.js calling the duel service | Laptop | Offline mode |
 
 ## Data
 
-- JSONL, one pair per line: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), `source`, `target`, `country`, `age_range`, `split` (`train` | `test`), `status`, `origin` (`web` | `synthetic` | `human`), `provenance` (URL + license for web; model + prompt id + seed for synthetic; event for human).
-- Build path:
+- JSONL, one pair per line: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), `source`, `target`, `country`, `age_range`, `split` (`train` | `test`), `status` (`pending_review` | `auto_validated` | `approved` | `rejected`), `origin` (`web` | `synthetic` | `human`), `provenance` (URL + license for web; model + prompt version + seed for synthetic; event for human).
+- Build path, with **no human in the loop**:
   1. Web research of real Gen Z slang and parent speech (MX, GT, CO and neutral LatAm): glossaries, slang dictionaries, articles with usage examples. Respect licenses; record every source in `data/SOURCES.md`.
-  2. Build a **term bank** (`data/terms.jsonl`): term, meaning, country, example, source URL.
-  3. Generate synthetic pairs with `GEMINI_MODEL` **anchored on the term bank** (the prompt receives term, meaning, source example and country). Record model, prompt version and seed. Target ~1,000 training pairs balanced by direction.
-  4. Test set: ~300 pairs, `origin=web` only (real usage examples with their meaning rewritten as reference), never synthetic — synthetic references written by Gemini would bias chrF++ toward Goliath. Mark `status=pending_review`; the presenter reviews them (`make review-test` exports a CSV).
-- The audience app adds `origin=human` pairs at every event; approved in `/admin`; `make export` pulls approved pairs from Firestore into `data/`.
-- The prompt receives `country` so each event can use its local variant.
+  2. **Term bank** (`data/terms.jsonl`): term, meaning, country, generation, example, source; terms that are also ordinary words are flagged `ambiguous` from general-speech counts.
+  3. **Real sentences** (`data/raw/web_usage*.jsonl`): round 1 goes to test; round 2 is split by a stable hash of the id, half test, half training pairs anchored in the real sentence (`make real-pairs`).
+  4. **Synthetic pairs** from `GEMINI_MODEL` anchored on the term bank (`make pairs`), validated against the bank; model, prompt version and seed recorded.
+  5. **Test set**: `origin=web` only, never synthetic (a Gemini reference would bias chrF++ toward Goliath). `make test-set` validates every pair against the term bank and marks it `auto_validated` or `rejected` with the reason, including any overlap with training (also as a substring). A human pass (`make review-test`) is optional.
+- The audience app can add `origin=human` pairs at an event (approved in `/admin`; `make export`).
+- The prompt receives `country` and a glossary from the term bank, so each event can use its local variant.
 
 ## Training
 
-- `train/train_lora.py` runs end to end: load approved pairs, LoRA fine-tune `GEMMA_BASE_MODEL` (r=16, alpha=32, lr 2e-4, 3 epochs), merge, quantize to Q4_K_M GGUF with llama.cpp, write Modelfile, upload to `gs://ai-experiments-487722-genlingo-models/<tag>/`.
-- `train/genlingo.ipynb` wraps the same script for Colab / Colab Enterprise.
-- `make train` submits a Vertex AI Custom Job (container built with Cloud Build) on an L4 in `europe-west4`, staging bucket `gs://ai-experiments-487722-train-eu`. Writes `train/runs/<tag>.json` with duration, machine, and estimated cost.
+- `train/train_lora.py` fine-tunes `GEMMA_BASE_MODEL` with LoRA (r=16, alpha=32, lr 2e-4, 3 epochs) on the chat JSONL rendered with the duel's prompt (`make train-data`, `v2+glossary`).
+- `train/finish.py` merges the adapter, writes the f16 and `QUANT` (Q5_K_M) GGUFs and the Modelfile, and uploads to `gs://ai-experiments-487722-genlingo-models/<tag>/`.
+- `make train` runs both as Cloud Run Jobs from one image (`infra/03-train-job.sh`) and writes `train/runs/<tag>.json` with duration and estimated cost per stage. `TRAIN_RUNTIME=vertex` runs everything as one Vertex AI Custom Job; `train/genlingo.ipynb` wraps it for Colab; `make train-finish` redoes the merge on the laptop.
 - `make pull-model TAG=…` downloads the GGUF and runs `ollama create`.
-- Each model is tagged with its data date (`genlingo-2027-03`) so the talk can show a monthly retrain and its cost.
-- Base candidates: Gemma 4 E2B and E4B. `make eval` picks the smallest one meeting p50 < 1 s and best chrF++.
+- Tags carry the data date (`genlingo-YYYY-MM`, plus a letter for a second data version in the same month, e.g. `genlingo-2026-10b-e2b`).
+- `make eval` picks the on-stage David: the smallest export within 2 points of its f16 on slang handled, with p50 < 1 s.
 
 ## Duel service
 
-- `POST /duel` with `phrase`, `direction`, `country`, optional `david_tag`: calls David and Goliath (`GEMINI_MODEL`) in parallel with the same prompt; returns translation, latency ms, tokens and cost for each.
-- Cost from per-million-token prices in config. David's inference cost is zero; the presenter view shows his training cost amortized.
-- Round types: **evaluation rounds** use test-set phrases and show chrF++ live; **audience rounds** use submitted phrases, no reference, decided by vote.
-- Offline: with no internet, Goliath shows as offline and David keeps working.
-- `david_tag` lets two versions of David compete.
+- `POST /duel` with `phrase`, `direction`, `country`, optional `david_tag`: calls David and Goliath (`GEMINI_MODEL`) in parallel, each with the prompt it was trained or configured for; returns translation, latency ms, tokens and cost for each.
+- Cost from a dated price schedule (`GEMINI_PRICE_SCHEDULE`). David's inference cost is zero; the presenter view shows his training cost amortized over the rounds he played.
+- Round types: **evaluation rounds** use auto-validated test-set phrases and show chrF++ live; **audience rounds** use submitted phrases, no reference, decided by vote when the audience is connected.
+- Offline: with no internet, Goliath shows as offline, Firestore is skipped and David keeps working.
+- `david_tag` lets two versions of David compete; the scoreboard is per David.
 
 ## Audience flow
 
 - Join by QR code, no sign-up (anonymous auth). Submit a phrase (one every 20 s per person, enforced server side) and vote each round.
-- Submitted phrases wait in a queue the presenter approves from the laptop before they reach the screen; blocklist as a first filter.
+- Phrases that pass the blocklist go straight to the screen queue (`AUTO_APPROVE_PHRASES=1`, the default); with `0` the presenter approves them in `/admin`. The talk also works with no audience at all.
 
 ## Presenter view
 
 - Phrase and direction; David and Goliath side by side with translation, latency and cost.
-- Persistent scoreboard: rounds won, average chrF++, p50 latency, cumulative cost per model, live vote results.
-- Indicators for offline mode and David's model tag.
+- Persistent scoreboard per David: rounds won, average chrF++, p50 latency, cumulative cost, live vote results.
+- Indicators for offline mode and David's model tag, quantization and size.
 
 ## Acceptance criteria
 
 - `make up` starts Ollama, the duel service and the presenter view; the duel works with Wi-Fi off.
 - David's p50 latency < 1 s for phrases up to 30 words on the M1 Max 64 GB laptop.
-- `make eval` runs the test pairs against both models and writes `evals/report.md` (chrF++, per-origin, latency p50/p95, cost, fp16 vs Q4).
+- `make eval` runs the test pairs against both models and writes `evals/report.md` (chrF++, term metrics, per-origin, latency p50/p95, cost, compression).
 - An approved audience phrase reaches the screen in < 3 s.
 - `make reset` clears rounds, votes and scoreboard.
 - `make test` passes.
@@ -86,7 +87,7 @@ These demos are teaching material for a talk. The code, folder names, reports an
 | Cloud models | Gemini via Vertex AI with the Google Gen AI SDK (`@google/genai` / `google-genai`), ADC, `GOOGLE_CLOUD_LOCATION=global` |
 | Images | Nano Banana 2 Lite (`IMAGE_MODEL`) via Vertex AI |
 | Local models | Gemma served with Ollama; EmbeddingGemma where retrieval is needed |
-| Fine-tuning | LoRA with Hugging Face TRL + PEFT as a Vertex AI Custom Job (L4, `europe-west4`); same script wrapped in a Colab notebook; exported to quantized GGUF for Ollama |
+| Fine-tuning | LoRA with Hugging Face TRL + PEFT on serverless GPUs (Genlingo: Cloud Run Jobs, L4, `europe-west4`; Vertex AI Custom Job as alternative); same script wrapped in a Colab notebook; exported to quantized GGUF for Ollama |
 | Agents | Agent Development Kit (ADK, Python); MCP for tools; A2A for agent-to-agent |
 | Cloud | Google Cloud project `ai-experiments-487722`. Every web app or API runs on **Cloud Run** (`us-central1`, Dockerfile + Cloud Build + Artifact Registry repo `charlas2027`). Firebase services (Auth, Firestore named database per app, FCM, Storage, App Check) are used as SDKs, never Firebase Hosting |
 | Local data | JSON/JSONL files or SQLite in the repo |
