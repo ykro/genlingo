@@ -79,6 +79,7 @@ sources by `source_id` (exact per-entry URL in the record). Accessed 2026-09-30.
 | S60 | https://www.telemetro.com/actualidad/que-significan-las-palabras-la-generacion-z-asi-hablan-ahora-n6079373 | Telemetro | © Telemetro, all rights reserved; facts + short attributed quotation (research/education) | LATAM | 0 terms + meanings (paraphrased), 0 term examples; 3 usage examples (real) | 2026-10-01 |
 | S61 | https://quillbot.com/es/blog/vocabulario/expresiones-generacion-z/ | QuillBot (blog en español) | © QuillBot, all rights reserved; facts + short attributed quotation (research/education) | LATAM | 1 terms + meanings (paraphrased), 1 term examples; 8 usage examples (real); cited by 10 curator-written sentences | 2026-10-01 |
 | S62 | https://es.wiktionary.org/wiki/ (additional pages, see per-record URL) | Wikcionario (Wikimedia Foundation) | CC BY-SA 4.0 | MX, GT, CO | 27 terms + meanings (paraphrased), 27 term examples; 27 usage examples (real); cited by 16 curator-written sentences | 2026-10-01 |
+| S63 | https://huggingface.co/datasets/shraavb/spanish-slang-stt-data | shraavb (Hugging Face; repackages CIEMPIESS, Common Voice, OpenSLR) | dataset card: CC BY 4.0; upstream corpora under their own licenses | MX, LATAM | **No text taken.** Only per-term match counts over ~39k general-speech transcripts, to flag ambiguous term-bank entries (`scripts/flag_ambiguous_terms.py`). | 2026-10-01 |
 
 Ids S21, S32, S34–S36 were consulted but nothing was taken from them.
 
