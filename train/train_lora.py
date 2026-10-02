@@ -228,7 +228,7 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
         "train_s": round(train_s, 1),
         "adapter_dir": str(adapter_dir),
     }
-    if args.adapter_only:  # bigger bases: merge + GGUF on a machine with more RAM (finish_local.py)
+    if args.adapter_only:  # Cloud Run: merge + GGUF run in the next job (finish.py), not in GPU memory
         return {**stats, "merge_s": 0.0, "merged_dir": None}
 
     # Free what training no longer needs before the RAM-heavy part.
@@ -259,13 +259,14 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
 # GGUF + Modelfile
 # ---------------------------------------------------------------------------------------------
 def to_gguf(merged_dir: Path, out_dir: Path, tag: str, llama_cpp: Path, quant: str, drop_merged: bool = False,
-            outtype: str = "f16") -> dict:
+            outtype: str = "f16", f16_dir: Path | None = None) -> dict:
     """f16 GGUF (the "uncompressed" reference) and a quantized one (what the laptop runs).
     Q4_K_M keeps ~4.5 bits per weight with mixed precision on the most sensitive tensors.
     `outtype="q8_0"` halves the intermediate file for bigger bases, at the cost of not publishing
-    an f16 reference (the q8_0 file is deleted once quantized)."""
+    an f16 reference (the q8_0 file is deleted once quantized). `f16_dir` puts the intermediate
+    file elsewhere (on Cloud Run: a disk volume instead of the in-memory filesystem)."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    f16 = out_dir / f"{tag}-{outtype}.gguf"
+    f16 = (f16_dir or out_dir) / f"{tag}-{outtype}.gguf"
     q = out_dir / f"{tag}-{quant.lower()}.gguf"
     t0 = time.time()
     subprocess.run(
@@ -317,7 +318,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--gguf-outtype", default=env("GGUF_OUTTYPE", "f16"), choices=["f16", "q8_0"],
                     help="intermediate GGUF before quantizing: f16 (published as reference) or q8_0 (smaller)")
     ap.add_argument("--adapter-only", action="store_true", default=env("ADAPTER_ONLY", "") == "1",
-                    help="stop after saving the LoRA adapter (merge + GGUF later with finish_local.py)")
+                    help="stop after saving the LoRA adapter (merge + GGUF in the next job: finish.py)")
     ap.add_argument("--drop-merged", action="store_true", default=env("DROP_MERGED", "") == "1",
                     help="delete the merged checkpoint once converted (frees ~10 GB of in-memory disk)")
     ap.add_argument("--llama-cpp", default=env("LLAMA_CPP_DIR", "/opt/llama.cpp"))

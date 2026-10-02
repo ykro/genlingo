@@ -1,4 +1,5 @@
-# Training image for the Cloud Run GPU job (NVIDIA L4); the same image runs as a Vertex AI job. Built with Cloud Build.
+# Training image for the Cloud Run GPU job (NVIDIA L4) and the CPU finish job (finish.py); the same image runs
+# as a Vertex AI job. Built with Cloud Build.
 # Stage 1 compiles llama.cpp's quantizer (CPU only: quantizing doesn't need the GPU).
 ARG LLAMA_CPP_TAG=b11292
 
@@ -25,6 +26,6 @@ COPY --from=llama /opt/llama.cpp/convert_hf_to_gguf.py /opt/llama.cpp/convert_hf
 COPY --from=llama /opt/llama.cpp/conversion /opt/llama.cpp/conversion
 COPY --from=llama /opt/llama.cpp/gguf-py /opt/llama.cpp/gguf-py
 COPY --from=llama /opt/llama.cpp/models /opt/llama.cpp/models
-COPY train_lora.py /app/train_lora.py
+COPY train_lora.py finish.py /app/
 ENV LLAMA_CPP_DIR=/opt/llama.cpp WORK_DIR=/tmp/train_lora PYTHONUNBUFFERED=1 HF_HUB_DISABLE_TELEMETRY=1
 ENTRYPOINT ["python", "/app/train_lora.py"]
