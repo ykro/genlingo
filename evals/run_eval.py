@@ -195,7 +195,12 @@ async def main_async(args) -> None:
         prev = json.loads(Path(args.merge_with).read_text())
         assert [p["id"] for p in prev["pairs"]] == [p["id"] for p in raw["pairs"]], "different test set"
         new_labels = {m.get("label", m["name"]) for m in raw["models"]}
-        raw["models"] = [m for m in prev["models"] if m.get("label", m["name"]) not in new_labels] + raw["models"]
+        kept = [m for m in prev["models"] if m.get("label", m["name"]) not in new_labels]
+        if any(m.get("role") == "david" for m in raw["models"]):  # one on-stage David: the current LOCAL_MODEL_TAG
+            for m in kept:
+                if m.get("role") in ("david", "david_f16"):
+                    m["role"] = m["role"].replace("david", "david_alt", 1)
+        raw["models"] = kept + raw["models"]
         raw["results"] = [r for r in prev["results"] if r["model"] not in new_labels] + raw["results"]
         raw["merged_from"] = Path(args.merge_with).name
     (out_dir / f"{stamp}.json").write_text(json.dumps(raw, ensure_ascii=False, indent=1))

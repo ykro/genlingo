@@ -155,14 +155,23 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
 P50_BUDGET_MS = 1000  # David must answer in under a second on the stage laptop
 ROLE_LABEL = {
     "base": "base (sin ajuste)",
-    "david": "David (LoRA, Q4)",
+    "david": "David (LoRA, {quant})",
     "david_f16": "David (LoRA, f16)",
-    "david_alt": "David candidato (LoRA, Q4)",
+    "david_alt": "David candidato (LoRA, {quant})",
     "david_alt_f16": "David candidato (LoRA, f16)",
     "goliath": "Goliath",
     "goliath_glossary": "Goliath con el glosario de David",
 }
 PROMPT_LABEL = {"v1": "v1", "v2": "v2", "v2+glossary": "v2 + glosario"}
+
+
+def quant_label(name: str, meta: dict | None) -> str:
+    """Quantization of a local variant: the tag suffix wins (-q5_k_m, -iq-q4_k_m, -f16), else what the eval recorded."""
+    import re
+
+    tag = name.removesuffix(" + glosario")
+    m = re.search(r"-(?:iq-)?(q\d_k_m|q\d_k|q8_0|f16)$", tag)
+    return m.group(1).upper() if m else ((meta or {}).get("quant") or "Q4_K_M")
 
 
 def _n(x, d=1):
@@ -343,6 +352,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
             "corre `make test-set` para validarlas automáticamente.",
             "",
         ]
+    meta_by = {m.get("label", m["name"]): m for m in raw["models"]}
     lines += [
         "## Resumen",
         "",
@@ -352,7 +362,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
         table(
             ["modelo", "rol", "prompt", "chrF++", "p50", "p95", "costo total", "costo / 1,000 frases", "tamaño", "errores"],
             [
-                [name, ROLE_LABEL.get(s["role"], s["role"]), PROMPT_LABEL.get(s.get("style", "v1"), "v1"), _n(s["chrf"]), _ms(s["p50"]), _ms(s["p95"]),
+                [name, ROLE_LABEL.get(s["role"], s["role"]).format(quant=quant_label(name, meta_by.get(name))), PROMPT_LABEL.get(s.get("style", "v1"), "v1"), _n(s["chrf"]), _ms(s["p50"]), _ms(s["p95"]),
                  _usd(s["cost"]), _usd(s["cost_per_1k"]), _gb(s.get("size_bytes")), s["errors"]]
                 for name, s in summary.items()
             ],
@@ -396,23 +406,26 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
 
     david = next((s for s in summary.values() if s["role"] == "david"), None)
     f16 = next((s for s in summary.values() if s["role"] == "david_f16"), None)
-    lines += ["## Compresión: f16 vs Q4", ""]
+    quant = next((quant_label(m.get("label", m["name"]), m) for m in raw["models"] if m.get("role") == "david"), "Q4_K_M")
+    lines += [f"## Compresión: f16 vs {quant}", ""]
     if david and f16:
         lines += [
             table(
                 ["versión", "tamaño", "p50", "chrF++"],
                 [["f16", _gb(f16.get("size_bytes")), _ms(f16["p50"]), _n(f16["chrf"])],
-                 ["Q4_K_M", _gb(david.get("size_bytes")), _ms(david["p50"]), _n(david["chrf"])]],
+                 [quant, _gb(david.get("size_bytes")), _ms(david["p50"]), _n(david["chrf"])]],
             ),
             "",
         ]
     else:
-        lines += ["Pendiente: se necesita David en f16 y en Q4 en Ollama (`make pull-model FP16=1`).", ""]
+        lines += ["Pendiente: se necesita David en f16 y cuantizado en Ollama (`make pull-model FP16=1`).", ""]
 
     lines += ["## Entrenamiento", ""]
     run = None
-    if runs_dir and raw.get("david_tag") and (runs_dir / f"{raw['david_tag']}.json").exists():
-        run = json.loads((runs_dir / f"{raw['david_tag']}.json").read_text())
+    if runs_dir and raw.get("david_tag"):
+        from genlingo_duel.runs import load_run
+
+        run = load_run(runs_dir, raw["david_tag"])
     if run and run.get("duration_s"):
         met = run.get("metrics", {})
         lines += [
@@ -423,7 +436,8 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
             ),
             "",
             (
-                "Costo = segundos facturados × tarifas por segundo de Cloud Run (GPU L4 sin redundancia zonal + vCPU + memoria)."
+                "Costo = segundos facturados × tarifas por segundo de Cloud Run (GPU L4 sin redundancia zonal + vCPU + memoria"
+                + ("; entrenamiento en la L4 + fusión y GGUF en un job de CPU)." if run.get("stages") else ").")
                 if run.get("rates_usd_per_s")
                 else f"Costo = duración × tarifa por hora estimada (${run.get('hourly_usd', 0)}/h)."
             )
