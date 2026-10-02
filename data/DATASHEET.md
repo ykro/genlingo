@@ -25,42 +25,42 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 
 |  | genz_to_parent | parent_to_genz | total |
 | --- | --- | --- | --- |
-| dev · web | 37 | 36 | 73 |
+| dev · web | 77 | 71 | 148 |
 | test · web | 294 | 228 | 522 |
-| train · synthetic | 840 | 1460 | 2300 |
-| train · web | 129 | 132 | 261 |
-| **total** | 1300 | 1856 | 3156 |
+| train · synthetic | 765 | 1427 | 2192 |
+| train · web | 281 | 275 | 556 |
+| **total** | 1417 | 2001 | 3418 |
 
 ### Pairs by split and origin × country
 
 |  | MX | GT | CO | LATAM | total |
 | --- | --- | --- | --- | --- | --- |
-| dev · web | 8 | 26 | 37 | 2 | 73 |
+| dev · web | 8 | 71 | 67 | 2 | 148 |
 | test · web | 101 | 150 | 185 | 86 | 522 |
-| train · synthetic | 541 | 758 | 525 | 476 | 2300 |
-| train · web | 9 | 86 | 142 | 24 | 261 |
-| **total** | 659 | 1020 | 889 | 588 | 3156 |
+| train · synthetic | 459 | 746 | 517 | 470 | 2192 |
+| train · web | 9 | 268 | 255 | 24 | 556 |
+| **total** | 577 | 1235 | 1024 | 582 | 3418 |
 
 ### Pairs by split and origin × status
 
 |  | auto_validated | approved | pending_review | rejected | total |
 | --- | --- | --- | --- | --- | --- |
-| dev · web | 73 | 0 | 0 | 0 | 73 |
+| dev · web | 148 | 0 | 0 | 0 | 148 |
 | test · web | 399 | 0 | 0 | 123 | 522 |
-| train · synthetic | 0 | 2300 | 0 | 0 | 2300 |
-| train · web | 261 | 0 | 0 | 0 | 261 |
-| **total** | 733 | 2300 | 0 | 123 | 3156 |
+| train · synthetic | 0 | 2192 | 0 | 0 | 2192 |
+| train · web | 556 | 0 | 0 | 0 | 556 |
+| **total** | 1103 | 2192 | 0 | 123 | 3418 |
 
 ### Term bank (`data/terms.jsonl`)
 
-406 terms from 57 web sources (see `SOURCES.md`; S63 there is a general-speech corpus used only to
+532 terms from 76 web sources (see `SOURCES.md`; S63 there is a general-speech corpus used only to
 count ambiguous terms, not a source of terms or sentences).
 
 | country | genz | parent | total |
 | --- | --- | --- | --- |
 | MX | 42 | 39 | 81 |
-| GT | 67 | 43 | 110 |
-| CO | 101 | 45 | 146 |
+| GT | 82 | 82 | 164 |
+| CO | 131 | 87 | 218 |
 | LATAM | 49 | 20 | 69 |
 
 ### Web usage examples (`data/raw/web_usage.jsonl`, source of the test set)
@@ -98,7 +98,7 @@ count ambiguous terms, not a source of terms or sentences).
    test-set leakage. Last run: 2464 generated, 1745 valid,
    1500 kept after rebalancing; rejected by reason: target_missing_term 210, source_missing_term 154, foreign_term 116, genz_slang_in_source 99, slang_left_in_target 79, parent_term_left_in_target 27, duplicate 27, test_leak 7. Cost
    ≈ $0.7067 in 585.1 s.
-   
+   Re-validated against the grown term bank (532 terms): 1445 kept, dropped foreign_term 45, parent_term_left_in_target 8, genz_slang_in_source 1, slang_left_in_target 1.
    **Multi-term pairs** (`data/pairs/synthetic_multi.jsonl`, `synthetic-multi-2026-10b`, 800 pairs,
    `scripts/generate_multi_pairs.py`): 2–3 slang terms change in the same sentence and every expected
    counterpart must be present; ≈ $0.5127.
@@ -115,7 +115,7 @@ count ambiguous terms, not a source of terms or sentences).
    Gen Z slang of the country; no other-country terms; sane length; no overlap with training.
    Passing pairs are `auto_validated`, failing ones `rejected` with the reason. A human pass
    (`make review-test`) is optional and overrides the automatic decision.
-5. **Dev pairs** (`origin=web`, `split=dev`, `data/pairs/dev_real.jsonl`, 73 pairs). One real sentence in five
+5. **Dev pairs** (`origin=web`, `split=dev`, `data/pairs/dev_real.jsonl`, 148 pairs). One real sentence in five
    from the training side (stable hash of the sentence id, both directions together) is held out to
    decide data rounds and ablations, so the test set is touched once per round. Dev never overlaps a
    test, niche or training sentence (also checked as substrings). Davids trained before 2026-10-02 saw

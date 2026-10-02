@@ -59,8 +59,10 @@ def main() -> None:
     # Dev must not appear in any training file either (synthetic pairs quote real sentences sometimes).
     synthetic = TextIndex(x for f in ("synthetic.jsonl", "synthetic_multi.jsonl", "human.jsonl")
                           for r in read_jsonl(DATA / "pairs" / f) for x in (r["source"], r["target"]))
-    dev = [p for p in pairs if p["split"] == "dev" and not (synthetic.overlaps(p["source"]) or synthetic.overlaps(p["target"]))]
     train = [p for p in pairs if p["split"] == "train"]
+    real = TextIndex(x for p in train for x in (p["source"], p["target"]))  # two rewrites can be near-identical
+    dev = [p for p in pairs if p["split"] == "dev" and not any(idx.overlaps(p["source"]) or idx.overlaps(p["target"])
+                                                               for idx in (synthetic, real))]
     n = write_jsonl(OUT, train)
     d = write_jsonl(DEV, dev)
     print(f"{n} real training pairs -> {OUT.relative_to(DATA.parent)}, {d} dev pairs -> {DEV.relative_to(DATA.parent)}; "

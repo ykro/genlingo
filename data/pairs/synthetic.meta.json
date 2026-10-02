@@ -30,5 +30,33 @@
   },
   "cost_usd": 0.7067,
   "duration_s": 585.1,
-  "generated_at": "2026-10-02T10:59:00-0600"
+  "generated_at": "2026-10-02T10:59:00-0600",
+  "refiltered": {
+    "terms": 532,
+    "dropped": {
+      "foreign_term": 45,
+      "parent_term_left_in_target": 8,
+      "genz_slang_in_source": 1,
+      "slang_left_in_target": 1
+    },
+    "kept": 1431,
+    "at": "2026-10-02T11:40:07-0600",
+    "dropped_unvalidated_links": 14
+  },
+  "top_up": {
+    "for": "terms added on 2026-10-02 (t3-)",
+    "seed": 3031,
+    "generated": 524,
+    "valid": 284,
+    "added": 284,
+    "dropped": {
+      "foreign_term": 57,
+      "target_missing_term": 69,
+      "parent_term_left_in_target": 5,
+      "slang_left_in_target": 32,
+      "genz_slang_in_source": 26,
+      "source_missing_term": 51
+    },
+    "cost_usd": 0.1518
+  }
 }

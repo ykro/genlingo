@@ -96,7 +96,7 @@ def load_counterparts(data_dir: Path) -> dict[str, str | None]:
 
 
 def plan_calls(bank: TermBank, vectors: dict[str, list[float]], target: int, seed: int,
-               counterparts: dict[str, str | None] | None = None) -> list[dict]:
+               counterparts: dict[str, str | None] | None = None, anchor_prefix: str = "") -> list[dict]:
     """Round-robin over countries and terms; each call = one kind, one anchor term, its validated counterpart."""
     counterparts = counterparts or {}
     rng = random.Random(seed)
@@ -111,6 +111,10 @@ def plan_calls(bank: TermBank, vectors: dict[str, list[float]], target: int, see
         country = countries[i % len(countries)]
         anchor_gen = "parent" if kind.endswith("_parent") else "genz"
         pool = sorted(bank.ids(anchor_gen, [country])) or sorted(bank.ids(anchor_gen, ["LATAM"]))
+        if anchor_prefix:  # top-up rounds: only the terms a new research round added
+            pool = [t for t in pool if t.startswith(anchor_prefix)]
+            if not pool:
+                continue
         key = (kind, country)
         cursors[key] = cursors.get(key, rng.randrange(len(pool)))
         anchor = pool[cursors[key] % len(pool)]
@@ -295,7 +299,7 @@ async def main_async(args: argparse.Namespace) -> None:
     else:  # cached EmbeddingGemma vectors, used only to pick traps (no model call)
         vectors = json.loads((data / ".cache" / "term_embeddings.json").read_text())["vectors"]
     # Over-generate: validation against the term bank is strict and rejects a good share.
-    calls = plan_calls(bank, vectors, int(args.target * 2.2), args.seed, load_counterparts(data))
+    calls = plan_calls(bank, vectors, int(args.target * 2.2), args.seed, load_counterparts(data), args.anchor_prefix)
     model = "mock" if s.mock_ai else s.gemini_model
     usage = {"input": 0, "output": 0}
     t0 = time.time()
@@ -374,6 +378,7 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=2027)
     ap.add_argument("--concurrency", type=int, default=8)
     ap.add_argument("--out", default=None)
+    ap.add_argument("--anchor-prefix", default="", help="only anchor on term ids with this prefix (top-up for a new round)")
     asyncio.run(main_async(ap.parse_args()))
 
 

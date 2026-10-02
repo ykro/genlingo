@@ -235,7 +235,31 @@ async def main_async(args) -> None:
     print(json.dumps(meta, ensure_ascii=False))
 
 
+def refilter(data: Path) -> None:
+    """Re-validate the multi-term pairs against the CURRENT term bank (it grows each research round)."""
+    bank = TermBank(read_jsonl(data / "terms.jsonl"), ignore_ambiguous=True)
+    path = data / "pairs" / "synthetic_multi.jsonl"
+    kept, dropped = [], {}
+    for p in read_jsonl(path):
+        pr = p["provenance"]
+        call = {"source_ids": pr.get("source_term_ids", []), "target_ids": pr.get("target_term_ids", []),
+                "trap": pr.get("trap_id"), "direction": p["direction"]}
+        reason = validate_multi(bank, call, p)
+        if reason:
+            dropped[reason] = dropped.get(reason, 0) + 1
+        else:
+            kept.append(p)
+    write_jsonl(path, kept)
+    meta_path = path.with_suffix(".meta.json")
+    meta = json.loads(meta_path.read_text())
+    meta["refiltered"] = {"terms": len(bank.terms), "dropped": dropped, "kept": len(kept), "at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
+    meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n")
+    print(json.dumps(meta["refiltered"], ensure_ascii=False))
+
+
 def main() -> None:
+    if "--refilter" in sys.argv:
+        return refilter(get_settings().data_dir)
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--target", type=int, default=800)
     ap.add_argument("--seed", type=int, default=2028)

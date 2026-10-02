@@ -32,5 +32,15 @@
   },
   "cost_usd": 0.5127,
   "duration_s": 338.9,
-  "generated_at": "2026-10-02T11:05:46-0600"
+  "generated_at": "2026-10-02T11:05:46-0600",
+  "refiltered": {
+    "terms": 504,
+    "dropped": {
+      "foreign_term": 52,
+      "parent_term_left_in_target": 1
+    },
+    "kept": 701,
+    "at": "2026-10-02T11:40:14-0600",
+    "dropped_unvalidated_links": 46
+  }
 }

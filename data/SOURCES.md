@@ -81,6 +81,32 @@ sources by `source_id` (exact per-entry URL in the record). Accessed 2026-09-30.
 | S61 | https://quillbot.com/es/blog/vocabulario/expresiones-generacion-z/ | QuillBot (blog en español) | © QuillBot, all rights reserved; facts + short attributed quotation (research/education) | LATAM | 1 terms + meanings (paraphrased), 1 term examples; 8 usage examples (real); cited by 10 curator-written sentences | 2026-10-01 |
 | S62 | https://es.wiktionary.org/wiki/ (additional pages, see per-record URL) | Wikcionario (Wikimedia Foundation) | CC BY-SA 4.0 | MX, GT, CO | 27 terms + meanings (paraphrased), 27 term examples; 27 usage examples (real); cited by 16 curator-written sentences | 2026-10-01 |
 | S63 | https://huggingface.co/datasets/shraavb/spanish-slang-stt-data | shraavb (Hugging Face; repackages CIEMPIESS, Common Voice, OpenSLR) | dataset card: CC BY 4.0; upstream corpora under their own licenses | MX, LATAM | **No text taken.** Only per-term match counts over ~39k general-speech transcripts, to flag ambiguous term-bank entries (`scripts/flag_ambiguous_terms.py`). | 2026-10-01 |
+| S64 | https://soymigrante.com/revista/otras-20-palabras-chapinas-que-solo-un-guatemalteco-reconoce/ | SoyMigrante.com (Revista) | © SoyMigrante.com Revista, all rights reserved; facts + short attributed quotation (research/education) | GT | 12 terms + meanings (paraphrased), 12 term examples; 32 usage examples (real) | 2026-10-02 |
+| S65 | https://soymigrante.com/revista/guatemaltequismos-que-superan-fronteras/ | SoyMigrante.com (Revista) | © SoyMigrante.com Revista, all rights reserved; facts + short attributed quotation (research/education) | GT | 6 terms + meanings (paraphrased), 6 term examples; 27 usage examples (real) | 2026-10-02 |
+| S66 | https://soymigrante.com/revista/10-verbos-super-chapines-que-solo-un-guatemalteco-entiende/ | SoyMigrante.com (Revista) | © SoyMigrante.com Revista, all rights reserved; facts + short attributed quotation (research/education) | GT | 5 terms + meanings (paraphrased), 5 term examples; 5 usage examples (real) | 2026-10-02 |
+| S67 | https://soymigrante.com/revista/todo-chapin-conoce-estas-palabras-guatemaltecas-cuales-usas/ | SoyMigrante.com (Revista) | © SoyMigrante.com Revista, all rights reserved; facts + short attributed quotation (research/education) | GT | 5 terms + meanings (paraphrased), 5 term examples; 5 usage examples (real) | 2026-10-02 |
+| S68 | https://www.guatemala.com/noticias/entretenimiento/asi-es-como-nos-expresamos-los-guatemaltecos.html | Guatemala.com | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 6 terms + meanings (paraphrased), 6 term examples; 8 usage examples (real) | 2026-10-02 |
+| S69 | https://www.guatemala.com/noticias/sociedad/las-frases-toda-abuelita-guatemalteca-ha-mencionado-alguna-vez.html | Guatemala.com | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 0 terms + meanings (paraphrased), 0 term examples; 3 usage examples (real) | 2026-10-02 |
+| S70 | https://guateinmortal.wordpress.com/2016/10/25/las-tipicas-frases-del-chapin/ | Guate Inmortal (blog on WordPress.com) | CC BY 4.0 (Creative Commons Reconocimiento 4.0 Internacional, per the blog footer) | GT | 0 terms + meanings (paraphrased), 0 term examples; 1 usage examples (real) | 2026-10-02 |
+| S71 | https://www.guatemala.com/aprende/cultura-guatemalteca/frases-guatemaltecas-que-empiezan-con-a | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 5 terms + meanings (paraphrased), 5 term examples; 5 usage examples (real) | 2026-10-02 |
+| S72 | https://www.guatemala.com/aprende/cultura-guatemalteca/guatemaltequismos-que-inician-con-m | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 2 terms + meanings (paraphrased), 2 term examples; 2 usage examples (real) | 2026-10-02 |
+| S73 | https://www.guatemala.com/aprende/cultura-guatemalteca/guatemaltequismos-que-empiezan-con-ch | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 2 terms + meanings (paraphrased), 2 term examples; 2 usage examples (real) | 2026-10-02 |
+| S74 | https://www.guatemala.com/aprende/cultura-guatemalteca/general/expresiones-guatemaltecas-que-se-usan-en-la-cotidianidad | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 1 terms + meanings (paraphrased), 1 term examples; 2 usage examples (real) | 2026-10-02 |
+| S75 | https://www.guatemala.com/aprende/cultura-guatemalteca/general/significado-de-la-palabra-yuca-en-guatemala | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 1 terms + meanings (paraphrased), 1 term examples; 2 usage examples (real) | 2026-10-02 |
+| S76 | https://www.guatemala.com/aprende/cultura-guatemalteca/general/significado-de-la-expresion-vaa-en-guatemala | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 0 terms + meanings (paraphrased), 0 term examples; 2 usage examples (real) | 2026-10-02 |
+| S77 | https://www.guatemala.com/aprende/cultura-guatemalteca/general/origen-palabra-chucho-guatemala | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 0 terms + meanings (paraphrased), 0 term examples; 1 usage examples (real) | 2026-10-02 |
+| S78 | https://www.guatemala.com/aprende/cultura-guatemalteca/general/que-significa-palabra-chulo-guatemala | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 0 terms + meanings (paraphrased), 0 term examples; 2 usage examples (real) | 2026-10-02 |
+| S79 | https://www.guatemala.com/aprende/cultura-guatemalteca/general/significado-de-la-palabra-mucha-en-guatemala | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 2 terms + meanings (paraphrased), 2 term examples; 2 usage examples (real) | 2026-10-02 |
+| S80 | https://www.guatemala.com/aprende/cultura-guatemalteca/general/que-son-los-guatemaltequismos | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 0 terms + meanings (paraphrased), 0 term examples; 3 usage examples (real) | 2026-10-02 |
+| S81 | https://www.guatemala.com/aprende/cultura-guatemalteca/guatemaltequismos-para-decirle-a-alguien-que-es-inteligente | Aprende Guatemala (Guatemala.com) | © Guatemala.com, all rights reserved; facts + short attributed quotation (research/education) | GT | 1 terms + meanings (paraphrased), 1 term examples; 1 usage examples (real) | 2026-10-02 |
+| S82 | https://www.soy502.com/articulo/buzzfeed-viraliza-diez-frases-guatemaltecas-ilustradas-emojis | Soy502 | © Soy502, all rights reserved; facts + short attributed quotation (research/education) | GT | 2 terms + meanings (paraphrased), 2 term examples; 3 usage examples (real) | 2026-10-02 |
+| S83 | https://www.todacolombia.com/informacion-de-colombia/frases-colombianas.html | TodaColombia (Andrés G. Martínez) | © TodaColombia, all rights reserved ("se prohíbe la reproducción parcial o total"); facts + short attributed quotation (research/education) | CO | 15 terms + meanings (paraphrased), 15 term examples; 20 usage examples (real) | 2026-10-02 |
+| S84 | https://getvico.com/blog/en/palabras-paisas-vocababulary-complete-list-1/ | VICO blog (getvico.com) | © VICO Rooms, Inc., all rights reserved; facts + short attributed quotation (research/education) | CO | 3 terms + meanings (paraphrased), 3 term examples; 13 usage examples (real) | 2026-10-02 |
+| S85 | https://www.elnuevosiglo.com.co/cultura-y-sociedad/10-expresiones-tipicas-que-solo-los-colombianos-reconocen | El Nuevo Siglo (glossary by Babbel linguists) | © El Nuevo Siglo, reproduction prohibited without permission; facts + short attributed quotation (research/education) | CO | 6 terms + meanings (paraphrased), 6 term examples; 10 usage examples (real) | 2026-10-02 |
+| S86 | https://www.inravision.gov.co/dia-de-la-madre-frases-tipicas-mama-origen | Inravisión / RTVC Sistema de Medios Públicos (Señal Memoria) | © RTVC, protected by copyright per site terms; facts + short attributed quotation (research/education) | CO | 3 terms + meanings (paraphrased), 3 term examples; 3 usage examples (real) | 2026-10-02 |
+| S87 | https://locombianos.com/51-frases-tipicas-de-la-mama-colombiana/ | Locombianos | © Locombianos, all rights reserved; facts + short attributed quotation (research/education) | CO | 4 terms + meanings (paraphrased), 4 term examples; 3 usage examples (real) | 2026-10-02 |
+| S88 | https://interimage.es/20-dichos-tipicos-de-las-mamas-colombianas/ | Inter-Image (blog) | © Inter Image, todos los derechos reservados; facts + short attributed quotation (research/education) | CO | 1 terms + meanings (paraphrased), 1 term examples; 1 usage examples (real) | 2026-10-02 |
+| S89 | https://www.infobae.com/colombia/2026/04/28/colombiana-explico-cuales-son-las-expresiones-mas-neas-del-parlache-y-y-su-vinculo-con-medellin/ | Infobae Colombia (quoting the creator of the public account @elparche.ilustrado) | © Infobae, all rights reserved; facts + short attributed quotation (research/education) | CO | 0 terms + meanings (paraphrased), 0 term examples; 1 usage examples (real) | 2026-10-02 |
 
 Ids S21, S32, S34–S36 were consulted but nothing was taken from them.
 
@@ -102,3 +128,33 @@ Notes:
 - **S16** (FluentU): 0 new terms, 14 new usage examples, 0 curator sentences citing it.
 - **S17** (FluentU): 2 new terms, 9 new usage examples, 0 curator sentences citing it.
 - **S20** (Alcaldía de Medellín — Medellín Joven): 26 new terms, 45 new usage examples, 4 curator sentences citing it.
+
+## Round 3 (2026-10-02): sources checked
+
+New sources used by `raw/terms_2026-10-02.jsonl` and `raw/web_usage_2026-10-02.jsonl` (ids continue after S63 in
+`../SOURCES.md`; same policy: facts paraphrased, short attributed quotations ≤ 30 words, exact per-record URL in
+each record). Accessed 2026-10-02.
+Notes:
+- Every usage `example` and every term `example` is verbatim from the page at the record's `source_url`
+  (checked against the fetched page text, whitespace-normalized); all records are `example_origin: "source"`.
+  Rewrites are the curator's; meanings are paraphrased.
+- S64–S67 (SoyMigrante.com Revista), S68–S69 (Guatemala.com), S71–S81 (Aprende Guatemala, Guatemala.com's
+  explainer section) and S82 (Soy502) are all-rights-reserved press: only facts and short attributed quotations
+  for research/education. Many of their examples are the outlet's own illustrative sentences for each word, so
+  they read as older/general GT speech and were mostly used as *parent* sentences.
+- S70 (Guate Inmortal) is a WordPress.com blog licensed CC BY 4.0 (footer: "Creative Commons Reconocimiento 4.0
+  Internacional"); attribution is the per-record URL.
+- Aprende Guatemala moved from `aprende.guatemala.com` to `www.guatemala.com/aprende/…`; the URLs above are the
+  current canonical ones (resolved through the site's own API on 2026-10-02).
+- The term `cuate` (t3-gt-021) cites S66, where it is used; its meaning was also checked against Aprende
+  Guatemala's "Origen de la palabra Cuate en Guatemala"
+  (https://www.guatemala.com/aprende/cultura-guatemalteca/general/origen-palabra-cuate-guatemala).
+- S83–S89 (CO) are all-rights-reserved: facts + short attributed quotations only. S83 TodaColombia and
+  S86–S88 are mostly sayings of parents/mothers (used as *parent* sentences); S85 El Nuevo Siglo terms are
+  regional (Costa, Santander, Boyacá, Nariño).
+- Term examples were taken from the same page as the usage rows, so most new-term examples are also a w3 usage
+  sentence (or part of one). Assign those rows with their term in mind when splitting train/dev/test.
+- Existing sources reused with their original ids (new pages or previously unused examples):
+- **S04** (abisai7 / diccionario-chapin (MIT)): 4 new terms, 46 new usage examples.
+- **S20** (Alcaldía de Medellín — Medellín Joven): 20 new terms, 27 new usage examples.
+- **S62** (Wikcionario (Wikimedia Foundation), CC BY-SA 4.0): 20 new terms, 25 new usage examples.

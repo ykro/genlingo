@@ -73,6 +73,9 @@ def main() -> None:
         if r["status"] in ("approved", "rejected") and r["provenance"].get("validation", {}).get("by") != "auto":
             seen.add(norm(r["source"]))
             continue  # a person decided; keep it
+        if r["provenance"].get("validation", {}).get("reason") == "overlaps_training":
+            seen.add(norm(r["source"]))
+            continue  # once leaked, always out: an earlier David trained on it (even if that data is archived now)
         reason = check(bank, r, linked.get(r["provenance"].get("usage_id"), []), train_text, seen)
         seen.add(norm(r["source"]))
         r["status"] = "rejected" if reason else "auto_validated"
