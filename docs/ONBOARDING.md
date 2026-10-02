@@ -137,7 +137,7 @@ Si la cuenta no existe, la crea con una contraseña aleatoria que nadie ve; el p
 ```bash
 make test-set                 # 1. set de prueba desde oraciones reales, validado contra el banco (sin humanos)
 make real-pairs               #    pares de entrenamiento anclados en oraciones reales
-make export                   # 2. pares del público aprobados en /admin -> data/pairs/human.jsonl (+ datasheet)
+make export                   # 2. (si hubo público) pares aprobados en /admin -> data/pairs/human.jsonl
 make pairs                    # 3. (opcional) regenerar los pares sintéticos con Gemini (~$0.80, 6 min)
 make train TAG=genlingo-2026-11-e2b                        # 4. LoRA en Cloud Run (L4) -> train/runs/<tag>.json
 make train TAG=genlingo-2026-11-e4b GEMMA_BASE_MODEL=gemma-4-E4B-it TRAIN_ARGS=--adapter-only
@@ -183,10 +183,12 @@ Para ensayar «Wi-Fi apagado» sin tocar el sistema operativo, pon `FORCE_OFFLIN
 
 ## 6. El flujo del público en el Chrome del emulador
 
+El público es opcional: sin él, la charla corre con rondas `E` y frases escritas con `/`.
+
 1. En `.env`: `AUDIENCE_FEED=1` y el mismo `EVENT_ID` que tiene desplegado Cloud Run (hoy `ensayo`). Luego `make up`.
 2. En el emulador, abre la app con el token de depuración: `https://genlingo-611681112050.us-central1.run.app/#appcheck-debug=<token>`.
-3. En el teléfono: «Reta a los modelos» → dirección → frase → «Enviar». La frase queda pendiente (una cada 20 s por persona, máximo 30 palabras, blocklist).
-4. En `/admin` (cuenta del presentador): «Aprobar». `audience_feed.py` la recibe por un listener de Firestore (con sondeo cada 2 s de respaldo) y aparece como «Siguiente del público» en la vista del presentador; el presupuesto es menos de 3 s.
+3. En el teléfono: «Reta a los modelos» → dirección → frase → «Enviar» (una cada 20 s por persona, máximo 30 palabras, blocklist). Con `AUTO_APPROVE_PHRASES=1` (por defecto en Cloud Run) la frase queda aprobada al instante.
+4. Si `AUTO_APPROVE_PHRASES=0`, apruébala en `/admin` (cuenta del presentador). `audience_feed.py` la recibe por un listener de Firestore (con sondeo cada 2 s de respaldo) y aparece como «Siguiente del público» en la vista del presentador; el presupuesto es menos de 3 s.
 5. En la vista del presentador: `Enter`. El duelo publica la ronda en Firestore (`rounds/{id}`, `status: voting`); el teléfono muestra «Votar por David» / «Votar por Goliath».
 6. Vota en el teléfono; la vista del presentador muestra «Votos en vivo». `V` cierra la ronda, lee el conteo de `rounds/{id}/votes` y decide al ganador.
 
@@ -203,7 +205,7 @@ El script entra a `/admin` con `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, aprueba
 
 1. **Vista del presentador** (`web/components/presenter/PresenterApp.tsx`). `Enter` toma la primera frase de la cola (la vista consulta `GET /queue` cada segundo) y llama `DuelClient.duel()` (`duelClient.ts`) con frase, dirección, país, `phrase_id` y el `david_tag` activo (el de `M`).
 2. **API** (`duel/genlingo_duel/main.py`). `POST /duel` valida el país y llama `run_round`, que decide el tipo de ronda (con referencia es evaluación; sin ella, del público) y llama `arena.duel(...)`.
-3. **Prompt por contendiente** (`arena.py`). `prompt_style_for` lee `train/runs/<tag>.json` (sin el sufijo `-f16`) para saber con qué prompt se entrenó ese David; Goliath usa `GOLIATH_PROMPT_STYLE` (`v2`). Si alguno usa `v2+glossary`, `glossary.py` recupera 4 entradas del banco del país y LATAM: términos de la generación de origen que aparecen en la frase (`terms.py`, coincidencia tolerante a inflexiones) y, si faltan, los de la otra generación más cercanos por coseno con EmbeddingGemma. `prompts.py` arma los mensajes.
+3. **Prompt por contendiente** (`arena.py`). `prompt_style_for` lee el run file del tag (`runs.py` quita sufijos como `-f16` o `-q5_k_m` hasta encontrarlo) para saber con qué prompt se entrenó ese David; Goliath usa `GOLIATH_PROMPT_STYLE` (`v2`). Si alguno usa `v2+glossary`, `glossary.py` recupera 4 entradas del banco del país y LATAM: términos de la generación de origen que aparecen en la frase (`terms.py`, coincidencia tolerante a inflexiones) y, si faltan, los de la otra generación más cercanos por coseno con EmbeddingGemma. `prompts.py` arma los mensajes.
 4. **¿Hay red?** (`duel_core/connectivity.py`). Una conexión TCP a `aiplatform.googleapis.com:443` con 0.8 s de tope, en caché 3 s. Esperar un timeout HTTP congelaría el escenario.
 5. **Duelo en paralelo** (`duel_core/duel.py`). `run_duel` lanza ambos contendientes con `asyncio.gather`. A Goliath sin red se le marca `offline` sin llamarlo; un error de red se convierte en `offline` y cualquier otro error en `error`, sin tumbar la ronda. David va por `ollama_client.py` (`/api/chat`, sin streaming, `think: false`, temperatura 0.2); Goliath por `gemini_client.py` (Vertex AI, ADC, timeout 20 s; los tokens de razonamiento cuentan como salida).
 6. **Medición** (`duel.py`, `cost.py`, `metrics.py`). `clean_translation` deja la primera línea sin etiquetas ni comillas; el costo usa `PriceSchedule.at()` (tarifa vigente hoy) y guarda qué tarifa usó; si hay referencia, se calcula chrF++ de oración. La arena suma el tiempo de recuperación del glosario a la latencia de quien lo usó y registra el prompt y los términos del glosario.
@@ -240,7 +242,7 @@ El script entra a `/admin` con `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, aprueba
 
 - [ ] Set de prueba validado: `make test-set` (sin intervención humana).
 - [ ] `make eval`; actualiza las cifras de la charla con `evals/report.md`.
-- [ ] Evento: `EVENT_ID` y `EVENT_COUNTRY` nuevos en `.env` y desplegados (`EVENT_ID=… EVENT_COUNTRY=… RECAPTCHA_SITE_KEY=… make deploy`); `AUDIENCE_FEED=1`.
+- [ ] Evento: `EVENT_ID` y `EVENT_COUNTRY` nuevos en `.env` y desplegados (`EVENT_ID=… EVENT_COUNTRY=… RECAPTCHA_SITE_KEY=… make deploy`); `AUDIENCE_FEED=1` solo si habrá público.
 - [ ] `make test` en verde.
 - [ ] `ollama list` muestra `LOCAL_MODEL_TAG`, `DAVID_PREVIOUS_TAG` y `embeddinggemma`.
 
