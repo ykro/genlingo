@@ -89,8 +89,8 @@ Ensayo sin red ni GPU: pon `MOCK_AI=1` en `.env` y corre `make up` (modelos simu
 | `make review-test-apply` | Aplica las decisiones del CSV (`a` aprobar, `r` rechazar, referencia corregida opcional). |
 | `make export` | Baja de Firestore los pares del público aprobados en `/admin` a `data/pairs/human.jsonl` y recuenta el datasheet. |
 | `make train-data` | Renderiza los pares aprobados al JSONL de chat con el mismo prompt (y glosario) del duelo. |
-| `make train` | Entrena en un Cloud Run Job con una L4: `make train TAG=genlingo-2027-03 [GEMMA_BASE_MODEL=…] [TRAIN_ARGS=…]`. Escribe `train/runs/<tag>.json`. |
-| `make train-finish` | Fusiona y exporta a GGUF en la laptop un adaptador entrenado en la nube y lo publica: `make train-finish TAG=…`. |
+| `make train` | Entrena en un Cloud Run Job con una L4 y después fusiona y convierte a GGUF en un job de CPU: `make train TAG=genlingo-2027-03 [QUANT=Q5_K_M] [GEMMA_BASE_MODEL=…] [TRAIN_ARGS=…]`. Escribe `train/runs/<tag>.json`. |
+| `make train-finish` | Respaldo: fusiona y exporta a GGUF en la laptop un adaptador entrenado en la nube y lo publica: `make train-finish TAG=…`. |
 | `make train-local` | El mismo entrenamiento en la Mac (MPS), para experimentos. |
 | `make quant-sweep` | Desde el GGUF f16 de un David: Q5_K_M, Q6_K, Q8_0 y Q4/Q5 calibrados con imatrix (pares de entrenamiento), registrados en Ollama. |
 | `make pull-model` | Descarga un David del bucket y lo registra en Ollama: `make pull-model TAG=… [FP16=1]`. |
@@ -112,7 +112,7 @@ web/                  Next.js: app del público (/), moderación (/admin), vista
   firestore.rules     Ningún cliente escribe directo; todo pasa por la API
 data/                 terms.jsonl, raw/web_usage.jsonl, pairs/, review/, SOURCES.md, DATASHEET.md
 scripts/              Construcción de datos, revisión, export, reset, make up
-train/                train_lora.py, submit_job.py, finish_local.py, train_local.py, notebook, runs/
+train/                train_lora.py, finish.py, submit_job.py, finish_local.py, train_local.py, notebook, runs/
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/
 infra/                Scripts gcloud numerados (01–06) y env.sh compartido
 docs/                 ONBOARDING.md, diagrams/ (HTML + SVG + PNG), screenshots/
@@ -136,19 +136,28 @@ Si hay red, el duelo también llama a Goliath y, con `AUDIENCE_FEED=1`, recibe f
 - **App del público** en Cloud Run (`us-central1`, `min-instances=1` para que el QR no reciba a la sala con un arranque en frío). Auth anónima de Firebase (sin registro), App Check con reCAPTCHA Enterprise, límite de una frase cada 20 s aplicado en una transacción del servidor, blocklist y moderación del presentador en `/admin`.
 - **Firestore**, base de datos `genlingo`: frases, rondas, votos (uno por persona) y pares del público. Las reglas niegan toda escritura de clientes; la cuenta de servicio `genlingo-web` solo puede tocar esa base (condición de IAM).
 - **Goliath**: Gemini en Vertex AI con ADC, `GOOGLE_CLOUD_LOCATION=global`, razonamiento `low`.
-- **Entrenamiento**: Cloud Run Job con GPU en `europe-west4`; imagen construida con Cloud Build en Artifact Registry `charlas2027`.
+- **Entrenamiento**: dos Cloud Run Jobs en `europe-west4` (L4 para entrenar, CPU para fusionar y convertir a GGUF); imagen construida con Cloud Build en Artifact Registry `charlas2027`.
 
-### Por qué Cloud Run GPU Jobs
+### Por qué dos Cloud Run Jobs
 
-Un reentrenamiento al mes no justifica nada encendido entre corridas. Un Cloud Run Job con una L4 es serverless, se cobra por segundo mientras la tarea corre y usa el mismo tipo de imagen que el resto. `train/submit_job.py` calcula el costo con las tarifas por segundo de GPU, vCPU y memoria, y lo deja en `train/runs/<tag>.json`.
+Un reentrenamiento al mes no justifica nada encendido entre corridas. Cloud Run Jobs es serverless, se cobra por segundo mientras la tarea corre y usa el mismo tipo de imagen que el resto. `make train` encadena dos jobs de la misma imagen (`infra/03-train-job.sh`):
 
-Dos límites dieron forma al job (`infra/03-train-job.sh`): las tareas con GPU duran como máximo 1 h, y el sistema de archivos de Cloud Run vive en memoria (32 GiB en total). Por eso los pesos base se cachean en un volumen de Cloud Storage, mientras el modelo fusionado y los GGUF van al disco en memoria: leer y escribir el GGUF sobre el bucket montado iba a ~3 MB/s (corridas canceladas `kcwqz` y `kqlxv` en `train/runs/failed/`).
+| Job | Máquina | Qué hace |
+| --- | --- | --- |
+| `genlingo-train` | 1× L4, 8 vCPU, 32 GiB | Entrena el adaptador LoRA y lo guarda en el volumen del bucket (`ADAPTER_ONLY=1`). |
+| `genlingo-finish` | solo CPU, 8 vCPU, 32 GiB, disco efímero de 10 GiB | Fusiona el adaptador, convierte a GGUF f16, cuantiza a `QUANT` (Q5_K_M) y publica en el bucket de modelos (`train/finish.py`). |
 
-Alternativas descartadas como camino principal, pero disponibles: un Vertex AI Custom Job con el mismo contenedor (`TRAIN_RUNTIME=vertex`), el notebook `train/genlingo.ipynb` para Colab, y `make train-local` en la Mac (36.9 min para 1,000 pares en MPS; en la L4, la fase de entrenamiento de ese mismo tamaño tomó 5.8 min).
+`train/submit_job.py` espera a los dos, calcula el costo de cada uno con las tarifas por segundo de GPU, vCPU y memoria, y deja el detalle por etapa y el total en `train/runs/<tag>.json`.
 
-### Por qué E4B termina en la laptop (`make train-finish`)
+Por qué dividirlo: el sistema de archivos de Cloud Run vive en la memoria de la instancia. Entrenar, guardar un checkpoint fusionado de 10 GB y escribir un GGUF f16 de 9 GB no caben juntos en 32 GiB: la corrida `genlingo-2026-11-e2b` (`zct96`) murió por memoria al convertir a f16, y E4B ya había fallado igual al fusionar. En el job de CPU no queda nada del entrenamiento en memoria: los pesos base se copian del bucket con una lectura secuencial (cargarlos con `mmap` desde el bucket montado iba a ~5 MB/s), la fusión corre en un proceso hijo (devuelve sus ~10 GB al terminar), el checkpoint fusionado va al disco en memoria, el GGUF f16 va al disco efímero (respaldado en disco, no en memoria) y el checkpoint se borra antes de cuantizar. Además la GPU no se cobra mientras se fusiona y convierte. Los pesos base se cachean en un volumen de Cloud Storage que comparten los dos jobs; los GGUF no van ahí porque el convertidor escribe a saltos y sobre el bucket montado iba a ~3 MB/s (corridas canceladas `kcwqz` y `kqlxv` en `train/runs/failed/`).
 
-Gemma 4 E4B entrena bien en la L4 (282 pasos, 24.7 min) y el adaptador LoRA se guarda en el bucket. Pero fusionar un checkpoint de 16 GB y convertirlo a GGUF no cabe en los 32 GiB del job: la corrida `genlingo-2026-10-e4b` terminó con «The configured memory limit was reached». La parte que necesita GPU se queda en la nube y la que necesita RAM se hace en la laptop de 64 GB: `make train-finish TAG=genlingo-2026-10-e4b` descarga el adaptador, fusiona, cuantiza a Q4_K_M y publica en el mismo bucket, así que `make pull-model` no distingue dónde se hizo la fusión. Para bases grandes, `TRAIN_ARGS=--adapter-only` detiene el job después de guardar el adaptador. E4B no salió a escena: con 67 % de jerga resuelta y p50 de 836 ms no supera al E2B f16.
+Descartado: Google Cloud Batch con una L4 y disco persistente. Resolvía la memoria en un solo paso, pero suma otra API, otra imagen de VM con drivers y otra cuenta de permisos, mientras que dos jobs reutilizan la imagen, la cuenta de servicio y el bucket que ya existían.
+
+Alternativas disponibles: un Vertex AI Custom Job con el mismo contenedor y 200 GB de disco (`TRAIN_RUNTIME=vertex`, todo en un paso), el notebook `train/genlingo.ipynb` para Colab, y `make train-local` en la Mac (36.9 min para 1,000 pares en MPS; en la L4, la fase de entrenamiento de ese mismo tamaño tomó 5.8 min).
+
+### `make train-finish`: el respaldo en la laptop
+
+`make train-finish TAG=…` corre el mismo `train/finish.py` en la Mac de 64 GB: baja el adaptador del bucket, fusiona, convierte, cuantiza (`QUANT`, `KEEP_F16=1` para publicar también el f16) y publica en el mismo bucket, así que `make pull-model` no distingue dónde se hizo la fusión. Sirve cuando el job de CPU no puede correr, y para E4B: su checkpoint fusionado de 16 GB más el modelo en memoria no caben en 32 GiB ni en el job de CPU. E4B no salió a escena: con 67 % de jerga resuelta y p50 de 836 ms no supera al E2B f16.
 
 ### El prompt con glosario
 
@@ -202,19 +211,21 @@ Las diez peores derrotas de David y los cortes por país y dirección están en 
 
 ## Costo de entrenamiento por corrida
 
-Cloud Run Job, 1× NVIDIA L4 sin redundancia zonal, 8 vCPU, 32 GiB, `europe-west4`. Costo = segundos facturados × tarifas por segundo (`CLOUD_RUN_*_USD_PER_S` en `.env`).
+Cloud Run Jobs en `europe-west4`: entrenamiento en 1× NVIDIA L4 sin redundancia zonal, 8 vCPU, 32 GiB; desde `genlingo-2026-11-e2b`, fusión + GGUF en un job aparte de CPU (8 vCPU, 32 GiB). Costo = segundos facturados × tarifas por segundo (`CLOUD_RUN_*_USD_PER_S` en `.env`), por etapa.
 
 | Corrida | Base | Pares | Resultado | Duración | Costo |
 | --- | --- | --- | --- | --- | --- |
 | `genlingo-2026-09` | E2B | 1,000 (`pairs-v2`) | listo (loss 2.33 → 0.14) | 17.4 min | $0.41 |
 | `genlingo-2026-10-e2b` | E2B | 1,500 (`pairs-v3`) | listo (loss 2.26 → 0.12) | 28.2 min | $0.67 |
 | `genlingo-2026-10-e4b` | E4B | 1,500 (`pairs-v3`) | entrenó; sin memoria al fusionar → `make train-finish` | 41.3 min | $0.98 |
+| `genlingo-2026-11-e2b` | E2B | 1,709 (1,375 sintéticos + 334 anclados en oraciones reales) | listo en la nube, dos jobs (loss 2.62 → 0.16): entrenamiento 25.3 min $0.60 + fusión/GGUF Q5_K_M y f16 9.0 min $0.11 | 34.3 min | $0.71 |
+| `failed/genlingo-2026-11-e2b-zct96` | E2B | 1,709 | entrenó; muerta por memoria al convertir a GGUF f16 en el job único → motivó la división en dos jobs | 26.8 min | $0.63 |
 | `failed/genlingo-2026-09-nv5r5` | E2B | 1,000 | falló al arrancar (faltaba `gcc` para Triton) | 10.9 min | $0.26 |
 | `failed/genlingo-2026-09-kcwqz` | E2B | 1,000 | cancelada: GGUF escrito en el bucket montado, demasiado lento | 31.2 min | $0.74 |
 | `failed/genlingo-2026-09-kqlxv` | E2B | 1,000 | cancelada a ~28 min (misma causa, al leer) | — | sin registro |
 | `experiments/genlingo-2026-09-pairs-v1` | E2B | 1,000 (`pairs-v1`) | laptop, MPS | 36.9 min | $0 |
 
-Generar los 1,500 pares sintéticos de `pairs-v3` con Gemini costó $0.80 (6 min). Un reentrenamiento mensual de E2B cuesta menos de $1; la inferencia de David, $0.
+Generar los 1,500 pares sintéticos de `pairs-v3` con Gemini costó $0.80 (6 min). Un reentrenamiento mensual de E2B, de punta a punta en la nube (entrenamiento → GGUF), cuesta menos de $1; la inferencia de David, $0.
 
 ## Versiones
 
