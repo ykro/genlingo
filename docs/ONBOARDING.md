@@ -33,12 +33,13 @@ make test                                 # 55 pruebas de Python, 12 de Vitest, 
 | Modelo | Cómo se obtiene | Para qué |
 | --- | --- | --- |
 | `embeddinggemma` | `ollama pull embeddinggemma` | Glosario del banco de términos (`EMBEDDING_MODEL`). Necesario en escena. |
-| `genlingo-2026-10-e2b` y `genlingo-2026-10-e2b-f16` | `make pull-model TAG=genlingo-2026-10-e2b FP16=1` | David de escena (`LOCAL_MODEL_TAG`) y su versión Q4. |
+| `genlingo-2026-10-e2b-q5_k_m` | `make pull-model TAG=genlingo-2026-10-e2b-q5_k_m` | David de escena (`LOCAL_MODEL_TAG`): Q5_K_M, 3.62 GB, elegido por el barrido de cuantización. |
+| `genlingo-2026-10-e2b` y `-e2b-f16` | `make pull-model TAG=genlingo-2026-10-e2b FP16=1` | El mismo David en Q4 y f16, para el eval de compresión (`make quant-sweep` parte del f16). |
 | `genlingo-2026-09` | `make pull-model TAG=genlingo-2026-09` (agrega `FP16=1` para el eval de compresión) | David del mes pasado (`DAVID_PREVIOUS_TAG`, tecla `M`). |
 | `genlingo-2026-10-e4b` | `make pull-model TAG=genlingo-2026-10-e4b` (sin `FP16`: `make train-finish` publica solo el Q4) | Candidato E4B para `make eval`. |
 | `gemma4:e2b-it-qat`, `gemma4:e4b` | `ollama pull gemma4:e2b-it-qat`, `ollama pull gemma4:e4b` | Modelos base sin afinar (`BASE_MODEL_TAGS`) para `make eval`. |
 
-`make pull-model` (`train/pull_model.sh`) copia de `gs://ai-experiments-487722-genlingo-models/<tag>/` el `Modelfile`, el GGUF Q4_K_M y `metrics.json` (más `Modelfile.f16` y el GGUF f16 con `FP16=1`) a `models/<tag>/` y corre `ollama create`. El Modelfile usa `RENDERER gemma4` / `PARSER gemma4` (`OLLAMA_RENDERER`), así que el modelo afinado recibe el prompt igual que su base.
+`make pull-model` (`train/pull_model.sh`) copia de `gs://ai-experiments-487722-genlingo-models/<tag>/` el `Modelfile`, el GGUF que ese Modelfile nombra y `metrics.json` (más `Modelfile.f16` y el GGUF f16 con `FP16=1`) a `models/<tag>/` y corre `ollama create`. El Modelfile usa `RENDERER gemma4` / `PARSER gemma4` (`OLLAMA_RENDERER`), así que el modelo afinado recibe el prompt igual que su base.
 
 ### Credenciales: ADC
 
@@ -134,9 +135,8 @@ Si la cuenta no existe, la crea con una contraseña aleatoria que nadie ve; el p
 ## 4. Datos, entrenamiento y eval: la cadena completa
 
 ```bash
-make review-test              # 1. data/review/test_review.csv para el presentador
-#    llenar `decision` (a / r) y, si hace falta, `corrected_target`
-make review-test-apply        #    aplica las decisiones a data/pairs/test_web.jsonl
+make test-set                 # 1. set de prueba desde oraciones reales, validado contra el banco (sin humanos)
+make real-pairs               #    pares de entrenamiento anclados en oraciones reales
 make export                   # 2. pares del público aprobados en /admin -> data/pairs/human.jsonl (+ datasheet)
 make pairs                    # 3. (opcional) regenerar los pares sintéticos con Gemini (~$0.80, 6 min)
 make train TAG=genlingo-2026-11-e2b                        # 4. LoRA en Cloud Run (L4) -> train/runs/<tag>.json
@@ -148,13 +148,13 @@ make eval                     # 7. evals/report.md (con DAVID_TAGS que incluya l
 
 Qué pasa en cada paso:
 
-1. **Revisión del set de prueba.** Solo los pares `approved` entran a las rondas de evaluación en escena y a los números principales del eval. Mientras ninguno esté aprobado, `make eval` usa los `pending_review` y marca el reporte como ensayo. Hoy los 319 están pendientes.
+1. **Set de prueba sin humanos.** `scripts/validate_test_set.py` valida cada par contra el banco de términos (la jerga del origen existe y se reemplaza, o la referencia usa jerga Gen Z del país; nada de otro país; longitud; sin solapes con entrenamiento) y lo marca `auto_validated` o `rejected` con el motivo. Las rondas `E` y el eval usan los `auto_validated`. `make review-test` queda como pasada humana opcional, y sus decisiones mandan sobre las automáticas. `make real-pairs` arma pares de entrenamiento con la otra mitad de las oraciones reales de la segunda ronda de investigación.
 2. **`make export`** lee `pairs` con `status == approved` de Firestore, los convierte en pares `origin=human` (procedencia: evento e id) y manda 20 % al split de prueba con un hash estable del id.
 3. **`make pairs`** (`scripts/generate_pairs.py`, `pairs-v3`): cada llamada nombra un término y su contraparte de la otra generación, del mismo país (contrapartes encontradas con EmbeddingGemma), con trampas de otro país como negativos difíciles. Cada par se valida contra el banco y los rechazos se cuentan por motivo en `data/pairs/synthetic.meta.json`.
 4. **`make train`** primero corre `make train-data` (`scripts/build_train_set.py`): renderiza los pares aprobados con el prompt del duelo (`v2+glossary` por defecto) a `data/train/chat.jsonl` y anota el estilo en `chat.meta.json`. Después `train/submit_job.py` sube el JSONL al bucket de staging, asegura la imagen (02) y el job (03), lanza `gcloud run jobs execute` con los argumentos de `train_lora.py`, espera, calcula el costo y escribe `train/runs/<tag>.json` con duración, máquina, costo, métricas y `prompt_style`. `TAG` por defecto es `genlingo-<año>-<mes>`; usa el sufijo de la base (`-e2b`, `-e4b`) cuando compares bases.
 5. **`make train-finish`** (`train/finish_local.py`) baja el adaptador de `gs://…-train-eu/genlingo/runs/<tag>/adapter`, fusiona en bf16, convierte con llama.cpp `b11292` (`train/setup_llama_cpp.sh` lo descarga en `train/.llama.cpp`), cuantiza a Q4_K_M, publica en el bucket de modelos y agrega un bloque `finish` al run file. Hace falta porque fusionar E4B no cabe en los 32 GiB del job.
 6. **`make pull-model`**: ver la tabla de modelos de Ollama.
-7. **`make eval`** (`evals/run_eval.py`): modelos base (`BASE_MODEL_TAGS`, el primero también con glosario), cada David de `DAVID_TAGS` con el prompt con que se entrenó (más su `-f16` si está en Ollama), y Goliath con y sin glosario. Los modelos locales se precalientan y corren de a uno, a temperatura 0. Los resultados por frase quedan en `evals/results/<fecha>.json` y el reporte en `evals/report.md`. El reporte elige al David de escena: la variante con más jerga resuelta que cumple p50 < 1 s.
+7. **`make eval`** (`evals/run_eval.py`): modelos base (`BASE_MODEL_TAGS`, el primero también con glosario), cada David de `DAVID_TAGS` con el prompt con que se entrenó (más su `-f16` si está en Ollama), y Goliath con y sin glosario. Los modelos locales se precalientan y corren de a uno, a temperatura 0. Los resultados por frase quedan en `evals/results/<fecha>.json` y el reporte en `evals/report.md`. El reporte elige al David de escena: el archivo más pequeño a ≤ 2 puntos del f16 en jerga resuelta, con p50 < 1 s (sección «Compresión»). `make quant-sweep TAG=…` construye Q5_K_M, Q6_K, Q8_0 y Q4/Q5 calibrados con imatrix (sobre pares de entrenamiento) para ese barrido.
 
 Después del eval, actualiza `.env`: `LOCAL_MODEL_TAG` (David de escena), `DAVID_PREVIOUS_TAG` (el del mes anterior) y `DAVID_TAGS`.
 
@@ -164,7 +164,7 @@ Después del eval, actualiza `.env`: `LOCAL_MODEL_TAG` (David de escena), `DAVID
 make up
 ```
 
-`scripts/up.sh` arranca `ollama serve` si no está corriendo, comprueba que `LOCAL_MODEL_TAG` exista en Ollama, lo carga con una llamada vacía (`keep_alive` 30 min), levanta el servicio del duelo en `127.0.0.1:8787` y la vista del presentador (build de producción de `web/`, `next start` en `127.0.0.1:3000`), y abre `http://127.0.0.1:3000/presenter`.
+`scripts/up.sh` arranca `ollama serve` (con `OLLAMA_MAX_LOADED_MODELS=4`) si no está corriendo, comprueba que `LOCAL_MODEL_TAG` y `DAVID_PREVIOUS_TAG` existan en Ollama, precarga exactamente los tres modelos de escena (los dos Davids y EmbeddingGemma, `keep_alive` 2 h), levanta el servicio del duelo en `127.0.0.1:8787` y la vista del presentador (`next start` en `127.0.0.1:3000`, recompilada si cambió algo en `web/` desde el último build) y abre `http://127.0.0.1:3000/presenter`. La charla entera funciona sin público: rondas `E` (set de prueba) y frases escritas con `/`.
 
 Teclas de la vista del presentador:
 
@@ -221,17 +221,15 @@ El script entra a `/admin` con `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, aprueba
 
 | Síntoma | Causa y solución |
 | --- | --- |
-| `make up` dice «David (…) no está en Ollama» aunque `ollama list` lo muestra | `scripts/up.sh` comprueba con `ollama list \| grep -q …` bajo `set -o pipefail`: `grep -q` sale al primer acierto, `ollama list` recibe SIGPIPE y el pipeline falla cuando el modelo no es la última línea de la lista. Es un error de `scripts/up.sh` (línea 15); se corrige capturando la salida antes de filtrarla (por ejemplo `ollama list \| grep "…" >/dev/null`). |
-| La vista del presentador no refleja cambios recientes de `web/` | `make up` solo construye si falta `web/.next/BUILD_ID`. Reconstruye con `cd web && npm run build`. |
-| La latencia de David sube a 2–3 s y la del glosario a ~850 ms | Ollama está descargando y recargando modelos: en esta laptop mantiene hasta 3 cargados. David, EmbeddingGemma y el David del mes pasado ya son 3; cualquier otro modelo (otra demo, un `make eval`) desaloja alguno. Revisa con `ollama ps` y descarga lo que sobre con `curl http://127.0.0.1:11434/api/generate -d '{"model":"<modelo>","keep_alive":0}'`. |
+| `make up` dice «… no está en Ollama» | Ese tag no está registrado: `make pull-model TAG=…`. |
+| La latencia de David sube a 2–3 s y la del glosario a ~850 ms | Ollama está descargando y recargando modelos. `make up` pide `OLLAMA_MAX_LOADED_MODELS=4`, pero solo aplica si `make up` arrancó Ollama (si ya corría, configúralo allí); cualquier otro modelo (otra demo, un `make eval`) puede desalojar alguno. Revisa con `ollama ps` y descarga lo que sobre con `curl http://127.0.0.1:11434/api/generate -d '{"model":"<modelo>","keep_alive":0}'`. |
 | La primera ronda con `M` tarda varios segundos | El David del mes pasado no estaba cargado. Precaliéntalo (ver la lista del día de la charla). |
-| `E` muestra «No quedan frases de prueba para esa combinación» | No hay pares de prueba `approved` (o ya se usaron todos). Aprueba el set con `make review-test` / `make review-test-apply`, o ensaya con `ALLOW_UNREVIEWED_TEST=1` en `.env`. `make reset` libera las ya usadas. |
+| `E` muestra «No quedan frases de prueba para esa combinación» | Ya se usaron todos los pares `auto_validated` de esa combinación (o falta `make test-set`). `make reset` libera las ya usadas. |
 | Goliath aparece «sin conexión» con internet | `FORCE_OFFLINE=1` en `.env`, o no hay salida TCP a `aiplatform.googleapis.com:443` (VPN, proxy, red del evento). |
 | Goliath da error en vez de traducir | ADC vencido: `gcloud auth application-default login`. Un timeout de 20 s se muestra como error, no como «sin conexión». |
 | El teléfono dice «Falta la verificación de la app» o la API responde 401 | App Check: navegador sin reCAPTCHA válido. En automatización y emulador, usa el token de depuración (sección 3). |
 | Una frase aprobada no llega a la pantalla | `AUDIENCE_FEED=0` o `EVENT_ID` distinto entre `.env` y Cloud Run. `GET http://127.0.0.1:8787/health` muestra `audience_feed`, `event` y `feed_last_sync`. |
 | El teléfono muestra una ronda vieja de un ensayo | El teléfono muestra la última ronda del evento. `make reset` con `AUDIENCE_FEED=1` y red borra las rondas del evento; o usa un `EVENT_ID` nuevo por evento. |
-| La vista del presentador no muestra «entrenar: $…» para el David de escena | El costo se busca en `train/runs/<tag>.json` con el tag exacto; para `genlingo-2026-10-e2b-f16` no existe ese archivo (el run es `genlingo-2026-10-e2b`). Con `genlingo-2026-09` sí aparece. |
 | `make test` omite las reglas de Firestore | Falta JDK 21 (`brew install openjdk@21`) o `web/node_modules`. |
 | El job de entrenamiento muere con «memory limit was reached» | Base demasiado grande para fusionar en 32 GiB. Usa `TRAIN_ARGS=--adapter-only` y termina con `make train-finish`. |
 | `make train` falla al descargar pesos con 429 | Descargas anónimas de Hugging Face desde la nube. Crea `hf-token` en Secret Manager y vuelve a correr `infra/01-train-service-account.sh`. |
@@ -240,8 +238,8 @@ El script entra a `/admin` con `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, aprueba
 
 **El día anterior**
 
-- [ ] Set de prueba revisado: `make review-test`, decisiones en el CSV, `make review-test-apply`. Confirma que haya pares `approved` y que `ALLOW_UNREVIEWED_TEST=0`.
-- [ ] `make eval` con el set aprobado; actualiza las cifras de la charla con `evals/report.md`.
+- [ ] Set de prueba validado: `make test-set` (sin intervención humana).
+- [ ] `make eval`; actualiza las cifras de la charla con `evals/report.md`.
 - [ ] Evento: `EVENT_ID` y `EVENT_COUNTRY` nuevos en `.env` y desplegados (`EVENT_ID=… EVENT_COUNTRY=… RECAPTCHA_SITE_KEY=… make deploy`); `AUDIENCE_FEED=1`.
 - [ ] `make test` en verde.
 - [ ] `ollama list` muestra `LOCAL_MODEL_TAG`, `DAVID_PREVIOUS_TAG` y `embeddinggemma`.
@@ -252,7 +250,6 @@ El script entra a `/admin` con `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, aprueba
 - [ ] `make up`; la vista en el proyector a 1920×1080, `F` para pantalla completa.
 - [ ] Precalentamiento: una ronda escrita (`/`) en cada dirección con el David de escena, `M` y una ronda con el del mes pasado, `M` de vuelta. `ollama ps` debe mostrar solo David, EmbeddingGemma y el David del mes pasado; cierra cualquier otro cliente de Ollama.
 - [ ] Prueba con Wi-Fi apagado: apaga el Wi-Fi, espera «Sin conexión» (la vista consulta cada 3 s), escribe una frase: David responde en menos de 1 s y Goliath aparece desconectado. Vuelve a encender el Wi-Fi y espera «En línea».
-- [ ] Prueba del público: escanea el QR con tu teléfono, manda una frase, apruébala en `/admin` y comprueba que llegue a la pantalla en menos de 3 s.
-- [ ] `/admin` abierto con la sesión del presentador.
+- [ ] (Opcional, si hay público) escanea el QR, manda una frase y comprueba que llegue a la pantalla en menos de 3 s (con `AUTO_APPROVE_PHRASES=1` no hace falta aprobarla).
 - [ ] `make reset` con red (pone en cero el marcador local y borra las rondas del evento en Firestore).
 - [ ] La laptop no se duerme (`caffeinate -d` en otra terminal) y está conectada a la corriente.
