@@ -21,12 +21,15 @@ up: ## Start Ollama + warm David + duel service + presenter view (works with Wi-
 reset: ## Clear rounds, votes and scoreboard (local + this event's Firestore rounds)
 	@$(UV) python scripts/reset.py
 
-test: ## Run all tests (no network: MOCK_AI in tests)
+test: ## Run all tests (no network: MOCK_AI in tests). SKIP_WEB=1 / SKIP_RULES=1 skip a suite on purpose
 	cd duel && MOCK_AI=1 uv run pytest -q
-	@if [ -d web/node_modules ]; then cd web && npm test --silent && npx tsc --noEmit && npx eslint . ; else echo "(web: npm install first to run its tests)"; fi
+	@if [ -d web/node_modules ]; then cd web && npm test --silent && npx tsc --noEmit && npx eslint . ; \
+	elif [ "$(SKIP_WEB)" = 1 ]; then echo "!! SKIP_WEB=1: web tests NOT run"; \
+	else echo "!! web tests can't run: (cd web && npm install), or SKIP_WEB=1 to skip them on purpose" >&2; exit 1; fi
 	@if [ -x "$(JAVA21)/bin/java" ] && [ -d web/node_modules ]; then \
 	  cd web && JAVA_HOME="$(JAVA21)" PATH="$(JAVA21)/bin:$$PATH" npm run --silent test:rules; \
-	else echo "(rules: brew install openjdk@21 to run the Firestore rules tests)"; fi
+	elif [ "$(SKIP_RULES)" = 1 ] || [ "$(SKIP_WEB)" = 1 ]; then echo "!! Firestore rules tests NOT run"; \
+	else echo "!! Firestore rules tests can't run: brew install openjdk@21, or SKIP_RULES=1 to skip them on purpose" >&2; exit 1; fi
 
 eval: ## Test set through base models, David and Goliath -> evals/report.md
 	$(UV) python evals/run_eval.py $(EVAL_ARGS)
