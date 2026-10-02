@@ -204,11 +204,10 @@
   line-height: 1.04;
   text-wrap: balance;
   color: var(--ink);
+  /* Shrinks when the column is full; FitText then shrinks the type until the whole answer fits. */
+  flex: 0 1 auto;
   min-height: 0;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
 }
 
 .stats {

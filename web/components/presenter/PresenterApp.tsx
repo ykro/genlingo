@@ -316,6 +316,30 @@ function answerSize(text: string) {
   return n <= 40 ? 88 : n <= 70 ? 72 : n <= 110 ? 58 : 48;
 }
 
+/**
+ * A translation must always be readable in full from the back of the room: start at the size
+ * picked from its length and shrink until it fits its column (no ellipsis, no hidden words).
+ */
+function FitText({ text, start, min = 36, className }: { text: string; start: number; min?: number; className: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let size = start;
+    el.style.fontSize = `${size}px`;
+    // Display glyphs poke a little above/below a tight line box; only a hidden line counts as overflow.
+    while (size > min && el.scrollHeight - el.clientHeight > size * 0.4) {
+      size -= 4;
+      el.style.fontSize = `${size}px`;
+    }
+  }, [text, start, min]);
+  return (
+    <p ref={ref} className={className} style={{ fontSize: start }}>
+      {text}
+    </p>
+  );
+}
+
 function RoundView({ round, live, online = true }: { round?: Round; live?: { phrase: string; direction: Direction; startedAt: number }; online?: boolean }) {
   const phrase = round?.phrase ?? live!.phrase;
   const direction = round?.direction ?? live!.direction;
@@ -419,9 +443,7 @@ function Column({
   return (
     <article className={`${s.column} ${loser ? s.loser : ""}`}>
       {label}
-      <p className={`display ${s.answer}`} style={{ fontSize: answerSize(result.text) }}>
-        {result.text}
-      </p>
+      <FitText className={`display ${s.answer}`} text={result.text} start={answerSize(result.text)} />
       {!!result.extra?.glossary?.length && (
         // Retrieval over our own term bank: shown, because it's part of why David answers well.
         <p className={s.glossary}>

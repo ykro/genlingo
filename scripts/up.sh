@@ -64,5 +64,5 @@ echo
 echo "  Duelo:      http://127.0.0.1:${PORT}/health"
 echo "  Pantalla:   http://127.0.0.1:3000/presenter   (F pantalla completa, E set de prueba, / escribir, M mes pasado)"
 echo
-command -v open >/dev/null && open "http://127.0.0.1:3000/presenter" || true
+[ "${NO_OPEN:-0}" = 1 ] || { command -v open >/dev/null && open "http://127.0.0.1:3000/presenter" || true; }
 wait
