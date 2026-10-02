@@ -59,7 +59,7 @@ def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str
     davids = [t.strip() for t in os.environ.get("DAVID_TAGS", s.david_tag).split(",") if t.strip()]
     for tag in davids:
         role = "david" if tag == s.david_tag else "david_alt"
-        add(tag, role, "ollama", prompt_style_for(s, tag), quant="Q4_K_M")
+        add(tag, role, "ollama", prompt_style_for(s, tag), quant=quant_of(s, tag))
         if available is None or {f"{tag}-f16", f"{tag}-f16:latest"} & available:  # only if it was pulled
             add(f"{tag}-f16", "david_f16" if role == "david" else "david_alt_f16", "ollama", prompt_style_for(s, tag), quant="F16")
     if with_goliath and s.gemini_model:
@@ -71,6 +71,19 @@ def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str
         if m["kind"] == "ollama" and available is not None and not ({m["name"], f"{m['name']}:latest"} & available):
             m["skip"] = "no está en Ollama (make pull-model)"
     return plan
+
+
+def quant_of(s, tag: str) -> str:
+    """Quantization of a David export: from the tag suffix (-q5_k_m, -iq-q4_k_m…), else from its run file."""
+    import re
+
+    from genlingo_duel.runs import load_run
+
+    m = re.search(r"-(?:iq-)?(q\d_k_m|q\d_k|q8_0)$", tag)
+    if m:
+        return m.group(1).upper()
+    run = load_run(s.runs_dir, tag) or {}
+    return run.get("quant") or (run.get("finish") or {}).get("quant") or (run.get("metrics") or {}).get("quant") or "Q4_K_M"
 
 
 async def run_model(m: dict, client, pairs, price: Price, concurrency: int, context: dict) -> list[dict]:
