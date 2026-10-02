@@ -7,6 +7,7 @@ Goliath = Gemini on Vertex AI (paid per token, needs internet).
 from __future__ import annotations
 
 import json
+import logging
 import time
 from dataclasses import dataclass
 
@@ -29,6 +30,8 @@ from .prompts import COUNTRIES, STYLES, Direction, prompt_version, translation_m
 from .runs import load_run
 from .settings import Settings, goliath_prices
 from .terms import TermBank
+
+log = logging.getLogger("genlingo.arena")
 
 # Mock answers: David "knows" the slang, Goliath answers almost literally, so rehearsals show
 # a plausible duel without network or GPU.
@@ -125,9 +128,14 @@ class Arena:
         styles = {"david": prompt_style_for(s, tag), "goliath": s.goliath_prompt_style}
         entries: list[dict] = []
         retrieval_ms = 0.0
+        glossary_error = None
         if "v2+glossary" in styles.values():
             t0 = time.perf_counter()
-            entries = await (await self.get_glossary()).entries(phrase, direction, country)
+            try:
+                entries = await (await self.get_glossary()).entries(phrase, direction, country)
+            except Exception as exc:  # embedding model missing or Ollama hiccup: duel without glossary, never a 500
+                log.warning("glossary unavailable, continuing without it: %s", exc)
+                glossary_error = f"{type(exc).__name__}: {exc}"[:200]
             retrieval_ms = (time.perf_counter() - t0) * 1000
         block = render_glossary(entries, COUNTRIES[country])
         messages = {name: translation_messages(phrase, direction, country, style, block) for name, style in styles.items()}
@@ -143,4 +151,6 @@ class Arena:
                 "glossary": [e["term"] for e in entries] if used else [],
                 "retrieval_ms": round(retrieval_ms, 1) if used else 0.0,
             }
+            if used and glossary_error:
+                res.extra["glossary_error"] = glossary_error
         return results

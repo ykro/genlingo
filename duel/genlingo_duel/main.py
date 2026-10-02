@@ -11,11 +11,13 @@ import asyncio
 import json
 import logging
 import random
+import re
 from contextlib import asynccontextmanager
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from .arena import Arena
@@ -28,12 +30,17 @@ from .settings import Settings, get_settings
 
 log = logging.getLogger("genlingo.duel")
 
+# Round ids are 12 hex chars (Scoreboard.record_round); David tags are Ollama names.
+ROUND_ID = Path(pattern=r"^[0-9a-f]{12}$")
+TAG_PATTERN = r"^[a-z0-9][a-z0-9._:-]{0,79}$"
+LOCAL_ORIGIN = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+
 
 class DuelRequest(BaseModel):
     phrase: str = Field(min_length=1, max_length=400)
     direction: Direction
     country: str = "LATAM"
-    david_tag: str | None = None
+    david_tag: str | None = Field(default=None, pattern=TAG_PATTERN)
     reference: str | None = None
     round_type: Literal["evaluation", "audience"] | None = None
     pair_id: str | None = None
@@ -43,7 +50,7 @@ class DuelRequest(BaseModel):
 class EvaluationRequest(BaseModel):
     direction: Direction | None = None
     country: str | None = None
-    david_tag: str | None = None
+    david_tag: str | None = Field(default=None, pattern=TAG_PATTERN)
 
 
 class VotesRequest(BaseModel):
@@ -76,9 +83,26 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
             feed.stop()
 
     app = FastAPI(title="Genlingo · duelo", lifespan=lifespan)
-    # The presenter view runs on another localhost port.
-    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+    # The presenter view runs on another localhost port; nothing else may call this API from a browser.
+    app.add_middleware(CORSMiddleware, allow_origin_regex=LOCAL_ORIGIN, allow_methods=["*"], allow_headers=["*"])
     app.state.board, app.state.arena, app.state.feed = board, arena, feed
+    background: set[asyncio.Task] = set()
+
+    @app.middleware("http")
+    async def local_only_writes(request: Request, call_next):
+        """/reset wipes the scoreboard: only from this machine (any browser origin must be localhost)."""
+        if request.url.path == "/reset":
+            origin = request.headers.get("origin")
+            client = request.client.host if request.client else ""
+            if (origin and not re.match(LOCAL_ORIGIN, origin)) or client not in ("127.0.0.1", "::1", "localhost", "testclient"):
+                return JSONResponse({"detail": "Solo desde esta laptop."}, status_code=403)
+        return await call_next(request)
+
+    def fire_and_forget(fn, *args) -> None:
+        """Firestore writes never block a round: they run in a thread, in the background."""
+        task = asyncio.create_task(asyncio.to_thread(fn, *args))
+        background.add(task)
+        task.add_done_callback(background.discard)
 
     def check_country(country: str) -> None:
         if country not in COUNTRIES:
@@ -99,22 +123,39 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
             phrase_id=req.phrase_id,
             david_tag=req.david_tag or s.david_tag,
         )
-        if feed is not None:
-            feed.publish_round(rnd)
+        if feed is not None and await arena.is_online():  # offline: the round stays local
+            fire_and_forget(feed.publish_round, rnd)
             if req.phrase_id:
-                feed.mark_shown(req.phrase_id)
+                fire_and_forget(feed.mark_shown, req.phrase_id)
         return rnd
+
+    async def david_models(tags: list[str], ollama_up: bool) -> dict:
+        """Quantization and file size of each David on stage, for the chip on the presenter view."""
+        if s.mock_ai or not ollama_up:
+            return {}
+        try:
+            models = await arena.david_client.list_models()  # type: ignore[attr-defined]
+        except Exception:
+            return {}
+        out = {}
+        for m in models:
+            name = (m.get("name") or "").removesuffix(":latest")
+            if name in tags:
+                out[name] = {"quant": (m.get("details") or {}).get("quantization_level"), "size_bytes": m.get("size")}
+        return out
 
     @app.get("/health")
     async def health() -> dict:
         ollama_up = True if s.mock_ai else await arena.david_client.is_up()  # type: ignore[attr-defined]
+        tags = [t for t in (s.david_tag, s.david_previous_tag) if t]
         return {
             "ok": True,
             "mock": s.mock_ai,
             "online": await arena.is_online(),
             "ollama": ollama_up,
             "david_tag": s.david_tag,
-            "david_tags": [t for t in (s.david_tag, s.david_previous_tag) if t],
+            "david_tags": tags,
+            "david_models": await david_models(tags, ollama_up),
             "goliath_model": s.gemini_model,
             "event": s.event_id,
             "audience_feed": feed is not None,
@@ -155,51 +196,53 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
         return board.list_rounds(limit)
 
     @app.get("/rounds/{round_id}")
-    async def get_round(round_id: str) -> dict:
+    async def get_round(round_id: str = ROUND_ID) -> dict:
         rnd = board.get_round(round_id)
         if rnd is None:
             raise HTTPException(404, "Ronda no encontrada.")
         return rnd
 
     @app.post("/rounds/{round_id}/votes")
-    async def set_votes(round_id: str, req: VotesRequest) -> dict:
+    async def set_votes(req: VotesRequest, round_id: str = ROUND_ID) -> dict:
         rnd = board.set_votes(round_id, req.david, req.goliath)
         if rnd is None:
             raise HTTPException(404, "Ronda no encontrada.")
         return rnd
 
     @app.get("/rounds/{round_id}/votes")
-    async def live_votes(round_id: str) -> dict:
+    async def live_votes(round_id: str = ROUND_ID) -> dict:
         """Live tally while phones vote (read from Firestore); stored tally when offline."""
         rnd = board.get_round(round_id)
         if rnd is None:
             raise HTTPException(404, "Ronda no encontrada.")
-        if feed is not None:
+        if feed is not None and await arena.is_online():
             try:
-                d, g = await asyncio.to_thread(feed.tally, round_id)
+                d, g = await asyncio.wait_for(asyncio.to_thread(feed.tally, round_id), timeout=5)
                 return {"david": d, "goliath": g, "live": True}
             except Exception:
                 pass
         return {"david": rnd["votes_david"], "goliath": rnd["votes_goliath"], "live": False}
 
     @app.post("/rounds/{round_id}/close")
-    async def close_round(round_id: str) -> dict:
+    async def close_round(round_id: str = ROUND_ID) -> dict:
         """Close voting: read the tally from Firestore (if connected) and decide the round."""
         if board.get_round(round_id) is None:
             raise HTTPException(404, "Ronda no encontrada.")
-        if feed is None:
+        if feed is None or not await arena.is_online():
             return board.get_round(round_id)  # type: ignore[return-value]
         try:
-            d, g = feed.tally(round_id)
+            d, g = await asyncio.wait_for(asyncio.to_thread(feed.tally, round_id), timeout=5)
         except Exception as exc:
             raise HTTPException(503, f"No se pudieron leer los votos: {exc}") from exc
-        feed.close_round(round_id)
+        fire_and_forget(feed.close_round, round_id)
         return board.set_votes(round_id, d, g)  # type: ignore[return-value]
 
     @app.get("/scoreboard")
     async def scoreboard(david_tag: str | None = None) -> dict:
-        out = board.summary()
-        out["david_tag"] = david_tag or s.david_tag
+        """Per David: wins, chrF++, p50 and amortized cost only count rounds played by this tag."""
+        tag = david_tag or s.david_tag
+        out = board.summary(david_tag=tag)
+        out["david_tag"] = tag
         out["david_training"] = training_run(s, out["david_tag"])
         return out
 

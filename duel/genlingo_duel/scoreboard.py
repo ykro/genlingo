@@ -152,9 +152,16 @@ class Scoreboard:
         return {r[0] for r in self.db.execute("SELECT pair_id FROM rounds WHERE pair_id IS NOT NULL")}
 
     # ---- scoreboard ---------------------------------------------------------------------
-    def summary(self) -> dict[str, Any]:
-        rounds = [self._row(r) for r in self.db.execute("SELECT * FROM rounds").fetchall()]
-        out: dict[str, Any] = {"rounds": len(rounds), "draws": sum(1 for r in rounds if r["winner"] == "draw")}
+    def summary(self, david_tag: str | None = None) -> dict[str, Any]:
+        """Totals for one David (rounds played by `david_tag`), or for every round when None."""
+        if david_tag:
+            rows = self.db.execute("SELECT * FROM rounds WHERE david_tag = ?", (david_tag,)).fetchall()
+        else:
+            rows = self.db.execute("SELECT * FROM rounds").fetchall()
+        rounds = [self._row(r) for r in rows]
+        total = self.db.execute("SELECT COUNT(*) FROM rounds").fetchone()[0]
+        out: dict[str, Any] = {"rounds": len(rounds), "rounds_all_davids": total,
+                               "draws": sum(1 for r in rounds if r["winner"] == "draw")}
         for name in ("david", "goliath"):
             mine = [r[name] for r in rounds]
             ok = [m for m in mine if m["status"] == "ok"]
