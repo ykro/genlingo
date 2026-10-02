@@ -57,7 +57,7 @@ def main() -> None:
                 Pair.model_validate(pair)
                 pairs.append(pair)
     # Dev must not appear in any training file either (synthetic pairs quote real sentences sometimes).
-    synthetic = TextIndex(x for f in ("synthetic.jsonl", "synthetic_v4.jsonl", "human.jsonl")
+    synthetic = TextIndex(x for f in ("synthetic.jsonl", "synthetic_multi.jsonl", "human.jsonl")
                           for r in read_jsonl(DATA / "pairs" / f) for x in (r["source"], r["target"]))
     dev = [p for p in pairs if p["split"] == "dev" and not (synthetic.overlaps(p["source"]) or synthetic.overlaps(p["target"]))]
     train = [p for p in pairs if p["split"] == "train"]

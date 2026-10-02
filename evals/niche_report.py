@@ -28,8 +28,8 @@ USABLE = {"auto_validated", "approved"}
 
 # As registered in evals/niche.md (2026-10-02).
 NICHES = {
-    "Nicho 1 · slang chapín (GT)": lambda p: p["country"] == "GT",
-    "Nicho 2 · papás → Gen Z en GT y CO": lambda p: p["direction"] == "parent_to_genz" and p["country"] in ("GT", "CO"),
+    "Slang chapín (GT)": lambda p: p["country"] == "GT",
+    "Papás → Gen Z (GT/CO)": lambda p: p["direction"] == "parent_to_genz" and p["country"] in ("GT", "CO"),
 }
 CONTEXT = {
     "Todo el set": lambda p: True,

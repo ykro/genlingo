@@ -8,18 +8,18 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 
 | modelo | rol | prompt | chrF++ | p50 | p95 | costo total | costo / 1,000 frases | tamaño | errores |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma4:e2b-it-qat | base (sin ajuste) | v2 | 50.2 | 364 ms | 490 ms | $0 | $0 | 4.34 GB | 0 |
-| gemma4:e2b-it-qat + glosario | base (sin ajuste) | v2 + glosario | 55.0 | 452 ms | 592 ms | $0 | $0 | 4.34 GB | 0 |
-| gemma4:e4b | base (sin ajuste) | v2 | 48.2 | 802 ms | 1.10 s | $0 | $0 | 6.58 GB | 0 |
-| genlingo-2026-10b-e2b + glosario | David (LoRA, Q5_K_M) | v2 + glosario | 56.6 | 557 ms | 751 ms | $0 | $0 | 3.62 GB | 0 |
-| genlingo-2026-10b-e2b-f16 + glosario | David (LoRA, f16) | v2 + glosario | 56.7 | 543 ms | 786 ms | $0 | $0 | 9.27 GB | 0 |
-| genlingo-2026-10-e2b-q5_k_m + glosario | David candidato (LoRA, Q5_K_M) | v2 + glosario | 55.4 | 564 ms | 744 ms | $0 | $0 | 3.62 GB | 0 |
-| genlingo-2026-10-e2b + glosario | David candidato (LoRA, Q4_K_M) | v2 + glosario | 55.7 | 512 ms | 696 ms | $0 | $0 | 3.42 GB | 0 |
-| genlingo-2026-10-e2b-f16 + glosario | David candidato (LoRA, f16) | v2 + glosario | 56.3 | 566 ms | 807 ms | $0 | $0 | 9.27 GB | 0 |
-| genlingo-2026-09 | David candidato (LoRA, Q4_K_M) | v1 | 55.0 | 391 ms | 545 ms | $0 | $0 | 3.42 GB | 0 |
-| genlingo-2026-09-f16 | David candidato (LoRA, f16) | v1 | 55.4 | 435 ms | 639 ms | $0 | $0 | 9.27 GB | 0 |
-| gemini-3.8-flash | Goliath | v2 | 53.1 | 3.26 s | 8.82 s | $0.43 | $1.08 | — | 1 |
-| gemini-3.8-flash + glosario | Goliath con el glosario de David | v2 + glosario | 56.5 | 3.84 s | 9.00 s | $0.49 | $1.24 | — | 0 |
+| gemma4:e2b-it-qat | base (sin ajuste) | país | 50.2 | 364 ms | 490 ms | $0 | $0 | 4.34 GB | 0 |
+| gemma4:e2b-it-qat + glosario | base (sin ajuste) | país + glosario | 55.0 | 452 ms | 592 ms | $0 | $0 | 4.34 GB | 0 |
+| gemma4:e4b | base (sin ajuste) | país | 48.2 | 802 ms | 1.10 s | $0 | $0 | 6.58 GB | 0 |
+| genlingo-2026-10b-e2b + glosario | David (LoRA, Q5_K_M) | país + glosario | 56.6 | 557 ms | 751 ms | $0 | $0 | 3.62 GB | 0 |
+| genlingo-2026-10b-e2b-f16 + glosario | David (LoRA, f16) | país + glosario | 56.7 | 543 ms | 786 ms | $0 | $0 | 9.27 GB | 0 |
+| genlingo-2026-10-e2b-q5_k_m + glosario | David candidato (LoRA, Q5_K_M) | país + glosario | 55.4 | 564 ms | 744 ms | $0 | $0 | 3.62 GB | 0 |
+| genlingo-2026-10-e2b + glosario | David candidato (LoRA, Q4_K_M) | país + glosario | 55.7 | 512 ms | 696 ms | $0 | $0 | 3.42 GB | 0 |
+| genlingo-2026-10-e2b-f16 + glosario | David candidato (LoRA, f16) | país + glosario | 56.3 | 566 ms | 807 ms | $0 | $0 | 9.27 GB | 0 |
+| genlingo-2026-09 | David candidato (LoRA, Q4_K_M) | básico | 55.0 | 391 ms | 545 ms | $0 | $0 | 3.42 GB | 0 |
+| genlingo-2026-09-f16 | David candidato (LoRA, f16) | básico | 55.4 | 435 ms | 639 ms | $0 | $0 | 9.27 GB | 0 |
+| gemini-3.8-flash | Goliath | país | 53.1 | 3.26 s | 8.82 s | $0.43 | $1.08 | — | 1 |
+| gemini-3.8-flash + glosario | Goliath con el glosario de David | país + glosario | 56.5 | 3.84 s | 9.00 s | $0.49 | $1.24 | — | 0 |
 
 Costo de Goliath con la tarifa del día del eval: $0.75 entrada / $3.75 salida por millón de tokens (vigente desde 2026-09-30).
 Con la tarifa desde 2027-01-01 ($1.50 / $7.50), este mismo eval costaría $0.86 ($2.17 por 1,000 frases).
@@ -166,7 +166,7 @@ David gana 207 de 398 frases por chrF++ de oración. Las 10 peores derrotas:
 
 ## Metodología
 
-- Prompts en `duel/genlingo_duel/prompts.py`, temperatura 0. Cada variante declara su prompt en la tabla: cada David con el prompt con el que se entrenó; los modelos base y Goliath con v2, y también con el glosario de David («+ glosario») para que la comparación con los datos de David sea justa y visible.
+- Prompts en `duel/genlingo_duel/prompts.py`, temperatura 0. Cada variante declara su prompt en la tabla: cada David con el prompt con el que se entrenó; los modelos base y Goliath con el prompt con país, y también con el glosario de David («+ glosario») para que la comparación con los datos de David sea justa y visible.
 - Glosario: entradas del banco de términos recuperadas con EmbeddingGemma local; su tiempo cuenta en la latencia.
 - chrF++ = sacrebleu CHRF con `word_order=2`, a nivel de corpus.
 - Costo de Goliath = tokens × precio por millón vigente el día del eval (`GEMINI_PRICE_SCHEDULE`); los tokens de razonamiento se cobran como salida.

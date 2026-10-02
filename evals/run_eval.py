@@ -48,17 +48,17 @@ def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str
     from genlingo_duel.arena import prompt_style_for
 
     def add(name, role, kind, style, **kw):
-        label = name + {"v2+glossary": " + glosario", "v2+lex": " + léxico"}.get(style, "") + kw.pop("suffix", "")
+        label = name + {"glossary": " + glosario", "lexicon": " + léxico"}.get(style, "") + kw.pop("suffix", "")
         plan.append({"name": name, "label": label, "role": role, "kind": kind, "style": style, **kw})
 
-    # The glossary everyone else gets is the one the stage David uses (v2+lex or v2+glossary).
+    # The glossary everyone else gets is the one the stage David uses (lexicon or glossary).
     stage_style = prompt_style_for(s, s.david_tag)
-    gstyle = stage_style if stage_style in GLOSSARY_STYLES else "v2+glossary"
+    gstyle = stage_style if stage_style in GLOSSARY_STYLES else "glossary"
 
     plan: list[dict] = []
     bases = [t.strip() for t in os.environ.get("BASE_MODEL_TAGS", "").split(",") if t.strip()]
     for i, tag in enumerate(bases):
-        add(tag, "base", "ollama", "v2")
+        add(tag, "base", "ollama", "country")
         if i == 0:
             add(tag, "base", "ollama", gstyle)
     davids = [t.strip() for t in os.environ.get("DAVID_TAGS", s.david_tag).split(",") if t.strip()]
@@ -71,7 +71,7 @@ def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str
         if available is None or {f"{tag}-f16", f"{tag}-f16:latest"} & available:  # only if it was pulled
             add(f"{tag}-f16", "david_f16" if role == "david" else "david_alt_f16", "ollama", prompt_style_for(s, tag), quant="F16")
     if with_goliath and s.gemini_model:
-        add(s.gemini_model, "goliath", "gemini", "v2")
+        add(s.gemini_model, "goliath", "gemini", "country")
         add(s.gemini_model, "goliath_glossary", "gemini", gstyle)
     if only:
         plan = [m for m in plan if m["name"] in only or m["role"] in only or m["label"] in only]

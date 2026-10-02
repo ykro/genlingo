@@ -192,7 +192,9 @@ ROLE_LABEL = {
     "goliath": "Goliath",
     "goliath_glossary": "Goliath con el glosario de David",
 }
-PROMPT_LABEL = {"v1": "v1", "v2": "v2", "v2+glossary": "v2 + glosario"}
+PROMPT_LABEL = {"plain": "básico", "country": "país", "glossary": "país + glosario", "lexicon": "país + léxico",
+                # results written before the styles had descriptive names
+                "v1": "básico", "v2": "país", "v2+glossary": "país + glosario", "v2+lex": "país + léxico"}
 
 
 def quant_label(name: str, meta: dict | None) -> str:
@@ -272,7 +274,7 @@ def summarize(raw: dict) -> dict[str, dict]:
 
 def pick_base(summary: dict[str, dict]) -> tuple[str | None, str]:
     """Smallest base model with p50 < 1 s and the best chrF++ (ties -> smaller)."""
-    bases = [s for s in summary.values() if s["role"] == "base" and s.get("style", "v2") != "v2+glossary" and s["chrf"] is not None]
+    bases = [s for s in summary.values() if s["role"] == "base" and s.get("style", "country") not in ("glossary", "lexicon", "v2+glossary", "v2+lex") and s["chrf"] is not None]
     fast = [s for s in bases if s["p50"] is not None and s["p50"] < P50_BUDGET_MS]
     if not fast:
         return None, "Ningún modelo base cumple p50 < 1 s."
@@ -396,7 +398,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
         table(
             ["modelo", "rol", "prompt", "chrF++", "p50", "p95", "costo total", "costo / 1,000 frases", "tamaño", "errores"],
             [
-                [name, ROLE_LABEL.get(s["role"], s["role"]).format(quant=quant_label(name, meta_by.get(name))), PROMPT_LABEL.get(s.get("style", "v1"), "v1"), _n(s["chrf"]), _ms(s["p50"]), _ms(s["p95"]),
+                [name, ROLE_LABEL.get(s["role"], s["role"]).format(quant=quant_label(name, meta_by.get(name))), PROMPT_LABEL.get(s.get("style", "plain"), "básico"), _n(s["chrf"]), _ms(s["p50"]), _ms(s["p95"]),
                  _usd(s["cost"]), _usd(s["cost_per_1k"]), _gb(s.get("size_bytes")), s["errors"]]
                 for name, s in summary.items()
             ],
@@ -502,7 +504,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
         "## Metodología",
         "",
         "- Prompts en `duel/genlingo_duel/prompts.py`, temperatura 0. Cada variante declara su prompt en la tabla: cada David "
-        "con el prompt con el que se entrenó; los modelos base y Goliath con v2, y también con el glosario de David "
+        "con el prompt con el que se entrenó; los modelos base y Goliath con el prompt con país, y también con el glosario de David "
         "(«+ glosario») para que la comparación con los datos de David sea justa y visible.",
         "- Glosario: entradas del banco de términos recuperadas con EmbeddingGemma local; su tiempo cuenta en la latencia.",
         "- chrF++ = sacrebleu CHRF con `word_order=2`, a nivel de corpus.",

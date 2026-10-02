@@ -100,22 +100,33 @@ def test_goliath_cost_uses_the_price_in_force_today(settings):
     assert r["david"]["price"]["input_per_million"] == 0
 
 
-def test_david_gets_his_glossary_goliath_the_plain_v2_prompt(settings):
+def test_david_gets_his_glossary_goliath_the_country_prompt(settings):
     import json as _json
 
     (settings.runs_dir / "genlingo-glossary.json").write_text(_json.dumps({"tag": "genlingo-glossary", "prompt_style": "v2+glossary"}))
     with client(settings) as c:
         r = c.post("/duel", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent", "country": "MX",
                                   "david_tag": "genlingo-glossary"}).json()
-    assert r["david"]["extra"]["prompt"] == "translate-v2+glossary"
+    assert r["david"]["extra"]["prompt"] == "translate-country+glossary"  # old run-file name, mapped
     assert "mid" in r["david"]["extra"]["glossary"]
-    assert r["goliath"]["extra"] == {"prompt": "translate-v2", "glossary": [], "retrieval_ms": 0.0}
+    assert r["goliath"]["extra"] == {"prompt": "translate-country", "glossary": [], "retrieval_ms": 0.0}
+
+
+def test_lexicon_david_gets_the_lexicon_glossary(settings):
+    import json as _json
+
+    (settings.runs_dir / "genlingo-lex.json").write_text(_json.dumps({"tag": "genlingo-lex", "prompt_style": "lexicon"}))
+    with client(settings) as c:
+        r = c.post("/duel", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent", "country": "MX",
+                                  "david_tag": "genlingo-lex"}).json()
+    assert r["david"]["extra"]["prompt"] == "translate-country+lexicon"
+    assert "mid" in r["david"]["extra"]["glossary"]
 
 
 def test_last_months_david_keeps_his_old_prompt(settings):
     with client(settings) as c:
         r = c.post("/duel", json={"phrase": "x", "direction": "genz_to_parent", "country": "MX"}).json()
-    assert r["david"]["extra"]["prompt"] == "translate-v1"
+    assert r["david"]["extra"]["prompt"] == "translate-plain"
 
 
 def test_quantized_exports_map_to_their_training_run(settings):

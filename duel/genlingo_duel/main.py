@@ -48,7 +48,7 @@ class DuelRequest(BaseModel):
     label: str | None = Field(default=None, max_length=80)
 
 
-# The specialty round draws from niche 1 of evals/niche.md: the GT test pairs ("slang chapín").
+# The specialty round draws from the «slang chapín» niche of evals/niche.md: the GT test pairs ("slang chapín").
 SPECIALTY = {"country": "GT", "label": "Ronda de especialidad: slang chapín"}
 
 

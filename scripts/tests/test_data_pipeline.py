@@ -76,7 +76,7 @@ def test_filter_counts_reasons_and_mock_pairs_validate():
     calls = plan_calls(BANK, VEC, 40, seed=1, counterparts=CP)
     pairs = [p for c in calls for p in to_pairs(c, mock_generate(BANK, c), "mock")]
     kept, dropped = filter_pairs(BANK, {c["seed"]: c for c in calls}, pairs, TextIndex([]))
-    assert kept and all(p["provenance"]["prompt_version"] == "pairs-v5" for p in kept)
+    assert kept and all(p["provenance"]["prompt_version"] == "synthetic-2026-10b" for p in kept)
     assert all(isinstance(v, int) for v in dropped.values())
 
 

@@ -166,9 +166,9 @@ Alternativas disponibles: un Vertex AI Custom Job con el mismo contenedor y 200 
 
 ### El prompt con glosario
 
-El prompt `translate-v2` empieza por el país («Variante: español de Guatemala. Usa solo expresiones de Guatemala…») porque «chido» y «chilero» son la misma palabra en lugares distintos. Al final lleva un glosario de cuatro entradas del banco de términos, del país o neutras: primero los términos de la generación de origen que aparecen literalmente en la frase y después los más cercanos por significado según EmbeddingGemma. El tiempo de recuperación se suma a la latencia de David.
+El prompt con país empieza por el país («Variante: español de Guatemala. Usa solo expresiones de Guatemala…») porque «chido» y «chilero» son la misma palabra en lugares distintos. Al final lleva un glosario de cuatro entradas del banco de términos, del país o neutras: primero los términos de la generación de origen que aparecen literalmente en la frase y después los más cercanos por significado según EmbeddingGemma. El tiempo de recuperación se suma a la latencia de David.
 
-David se entrena con exactamente ese formato (`make train-data` usa `v2+glossary` por defecto) y el duelo lee de `train/runs/<tag>.json` con qué prompt se entrenó cada David: no hay diferencia entre entrenamiento y escena. Goliath recibe `v2` sin glosario por defecto (`GOLIATH_PROMPT_STYLE`), porque el banco es dato de David; `make eval` corre además a Goliath con el mismo glosario, y así se ve cuánto del resultado es modelo y cuánto es dato.
+David se entrena con exactamente ese formato (`make train-data` usa el estilo con glosario por defecto) y el duelo lee de `train/runs/<tag>.json` con qué prompt se entrenó cada David: no hay diferencia entre entrenamiento y escena. Goliath recibe el prompt con país, sin glosario, por defecto (`GOLIATH_PROMPT_STYLE`), porque el banco es dato de David; `make eval` corre además a Goliath con el mismo glosario, y así se ve cuánto del resultado es modelo y cuánto es dato.
 
 ### El set de prueba es solo web, nunca sintético
 
@@ -185,7 +185,7 @@ Los precios cambian, y eso es parte de la historia. `GEMINI_PRICE_SCHEDULE=2026-
 ### Quién gana una ronda
 
 - **Ronda de evaluación** (frase del set de prueba, tecla `E`): gana el chrF++ más alto; diferencias menores a 0.5 son empate. Usa pares `auto_validated` (o aprobados por una persona), listos sin revisión humana.
-- **Ronda de especialidad: slang chapín** (tecla `G`): igual, pero con la siguiente frase guatemalteca del set de prueba en un orden fijo con semilla (`SPECIALTY_SEED`), el nicho 1 de [evals/niche.md](evals/niche.md). Nadie elige la frase. El país por defecto del escenario es `GT`.
+- **Ronda de especialidad: slang chapín** (tecla `G`): igual, pero con la siguiente frase guatemalteca del set de prueba en un orden fijo con semilla (`SPECIALTY_SEED`), el nicho «slang chapín» de [evals/niche.md](evals/niche.md). Nadie elige la frase. El país por defecto del escenario es `GT`.
 - **Frase en vivo** (escrita con `/`) o **del público** (desde un teléfono): con la app del público conectada (`AUDIENCE_FEED=1`) decide el voto (`V` cierra la votación); sin público, la ronda muestra las dos traducciones sin ganador. La charla completa funciona sin público: rondas `E` y frases escritas.
 - Las frases del público que pasan la blocklist van directo a la cola de la pantalla (`AUTO_APPROVE_PHRASES=1`, por defecto); con `0`, el presentador las aprueba en `/admin`.
 - Si Goliath no tiene red o falla, David gana por presentarse.
@@ -200,7 +200,7 @@ Eval del 2026-10-02 sobre 399 pares de prueba web `auto_validated` (de 522 candi
 | `gemma4:e2b-it-qat` (base) | 58 % | 95 % | 10 % | 14 % | 50.2 | 364 ms | $0 | 4.34 GB |
 | `gemma4:e2b-it-qat` + glosario | 62 % | 94 % | 20 % | 23 % | 55.0 | 452 ms | $0 | 4.34 GB |
 | `gemma4:e4b` (base) | 68 % | 97 % | 31 % | 17 % | 48.2 | 802 ms | $0 | 6.58 GB |
-| `genlingo-2026-09` (Q4, prompt v1) | 62 % | 94 % | 20 % | 14 % | 55.0 | 391 ms | $0 | 3.42 GB |
+| `genlingo-2026-09` (Q4, prompt básico) | 62 % | 94 % | 20 % | 14 % | 55.0 | 391 ms | $0 | 3.42 GB |
 | `genlingo-2026-10-e2b` + glosario (Q4) | 67 % | 95 % | 31 % | 16 % | 55.7 | 512 ms | $0 | 3.42 GB |
 | `genlingo-2026-10-e2b-q5_k_m` + glosario (anterior) | 74 % | 97 % | 43 % | 18 % | 55.4 | 564 ms | $0 | 3.62 GB |
 | `genlingo-2026-10-e2b-f16` + glosario | 74 % | 99 % | 42 % | 19 % | 56.3 | 566 ms | $0 | 9.27 GB |
@@ -211,7 +211,7 @@ Eval del 2026-10-02 sobre 399 pares de prueba web `auto_validated` (de 522 candi
 
 **Lectura honesta.** Frase por frase, David resuelve la jerga y Goliath no en 46 frases; al revés, en 31. Contra Goliath con glosario la cuenta se invierte: 36 contra 39. En *cambios acertados* (palabras exactas de la referencia) Goliath gana a David con y sin glosario, y David todavía mete jerga de otro país en 14 de 173 frases papás → Gen Z (Goliath: 2). Los datos de la segunda ronda le dieron a David 8 puntos de jerga resuelta, casi todos en papás → Gen Z, que es lo que enseñan los pares reales en esa dirección (una oración Gen Z real como salida). David gana en velocidad, costo y privacidad, y gana en jerga mientras el banco de términos y las oraciones reales sean solo suyos. chrF++ queda pegado a la línea base de copiar (53.2) porque una reescritura de registro conserva casi todas las palabras: no sirve para decidir quién tradujo la jerga.
 
-Las diez peores derrotas de David y los cortes por país y dirección están en [evals/report.md](evals/report.md). La primera versión de los datos (`pairs-v1`, paráfrasis libre) dejó a David *por debajo* de la base (chrF++ 39.1): está documentado en [evals/experiments/2026-09-pairs-v1.md](evals/experiments/2026-09-pairs-v1.md).
+Las diez peores derrotas de David y los cortes por país y dirección están en [evals/report.md](evals/report.md). La primera versión de los datos (paráfrasis libre) dejó a David *por debajo* de la base (chrF++ 39.1): está documentado en [evals/experiments/2026-09-parafrasis-libres.md](evals/experiments/2026-09-parafrasis-libres.md).
 
 | Tecla `M`: el David del mes pasado | Wi-Fi apagado |
 | --- | --- |
@@ -224,17 +224,17 @@ Cloud Run Jobs en `europe-west4`: entrenamiento en 1× NVIDIA L4 sin redundancia
 
 | Corrida | Base | Pares | Resultado | Duración | Costo |
 | --- | --- | --- | --- | --- | --- |
-| `genlingo-2026-09` | E2B | 1,000 (`pairs-v2`) | listo (loss 2.33 → 0.14) | 17.4 min | $0.41 |
-| `genlingo-2026-10-e2b` | E2B | 1,500 (`pairs-v3`) | listo (loss 2.26 → 0.12) | 28.2 min | $0.67 |
-| `genlingo-2026-10-e4b` | E4B | 1,500 (`pairs-v3`) | entrenó; sin memoria al fusionar → `make train-finish` | 41.3 min | $0.98 |
+| `genlingo-2026-09` | E2B | 1,000 (edición mínima) | listo (loss 2.33 → 0.14) | 17.4 min | $0.41 |
+| `genlingo-2026-10-e2b` | E2B | 1,500 (anclados en el banco) | listo (loss 2.26 → 0.12) | 28.2 min | $0.67 |
+| `genlingo-2026-10-e4b` | E4B | 1,500 (anclados en el banco) | entrenó; sin memoria al fusionar → `make train-finish` | 41.3 min | $0.98 |
 | `genlingo-2026-10b-e2b` | E2B | 1,709 (1,375 sintéticos + 334 anclados en oraciones reales) | listo en la nube, dos jobs (loss 2.62 → 0.16): entrenamiento 25.3 min $0.60 + fusión/GGUF Q5_K_M y f16 9.0 min $0.11 | 34.3 min | $0.71 |
 | `failed/genlingo-2026-10b-e2b-zct96` | E2B | 1,709 | entrenó; muerta por memoria al convertir a GGUF f16 en el job único → motivó la división en dos jobs | 26.8 min | $0.63 |
 | `failed/genlingo-2026-09-nv5r5` | E2B | 1,000 | falló al arrancar (faltaba `gcc` para Triton) | 10.9 min | $0.26 |
 | `failed/genlingo-2026-09-kcwqz` | E2B | 1,000 | cancelada: GGUF escrito en el bucket montado, demasiado lento | 31.2 min | $0.74 |
 | `failed/genlingo-2026-09-kqlxv` | E2B | 1,000 | cancelada a ~28 min (misma causa, al leer) | — | sin registro |
-| `experiments/genlingo-2026-09-pairs-v1` | E2B | 1,000 (`pairs-v1`) | laptop, MPS | 36.9 min | $0 |
+| `experiments/genlingo-2026-09-parafrasis` | E2B | 1,000 (paráfrasis libre) | laptop, MPS | 36.9 min | $0 |
 
-Generar los 1,500 pares sintéticos de `pairs-v3` con Gemini costó $0.80 (6 min). Un reentrenamiento mensual de E2B, de punta a punta en la nube (entrenamiento → GGUF), cuesta menos de $1; la inferencia de David, $0.
+Generar 1,500 pares sintéticos con Gemini cuesta menos de $1 (unos 6 min). Un reentrenamiento mensual de E2B, de punta a punta en la nube (entrenamiento → GGUF), cuesta menos de $1; la inferencia de David, $0.
 
 ## Versiones
 
@@ -256,7 +256,7 @@ Los modelos vienen de variables de entorno (`GEMINI_MODEL`, `GEMMA_BASE_MODEL`, 
 | --- | --- | --- |
 | `data/terms.jsonl` (406 términos) y `data/raw/web_usage*.jsonl` (739 oraciones) | 57 fuentes web de MX, GT, CO y Latinoamérica, consultadas el 2026-09-30 y el 2026-10-01 ([SOURCES.md](data/SOURCES.md)); un corpus de habla general (S63) solo para contar términos ambiguos | WikiLengua (CC BY-SA 3.0), Wikcionario (CC BY-SA 4.0) y diccionario-chapin (MIT) se reutilizan bajo su licencia con atribución por registro. De las fuentes con todos los derechos reservados solo se toman hechos (término y significado, parafraseado) y una cita breve atribuida por entrada, con fines de investigación y educación. |
 | `data/pairs/test_web.jsonl` (522 pares, 399 `auto_validated`) y `data/pairs/real_train.jsonl` (334 pares) | Oraciones reales de esas fuentes; la referencia es reescritura del curador (menos de 30 % son oraciones escritas por el curador, marcadas `example_origin=curator`) | Igual que la fuente; los pares que citan ejemplos CC BY-SA heredan share-alike para ese texto. |
-| `data/pairs/synthetic.jsonl` (1,375 pares) | `gemini-3.8-flash`, prompt `pairs-v3`, semilla base 2027; solo entrenamiento | Cada par registra modelo, versión de prompt, semilla y los ids de término de los que salió. |
+| `data/pairs/synthetic.jsonl` y `synthetic_multi.jsonl` (pares sintéticos) | `gemini-3.8-flash`, contrapartes validadas por significado (`data/counterparts.jsonl`), semilla base 2027; solo entrenamiento | Cada par registra modelo, versión de prompt, semilla y los ids de término de los que salió. |
 | `data/pairs/human.jsonl` | Público de cada evento, aprobado en `/admin` (`make export`) | Procedencia: evento e id de Firestore. |
 
 Limitaciones conocidas (del datasheet): la jerga juvenil guatemalteca está poco documentada en línea; la jerga envejece rápido; las referencias son de una sola persona, así que chrF++ subestima traducciones alternativas válidas.

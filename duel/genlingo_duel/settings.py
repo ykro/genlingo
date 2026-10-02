@@ -42,10 +42,10 @@ class Settings:
     david_tag: str = field(default_factory=lambda: _env("LOCAL_MODEL_TAG"))
     # Last month's David, for the "last month vs this month" duel on stage.
     david_previous_tag: str = field(default_factory=lambda: _env("DAVID_PREVIOUS_TAG"))
-    # Prompt styles (v1 | v2 | v2+glossary). David's comes from his run file when it has one;
+    # Prompt styles (plain | country | glossary | lexicon; see prompts.py). David's comes from his run file when it has one;
     # Goliath gets no glossary by default (the term bank is David's data), set it to compare.
-    david_prompt_style: str = field(default_factory=lambda: _env("DAVID_PROMPT_STYLE", "v1"))
-    goliath_prompt_style: str = field(default_factory=lambda: _env("GOLIATH_PROMPT_STYLE", "v2"))
+    david_prompt_style: str = field(default_factory=lambda: _env("DAVID_PROMPT_STYLE", "plain"))
+    goliath_prompt_style: str = field(default_factory=lambda: _env("GOLIATH_PROMPT_STYLE", "country"))
     ollama_url: str = field(default_factory=lambda: _env("OLLAMA_URL", "http://127.0.0.1:11434"))
     # Local sentence-embedding model (Ollama) for the term-bank glossary retrieval.
     embedding_model: str = field(default_factory=lambda: _env("EMBEDDING_MODEL"))
@@ -61,7 +61,7 @@ class Settings:
     # after build_test_set); on stage keep it 0: only auto-validated pairs (or ones a person
     # approved in the optional human pass) are shown.
     allow_unreviewed_test: bool = field(default_factory=lambda: _flag("ALLOW_UNREVIEWED_TEST"))
-    # Specialty rounds (key G): niche 1 of evals/niche.md (GT test pairs), in a fixed seeded order.
+    # Specialty rounds (key G): the «slang chapín» niche of evals/niche.md (GT test pairs), in a fixed seeded order.
     specialty_seed: int = field(default_factory=lambda: int(_env("SPECIALTY_SEED", "2027")))
     # David's N-best: candidates generated in parallel and reranked with the term bank (1 = off).
     david_nbest: int = field(default_factory=lambda: int(_env("DAVID_NBEST", "1")))

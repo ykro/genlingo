@@ -76,7 +76,7 @@ def test_offline_skips_firestore_and_latency_does_not_grow(settings):
 
 
 def test_glossary_failure_degrades_to_no_glossary(settings, monkeypatch):
-    s = dataclasses.replace(settings, goliath_prompt_style="v2+glossary")
+    s = dataclasses.replace(settings, goliath_prompt_style="glossary")
 
     async def broken(self):
         raise RuntimeError("embedding model not found")

@@ -86,7 +86,7 @@ Ids S21, S32, S34–S36 were consulted but nothing was taken from them.
 
 ## Round 2 (2026-10-01): sources checked
 
-New sources used by `raw/terms_v2.jsonl` and `raw/web_usage_v2.jsonl` (ids continue after S40 in
+New sources used by `raw/terms_2026-10-01.jsonl` and `raw/web_usage_2026-10-01.jsonl` (ids continue after S40 in
 `../SOURCES.md`; same policy: facts paraphrased, short attributed quotations ≤ 30 words, exact per-record URL in
 each record). Accessed 2026-10-01.
 Notes:

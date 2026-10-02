@@ -1,10 +1,10 @@
-"""Generate multi-term synthetic TRAINING pairs with Gemini (pairs-v4), built from the term bank.
+"""Generate multi-term synthetic TRAINING pairs with Gemini, built from the term bank.
 
     uv run --project duel python scripts/generate_multi_pairs.py [--target 800] [--seed 2028]
 
 Why: on the test set David changes fewer of the words the reference changes than Goliath does
-(reference-change recall 22 % vs 30 %). pairs-v3 teaches one substitution per sentence, so David
-learns to swap one term and leave the rest. Here every pair has 2–3 slang terms that change at
+(reference-change recall 22 % vs 30 %). One substitution per sentence teaches David
+to swap one term and leave the rest. Here every pair has 2–3 slang terms that change at
 once, and every expected counterpart must be present in the target:
 
 - p2g_multi    papás -> Gen Z: 2–3 parents' expressions in the source, their Gen Z counterparts of the
@@ -19,7 +19,7 @@ meaning-validated table (data/counterparts.jsonl): p2g_multi uses only parents' 
 one. Traps are the foreign term nearest by embedding (cached vectors, no model call). Every pair is
 validated against the term bank (validate_multi) and never overlaps a test sentence, not even as a
 substring. Training only: synthetic pairs never go to the test, dev or niche sets.
-Writes data/pairs/synthetic_v4.jsonl (+ .meta.json); pairs-v3 (synthetic.jsonl) stays as it is.
+Writes data/pairs/synthetic_multi.jsonl (+ .meta.json); the single-term pairs stay in synthetic.jsonl.
 """
 
 from __future__ import annotations
@@ -40,7 +40,7 @@ from genlingo_duel.prompts import COUNTRIES  # noqa: E402
 from genlingo_duel.settings import get_settings, goliath_prices  # noqa: E402
 from genlingo_duel.terms import TermBank, normalize  # noqa: E402
 
-PROMPT_VERSION = "pairs-v5-multi"
+PROMPT_VERSION = "synthetic-multi-2026-10b"
 PAIRS_PER_CALL = 4
 MIX = {"p2g_multi": 0.45, "p2g_plain": 0.25, "g2p_multi": 0.30}
 COUNTRY_WEIGHTS = {"GT": 0.4, "CO": 0.25, "MX": 0.25, "LATAM": 0.10}  # the talk is in Guatemala
@@ -220,7 +220,7 @@ async def main_async(args) -> None:
     p2g = [p for p in kept if p["direction"] == "parent_to_genz"][: round(args.target * 0.7)]
     g2p = [p for p in kept if p["direction"] == "genz_to_parent"][: args.target - len(p2g)]
     final = p2g + g2p
-    out = data / "pairs" / "synthetic_v4.jsonl"
+    out = data / "pairs" / "synthetic_multi.jsonl"
     write_jsonl(out, final)
     kinds, countries = {}, {}
     for p in final:

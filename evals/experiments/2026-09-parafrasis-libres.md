@@ -1,3 +1,5 @@
+> Experimento descartado: pares de **paráfrasis libre** (el primer intento de datos sintéticos). El modelo se llamaba `genlingo-2026-09-pairs-v1`.
+
 # Genlingo — evaluación
 
 Generado por `make eval` el 2026-09-30 15:30. 319 pares de prueba (web; nunca sintéticos).
@@ -12,8 +14,8 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | gemma4:e2b-it-qat | base (sin ajuste) | 47.1 | 334 ms | 486 ms | $0 | $0 | 4.34 GB | 0 |
 | gemma4:e4b | base (sin ajuste) | 47.0 | 687 ms | 926 ms | $0 | $0 | 6.58 GB | 0 |
-| genlingo-2026-09-pairs-v1 | David (LoRA, Q4) | 39.1 | 412 ms | 564 ms | $0 | $0 | 3.42 GB | 0 |
-| genlingo-2026-09-pairs-v1-f16 | David (LoRA, f16) | 40.1 | 491 ms | 684 ms | $0 | $0 | 9.27 GB | 1 |
+| genlingo-2026-09-parafrasis | David (LoRA, Q4) | 39.1 | 412 ms | 564 ms | $0 | $0 | 3.42 GB | 0 |
+| genlingo-2026-09-parafrasis-f16 | David (LoRA, f16) | 40.1 | 491 ms | 684 ms | $0 | $0 | 9.27 GB | 1 |
 | gemini-3.8-flash | Goliath | 48.8 | 1.42 s | 6.14 s | $0.1284 | $0.4036 | — | 1 |
 
 **Línea base "copiar la frase"** (devolver el texto original sin traducir): chrF++ 50.0. Un modelo que no supera esta línea no está traduciendo mejor que no hacer nada; mide cuánto del puntaje viene de palabras que la referencia comparte con el original.
@@ -24,8 +26,8 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 | --- | --- |
 | gemma4:e2b-it-qat | 47.1 (n=319) |
 | gemma4:e4b | 47.0 (n=319) |
-| genlingo-2026-09-pairs-v1 | 39.1 (n=319) |
-| genlingo-2026-09-pairs-v1-f16 | 40.1 (n=318) |
+| genlingo-2026-09-parafrasis | 39.1 (n=319) |
+| genlingo-2026-09-parafrasis-f16 | 40.1 (n=318) |
 | gemini-3.8-flash | 48.8 (n=318) |
 
 ### chrF++ por dirección
@@ -34,8 +36,8 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 | --- | --- | --- |
 | gemma4:e2b-it-qat | 52.5 (n=164) | 40.7 (n=155) |
 | gemma4:e4b | 54.4 (n=164) | 38.3 (n=155) |
-| genlingo-2026-09-pairs-v1 | 42.7 (n=164) | 34.8 (n=155) |
-| genlingo-2026-09-pairs-v1-f16 | 43.9 (n=164) | 35.6 (n=154) |
+| genlingo-2026-09-parafrasis | 42.7 (n=164) | 34.8 (n=155) |
+| genlingo-2026-09-parafrasis-f16 | 43.9 (n=164) | 35.6 (n=154) |
 | gemini-3.8-flash | 56.0 (n=164) | 40.3 (n=154) |
 
 ### chrF++ por país
@@ -44,8 +46,8 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 | --- | --- | --- | --- | --- |
 | gemma4:e2b-it-qat | 46.2 (n=88) | 48.7 (n=73) | 47.4 (n=70) | 46.3 (n=88) |
 | gemma4:e4b | 48.8 (n=88) | 48.1 (n=73) | 45.1 (n=70) | 45.3 (n=88) |
-| genlingo-2026-09-pairs-v1 | 38.2 (n=88) | 41.2 (n=73) | 40.1 (n=70) | 37.3 (n=88) |
-| genlingo-2026-09-pairs-v1-f16 | 39.5 (n=88) | 42.5 (n=73) | 39.9 (n=70) | 39.0 (n=87) |
+| genlingo-2026-09-parafrasis | 38.2 (n=88) | 41.2 (n=73) | 40.1 (n=70) | 37.3 (n=88) |
+| genlingo-2026-09-parafrasis-f16 | 39.5 (n=88) | 42.5 (n=73) | 39.9 (n=70) | 39.0 (n=87) |
 | gemini-3.8-flash | 49.5 (n=88) | 44.8 (n=73) | 53.4 (n=70) | 46.9 (n=87) |
 
 ## Modelo base: E2B vs E4B
@@ -65,7 +67,7 @@ Regla: el más pequeño que cumpla p50 < 1 s con el mejor chrF++.
 
 | tag | máquina | región | ejemplos | duración | costo estimado | loss inicial → final |
 | --- | --- | --- | --- | --- | --- | --- |
-| genlingo-2026-09-pairs-v1 | Apple M1 Max 64 GB (local, MPS) | laptop | 1000 | 36.9 min | $0 | 4.85 → 0.75 |
+| genlingo-2026-09-parafrasis | Apple M1 Max 64 GB (local, MPS) | laptop | 1000 | 36.9 min | $0 | 4.85 → 0.75 |
 
 Costo = duración × tarifa por hora estimada ($0.0/h). La inferencia de David cuesta $0: corre en la laptop.
 

@@ -1,13 +1,13 @@
 """Render approved training pairs into chat JSONL for train/train_lora.py.
 
-    uv run --project duel python scripts/build_train_set.py [--style v2+glossary] [--out data/train/chat.jsonl]
+    uv run --project duel python scripts/build_train_set.py [--style lexicon] [--out data/train/chat.jsonl]
 
 Uses the exact prompt of the duel (genlingo_duel.prompts), including the glossary retrieved from
 the term bank the same way the duel retrieves it on stage: David is trained on the same messages
 he receives, so there is no train/serve prompt mismatch. The style is recorded next to the data
 (chat.meta.json) and, after training, in the run file, so the duel knows how to prompt each David.
 
-v2+lex (the default): the glossary is built exactly as on stage (Glossary.lex_entries), and then the
+lexicon (the default): the glossary is built exactly as on stage (Glossary.lex_entries), and then the
 answer is made visible on purpose: in GOLD_SHARE of the examples every target-side term of the
 reference is in the glossary (added if retrieval missed it), in the rest it is removed, so David
 learns to use the glossary when it has the answer and to cope when it doesn't. Entries are shuffled.
@@ -110,7 +110,7 @@ async def build(style: str, out: Path) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--style", default="v2+lex", choices=STYLES)
+    ap.add_argument("--style", default="lexicon", choices=STYLES)
     ap.add_argument("--out", default=str(DATA / "train" / "chat.jsonl"))
     args = ap.parse_args()
     meta = asyncio.run(build(args.style, Path(args.out)))

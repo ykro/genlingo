@@ -2,7 +2,7 @@
 
     uv run --project duel python scripts/build_counterparts.py [--no-judge]
 
-Why: pairs-v3 picked each term's counterpart in the other generation as its nearest neighbour by
+Why: the earlier synthetic pairs picked each term's counterpart in the other generation as its nearest neighbour by
 embedding, and the embedding of "term: meaning" is dominated by the term's surface. 175 of the 217
 links used by synthetic.jsonl had cosine < 0.6 ("brainrot -> patatús", "luca -> crush"), so most
 synthetic pairs taught David a wrong-meaning substitution. Now a link exists only if:

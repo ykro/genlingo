@@ -24,7 +24,7 @@ PAIR_FILES = {
     "human": "pairs/human.jsonl",
     "real_train": "pairs/real_train.jsonl",
     "dev_real": "pairs/dev_real.jsonl",
-    "synthetic_v4": "pairs/synthetic_v4.jsonl",
+    "synthetic_multi": "pairs/synthetic_multi.jsonl",
 }
 
 

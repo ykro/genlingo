@@ -1,5 +1,8 @@
 # Nichos pre-registrados
 
+> Los nichos se numeraban (1, 2, 3) cuando se registraron; el 2026-10-02 se les dio nombre descriptivo.
+> Solo cambió el nombre: las definiciones de abajo son las registradas.
+
 Escrito el 2026-10-02 **antes** de calcular cualquier corte por nicho de David contra Goliath. La definición
 no cambia después de ver resultados; si un nicho sale mal, se reporta tal cual (`docs/BITACORA.md`).
 
@@ -8,13 +11,13 @@ Davids, sin Goliath y sin jerga resuelta. Los nichos no salen de esa tabla: el p
 la presentadora (la charla es en Guatemala y es donde Gemini tiene menos datos) y el segundo es la
 dirección que los datos reales vinieron a reforzar.
 
-## Nicho 1 · «Slang chapín»
+## «Slang chapín»
 
 - **Frases:** pares del set de prueba con `country = GT` y `status` en (`auto_validated`, `approved`).
 - **Cómo se evalúan:** con `country = GT` en el prompt de los dos (el país del par), como en escena.
 - **Dirección:** las dos.
 
-## Nicho 2 · «Papás → Gen Z en Guatemala y Colombia»
+## «Papás → Gen Z (GT/CO)»
 
 - **Frases:** pares del set de prueba con `direction = parent_to_genz`, `country` en (`GT`, `CO`) y
   `status` en (`auto_validated`, `approved`).
@@ -23,8 +26,8 @@ dirección que los datos reales vinieron a reforzar.
 
 ## Quién compite
 
-- **David:** el David de escena (`LOCAL_MODEL_TAG`), con el prompt con que se entrenó (`v2 + glosario`).
-- **Goliath:** `GEMINI_MODEL` como en escena (`GOLIATH_PROMPT_STYLE = v2`, sin glosario). Es el rival del nicho.
+- **David:** el David de escena (`LOCAL_MODEL_TAG`), con el prompt con que se entrenó (`país + glosario`).
+- **Goliath:** `GEMINI_MODEL` como en escena (`GOLIATH_PROMPT_STYLE = country`, sin glosario). Es el rival del nicho.
 - **Goliath + el mismo glosario:** se reporta siempre al lado, para separar modelo de datos, pero no
   decide el nicho.
 
@@ -74,7 +77,7 @@ Igual que «cambios acertados», pero una palabra que la referencia cambió cuen
 tiene la misma palabra, otra con la misma raíz de 5 letras, o un término del banco enlazado a ella en la
 tabla de contrapartes.
 
-### Nicho 3 · términos nuevos para Goliath
+### «Slang reciente»: términos nuevos para Goliath
 
 - **Frases:** pares del set de prueba (`auto_validated` o `approved`) cuyo término de jerga tiene su primera
   fecha de publicación registrada (en `SOURCES.md` o en el término) **posterior** al corte de conocimiento
@@ -85,7 +88,7 @@ tabla de contrapartes.
 ### Regla de victoria
 
 La misma: IC 95 % por bootstrap pareado (10,000 remuestreos, semilla 2027) de la diferencia David − Goliath;
-gana David si el límite inferior es mayor que 0. Para jerga correcta y nicho 3 el rival también es Goliath
+gana David si el límite inferior es mayor que 0. Para jerga correcta y «slang reciente» el rival también es Goliath
 como en escena, y Goliath + glosario se reporta al lado.
 
 ### Set de desarrollo

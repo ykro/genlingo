@@ -166,9 +166,9 @@ Available alternatives: a Vertex AI Custom Job with the same container and a 200
 
 ### The glossary prompt
 
-The `translate-v2` prompt starts with the country ("Variante: español de Guatemala. Usa solo expresiones de Guatemala…") because "chido" and "chilero" are the same word in different places. It ends with a four-entry glossary from the term bank, country-specific or neutral: first the source-generation terms that appear verbatim in the phrase, then the closest ones by meaning according to EmbeddingGemma. Retrieval time is added to David's latency.
+The country prompt starts with the country ("Variante: español de Guatemala. Usa solo expresiones de Guatemala…") because "chido" and "chilero" are the same word in different places. It ends with a four-entry glossary from the term bank, country-specific or neutral: first the source-generation terms that appear verbatim in the phrase, then the closest ones by meaning according to EmbeddingGemma. Retrieval time is added to David's latency.
 
-David is trained on exactly that format (`make train-data` uses `v2+glossary` by default) and the duel reads from `train/runs/<tag>.json` which prompt each David was trained with: there is no gap between training and stage. Goliath gets `v2` without a glossary by default (`GOLIATH_PROMPT_STYLE`), because the bank is David's data; `make eval` also runs Goliath with the same glossary, which shows how much of the result is the model and how much is the data.
+David is trained on exactly that format (`make train-data` uses the glossary style by default) and the duel reads from `train/runs/<tag>.json` which prompt each David was trained with: there is no gap between training and stage. Goliath gets the country prompt, without a glossary, by default (`GOLIATH_PROMPT_STYLE`), because the bank is David's data; `make eval` also runs Goliath with the same glossary, which shows how much of the result is the model and how much is the data.
 
 ### The test set is web-only, never synthetic
 
@@ -185,7 +185,7 @@ Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:
 ### Who wins a round
 
 - **Evaluation round** (test-set phrase, `E` key): the higher chrF++ wins; gaps under 0.5 are a draw. It uses `auto_validated` pairs (or ones a person approved), ready with no human review.
-- **Specialty round: chapín slang** (`G` key): the same, but with the next Guatemalan test phrase in a fixed seeded order (`SPECIALTY_SEED`), niche 1 of [evals/niche.md](evals/niche.md). Nobody picks the phrase. The stage's default country is `GT`.
+- **Specialty round: chapín slang** (`G` key): the same, but with the next Guatemalan test phrase in a fixed seeded order (`SPECIALTY_SEED`), the «slang chapín» niche of [evals/niche.md](evals/niche.md). Nobody picks the phrase. The stage's default country is `GT`.
 - **Live phrase** (typed with `/`) or **audience phrase** (from a phone): with the audience app connected (`AUDIENCE_FEED=1`) the vote decides (`V` closes voting); without an audience the round shows both translations with no winner. The whole talk works without an audience: `E` rounds and typed phrases.
 - Audience phrases that pass the blocklist go straight to the screen queue (`AUTO_APPROVE_PHRASES=1`, the default); with `0` the presenter approves them in `/admin`.
 - If Goliath has no network or fails, David wins by showing up.
@@ -200,7 +200,7 @@ Eval of 2026-10-02 on 399 `auto_validated` web test pairs (out of 522 candidates
 | `gemma4:e2b-it-qat` (base) | 58% | 95% | 10% | 14% | 50.2 | 364 ms | $0 | 4.34 GB |
 | `gemma4:e2b-it-qat` + glossary | 62% | 94% | 20% | 23% | 55.0 | 452 ms | $0 | 4.34 GB |
 | `gemma4:e4b` (base) | 68% | 97% | 31% | 17% | 48.2 | 802 ms | $0 | 6.58 GB |
-| `genlingo-2026-09` (Q4, v1 prompt) | 62% | 94% | 20% | 14% | 55.0 | 391 ms | $0 | 3.42 GB |
+| `genlingo-2026-09` (Q4, plain prompt) | 62% | 94% | 20% | 14% | 55.0 | 391 ms | $0 | 3.42 GB |
 | `genlingo-2026-10-e2b` + glossary (Q4) | 67% | 95% | 31% | 16% | 55.7 | 512 ms | $0 | 3.42 GB |
 | `genlingo-2026-10-e2b-q5_k_m` + glossary (previous) | 74% | 97% | 43% | 18% | 55.4 | 564 ms | $0 | 3.62 GB |
 | `genlingo-2026-10-e2b-f16` + glossary | 74% | 99% | 42% | 19% | 56.3 | 566 ms | $0 | 9.27 GB |
@@ -211,7 +211,7 @@ Eval of 2026-10-02 on 399 `auto_validated` web test pairs (out of 522 candidates
 
 **Honest reading.** Phrase by phrase, David handles the slang and Goliath doesn't in 46 phrases; the other way round, in 31. Against Goliath with the glossary the count flips: 36 against 39. On *reference-change recall* (exact words of the reference) Goliath beats David with and without the glossary, and David still slips in another country's slang in 14 of 173 parents → Gen Z phrases (Goliath: 2). The second-round data gave David 8 points of slang handled, almost all in parents → Gen Z, which is what the real pairs teach in that direction (a real Gen Z sentence as the output). David wins on speed, cost and privacy, and wins on slang as long as the term bank and the real sentences are his alone. chrF++ stays glued to the copy baseline (53.2) because a register rewrite keeps almost every word: it can't decide who translated the slang.
 
-David's ten worst losses and the per-country and per-direction breakdowns are in [evals/report.md](evals/report.md). The first version of the data (`pairs-v1`, free paraphrase) left David *below* the base model (chrF++ 39.1): it is documented in [evals/experiments/2026-09-pairs-v1.md](evals/experiments/2026-09-pairs-v1.md).
+David's ten worst losses and the per-country and per-direction breakdowns are in [evals/report.md](evals/report.md). The first version of the data (free paraphrase) left David *below* the base model (chrF++ 39.1): it is documented in [evals/experiments/2026-09-parafrasis-libres.md](evals/experiments/2026-09-parafrasis-libres.md).
 
 | `M` key: last month's David | Wi-Fi off |
 | --- | --- |
@@ -224,17 +224,17 @@ Cloud Run Jobs in `europe-west4`: training on 1× NVIDIA L4 without zonal redund
 
 | Run | Base | Pairs | Outcome | Duration | Cost |
 | --- | --- | --- | --- | --- | --- |
-| `genlingo-2026-09` | E2B | 1,000 (`pairs-v2`) | done (loss 2.33 → 0.14) | 17.4 min | $0.41 |
-| `genlingo-2026-10-e2b` | E2B | 1,500 (`pairs-v3`) | done (loss 2.26 → 0.12) | 28.2 min | $0.67 |
-| `genlingo-2026-10-e4b` | E4B | 1,500 (`pairs-v3`) | trained; out of memory while merging → `make train-finish` | 41.3 min | $0.98 |
+| `genlingo-2026-09` | E2B | 1,000 (minimal edits) | done (loss 2.33 → 0.14) | 17.4 min | $0.41 |
+| `genlingo-2026-10-e2b` | E2B | 1,500 (anchored on the bank) | done (loss 2.26 → 0.12) | 28.2 min | $0.67 |
+| `genlingo-2026-10-e4b` | E4B | 1,500 (anchored on the bank) | trained; out of memory while merging → `make train-finish` | 41.3 min | $0.98 |
 | `genlingo-2026-10b-e2b` | E2B | 1,709 (1,375 synthetic + 334 anchored in real sentences) | done in the cloud, two jobs (loss 2.62 → 0.16): train 25.3 min $0.60 + merge/GGUF Q5_K_M and f16 9.0 min $0.11 | 34.3 min | $0.71 |
 | `failed/genlingo-2026-10b-e2b-zct96` | E2B | 1,709 | trained; killed for memory converting to GGUF f16 in the single job → led to the split into two jobs | 26.8 min | $0.63 |
 | `failed/genlingo-2026-09-nv5r5` | E2B | 1,000 | failed at start (`gcc` missing for Triton) | 10.9 min | $0.26 |
 | `failed/genlingo-2026-09-kcwqz` | E2B | 1,000 | cancelled: GGUF written to the bucket mount, too slow | 31.2 min | $0.74 |
 | `failed/genlingo-2026-09-kqlxv` | E2B | 1,000 | cancelled at ~28 min (same cause, on read) | — | not recorded |
-| `experiments/genlingo-2026-09-pairs-v1` | E2B | 1,000 (`pairs-v1`) | laptop, MPS | 36.9 min | $0 |
+| `experiments/genlingo-2026-09-parafrasis` | E2B | 1,000 (free paraphrase) | laptop, MPS | 36.9 min | $0 |
 
-Generating the 1,500 `pairs-v3` synthetic pairs with Gemini cost $0.80 (6 min). A monthly E2B retrain, train → GGUF all in the cloud, costs under $1; David's inference, $0.
+Generating 1,500 synthetic pairs with Gemini costs under $1 (about 6 min). A monthly E2B retrain, train → GGUF all in the cloud, costs under $1; David's inference, $0.
 
 ## Versions
 
@@ -256,7 +256,7 @@ Models come from environment variables (`GEMINI_MODEL`, `GEMMA_BASE_MODEL`, `LOC
 | --- | --- | --- |
 | `data/terms.jsonl` (406 terms) and `data/raw/web_usage*.jsonl` (739 sentences) | 57 web sources from MX, GT, CO and Latin America, accessed 2026-09-30 and 2026-10-01 ([SOURCES.md](data/SOURCES.md)); a general-speech corpus (S63) only to count ambiguous terms | WikiLengua (CC BY-SA 3.0), Wiktionary (CC BY-SA 4.0) and diccionario-chapin (MIT) are reused under their licenses with per-record attribution. From all-rights-reserved sources only facts (a term and its meaning, paraphrased) and one short attributed quotation per entry are taken, for research and education. |
 | `data/pairs/test_web.jsonl` (522 pairs, 399 `auto_validated`) and `data/pairs/real_train.jsonl` (334 pairs) | Real sentences from those sources; the reference is the curator's rewrite (under 30% are curator-written sentences, marked `example_origin=curator`) | Same as the source; pairs quoting CC BY-SA examples inherit share-alike for that text. |
-| `data/pairs/synthetic.jsonl` (1,375 pairs) | `gemini-3.8-flash`, prompt `pairs-v3`, base seed 2027; training only | Every pair records model, prompt version, seed and the term ids it was built from. |
+| `data/pairs/synthetic.jsonl` and `synthetic_multi.jsonl` (synthetic pairs) | `gemini-3.8-flash`, meaning-validated counterparts (`data/counterparts.jsonl`), base seed 2027; training only | Every pair records model, prompt version, seed and the term ids it was built from. |
 | `data/pairs/human.jsonl` | Each event's audience, approved in `/admin` (`make export`) | Provenance: event and Firestore id. |
 
 Known limitations (from the datasheet): Guatemalan youth slang is thinly documented online; slang ages fast; references are one person's, so chrF++ underestimates valid alternative translations.

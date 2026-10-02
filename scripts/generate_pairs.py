@@ -1,21 +1,19 @@
-"""Generate synthetic TRAINING pairs with Gemini, built from the term bank (pairs-v5).
+"""Generate synthetic TRAINING pairs with Gemini, built from the term bank ("pares sintéticos").
 
     uv run --project duel python scripts/generate_pairs.py [--target 1500] [--seed 2027]
 
-History, because the talk shows it:
-- pairs-v1 let Gemini paraphrase freely: David learned to add "mijo" and extra clauses.
-- pairs-v2 asked for minimal edits: chrF++ went up, but the term-level eval showed David often
-  left the slang alone or borrowed another country's slang.
-- pairs-v3 (this file) makes every pair a *term substitution* checked against the term bank:
-    * each call names the slang term AND its counterpart in the other generation, same country;
-    * rebalanced toward papás -> Gen Z (the direction David was worst at);
-    * hard negatives: "in Mexico it's «feria», not «pisto» (Guatemala)";
-    * every pair is validated against the term bank; the reasons for rejection are counted.
-- pairs-v5 (this file now): v3 found each counterpart as the embedding-nearest term, and 175 of its 217
-  links meant something else ("brainrot -> patatús"). Counterparts now come only from the
-  meaning-validated table (data/counterparts.jsonl, scripts/build_counterparts.py). Without a
-  validated counterpart, the parents' side says the term's MEANING in plain words, and calls that
-  need a parents' term (p2g_parent, g2p_parent) are skipped. v3 lives in data/pairs/archive/.
+Every pair is a *term substitution* checked against the term bank:
+- each call names a slang term and, only when the meaning-validated lexicon has one
+  (data/counterparts.jsonl, scripts/build_counterparts.py), its counterpart in the other generation;
+  without a counterpart the parents' side says the term's MEANING in plain words, and calls that need
+  a parents' term are skipped;
+- rebalanced toward papás -> Gen Z (the direction David was worst at);
+- hard negatives: "in Mexico it's «feria», not «pisto» (Guatemala)";
+- every pair is validated against the term bank; the reasons for rejection are counted.
+
+Dead ends, in one line each (docs/BITACORA.md): free paraphrases taught David to rewrite everything;
+minimal edits left the slang alone; counterparts picked by embedding meant something else (those
+pairs are archived in data/pairs/archive/ and only used as rejected answers for ORPO).
 
 Traps (hard negatives) are the foreign term nearest by embedding (cached vectors, no model call).
 Why synthetic only for training: a test set written by Gemini would reward Gemini (Goliath) for
@@ -46,7 +44,7 @@ from genlingo_duel.prompts import COUNTRIES  # noqa: E402
 from genlingo_duel.settings import get_settings, goliath_prices  # noqa: E402
 from genlingo_duel.terms import TermBank  # noqa: E402
 
-PROMPT_VERSION = "pairs-v5"
+PROMPT_VERSION = "synthetic-2026-10b"  # data-date name, like the model tags
 PAIRS_PER_CALL = 4
 MAX_WORDS = 30
 # Share of calls per kind (p2g = papás -> Gen Z, g2p = Gen Z -> papás). 60 % p2g.

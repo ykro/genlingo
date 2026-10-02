@@ -14,104 +14,63 @@ set; los números de su momento (sobre sets anteriores) están en el historial d
 | Fecha | Iteración | Qué cambió | Jerga resuelta | Costo |
 | --- | --- | --- | --- | --- |
 | 2026-09-30 | Base sin afinar | Gemma 4 E2B tal cual | 58 % | $0 |
-| 2026-09-30 | `pairs-v1` (descartado) | Paráfrasis libres generadas por Gemini | chrF++ 39.1, por debajo de la base | $0 (laptop) |
-| 2026-10-01 | `genlingo-2026-09` | Pares de edición mínima (`pairs-v2`) | 62 % | $0.41 |
-| 2026-10-01 | `genlingo-2026-10-e2b` | Pares anclados en el banco (`pairs-v3`) + prompt con glosario | 67 % (Q4) | $0.67 |
-| 2026-10-01 | `genlingo-2026-10-e4b` (descartado) | Base más grande, E4B | 67 %, p50 836 ms | $0.98 |
+| 2026-10-01 | `genlingo-2026-09` | Pares de edición mínima | 62 % | $0.41 |
+| 2026-10-01 | `genlingo-2026-10-e2b` | Pares anclados en el banco + prompt con glosario | 67 % (Q4) | $0.67 |
 | 2026-10-01 | Barrido de cuantización | Q5_K_M en vez de Q4_K_M | 74 % | $0 (laptop) |
 | 2026-10-02 | `genlingo-2026-10b-e2b` | Oraciones reales + banco de 406 términos | **82 %** | $0.71 |
 | | Goliath (referencia) | `gemini-3.8-flash`, sin glosario | 78 % | $1.08 / 1,000 frases |
 | | Goliath + el mismo glosario | El banco de David en el prompt de Gemini | 82 % | $1.24 / 1,000 frases |
 
-## 1 · Paráfrasis libres (`pairs-v1`): el primer callejón sin salida
+## Callejones sin salida, en una línea
 
-- **Qué:** 1,000 pares sintéticos donde Gemini reescribía la frase entera «como lo diría la otra
-  generación». LoRA en la Mac (MPS), 36.9 min.
-- **Resultado:** chrF++ **39.1**, por debajo de la base sin afinar (47.1) y de copiar la frase (50.0).
-  David aprendió a parafrasear todo, no a cambiar la jerga.
-- **Lección:** una reescritura de registro cambia pocas palabras. Si el dato cambia todo, el modelo
-  cambia todo. Detalle en [evals/experiments/2026-09-pairs-v1.md](../evals/experiments/2026-09-pairs-v1.md).
+- **Paráfrasis libres** (2026-09-30): David aprendió a reescribir todo y quedó por debajo de no hacer nada (chrF++ 39.1 contra 50.0 de copiar la frase; [detalle](../evals/experiments/2026-09-parafrasis-libres.md)).
+- **Un modelo más grande** (E4B, 2026-10-01, $0.98): la misma jerga resuelta que E2B (67 %) con p50 de 836 ms; más modelo no compró más jerga.
+- **Q4_K_M**: perdía 7 puntos de jerga contra f16; Q5_K_M no pierde nada y pesa 3.62 GB.
+- **Entrenar, fusionar y convertir en un solo job** (`zct96`, $0.63): murió por memoria, porque en Cloud Run el disco vive en la memoria; ahora son dos jobs.
+- **Contrapartes por *embedding***: 175 de 217 enlaces significaban otra cosa («brainrot → patatús») y estaban en 1,065 de 1,375 pares sintéticos; quedan archivados solo como respuestas rechazadas.
 
-## 2 · Pares de edición mínima (`genlingo-2026-09`)
+## 1 · Pares de edición mínima (`genlingo-2026-09`)
 
-- **Qué:** `pairs-v2`, la misma frase con solo los términos de jerga cambiados. Primer entrenamiento en
-  la nube (Cloud Run Job con una L4), 17.4 min.
-- **Resultado:** **62 %** de jerga resuelta, chrF++ 55.0. Arriba de la base (58 %), pero casi todo el
-  avance está en Gen Z → papás; en papás → Gen Z resuelve solo el 20 %.
-- **Costo:** $0.41. Antes hubo tres corridas fallidas que también se pagaron: sin `gcc` para Triton
-  ($0.26), y dos donde el GGUF se escribía en el bucket montado a ~3 MB/s ($0.74 y una sin registro).
+La misma frase con solo los términos de jerga cambiados, generada por Gemini; primer entrenamiento en la
+nube (Cloud Run con una L4, 17.4 min, $0.41). **62 %** de jerga resuelta, arriba de la base (58 %), pero
+casi todo en Gen Z → papás: en papás → Gen Z resolvía el 20 %. Antes hubo tres corridas fallidas que
+también se pagaron (sin `gcc` para Triton, y el GGUF escrito en el bucket montado a ~3 MB/s).
 
-## 3 · Pares anclados en el banco + glosario (`genlingo-2026-10-e2b`)
+## 2 · Pares anclados en el banco + glosario (`genlingo-2026-10-e2b`)
 
-- **Qué:** `pairs-v3`. Cada par nombra un término del banco y su contraparte de la otra generación del
-  mismo país, con trampas de otro país como negativos difíciles; 60 % papás → Gen Z. El prompt empieza
-  por el país y lleva un glosario de cuatro entradas recuperadas con EmbeddingGemma. David se entrena con
-  ese mismo prompt.
-- **Resultado:** **67 %** en Q4_K_M; papás → Gen Z sube de 20 % a 31 %.
-- **Costo:** $0.67 (28.2 min). Generar los 1,500 pares con Gemini costó $0.80.
+Cada par nombra un término del banco y su contraparte de la otra generación del mismo país, con trampas
+de otro país como negativos difíciles y 60 % papás → Gen Z. El prompt empieza por el país y lleva un
+glosario de cuatro entradas recuperadas con EmbeddingGemma; David se entrena con ese mismo prompt.
+**67 %** en Q4_K_M y **74 %** en Q5_K_M tras el barrido de cuantización; papás → Gen Z sube de 20 % a 43 %.
+$0.67 de entrenamiento y $0.80 de pares.
 
-## 4 · Un modelo más grande no era la respuesta (E4B)
+## 3 · Oraciones reales (`genlingo-2026-10b-e2b`, en escena)
 
-- **Qué:** la misma receta sobre Gemma 4 E4B.
-- **Resultado:** **67 %**, igual que E2B, con p50 de 836 ms (al límite del segundo) y 5.3 GB. Fusionarlo
-  no cupo en los 32 GiB del job; terminó en la laptop con `make train-finish`.
-- **Costo:** $0.98. Quedó fuera de escena: más modelo no compró más jerga.
+Segunda ronda de investigación web: 22 fuentes, 146 términos y 420 oraciones reales. La mitad fue al set
+de prueba; la otra mitad, a 334 pares de entrenamiento anclados en la oración real, en las dos
+direcciones. **82 %**, +8 puntos, casi todo en papás → Gen Z (43 % → 59 %): supera a Goliath sin glosario
+(78 %) y empata con Goliath + glosario (82 %). Entrenar, fusionar y cuantizar de punta a punta en la nube
+costó **$0.71**. Se entrenó como `genlingo-2026-11-e2b` y se renombró: los tags llevan la fecha de los
+datos (segunda versión de octubre).
 
-## 5 · Q4 perdía jerga: barrido de cuantización
+## 4 · Set de prueba limpio
 
-- **Qué:** el mismo David 2026-10 exportado en Q4_K_M, Q5_K_M, Q6_K, Q8_0 y Q4/Q5 calibrados con imatrix.
-- **Resultado:** Q4_K_M perdía **7 puntos** contra f16 (67 % contra 74 %). Q5_K_M (3.62 GB) queda a la
-  par del f16 (9.27 GB) con la misma latencia. Regla desde entonces: el archivo más pequeño a ≤ 2 puntos
-  del f16, con p50 < 1 s.
-- **Costo:** $0, todo en la laptop.
+Dos frases de prueba estaban citadas dentro de pares de entrenamiento más largos. La validación ahora
+compara subcadenas, crudas y normalizadas, contra todos los archivos de entrenamiento: 4 pares de prueba
+fuera (403 → 399), quitados del set de prueba y no del entrenamiento porque David ya estaba entrenado.
 
-## 6 · Oraciones reales (`genlingo-2026-10b-e2b`)
+## 5 · Contrapartes por significado (en curso)
 
-- **Qué:** una segunda ronda de investigación web (22 fuentes nuevas, 146 términos, 420 oraciones reales).
-  La mitad de las oraciones fue al set de prueba; la otra mitad se convirtió en 334 pares de entrenamiento
-  anclados en la oración real, en las dos direcciones. El banco creció a 406 términos y los sintéticos se
-  refiltraron contra él (1,375).
-- **Resultado:** **82 %**, +8 puntos sobre el David anterior en la misma compresión, casi todo en
-  papás → Gen Z (43 % → 59 %). Supera a Goliath sin glosario (78 %) y empata con Goliath + glosario (82 %).
-- **Tropiezo:** el job único (entrenar + fusionar + GGUF) murió por memoria al convertir a f16 (`zct96`,
-  $0.63): en Cloud Run el disco vive en la memoria. Se dividió en dos jobs (L4 entrena, CPU fusiona y
-  cuantiza), y la primera corrida de punta a punta costó **$0.71**.
-- **Nombre:** se entrenó como `genlingo-2026-11-e2b` y se renombró: los tags llevan la fecha de los datos
-  (segunda versión de octubre), no la del entrenamiento.
-
-## 7 · Limpieza del set de prueba
-
-- **Qué:** la revisión encontró dos frases de prueba citadas dentro de pares de entrenamiento más largos.
-  La validación ahora compara subcadenas, crudas y normalizadas, contra todos los archivos de entrenamiento.
-- **Resultado:** 4 pares de prueba fuera (403 → 399). Se quitaron del set de prueba, no del entrenamiento,
-  porque David ya estaba entrenado. Todos los números de esta bitácora son del set limpio.
-
-## 8 · El error de las contrapartes (callejón sin salida descubierto tarde)
-
-- **Qué:** una revisión de los datos encontró que `pairs-v3` elegía la contraparte de cada término como
-  su vecino más cercano por *embedding* del texto «término: significado», que pesa más la forma de la
-  palabra que su significado. **175 de los 217 enlaces** término → contraparte tenían coseno < 0.6 y
-  significaban otra cosa («brainrot → patatús», «luca → crush», «slay → tener el tupé»), y cubrían
-  **1,065 de los 1,375** pares sintéticos. David llegó al 82 % aprendiendo, en parte, sustituciones con el
-  significado equivocado. Además, en el entrenamiento el término correcto estaba en el glosario solo el
-  45 % de las veces.
-- **Qué cambió:**
-  1. **Contrapartes validadas por significado** (`data/counterparts.jsonl`): vecinos mutuos con coseno
-     ≥ 0.65, o la elección de Gemini entre los 5 candidatos confirmada por una palabra de significado
-     compartida. Solo 63 de 382 términos tienen contraparte: la mayoría de las expresiones de papás no
-     tiene un equivalente Gen Z en el banco, y es mejor decir el significado que inventar uno.
-  2. **`pairs-v5`** (1,500 pares, $0.71) y **pares de varios términos** (800, $0.51) generados solo con
-     esos enlaces; sin contraparte, el lado de papás dice el significado con palabras normales.
-  3. **Glosario de léxico** (`v2+lex`): cada término de la frase con su contraparte validada, términos
-     cercanos y un término de otro país marcado como «NO de aquí»; en el entrenamiento, la respuesta
-     está en el glosario en el 85 % de los ejemplos.
-  4. **Etapa de preferencias (ORPO)** en el mismo job: 8 respuestas por frase, ordenadas con el banco;
-     los pares viejos con el significado equivocado son las respuestas rechazadas.
-  5. **N-best**: varias respuestas en paralelo y el banco elige.
-  6. **Un set de desarrollo** (73 pares reales, 20 % de los reales de entrenamiento) para decidir, y
-     métricas que miran el significado (jerga correcta), registradas antes de calcularlas.
-- **Resultado:** pendiente de la próxima corrida; se anota aquí con los números de desarrollo primero
-  y del set de prueba una sola vez.
+La revisión de datos encontró el error de las contrapartes (arriba) y que, al entrenar, el término
+correcto estaba en el glosario solo el 45 % de las veces. Lo que cambia para el próximo David:
+contrapartes validadas por significado (`data/counterparts.jsonl`; solo 63 de 382 términos tienen una,
+y sin contraparte se dice el significado), pares sintéticos regenerados con ellas (1,500, $0.71) y pares
+que cambian 2–3 términos a la vez (800, $0.51); un glosario de léxico con cada término y su contraparte,
+términos cercanos y uno de otro país marcado «NO de aquí», con la respuesta presente en el 85 % de los
+ejemplos de entrenamiento; una etapa de preferencias (ORPO) en el mismo job, que ordena 8 respuestas con
+el banco; N respuestas en paralelo al traducir, elegidas por el banco; más oraciones reales de Guatemala
+y Colombia; y un set de desarrollo (73 pares reales) para decidir sin tocar el set de prueba, con
+métricas de significado registradas antes de calcularlas. Resultado: pendiente de la corrida.
 
 ## Dónde gana David hoy, y dónde no
 
@@ -120,8 +79,8 @@ pareado ([evals/niche_report.md](../evals/niche_report.md)).
 
 | Nicho | n | David | Goliath | Δ | IC 95 % | Veredicto |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 · Slang chapín (GT) | 115 | 78 % | 70 % | +7.8 | [+0.0, +15.7] | empate estadístico |
-| 2 · Papás → Gen Z en GT y CO | 106 | 65 % | 49 % | +16.0 | [+3.8, +28.3] | **gana David** |
+| Slang chapín (GT) | 115 | 78 % | 70 % | +7.8 | [+0.0, +15.7] | empate estadístico |
+| Papás → Gen Z (GT/CO) | 106 | 65 % | 49 % | +16.0 | [+3.8, +28.3] | **gana David** |
 | Todo el set | 398 | 82 % | 78 % | +3.8 | [−0.5, +8.0] | empate estadístico |
 
 - **Gana** en papás → Gen Z para Guatemala y Colombia: es justo lo que enseñan los pares reales.

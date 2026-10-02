@@ -1,9 +1,9 @@
 """Real usage sentences from the web, and how they are split between test and training.
 
-Two collection rounds live in data/raw/: web_usage.jsonl (round 1, all test) and
-web_usage_v2.jsonl (round 2). Round 2 is split deterministically by id: half goes to the test
-set (more real references), half becomes *training* pairs anchored in real sentences
-(scripts/build_real_pairs.py). A sentence is never in both.
+Collection rounds live in data/raw/: web_usage.jsonl (2026-09-30, all test),
+web_usage_2026-10-01.jsonl (split deterministically by id: half test, half *training* pairs anchored
+in real sentences, scripts/build_real_pairs.py) and web_usage_2026-10-02.jsonl (training and dev only).
+A sentence is never in two of test, dev and training.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ from genlingo_duel.dataset import read_jsonl
 
 # round 1: all test; round 2: half test, half training; round 3: training (and dev), never test —
 # the test set and the niches were frozen before round 3 existed.
-ROUNDS = {"web_usage.jsonl": "test", "web_usage_v2.jsonl": "split", "web_usage_v3.jsonl": "train"}
+ROUNDS = {"web_usage.jsonl": "test", "web_usage_2026-10-01.jsonl": "split", "web_usage_2026-10-02.jsonl": "train"}
 
 
 def assignment(row_id: str) -> str:

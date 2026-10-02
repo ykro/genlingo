@@ -44,7 +44,7 @@ def _cos(a: list[float], b: list[float]) -> float:
     return sum(x * y for x, y in zip(a, b)) / (na * nb) if na and nb else 0.0
 
 
-LEX_K = 6  # entries in a v2+lex glossary
+LEX_K = 6  # entries in a lexicon glossary
 
 
 def load_counterparts(path: Path) -> dict[str, str | None]:
@@ -102,7 +102,7 @@ class Glossary:
         return {"id": tid, "term": t["term"], "meaning": t["meaning"], "generation": t["generation"], "country": t["country"], **extra}
 
     async def lex_entries(self, phrase: str, direction: str, country: str, k: int = LEX_K) -> list[dict]:
-        """v2+lex: each source-generation term in the phrase with its validated counterpart, then the
+        """Lexicon glossary: each source-generation term in the phrase with its validated counterpart, then the
         nearest target-generation terms, then one foreign term marked as such; shuffled per phrase."""
         allowed = [country, "LATAM"]
         source_gen, target_gen = ("genz", "parent") if direction == "genz_to_parent" else ("parent", "genz")

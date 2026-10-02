@@ -27,7 +27,7 @@ from .dataset import read_jsonl
 from .glossary import Glossary, hashing_embedder, load_counterparts
 from .glossary import render as render_glossary
 from .rerank import NBestClient, term_bank_scorer
-from .prompts import COUNTRIES, GLOSSARY_STYLES, STYLES, Direction, prompt_version, translation_messages
+from .prompts import COUNTRIES, GLOSSARY_STYLES, STYLES, canonical_style, Direction, prompt_version, translation_messages
 from .runs import load_run
 from .settings import Settings, goliath_prices
 from .terms import TermBank
@@ -51,9 +51,10 @@ def _mock_responder(table: dict[str, str]):
 def prompt_style_for(settings: Settings, david_tag: str) -> str:
     """Each David is prompted the way its training data was rendered (recorded in its run file)."""
     run = load_run(settings.runs_dir, david_tag)  # exports (-f16, -q5_k_m…) share their run's prompt
-    if run and run.get("prompt_style") in STYLES:
-        return run["prompt_style"]
-    return settings.david_prompt_style
+    style = canonical_style(run.get("prompt_style")) if run else None
+    if style in STYLES:
+        return style
+    return canonical_style(settings.david_prompt_style)
 
 
 @dataclass
@@ -128,7 +129,7 @@ class Arena:
     ) -> dict[str, ContenderResult]:
         s = self.settings
         tag = david_tag or s.david_tag
-        styles = {"david": prompt_style_for(s, tag), "goliath": s.goliath_prompt_style}
+        styles = {"david": prompt_style_for(s, tag), "goliath": canonical_style(s.goliath_prompt_style)}
         glossaries: dict[str, tuple[list[dict], float, str | None]] = {}
         for style in {st for st in styles.values() if st in GLOSSARY_STYLES}:
             glossaries[style] = await self.glossary_entries(style, phrase, direction, country)

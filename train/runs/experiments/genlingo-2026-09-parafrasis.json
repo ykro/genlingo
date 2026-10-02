@@ -1,5 +1,5 @@
 {
-  "tag": "genlingo-2026-09-pairs-v1",
+  "tag": "genlingo-2026-09-parafrasis",
   "app": "genlingo",
   "where": "local",
   "machine": "Apple M1 Max 64 GB (local, MPS)",
@@ -45,5 +45,6 @@
     "gguf_s": 75.3,
     "total_s": 2211.2
   },
-  "note": "First run on pairs-v1 (free paraphrase) synthetic data; superseded by pairs-v2. Kept to show the effect of data quality. GGUFs kept on the laptop only (Ollama: genlingo-2026-09-pairs-v1, -f16)."
+  "note": "First run on pairs-v1 (free paraphrase) synthetic data; superseded by pairs-v2. Kept to show the effect of data quality. GGUFs kept on the laptop only (Ollama: genlingo-2026-09-pairs-v1, -f16).",
+  "renamed_from": "genlingo-2026-09-pairs-v1"
 }

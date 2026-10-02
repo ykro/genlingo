@@ -22,7 +22,7 @@ export interface Round {
   id: string;
   number: number | null;
   round_type: "evaluation" | "audience";
-  /** e.g. "Ronda de especialidad: slang chapín" (niche 1 of evals/niche.md). */
+  /** e.g. "Ronda de especialidad: slang chapín" (the «slang chapín» niche of evals/niche.md). */
   label?: string | null;
   phrase: string;
   direction: Direction;

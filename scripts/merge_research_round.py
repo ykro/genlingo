@@ -1,10 +1,10 @@
-"""Fold a research round (data/raw/*_vN) into the term bank and SOURCES.md.
+"""Fold a research round (data/raw/*_<date>) into the term bank and SOURCES.md.
 
-    uv run --project duel python scripts/merge_research_round.py [v2|v3]
+    uv run --project duel python scripts/merge_research_round.py 2026-10-02   # the round's date
 
-- terms_vN.jsonl -> appended to terms.jsonl (skipping a term already present for the same country);
-- sources_vN.md  -> its table rows appended to the SOURCES.md table, its notes under "Round 2".
-web_usage_vN.jsonl stays in data/raw/: scripts/real_usage.py splits it (v2: test/train; v3: train/dev).
+- terms_<date>.jsonl -> appended to terms.jsonl (skipping a term already present for the same country);
+- sources_<date>.md -> its table rows appended to the SOURCES.md table, its notes under the round's title.
+web_usage_<date>.jsonl stays in data/raw/: scripts/real_usage.py splits it (2026-10-01: test/train; 2026-10-02: train/dev).
 Idempotent: running it twice adds nothing.
 """
 
@@ -18,8 +18,8 @@ from genlingo_duel.dataset import read_jsonl, write_jsonl
 from genlingo_duel.terms import normalize
 
 RAW = DATA / "raw"
-ROUND = sys.argv[1] if len(sys.argv) > 1 else "v2"
-ROUND_TITLE = {"v2": "Round 2 (2026-10-01)", "v3": "Round 3 (2026-10-02)"}
+ROUND = sys.argv[1] if len(sys.argv) > 1 else "2026-10-01"
+ROUND_TITLE = {"2026-10-01": "Round 2 (2026-10-01)", "2026-10-02": "Round 3 (2026-10-02)"}
 
 
 def merge_terms() -> int:

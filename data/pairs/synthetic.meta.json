@@ -1,6 +1,6 @@
 {
   "model": "gemini-3.8-flash",
-  "prompt_version": "pairs-v5",
+  "prompt_version": "synthetic-2026-10b",
   "base_seed": 2027,
   "calls": 616,
   "generated": 2464,

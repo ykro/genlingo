@@ -30,7 +30,7 @@ DIRECTION_TEXT: dict[Direction, tuple[str, str]] = {
 }
 
 TRANSLATE = PromptTemplate(
-    version="translate-v1",
+    version="translate-plain",
     system=(
         "Eres un traductor generacional del español de {country_name}. "
         "Reescribe la frase del habla de {source_gen} al habla de {target_gen}, "
@@ -40,10 +40,10 @@ TRANSLATE = PromptTemplate(
     user="{phrase}",
 )
 
-# v2: the country comes first and is explicit (no slang from other countries), and an optional
+# The country comes first and is explicit (no slang from other countries), and an optional
 # glossary from our term bank closes the system prompt.
-TRANSLATE_V2 = PromptTemplate(
-    version="translate-v2",
+TRANSLATE_COUNTRY = PromptTemplate(
+    version="translate-country",
     system=(
         "Variante: español de {country_name}. Usa solo expresiones de {country_name}; "
         "no mezcles jerga de otros países.\n"
@@ -57,34 +57,43 @@ TRANSLATE_V2 = PromptTemplate(
 
 # Prompt styles: the duel uses, for each David tag, the style its training data was rendered
 # with (train/runs/<tag>.json); base models and Goliath can use any of them.
-# v2+glossary: glossary = slang found in the phrase + nearest terms by embedding.
-# v2+lex: glossary from the meaning-validated lexicon: each slang term found in the phrase WITH its
+# plain: the first prompt, no country rules.  country: the country first, no foreign slang.
+# glossary: country + slang found in the phrase + nearest terms by embedding.
+# lexicon: country + the meaning-validated lexicon: each slang term found in the phrase WITH its
 # counterpart in the other generation, nearest terms to fill, and one term from another country
-# marked as such (k=6). David trained on v2+lex sees the answer when the lexicon has it.
-STYLES = ("v1", "v2", "v2+glossary", "v2+lex")
-GLOSSARY_STYLES = {"v2+glossary": "embed", "v2+lex": "lex"}
+# marked as such (k=6). A David trained on it sees the answer when the lexicon has it.
+STYLES = ("plain", "country", "glossary", "lexicon")
+GLOSSARY_STYLES = {"glossary": "embed", "lexicon": "lex"}
+# Names in run files and results written before the styles had descriptive names.
+STYLE_ALIASES = {"v1": "plain", "v2": "country", "v2+glossary": "glossary", "v2+lex": "lexicon"}
+
+
+def canonical_style(style: str | None) -> str | None:
+    return STYLE_ALIASES.get(style, style) if style else style
 
 
 def translation_messages(
     phrase: str,
     direction: Direction,
     country: str,
-    style: str = "v1",
+    style: str = "plain",
     glossary: str = "",
 ) -> list[Message]:
     if direction not in DIRECTION_TEXT:
         raise ValueError(f"dirección desconocida: {direction}")
     if country not in COUNTRIES:
         raise ValueError(f"país desconocido: {country}")
+    style = canonical_style(style)
     if style not in STYLES:
         raise ValueError(f"estilo de prompt desconocido: {style}")
     source_gen, target_gen = DIRECTION_TEXT[direction]
     fields = dict(country_name=COUNTRIES[country], source_gen=source_gen, target_gen=target_gen, phrase=phrase.strip())
-    if style == "v1":
+    if style == "plain":
         return TRANSLATE.render(**fields)
-    return TRANSLATE_V2.render(**fields, glossary=glossary if style in GLOSSARY_STYLES else "")
+    return TRANSLATE_COUNTRY.render(**fields, glossary=glossary if style in GLOSSARY_STYLES else "")
 
 
 def prompt_version(style: str) -> str:
-    return {"v1": TRANSLATE.version, "v2": TRANSLATE_V2.version, "v2+glossary": TRANSLATE_V2.version + "+glossary",
-            "v2+lex": TRANSLATE_V2.version + "+lex"}[style]
+    style = canonical_style(style)
+    return {"plain": TRANSLATE.version, "country": TRANSLATE_COUNTRY.version, "glossary": TRANSLATE_COUNTRY.version + "+glossary",
+            "lexicon": TRANSLATE_COUNTRY.version + "+lexicon"}[style]

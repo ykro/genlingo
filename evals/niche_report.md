@@ -8,8 +8,8 @@ David: `genlingo-2026-10b-e2b + glosario`. Rival del nicho: `gemini-3.8-flash` (
 
 | corte | n | David | rival | Δ (puntos) | IC 95 % | victorias de David | chrF++ David / rival | veredicto |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Nicho 1 · slang chapín (GT) | 115 | 78 % | 70 % | +7.8 | [+0.0, +15.7] | 70 % (16–7) | 61.2 / 51.4 | **empate estadístico** |
-| Nicho 2 · papás → Gen Z en GT y CO | 106 | 65 % | 49 % | +16.0 | [+3.8, +28.3] | 68 % (32–15) | 47.1 / 41.8 | **gana David** |
+| Slang chapín (GT) | 115 | 78 % | 70 % | +7.8 | [+0.0, +15.7] | 70 % (16–7) | 61.2 / 51.4 | **empate estadístico** |
+| Papás → Gen Z (GT/CO) | 106 | 65 % | 49 % | +16.0 | [+3.8, +28.3] | 68 % (32–15) | 47.1 / 41.8 | **gana David** |
 | Todo el set | 398 | 82 % | 78 % | +3.8 | [-0.5, +8.0] | 60 % (46–31) | 56.6 / 53.1 | **empate estadístico** |
 | País GT | 115 | 78 % | 70 % | +7.8 | [+0.0, +15.7] | 70 % (16–7) | 61.2 / 51.4 | **empate estadístico** |
 | País MX | 78 | 79 % | 82 % | -2.6 | [-12.8, +7.7] | 44 % (8–10) | 50.9 / 51.3 | **empate estadístico** |
@@ -20,8 +20,8 @@ David: `genlingo-2026-10b-e2b + glosario`. Rival del nicho: `gemini-3.8-flash` (
 
 | corte | n | David | rival | Δ (puntos) | IC 95 % | victorias de David | chrF++ David / rival | veredicto |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Nicho 1 · slang chapín (GT) | 115 | 78 % | 77 % | +0.9 | [-7.8, +9.6] | 52 % (14–13) | 61.2 / 58.5 | **empate estadístico** |
-| Nicho 2 · papás → Gen Z en GT y CO | 107 | 64 % | 60 % | +4.7 | [-6.5, +16.8] | 56 % (23–18) | 47.3 / 45.1 | **empate estadístico** |
+| Slang chapín (GT) | 115 | 78 % | 77 % | +0.9 | [-7.8, +9.6] | 52 % (14–13) | 61.2 / 58.5 | **empate estadístico** |
+| Papás → Gen Z (GT/CO) | 107 | 64 % | 60 % | +4.7 | [-6.5, +16.8] | 56 % (23–18) | 47.3 / 45.1 | **empate estadístico** |
 | Todo el set | 399 | 82 % | 82 % | -0.8 | [-5.0, +3.5] | 48 % (36–39) | 56.6 / 56.5 | **empate estadístico** |
 | País GT | 115 | 78 % | 77 % | +0.9 | [-7.8, +9.6] | 52 % (14–13) | 61.2 / 58.5 | **empate estadístico** |
 | País MX | 78 | 79 % | 86 % | -6.4 | [-16.7, +3.8] | 35 % (6–11) | 50.9 / 51.6 | **empate estadístico** |

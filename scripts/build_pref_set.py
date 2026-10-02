@@ -9,8 +9,8 @@ rendered the same way for the rejects) and term-bank patterns the job uses to ra
 - training prompts (`--n`, stratified toward GT and papás -> Gen Z): `must` = the target-side terms
   of the reference, `must_not` = source slang that has to go + other countries' slang of the target
   generation. The job samples 8 answers and keeps the best and the worst.
-- ready-made rejects (`--rejects`): pairs-v3 pairs whose counterpart link fails the meaning check
-  (data/pairs/archive/synthetic_v3.jsonl vs data/counterparts.jsonl). Their v3 target used a term
+- ready-made rejects (`--rejects`): archived pairs whose counterpart link fails the meaning check
+  (data/pairs/archive/wrong_meaning_pairs.jsonl vs data/counterparts.jsonl). Their target used a term
   with another meaning: it becomes `rejected`, and that wrong term goes into `must_not`.
 
 Only training data is read: never the test or dev sets.
@@ -48,7 +48,7 @@ def spec(bank: TermBank, direction: str, country: str, source: str, reference: s
 
 
 def wrong_term(prov: dict, cps: dict) -> str | None:
-    """The term in a v3 target that came from an unvalidated (wrong-meaning) link, if any."""
+    """The term in an archived target that came from an unvalidated (wrong-meaning) link, if any."""
     a, c, kind = prov.get("term_id"), prov.get("counterpart_id"), prov.get("kind")
     if not a or not c or cps.get(a) == c or cps.get(c) == a:
         return None
@@ -77,19 +77,19 @@ async def main_async(n: int, n_rejects: int, seed: int) -> None:
         rows.append({"id": r["id"], "messages": r["messages"][:-1], "reference": r["messages"][-1]["content"],
                      "must": must, "must_not": must_not})
 
-    # Ready-made rejects from pairs-v3: same prompt rendering as training and the stage (v2+lex).
+    # Ready-made rejects from the archived wrong-meaning pairs: same prompt rendering as training and the stage (lexicon).
     if s.mock_ai or not s.embedding_model:
         glossary = await Glossary(bank, hashing_embedder(), counterparts=cps).load()
     else:
         ollama = OllamaClient(s.ollama_url)
         glossary = await Glossary(bank, lambda t: ollama.embed(t, model=s.embedding_model),
                                   cache=DATA / ".cache" / "term_embeddings.json", model=s.embedding_model, counterparts=cps).load()
-    v3 = [p for p in read_jsonl(DATA / "pairs" / "archive" / "synthetic_v3.jsonl")]
-    bad = [(p, w) for p in v3 if (w := wrong_term(p["provenance"], cps)) and bank.found(w, p["target"])]
+    archived = list(read_jsonl(DATA / "pairs" / "archive" / "wrong_meaning_pairs.jsonl"))
+    bad = [(p, w) for p in archived if (w := wrong_term(p["provenance"], cps)) and bank.found(w, p["target"])]
     rng.shuffle(bad)
     for p, w in bad[:n_rejects]:
         entries = await glossary.lex_entries(p["source"], p["direction"], p["country"])
-        msgs = translation_messages(p["source"], p["direction"], p["country"], "v2+lex", render(entries, COUNTRIES[p["country"]]))
+        msgs = translation_messages(p["source"], p["direction"], p["country"], "lexicon", render(entries, COUNTRIES[p["country"]]))
         must, must_not = spec(bank, p["direction"], p["country"], p["source"], "")
         # Reference for the similarity tie-break: the source (a correct answer keeps most of its words), never the reject.
         rows.append({"id": p["id"], "messages": msgs, "reference": p["source"], "rejected": p["target"],
@@ -99,8 +99,8 @@ async def main_async(n: int, n_rejects: int, seed: int) -> None:
         for r in rows:
             fh.write(json.dumps(r, ensure_ascii=False) + "\n")
             n_out += 1
-    print(json.dumps({"rows": n_out, "train_prompts": min(n, len(pool)), "v3_bad_link_rejects": min(n_rejects, len(bad)),
-                      "v3_bad_link_available": len(bad)}))
+    print(json.dumps({"rows": n_out, "train_prompts": min(n, len(pool)), "wrong_meaning_rejects": min(n_rejects, len(bad)),
+                      "wrong_meaning_available": len(bad)}))
 
 
 def main() -> None:
