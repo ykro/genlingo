@@ -36,6 +36,7 @@ from _common import ROOT  # noqa: F401  (puts duel/ on sys.path)
 from duel_core import OllamaClient, cost_usd  # noqa: E402
 from genlingo_duel.dataset import Pair, read_jsonl, write_jsonl  # noqa: E402
 from genlingo_duel.glossary import Glossary, hashing_embedder  # noqa: E402
+from genlingo_duel.overlap import TextIndex  # noqa: E402
 from genlingo_duel.prompts import COUNTRIES  # noqa: E402
 from genlingo_duel.settings import get_settings, goliath_prices  # noqa: E402
 from genlingo_duel.terms import TermBank  # noqa: E402
@@ -234,7 +235,7 @@ def to_pairs(call: dict, raw: list[dict], model: str) -> list[dict]:
     return out
 
 
-def filter_pairs(bank: TermBank, calls_by_seed: dict[int, dict], pairs: list[dict], forbidden: set[str]):
+def filter_pairs(bank: TermBank, calls_by_seed: dict[int, dict], pairs: list[dict], forbidden: TextIndex):
     """Schema, length, duplicates, test leakage, then the term-bank validation."""
     kept, seen, dropped = [], set(), {}
     for p in pairs:
@@ -251,8 +252,8 @@ def filter_pairs(bank: TermBank, calls_by_seed: dict[int, dict], pairs: list[dic
                 reason = "identical"
             elif s in seen:
                 reason = "duplicate"
-            elif s in forbidden or t in forbidden:
-                reason = "test_leak"
+            elif forbidden.overlaps(p["source"]) or forbidden.overlaps(p["target"]):
+                reason = "test_leak"  # also a test sentence quoted inside the pair, or the pair inside one
             else:
                 reason = validate(bank, calls_by_seed[p["provenance"]["seed"]], p)
         if reason:
@@ -263,15 +264,14 @@ def filter_pairs(bank: TermBank, calls_by_seed: dict[int, dict], pairs: list[dic
     return kept, dropped
 
 
-def test_sentences(data_dir: Path) -> set[str]:
-    """Sentences reserved for the test set: the generator must never reproduce them."""
-    forbidden = set()
+def test_sentences(data_dir: Path) -> TextIndex:
+    """Sentences reserved for the test set: the generator must never reproduce them, whole or in part."""
+    texts: list[str] = []
     for row in read_jsonl(data_dir / "raw" / "web_usage.jsonl"):
-        forbidden |= {normalize(row["example"]), normalize(row.get("rewrite", ""))}
+        texts += [row["example"], row.get("rewrite", "")]
     for row in read_jsonl(data_dir / "pairs" / "test_web.jsonl"):
-        forbidden |= {normalize(row["source"]), normalize(row["target"])}
-    forbidden.discard("")
-    return forbidden
+        texts += [row["source"], row["target"]]
+    return TextIndex(texts)
 
 
 async def main_async(args: argparse.Namespace) -> None:

@@ -18,6 +18,7 @@ from build_test_set import source_licenses
 from genlingo_duel.dataset import Pair, read_jsonl, write_jsonl
 from genlingo_duel.terms import TermBank
 from real_usage import usage_rows
+from genlingo_duel.overlap import TextIndex
 from validate_test_set import check, norm
 
 OUT = DATA / "pairs" / "real_train.jsonl"
@@ -26,7 +27,9 @@ OUT = DATA / "pairs" / "real_train.jsonl"
 def main() -> None:
     bank = TermBank(read_jsonl(DATA / "terms.jsonl"), ignore_ambiguous=True)
     licenses = source_licenses((DATA / "SOURCES.md").read_text(encoding="utf-8"))
-    test_text = {norm(x) for r in read_jsonl(DATA / "pairs" / "test_web.jsonl") for x in (r["source"], r["target"])}
+    # Test sentences in use (rejected ones don't count), raw and normalized substrings included.
+    test_text = TextIndex(x for r in read_jsonl(DATA / "pairs" / "test_web.jsonl") if r["status"] != "rejected"
+                          for x in (r["source"], r["target"]))
     seen: set[str] = set()
     pairs, reasons = [], Counter()
     for row in usage_rows("train"):

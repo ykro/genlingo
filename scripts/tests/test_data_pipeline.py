@@ -1,4 +1,5 @@
 from build_test_set import build, source_licenses
+from genlingo_duel.overlap import TextIndex
 from generate_pairs import expected_terms, filter_pairs, mock_generate, plan_calls, render, to_pairs, validate
 from genlingo_duel.terms import TermBank
 
@@ -65,9 +66,20 @@ def test_validate_genz_to_parent_removes_slang():
 def test_filter_counts_reasons_and_mock_pairs_validate():
     calls = plan_calls(BANK, VEC, 40, seed=1)
     pairs = [p for c in calls for p in to_pairs(c, mock_generate(BANK, c), "mock")]
-    kept, dropped = filter_pairs(BANK, {c["seed"]: c for c in calls}, pairs, set())
+    kept, dropped = filter_pairs(BANK, {c["seed"]: c for c in calls}, pairs, TextIndex([]))
     assert kept and all(p["provenance"]["prompt_version"] == "pairs-v3" for p in kept)
     assert all(isinstance(v, int) for v in dropped.values())
+
+
+def test_filter_drops_pairs_that_quote_a_test_sentence():
+    calls = plan_calls(BANK, VEC, 40, seed=1)
+    pairs = [p for c in calls for p in to_pairs(c, mock_generate(BANK, c), "mock")]
+    kept, _ = filter_pairs(BANK, {c["seed"]: c for c in calls}, pairs, TextIndex([]))
+    victim = kept[0]
+    # the test sentence appears inside a longer generated sentence: still a leak
+    leak = TextIndex([victim["source"] + " y eso que ya le había avisado a todos"])
+    kept2, dropped2 = filter_pairs(BANK, {c["seed"]: c for c in calls}, pairs, leak)
+    assert victim["id"] not in {p["id"] for p in kept2} and dropped2.get("test_leak")
 
 
 def test_test_set_builder_maps_direction_license_and_keeps_review():

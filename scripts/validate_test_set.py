@@ -9,30 +9,35 @@ in provenance.validation:
 - papás -> Gen Z: the reference must contain a Gen Z term of its country (or LATAM);
 - no term from another country in the reference;
 - sane length (<= 40 words, reference 0.4x-2.5x the source);
-- no duplicates inside the test set and no overlap with any training sentence.
-Decisions a person made with `make review-test` (approved/rejected) are never overwritten.
+- no duplicates inside the test set and no overlap with any training file (synthetic, real-anchored,
+  audience), including a test sentence quoted inside a longer training sentence or vice versa
+  (raw and normalized substrings, genlingo_duel.overlap).
+A human pass is optional: decisions a person made with `make review-test` (approved/rejected)
+are never overwritten.
 """
 
 from __future__ import annotations
 
-import re
-import unicodedata
 from collections import Counter
 
 from _common import DATA
 from genlingo_duel.dataset import read_jsonl, write_jsonl
+from genlingo_duel.overlap import TextIndex, norm
 from genlingo_duel.terms import TermBank
 
 TEST = DATA / "pairs" / "test_web.jsonl"
+TRAIN_FILES = ("synthetic.jsonl", "real_train.jsonl", "human.jsonl")
+
+__all__ = ["check", "norm", "training_index"]
 
 
-def norm(text: str) -> str:
-    text = unicodedata.normalize("NFKD", text.lower())
-    text = "".join(c for c in text if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9ñ ]+", " ", text)).strip()
+def training_index() -> TextIndex:
+    """Every sentence of every training file (both sides of each pair)."""
+    return TextIndex(x for f in TRAIN_FILES for r in read_jsonl(DATA / "pairs" / f)
+                     if r.get("split") == "train" for x in (r["source"], r["target"]))
 
 
-def check(bank: TermBank, pair: dict, linked: list[str], train_text: set[str], seen: set[str]) -> str | None:
+def check(bank: TermBank, pair: dict, linked: list[str], other: TextIndex, seen: set[str]) -> str | None:
     src, ref, country = pair["source"], pair["target"], pair["country"]
     allowed = [country, "LATAM"]
     ws, wr = len(src.split()), len(ref.split())
@@ -40,7 +45,7 @@ def check(bank: TermBank, pair: dict, linked: list[str], train_text: set[str], s
         return "length"
     if norm(src) in seen:
         return "duplicate_in_test"
-    if norm(src) in train_text or norm(ref) in train_text:
+    if other.overlaps(src) or other.overlaps(ref):
         return "overlaps_training"
     if bank.foreign_in(ref, country):
         return "foreign_term_in_reference"
@@ -59,8 +64,7 @@ def check(bank: TermBank, pair: dict, linked: list[str], train_text: set[str], s
 def main() -> None:
     bank = TermBank(read_jsonl(DATA / "terms.jsonl"), ignore_ambiguous=True)
     linked = {u["id"]: u.get("term_ids", []) for u in read_jsonl(DATA / "raw" / "web_usage.jsonl")}
-    train_text = {norm(x) for f in ("synthetic.jsonl", "human.jsonl") for r in read_jsonl(DATA / "pairs" / f)
-                  if r.get("split") == "train" for x in (r["source"], r["target"])}
+    train_text = training_index()
     rows, seen, reasons = list(read_jsonl(TEST)), set(), Counter()
     for r in rows:
         if r["status"] in ("approved", "rejected") and r["provenance"].get("validation", {}).get("by") != "auto":
