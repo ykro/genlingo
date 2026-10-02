@@ -1,8 +1,6 @@
 # Genlingo — evaluación
 
-Generado por `make eval` el 2026-10-01 15:25. 319 pares de prueba (web; nunca sintéticos).
-
-> **Ensayo:** las referencias de prueba aún están en `pending_review` (sin revisión del presentador). Los números cambiarán al aprobar/corregir el set con `make review-test`.
+Generado por `make eval` el 2026-10-02 07:25. 403 pares de prueba (web; nunca sintéticos), 403 auto_validated. `auto_validated` = validada automáticamente contra el banco de términos (`scripts/validate_test_set.py`).
 
 ## Resumen
 
@@ -10,28 +8,23 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 
 | modelo | rol | prompt | chrF++ | p50 | p95 | costo total | costo / 1,000 frases | tamaño | errores |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma4:e2b-it-qat | base (sin ajuste) | v2 | 48.7 | 370 ms | 495 ms | $0 | $0 | 4.34 GB | 0 |
-| gemma4:e2b-it-qat + glosario | base (sin ajuste) | v2 + glosario | 52.0 | 501 ms | 713 ms | $0 | $0 | 4.34 GB | 0 |
-| gemma4:e4b | base (sin ajuste) | v2 | 47.1 | 775 ms | 1.07 s | $0 | $0 | 6.58 GB | 0 |
-| genlingo-2026-10-e2b + glosario | David (LoRA, Q4) | v2 + glosario | 51.2 | 496 ms | 683 ms | $0 | $0 | 3.42 GB | 0 |
-| genlingo-2026-10-e2b-f16 + glosario | David (LoRA, f16) | v2 + glosario | 51.9 | 534 ms | 776 ms | $0 | $0 | 9.27 GB | 0 |
-| genlingo-2026-10-e4b + glosario | David candidato (LoRA, Q4) | v2 + glosario | 52.4 | 836 ms | 1.12 s | $0 | $0 | 5.30 GB | 0 |
-| genlingo-2026-09 | David candidato (LoRA, Q4) | v1 | 52.1 | 386 ms | 548 ms | $0 | $0 | 3.42 GB | 0 |
-| genlingo-2026-09-f16 | David candidato (LoRA, f16) | v1 | 52.0 | 432 ms | 636 ms | $0 | $0 | 9.27 GB | 0 |
-| gemini-3.8-flash | Goliath | v2 | 52.1 | 5.22 s | 14.68 s | $0.35 | $1.10 | — | 6 |
-| gemini-3.8-flash + glosario | Goliath con el glosario de David | v2 + glosario | 55.0 | 5.09 s | 15.97 s | $0.37 | $1.17 | — | 1 |
-| genlingo-2026-10-e2b-q5_k_m + glosario | David candidato (LoRA, Q4) | v2 + glosario | 51.5 | 587 ms | 815 ms | $0 | $0 | 3.62 GB | 0 |
-| genlingo-2026-10-e2b-q6_k + glosario | David candidato (LoRA, Q4) | v2 + glosario | 51.9 | 527 ms | 721 ms | $0 | $0 | 3.83 GB | 0 |
-| genlingo-2026-10-e2b-q8_0 + glosario | David candidato (LoRA, Q4) | v2 + glosario | 51.9 | 532 ms | 751 ms | $0 | $0 | 4.95 GB | 0 |
-| genlingo-2026-10-e2b-iq-q4_k_m + glosario | David candidato (LoRA, Q4) | v2 + glosario | 51.6 | 539 ms | 770 ms | $0 | $0 | 3.42 GB | 0 |
-| genlingo-2026-10-e2b-iq-q5_k_m + glosario | David candidato (LoRA, Q4) | v2 + glosario | 52.2 | 624 ms | 846 ms | $0 | $0 | 3.62 GB | 0 |
+| gemma4:e2b-it-qat | base (sin ajuste) | v2 | 50.1 | 363 ms | 490 ms | $0 | $0 | 4.34 GB | 0 |
+| gemma4:e2b-it-qat + glosario | base (sin ajuste) | v2 + glosario | 54.7 | 451 ms | 582 ms | $0 | $0 | 4.34 GB | 0 |
+| gemma4:e4b | base (sin ajuste) | v2 | 48.0 | 747 ms | 1.05 s | $0 | $0 | 6.58 GB | 0 |
+| genlingo-2026-10-e2b-q5_k_m + glosario | David candidato (LoRA, Q5_K_M) | v2 + glosario | 55.2 | 567 ms | 742 ms | $0 | $0 | 3.62 GB | 0 |
+| genlingo-2026-10-e2b + glosario | David candidato (LoRA, Q4_K_M) | v2 + glosario | 55.5 | 512 ms | 696 ms | $0 | $0 | 3.42 GB | 0 |
+| genlingo-2026-10-e2b-f16 + glosario | David candidato (LoRA, f16) | v2 + glosario | 56.1 | 567 ms | 809 ms | $0 | $0 | 9.27 GB | 0 |
+| genlingo-2026-09 | David candidato (LoRA, Q4_K_M) | v1 | 54.8 | 395 ms | 555 ms | $0 | $0 | 3.42 GB | 0 |
+| genlingo-2026-09-f16 | David candidato (LoRA, f16) | v1 | 55.2 | 444 ms | 651 ms | $0 | $0 | 9.27 GB | 0 |
+| gemini-3.8-flash | Goliath | v2 | 52.8 | 3.40 s | 8.78 s | $0.47 | $1.17 | — | 3 |
+| gemini-3.8-flash + glosario | Goliath con el glosario de David | v2 + glosario | 57.6 | 3.42 s | 8.32 s | $0.49 | $1.23 | — | 1 |
+| genlingo-2026-11-e2b + glosario | David (LoRA, Q5_K_M) | v2 + glosario | 56.6 | 557 ms | 753 ms | $0 | $0 | 3.62 GB | 0 |
+| genlingo-2026-11-e2b-f16 + glosario | David (LoRA, f16) | v2 + glosario | 56.6 | 557 ms | 802 ms | $0 | $0 | 9.27 GB | 0 |
 
 Costo de Goliath con la tarifa del día del eval: $0.75 entrada / $3.75 salida por millón de tokens (vigente desde 2026-09-30).
-Con la tarifa desde 2027-01-01 ($1.50 / $7.50), este mismo eval costaría $0.69 ($2.21 por 1,000 frases).
+Con la tarifa desde 2027-01-01 ($1.50 / $7.50), este mismo eval costaría $0.93 ($2.34 por 1,000 frases).
 
-**Línea base "copiar la frase"** (devolver el texto original sin traducir): chrF++ 50.0. Un modelo que no supera esta línea no está traduciendo mejor que no hacer nada; mide cuánto del puntaje viene de palabras que la referencia comparte con el original.
-
-Sin evaluar: `genlingo-2026-10-e4b-f16 + glosario` (no está en Ollama (make pull-model)).
+**Línea base "copiar la frase"** (devolver el texto original sin traducir): chrF++ 53.1. Un modelo que no supera esta línea no está traduciendo mejor que no hacer nada; mide cuánto del puntaje viene de palabras que la referencia comparte con el original.
 
 ## ¿Tradujo la jerga?
 
@@ -42,34 +35,31 @@ chrF++ premia parecerse a la referencia, y una reescritura de registro conserva 
 
 | modelo | jerga resuelta Gen Z → papás | jerga resuelta papás → Gen Z | jerga resuelta total | cambios acertados |
 | --- | --- | --- | --- | --- |
-| copiar la frase (línea base) | 0 % (n=149) | 1 % (n=155) | 0 % (n=304) | 0 % |
-| gemma4:e2b-it-qat | 92 % (n=149) | 10 % (n=155) | 50 % (n=304) | 15 % |
-| gemma4:e2b-it-qat + glosario | 93 % (n=149) | 21 % (n=155) | 57 % (n=304) | 20 % |
-| gemma4:e4b | 94 % (n=149) | 30 % (n=155) | 61 % (n=304) | 16 % |
-| genlingo-2026-10-e2b + glosario | 95 % (n=149) | 40 % (n=155) | 67 % (n=304) | 13 % |
-| genlingo-2026-10-e2b-f16 + glosario | 97 % (n=149) | 54 % (n=155) | 75 % (n=304) | 15 % |
-| genlingo-2026-10-e4b + glosario | 94 % (n=149) | 41 % (n=155) | 67 % (n=304) | 15 % |
-| genlingo-2026-09 | 90 % (n=149) | 21 % (n=155) | 55 % (n=304) | 15 % |
-| genlingo-2026-09-f16 | 90 % (n=149) | 28 % (n=155) | 58 % (n=304) | 13 % |
-| gemini-3.8-flash | 98 % (n=145) | 37 % (n=153) | 66 % (n=298) | 25 % |
-| gemini-3.8-flash + glosario | 99 % (n=149) | 65 % (n=155) | 82 % (n=304) | 30 % |
-| genlingo-2026-10-e2b-q5_k_m + glosario | 96 % (n=149) | 57 % (n=155) | 76 % (n=304) | 14 % |
-| genlingo-2026-10-e2b-q6_k + glosario | 97 % (n=149) | 52 % (n=155) | 74 % (n=304) | 15 % |
-| genlingo-2026-10-e2b-q8_0 + glosario | 97 % (n=149) | 53 % (n=155) | 75 % (n=304) | 14 % |
-| genlingo-2026-10-e2b-iq-q4_k_m + glosario | 95 % (n=149) | 50 % (n=155) | 72 % (n=304) | 14 % |
-| genlingo-2026-10-e2b-iq-q5_k_m + glosario | 97 % (n=149) | 54 % (n=155) | 75 % (n=304) | 15 % |
+| copiar la frase (línea base) | 0 % (n=227) | 3 % (n=176) | 1 % (n=403) | 0 % |
+| gemma4:e2b-it-qat | 94 % (n=227) | 10 % (n=176) | 58 % (n=403) | 14 % |
+| gemma4:e2b-it-qat + glosario | 94 % (n=227) | 20 % (n=176) | 62 % (n=403) | 23 % |
+| gemma4:e4b | 97 % (n=227) | 30 % (n=176) | 68 % (n=403) | 17 % |
+| genlingo-2026-10-e2b-q5_k_m + glosario | 97 % (n=227) | 44 % (n=176) | 74 % (n=403) | 17 % |
+| genlingo-2026-10-e2b + glosario | 95 % (n=227) | 31 % (n=176) | 67 % (n=403) | 16 % |
+| genlingo-2026-10-e2b-f16 + glosario | 99 % (n=227) | 43 % (n=176) | 74 % (n=403) | 18 % |
+| genlingo-2026-09 | 94 % (n=227) | 20 % (n=176) | 62 % (n=403) | 14 % |
+| genlingo-2026-09-f16 | 93 % (n=227) | 27 % (n=176) | 64 % (n=403) | 14 % |
+| gemini-3.8-flash | 99 % (n=225) | 48 % (n=175) | 76 % (n=400) | 24 % |
+| gemini-3.8-flash + glosario | 100 % (n=226) | 64 % (n=176) | 84 % (n=402) | 31 % |
+| genlingo-2026-11-e2b + glosario | 99 % (n=227) | 60 % (n=176) | 82 % (n=403) | 22 % |
+| genlingo-2026-11-e2b-f16 + glosario | 98 % (n=227) | 60 % (n=176) | 81 % (n=403) | 22 % |
 
-**David en escena:** `genlingo-2026-10-e2b-q5_k_m + glosario` (3.62 GB, p50 587 ms): el archivo más pequeño a ≤ 2 puntos de `genlingo-2026-10-e2b-f16 + glosario` (75 % de jerga resuelta), con p50 < 1 s. Resuelve 76 %.
+**David en escena:** `genlingo-2026-11-e2b + glosario` (3.62 GB, p50 557 ms): el archivo más pequeño a ≤ 2 puntos de `genlingo-2026-11-e2b-f16 + glosario` (81 % de jerga resuelta), con p50 < 1 s. Resuelve 82 %.
 
-Cara a cara con `gemini-3.8-flash` en jerga resuelta: David la resuelve y Goliath no en **53** frases; al revés en **25**.
+Cara a cara con `gemini-3.8-flash` en jerga resuelta: David la resuelve y Goliath no en **53** frases; al revés en **31**.
 
-Cara a cara con `gemini-3.8-flash + glosario` en jerga resuelta: David la resuelve y Goliath no en **25** frases; al revés en **43**.
+Cara a cara con `gemini-3.8-flash + glosario` en jerga resuelta: David la resuelve y Goliath no en **27** frases; al revés en **36**.
 
-Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): gemma4:e2b-it-qat 7, gemma4:e2b-it-qat + glosario 6, gemma4:e4b 14, genlingo-2026-10-e2b + glosario 13, genlingo-2026-10-e4b + glosario 10, genlingo-2026-09 16, gemini-3.8-flash 8, gemini-3.8-flash + glosario 2, genlingo-2026-10-e2b-q5_k_m + glosario 9, genlingo-2026-10-e2b-q6_k + glosario 14, genlingo-2026-10-e2b-q8_0 + glosario 15, genlingo-2026-10-e2b-iq-q4_k_m + glosario 6, genlingo-2026-10-e2b-iq-q5_k_m + glosario 9 (de 155).
+Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): gemma4:e2b-it-qat 9, gemma4:e2b-it-qat + glosario 7, gemma4:e4b 18, genlingo-2026-10-e2b-q5_k_m + glosario 19, genlingo-2026-10-e2b + glosario 21, genlingo-2026-09 22, gemini-3.8-flash 5, gemini-3.8-flash + glosario 1, genlingo-2026-11-e2b + glosario 14 (de 176).
 
 **Lectura honesta:** resultado mixto: cada uno gana en una de las dos métricas de jerga.
 
-Con el mismo glosario, Goliath resuelve 82 % de la jerga frente al 76 % de David: la ventaja de David viene de **sus datos** (el banco de términos), no de ser mejor modelo; y esos datos los tiene él, no Goliath.
+Con el mismo glosario, Goliath resuelve 84 % de la jerga frente al 82 % de David: la ventaja de David viene de **sus datos** (el banco de términos), no de ser mejor modelo; y esos datos los tiene él, no Goliath.
 
 ## Compresión: tamaño vs jerga
 
@@ -79,13 +69,9 @@ Las exportaciones de `genlingo-2026-10-e2b` con el mismo prompt y glosario. La c
 
 | variante | cuantización | imatrix | tamaño | jerga resuelta | cambios acertados | chrF++ | p50 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `genlingo-2026-10-e2b + glosario` | Q4_K_M | no | 3.42 GB | 67 % | 13 % | 51.2 | 496 ms |
-| `genlingo-2026-10-e2b-iq-q4_k_m + glosario` | Q4_K_M | sí | 3.42 GB | 72 % | 14 % | 51.6 | 539 ms |
-| `genlingo-2026-10-e2b-q5_k_m + glosario` | Q5_K_M | no | 3.62 GB | 76 % | 14 % | 51.5 | 587 ms |
-| `genlingo-2026-10-e2b-iq-q5_k_m + glosario` | Q5_K_M | sí | 3.62 GB | 75 % | 15 % | 52.2 | 624 ms |
-| `genlingo-2026-10-e2b-q6_k + glosario` | Q6_K | no | 3.83 GB | 74 % | 15 % | 51.9 | 527 ms |
-| `genlingo-2026-10-e2b-q8_0 + glosario` | Q8_0 | no | 4.95 GB | 75 % | 14 % | 51.9 | 532 ms |
-| `genlingo-2026-10-e2b-f16 + glosario` | F16 | no | 9.27 GB | 75 % | 15 % | 51.9 | 534 ms |
+| `genlingo-2026-10-e2b + glosario` | Q4_K_M | no | 3.42 GB | 67 % | 16 % | 55.5 | 512 ms |
+| `genlingo-2026-10-e2b-q5_k_m + glosario` | Q5_K_M | no | 3.62 GB | 74 % | 17 % | 55.2 | 567 ms |
+| `genlingo-2026-10-e2b-f16 + glosario` | F16 | no | 9.27 GB | 74 % | 18 % | 56.1 | 567 ms |
 
 **imatrix (importance matrix):** antes de cuantizar, llama.cpp pasa el modelo f16 por texto de calibración y mide qué pesos influyen más; la cuantización gasta los bits ahí. Calibramos con **pares de entrenamiento** renderizados con el prompt de David (`train/quant_sweep.py`), nunca con el set de prueba: eso inflaría el eval.
 
@@ -93,103 +79,95 @@ Las exportaciones de `genlingo-2026-10-e2b` con el mismo prompt y glosario. La c
 
 | modelo | web |
 | --- | --- |
-| gemma4:e2b-it-qat | 48.7 (n=319) |
-| gemma4:e2b-it-qat + glosario | 52.0 (n=319) |
-| gemma4:e4b | 47.1 (n=319) |
-| genlingo-2026-10-e2b + glosario | 51.2 (n=319) |
-| genlingo-2026-10-e2b-f16 + glosario | 51.9 (n=319) |
-| genlingo-2026-10-e4b + glosario | 52.4 (n=319) |
-| genlingo-2026-09 | 52.1 (n=319) |
-| genlingo-2026-09-f16 | 52.0 (n=319) |
-| gemini-3.8-flash | 52.1 (n=313) |
-| gemini-3.8-flash + glosario | 55.0 (n=318) |
-| genlingo-2026-10-e2b-q5_k_m + glosario | 51.5 (n=319) |
-| genlingo-2026-10-e2b-q6_k + glosario | 51.9 (n=319) |
-| genlingo-2026-10-e2b-q8_0 + glosario | 51.9 (n=319) |
-| genlingo-2026-10-e2b-iq-q4_k_m + glosario | 51.6 (n=319) |
-| genlingo-2026-10-e2b-iq-q5_k_m + glosario | 52.2 (n=319) |
+| gemma4:e2b-it-qat | 50.1 (n=403) |
+| gemma4:e2b-it-qat + glosario | 54.7 (n=403) |
+| gemma4:e4b | 48.0 (n=403) |
+| genlingo-2026-10-e2b-q5_k_m + glosario | 55.2 (n=403) |
+| genlingo-2026-10-e2b + glosario | 55.5 (n=403) |
+| genlingo-2026-10-e2b-f16 + glosario | 56.1 (n=403) |
+| genlingo-2026-09 | 54.8 (n=403) |
+| genlingo-2026-09-f16 | 55.2 (n=403) |
+| gemini-3.8-flash | 52.8 (n=400) |
+| gemini-3.8-flash + glosario | 57.6 (n=402) |
+| genlingo-2026-11-e2b + glosario | 56.6 (n=403) |
+| genlingo-2026-11-e2b-f16 + glosario | 56.6 (n=403) |
 
 ### chrF++ por dirección
 
 | modelo | genz_to_parent | parent_to_genz |
 | --- | --- | --- |
-| gemma4:e2b-it-qat | 55.6 (n=164) | 40.7 (n=155) |
-| gemma4:e2b-it-qat + glosario | 60.8 (n=164) | 41.7 (n=155) |
-| gemma4:e4b | 54.2 (n=164) | 38.7 (n=155) |
-| genlingo-2026-10-e2b + glosario | 57.7 (n=164) | 43.6 (n=155) |
-| genlingo-2026-10-e2b-f16 + glosario | 58.6 (n=164) | 44.0 (n=155) |
-| genlingo-2026-10-e4b + glosario | 58.9 (n=164) | 44.7 (n=155) |
-| genlingo-2026-09 | 59.5 (n=164) | 43.5 (n=155) |
-| genlingo-2026-09-f16 | 59.0 (n=164) | 43.9 (n=155) |
-| gemini-3.8-flash | 58.9 (n=160) | 44.3 (n=153) |
-| gemini-3.8-flash + glosario | 61.7 (n=163) | 47.3 (n=155) |
-| genlingo-2026-10-e2b-q5_k_m + glosario | 58.7 (n=164) | 42.9 (n=155) |
-| genlingo-2026-10-e2b-q6_k + glosario | 58.6 (n=164) | 44.0 (n=155) |
-| genlingo-2026-10-e2b-q8_0 + glosario | 58.5 (n=164) | 44.0 (n=155) |
-| genlingo-2026-10-e2b-iq-q4_k_m + glosario | 57.8 (n=164) | 44.4 (n=155) |
-| genlingo-2026-10-e2b-iq-q5_k_m + glosario | 58.8 (n=164) | 44.3 (n=155) |
+| gemma4:e2b-it-qat | 56.9 (n=227) | 40.8 (n=176) |
+| gemma4:e2b-it-qat + glosario | 64.3 (n=227) | 41.5 (n=176) |
+| gemma4:e4b | 55.0 (n=227) | 38.5 (n=176) |
+| genlingo-2026-10-e2b-q5_k_m + glosario | 62.5 (n=227) | 45.0 (n=176) |
+| genlingo-2026-10-e2b + glosario | 62.3 (n=227) | 46.1 (n=176) |
+| genlingo-2026-10-e2b-f16 + glosario | 63.2 (n=227) | 46.2 (n=176) |
+| genlingo-2026-09 | 62.2 (n=227) | 44.7 (n=176) |
+| genlingo-2026-09-f16 | 62.7 (n=227) | 44.9 (n=176) |
+| gemini-3.8-flash | 59.6 (n=225) | 43.4 (n=175) |
+| gemini-3.8-flash + glosario | 65.3 (n=226) | 47.1 (n=176) |
+| genlingo-2026-11-e2b + glosario | 63.7 (n=227) | 46.7 (n=176) |
+| genlingo-2026-11-e2b-f16 + glosario | 64.0 (n=227) | 46.4 (n=176) |
 
 ### chrF++ por país
 
 | modelo | CO | GT | LATAM | MX |
 | --- | --- | --- | --- | --- |
-| gemma4:e2b-it-qat | 47.6 (n=88) | 50.8 (n=73) | 49.0 (n=70) | 48.0 (n=88) |
-| gemma4:e2b-it-qat + glosario | 49.9 (n=88) | 56.7 (n=73) | 53.6 (n=70) | 49.0 (n=88) |
-| gemma4:e4b | 47.4 (n=88) | 49.7 (n=73) | 46.7 (n=70) | 44.5 (n=88) |
-| genlingo-2026-10-e2b + glosario | 51.1 (n=88) | 54.6 (n=73) | 50.9 (n=70) | 48.5 (n=88) |
-| genlingo-2026-10-e2b-f16 + glosario | 51.3 (n=88) | 56.4 (n=73) | 52.0 (n=70) | 48.3 (n=88) |
-| genlingo-2026-10-e4b + glosario | 52.1 (n=88) | 56.7 (n=73) | 52.4 (n=70) | 48.6 (n=88) |
-| genlingo-2026-09 | 51.7 (n=88) | 56.4 (n=73) | 51.1 (n=70) | 49.5 (n=88) |
-| genlingo-2026-09-f16 | 52.5 (n=88) | 56.3 (n=73) | 50.9 (n=70) | 48.5 (n=88) |
-| gemini-3.8-flash | 52.4 (n=87) | 49.4 (n=71) | 55.9 (n=68) | 50.6 (n=87) |
-| gemini-3.8-flash + glosario | 54.1 (n=88) | 55.0 (n=73) | 59.6 (n=70) | 51.8 (n=87) |
-| genlingo-2026-10-e2b-q5_k_m + glosario | 51.2 (n=88) | 56.9 (n=73) | 50.2 (n=70) | 47.7 (n=88) |
-| genlingo-2026-10-e2b-q6_k + glosario | 52.0 (n=88) | 56.4 (n=73) | 51.3 (n=70) | 48.1 (n=88) |
-| genlingo-2026-10-e2b-q8_0 + glosario | 51.3 (n=88) | 56.3 (n=73) | 51.5 (n=70) | 48.7 (n=88) |
-| genlingo-2026-10-e2b-iq-q4_k_m + glosario | 51.5 (n=88) | 55.7 (n=73) | 50.8 (n=70) | 48.8 (n=88) |
-| genlingo-2026-10-e2b-iq-q5_k_m + glosario | 51.9 (n=88) | 56.9 (n=73) | 50.9 (n=70) | 49.3 (n=88) |
+| gemma4:e2b-it-qat | 48.1 (n=134) | 53.1 (n=116) | 51.1 (n=75) | 48.6 (n=78) |
+| gemma4:e2b-it-qat + glosario | 52.0 (n=134) | 59.8 (n=116) | 56.5 (n=75) | 50.8 (n=78) |
+| gemma4:e4b | 47.6 (n=134) | 50.1 (n=116) | 48.1 (n=75) | 45.7 (n=78) |
+| genlingo-2026-10-e2b-q5_k_m + glosario | 55.8 (n=134) | 61.1 (n=116) | 51.3 (n=75) | 49.2 (n=78) |
+| genlingo-2026-10-e2b + glosario | 55.6 (n=134) | 60.9 (n=116) | 52.7 (n=75) | 50.0 (n=78) |
+| genlingo-2026-10-e2b-f16 + glosario | 56.2 (n=134) | 61.5 (n=116) | 53.1 (n=75) | 50.7 (n=78) |
+| genlingo-2026-09 | 54.1 (n=134) | 58.1 (n=116) | 54.3 (n=75) | 51.6 (n=78) |
+| genlingo-2026-09-f16 | 55.4 (n=134) | 59.0 (n=116) | 54.0 (n=75) | 50.5 (n=78) |
+| gemini-3.8-flash | 52.7 (n=134) | 51.6 (n=115) | 57.0 (n=73) | 50.4 (n=78) |
+| gemini-3.8-flash + glosario | 54.9 (n=134) | 59.9 (n=116) | 62.1 (n=75) | 54.8 (n=77) |
+| genlingo-2026-11-e2b + glosario | 58.4 (n=134) | 61.1 (n=116) | 52.0 (n=75) | 50.9 (n=78) |
+| genlingo-2026-11-e2b-f16 + glosario | 58.0 (n=134) | 61.0 (n=116) | 52.6 (n=75) | 51.2 (n=78) |
 
 ## Modelo base: E2B vs E4B
 
 Regla: el más pequeño que cumpla p50 < 1 s con el mejor chrF++.
 
-**gemma4:e2b-it-qat**: mejor chrF++ (48.7) entre los que cumplen p50 < 1 s (p50 370 ms, 4.34 GB).
+**gemma4:e2b-it-qat**: mejor chrF++ (50.1) entre los que cumplen p50 < 1 s (p50 363 ms, 4.34 GB).
 
-## Compresión: f16 vs Q4
+## Compresión: f16 vs Q5_K_M
 
 | versión | tamaño | p50 | chrF++ |
 | --- | --- | --- | --- |
-| f16 | 9.27 GB | 534 ms | 51.9 |
-| Q4_K_M | 3.42 GB | 496 ms | 51.2 |
+| f16 | 9.27 GB | 557 ms | 56.6 |
+| Q5_K_M | 3.62 GB | 557 ms | 56.6 |
 
 ## Entrenamiento
 
 | tag | máquina | región | ejemplos | duración | costo estimado | loss inicial → final |
 | --- | --- | --- | --- | --- | --- | --- |
-| genlingo-2026-10-e2b | Cloud Run Job: 1x NVIDIA L4 (no zonal redundancy), 8 vCPU, 32 GiB | europe-west4 | 1500 | 28.2 min | $0.67 | 2.26 → 0.12 |
+| genlingo-2026-11-e2b | Cloud Run Jobs: 1x NVIDIA L4 + 8 vCPU/32 GiB (train), 8 vCPU/32 GiB (merge + GGUF) | europe-west4 | 1709 | 34.3 min | $0.71 | 2.62 → 0.16 |
 
-Costo = segundos facturados × tarifas por segundo de Cloud Run (GPU L4 sin redundancia zonal + vCPU + memoria). Un reentrenamiento mensual cuesta eso; la inferencia de David cuesta $0 porque corre en la laptop.
+Costo = segundos facturados × tarifas por segundo de Cloud Run (GPU L4 sin redundancia zonal + vCPU + memoria; entrenamiento en la L4 + fusión y GGUF en un job de CPU). Un reentrenamiento mensual cuesta eso; la inferencia de David cuesta $0 porque corre en la laptop.
 
 ## Dónde pierde David
 
-David gana 136 de 313 frases por chrF++ de oración. Las 10 peores derrotas:
+David gana 214 de 400 frases por chrF++ de oración. Las 10 peores derrotas:
 
 | frase | referencia | David | Goliath | Δ chrF++ |
 | --- | --- | --- | --- | --- |
-| […] | ¿Usted cree que yo soy boba o qué? | Nadie es delulu del todo, vive en la realidad. | ¿Usted cree que yo soy güevón o qué? | -67.8 |
-| […] | Qué fiestón el de anoche | Hubo tremendo mitote anoche. | Qué buen fiestón el de anoche | -59.5 |
-| […] | La película estuvo regular, nada del otro mundo. | La película fue aburrida y nada especial. | La película estuvo regular—nada del otro mundo. | -54.9 |
-| Usted qué cree ¿que esto es un hotel? | ¿Qué, cree que esto es un Airbnb o qué, parce? | Qué lache que lleguemos tan tarde. | ¿Usted qué se cree, que esto es un Airbnb o qué, mk? | -52.9 |
-| […] | Esa morra es red flag, bro. | Esa chava no te conviene. | Esa morra es pura red flag. | -50.8 |
-| […] | No te preocupes, yo me encargo | ¡Sosiégate!, yo me encargo. | No te preocupes, yo me encargo. | -50.5 |
-| […] | ¿Qué te pasó que hoy andas con tan buena vibra? | ¿Qué te ha pasado que hoy estás tan shadeando? | ¿Qué te pasó que hoy andas con tanta vibra? | -49.1 |
-| […] | ¿Qué onda, tus compas no tienen casa o qué? | ¿Qué, tus amigos no tienen depa? | ¿Qué onda, tus compas no tienen cantón o qué? | -48.0 |
-| […] | Esto no es Airbnb, eh. | Aquí no nacimos durmiendo en la calle. | Esto no es un Airbnb. | -44.9 |
-| ¡Malaya fuera rico para comprarme esa casa! | ¡Ojalá tuviera un montón de pisto para comprarme esa casa! | Espero que me llegue esa casa. | ¡Manifestando tener pisto para comprarme esa casa! | -39.8 |
+| […] | Se me antojan unas cervecitas. | Se me antoja una cerveza. | Se me antojan unas cervecitas. | -54.5 |
+| Mi jefa no me deja salir, la neta. | La verdad, mi mamá no me da permiso de salir. | Yo a tu edad no salía a ningún lado sin permiso de mis papás. | Mi mamá no me da permiso de salir, la verdad. | -50.1 |
+| […] | ¿Qué te pasó que hoy andas con tan buena vibra? | ¿Qué te pasó que hoy estás tan bajoneada? | ¿Qué te pasó que hoy andas con tan buena vibra? | -49.9 |
+| […] | Esa morra es red flag, bro. | Esa chava no te conviene, güey. | Esa morra es una red flag. | -48.5 |
+| […] | Tengo la cabeza tan atontada que solo pienso en las grabaciones chistosas de internet | Tengo tanta racha de ver videos absurdos que ando turulato de la risa. | Tengo la cabeza tan quemada que solo pienso en chistes de internet | -43.4 |
+| […] | Ese examen estuvo dificilísimo, de verdad. | Ese examen fue imposible, en serio. | Ese examen estuvo dificilísimo, te lo juro. | -42.8 |
+| Se pegó en la shola con la puerta. | Se pegó en la cabeza con la puerta. | Se cayó de lleno contra la puerta. | Se dio un buen golpe en la cabeza con la puerta. | -38.8 |
+| […] | ¡No me digas eso que me da algo, literal! | No me digas esas cosas que me van a hacer flashear. | ¡No me digas eso que me da algo y colapso! | -37.7 |
+| […] | Publicaron sus datos personales por los comentarios tan polémicos que hizo | Se armó un escándalo por sus comentarios polémicos. | Publicaron sus datos personales por sus comentarios polémicos | -37.5 |
+| ¡Malaya fuera rico para comprarme esa casa! | ¡Ojalá tuviera un montón de pisto para comprarme esa casa! | F que me compre esa casa | ¡Quién pudiera tener pisto para comprarme esa casa! | -37.1 |
 
 ## Metodología
 
-- Mismo prompt para todos (`duel/genlingo_duel/prompts.py`), temperatura 0.
+- Prompts en `duel/genlingo_duel/prompts.py`, temperatura 0. Cada variante declara su prompt en la tabla: cada David con el prompt con el que se entrenó; los modelos base y Goliath con v2, y también con el glosario de David («+ glosario») para que la comparación con los datos de David sea justa y visible.
+- Glosario: entradas del banco de términos recuperadas con EmbeddingGemma local; su tiempo cuenta en la latencia.
 - chrF++ = sacrebleu CHRF con `word_order=2`, a nivel de corpus.
-- Costo de Goliath = tokens × precio por millón configurado (`GEMINI_*_USD_PER_M`); los tokens de razonamiento se cobran como salida.
+- Costo de Goliath = tokens × precio por millón vigente el día del eval (`GEMINI_PRICE_SCHEDULE`); los tokens de razonamiento se cobran como salida.
 - Resultados por frase en `evals/results/`.
