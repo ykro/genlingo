@@ -34,6 +34,10 @@ from genlingo_duel.settings import get_settings
 from genlingo_duel.terms import TermBank
 
 
+def _ids(files: set[str]) -> list[set[str]]:
+    return [{r["id"] for r in read_jsonl(DATA / f)} for f in files]
+
+
 def with_gold(glossary: Glossary, bank: TermBank, entries: list[dict], p) -> tuple[list[dict], list[str], bool]:
     """Show every target-side term of the reference in GOLD_SHARE of the examples, hide it in the rest."""
     target_gen = "genz" if p.direction == "parent_to_genz" else "parent"
@@ -65,9 +69,13 @@ def with_gold(glossary: Glossary, bank: TermBank, entries: list[dict], p) -> tup
     return out, gold, show
 
 
-async def build(style: str, out: Path) -> dict:
+async def build(style: str, out: Path, exclude: tuple[str, ...] = ()) -> dict:
     s = get_settings()
-    pairs = train_pairs(DATA)
+    from genlingo_duel.dataset import PAIR_FILES
+
+    skip = {PAIR_FILES[k] for k in exclude}  # ablations: leave a whole data file out
+    skip_ids = set().union(*_ids(skip)) if skip else set()
+    pairs = [p for p in train_pairs(DATA) if p.id not in skip_ids]
     glossary = None
     bank = TermBank(read_jsonl(DATA / "terms.jsonl"))
     if style in GLOSSARY_STYLES:
@@ -101,7 +109,7 @@ async def build(style: str, out: Path) -> dict:
     by_origin: dict[str, int] = {}
     for p in pairs:
         by_origin[p.origin] = by_origin.get(p.origin, 0) + 1
-    meta = {"prompt_style": style, "prompt_version": prompt_version(style), "examples": len(pairs), "by_origin": by_origin,
+    meta = {"excluded": list(exclude), "prompt_style": style, "prompt_version": prompt_version(style), "examples": len(pairs), "by_origin": by_origin,
             "with_glossary": with_glossary, "embedding_model": s.embedding_model if glossary else None,
             "gold_in_glossary": round(gold_shown / gold_rows, 3) if gold_rows else None}
     out.with_name(out.stem + ".meta.json").write_text(json.dumps(meta, indent=2) + "\n")
@@ -112,8 +120,9 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--style", default="lexicon", choices=STYLES)
     ap.add_argument("--out", default=str(DATA / "train" / "chat.jsonl"))
+    ap.add_argument("--exclude", default="", help="comma-separated PAIR_FILES keys to leave out (ablations)")
     args = ap.parse_args()
-    meta = asyncio.run(build(args.style, Path(args.out)))
+    meta = asyncio.run(build(args.style, Path(args.out), tuple(k for k in args.exclude.split(",") if k)))
     print(f"{meta['examples']} training examples {meta['by_origin']} ({meta['prompt_version']}) -> {args.out}")
 
 

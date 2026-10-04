@@ -182,6 +182,9 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
 
     model = AutoModelForCausalLM.from_pretrained(base_dir, dtype=dtype, attn_implementation="eager")
 
+    if args.init_adapter:  # preference-only run: continue an SFT adapter with ORPO, no SFT here
+        return preference_only(args, model, tokenizer, work, len(dataset), device)
+
     lora = LoraConfig(
         r=args.lora_r,  # rank of the update matrices: capacity of what the adapter can learn
         lora_alpha=args.lora_alpha,  # scale of the update: alpha/sqrt(r) with rsLoRA, alpha/r without
@@ -262,6 +265,24 @@ def train_and_merge(args, base_dir: Path, data_path: Path, work: Path) -> dict:
             shutil.copy2(f, merged_dir / f.name)
     merge_s = time.time() - t1
     return {**stats, "merge_s": round(merge_s, 1), "merged_dir": str(merged_dir)}
+
+
+def preference_only(args, model, tokenizer, work: Path, n_examples: int, device: str) -> dict:
+    """Load a trained adapter (trainable), run the preference stage with the whole time budget, save."""
+    from peft import PeftModel
+
+    src = fetch(args.init_adapter, work / "init_adapter")
+    # No SFTTrainer here to move the model: without this, sampling runs on the CPU (24 min for 8 prompts).
+    peft_model = PeftModel.from_pretrained(model, src, is_trainable=True).to(device)
+    peft_model.enable_input_require_grads()  # gradient checkpointing needs grads flowing into the adapter
+    peft_model.gradient_checkpointing_enable()
+    adapter_dir = work / "adapter"
+    stats = preference_stage(args, peft_model, tokenizer, work, adapter_dir)
+    if (stats.get("pref") or {}).get("orpo") == "skipped":
+        raise SystemExit("preference-only run skipped ORPO: nothing new to publish")
+    trainable, total = peft_model.get_nb_trainable_parameters()
+    return {"examples": n_examples, "init_adapter": args.init_adapter, "trainable_params": trainable, "total_params": total,
+            "device": device, "train_s": 0.0, "adapter_dir": str(adapter_dir), "merge_s": 0.0, "merged_dir": None, **stats}
 
 
 def preference_stage(args, model, tokenizer, work: Path, adapter_dir: Path) -> dict:
@@ -363,6 +384,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--rslora", action=argparse.BooleanOptionalAction, default=True)
     # Preference stage (ORPO) after SFT, in the same job; off without --pref-data.
     ap.add_argument("--pref-data", default=env("PREF_DATA", ""), help="preference prompts JSONL (local or gs://)")
+    ap.add_argument("--init-adapter", default="", help="start from this trained adapter and run only the preference stage")
     ap.add_argument("--pref-samples", type=int, default=8)
     ap.add_argument("--pref-max", type=int, default=400)
     ap.add_argument("--pref-batch", type=int, default=8, help="prompts per generation batch (x samples)")

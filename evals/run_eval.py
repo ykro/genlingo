@@ -224,6 +224,13 @@ async def main_async(args) -> None:
         raw["results"] = [r for r in prev["results"] if r["model"] not in new_labels] + raw["results"]
         raw["merged_from"] = Path(args.merge_with).name
     raw["split"] = args.split
+    if args.latency_from:  # quality from this run, latency from a separate exclusive run of the same models
+        lr = json.loads(Path(args.latency_from).read_text())
+        by = {}
+        for r in lr["results"]:
+            if "error" not in r and r.get("latency_ms") is not None:
+                by.setdefault(r["model"], []).append(r["latency_ms"])
+        raw["latency"] = {"file": Path(args.latency_from).name, "n": len(lr["pairs"]), "by_model": by}
     name = f"{stamp}.json" if args.split == "test" else f"dev-{stamp}.json"
     (out_dir / name).write_text(json.dumps(raw, ensure_ascii=False, indent=1))
     report_path = ROOT / "evals" / ("report.md" if args.split == "test" else "report_dev.md")
@@ -238,6 +245,7 @@ def main() -> None:
     ap.add_argument("--no-goliath", action="store_true")
     ap.add_argument("--merge-with", default="", help="earlier raw results to merge these variants into")
     ap.add_argument("--split", choices=["test", "dev"], default="test", help="dev: data decisions; test: once per round")
+    ap.add_argument("--latency-from", default="", help="raw results of an exclusive latency run (p50/p95 come from there)")
     ap.add_argument("--nbest", type=int, default=int(__import__("os").environ.get("EVAL_NBEST", "1")),
                     help="also run each glossary-trained David with N candidates reranked by the term bank")
     asyncio.run(main_async(ap.parse_args()))

@@ -236,6 +236,7 @@ def summarize(raw: dict) -> dict[str, dict]:
     by_model: dict[str, list] = defaultdict(list)
     for r in raw["results"]:
         by_model[r["model"]].append(r)
+    lat = (raw.get("latency") or {}).get("by_model", {})
     out = {}
     for m in raw["models"]:
         if m.get("skip"):
@@ -263,8 +264,10 @@ def summarize(raw: dict) -> dict[str, dict]:
             "by_origin": sliced("origin"),
             "by_direction": sliced("direction"),
             "by_country": sliced("country"),
-            "p50": percentile([r["latency_ms"] for r in ok], 50),
-            "p95": percentile([r["latency_ms"] for r in ok], 95),
+            # Latency counts only from an exclusive run (nothing else loaded in Ollama): when the quality run
+            # was concurrent, raw["latency"] holds that separate run's latencies per model.
+            "p50": percentile(lat.get(key, [r["latency_ms"] for r in ok]), 50),
+            "p95": percentile(lat.get(key, [r["latency_ms"] for r in ok]), 95),
             "cost": cost,
             "cost_per_1k": cost / len(ok) * 1000 if ok else None,
             "sentence": {r["pair_id"]: (chrf_pp(r["text"], pairs[r["pair_id"]]["target"]), r["text"]) for r in ok},
@@ -382,6 +385,10 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
     ]
     if raw.get("mock"):
         lines += ["> **MOCK_AI=1**: números de ensayo con modelos simulados, no reales.", ""]
+    if raw.get("latency"):
+        L = raw["latency"]
+        lines += [f"> **Latencias** (p50, p95): de la corrida exclusiva `{L['file']}` ({L['n']} frases, nada más cargado en "
+                  "Ollama). La calidad sale de esta corrida, que pudo compartir la máquina con otros modelos.", ""]
     if not raw["reviewed"]:
         lines += [
             "> **Ensayo:** este eval incluyó referencias sin validar (`pending_review`); "
