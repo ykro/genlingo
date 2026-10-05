@@ -4,7 +4,7 @@ La historia de David, iteración por iteración: qué cambió, por qué, qué sa
 Incluye los callejones sin salida, porque explican las decisiones que quedaron.
 
 Los números de jerga resuelta son todos del **mismo set de prueba** (399 frases web `auto_validated`,
-eval del 2026-10-02), así que se pueden comparar entre sí. Las corridas viejas se reevaluaron sobre ese
+eval del 2026-10-02), así que se pueden comparar entre sí. Las ejecuciones viejas se reevaluaron sobre ese
 set; los números de su momento (sobre sets anteriores) están en el historial de `evals/report.md`.
 
 ![Jerga resuelta por iteración](diagrams/bitacora-jerga.svg)
@@ -33,7 +33,7 @@ set; los números de su momento (sobre sets anteriores) están en el historial d
 
 La misma frase con solo los términos de jerga cambiados, generada por Gemini; primer entrenamiento en la
 nube (Cloud Run con una L4, 17.4 min, $0.41). **62 %** de jerga resuelta, arriba de la base (58 %), pero
-casi todo en Gen Z → papás: en papás → Gen Z resolvía el 20 %. Antes hubo tres corridas fallidas que
+casi todo en Gen Z → papás: en papás → Gen Z resolvía el 20 %. Antes hubo tres ejecuciones fallidas que
 también se pagaron (sin `gcc` para Triton, y el GGUF escrito en el bucket montado a ~3 MB/s).
 
 ## 2 · Pares anclados en el banco + glosario (`genlingo-2026-10-e2b`)
@@ -59,18 +59,34 @@ Dos frases de prueba estaban citadas dentro de pares de entrenamiento más largo
 compara subcadenas, crudas y normalizadas, contra todos los archivos de entrenamiento: 4 pares de prueba
 fuera (403 → 399), quitados del set de prueba y no del entrenamiento porque David ya estaba entrenado.
 
-## 5 · Contrapartes por significado (en curso)
+## 5 · Contrapartes por significado (`genlingo-2026-10c-e2b-nomulti`)
 
 La revisión de datos encontró el error de las contrapartes (arriba) y que, al entrenar, el término
-correcto estaba en el glosario solo el 45 % de las veces. Lo que cambia para el próximo David:
-contrapartes validadas por significado (`data/counterparts.jsonl`; solo 63 de 382 términos tienen una,
-y sin contraparte se dice el significado), pares sintéticos regenerados con ellas (1,500, $0.71) y pares
-que cambian 2–3 términos a la vez (800, $0.51); un glosario de léxico con cada término y su contraparte,
-términos cercanos y uno de otro país marcado «NO de aquí», con la respuesta presente en el 85 % de los
-ejemplos de entrenamiento; una etapa de preferencias (ORPO) en el mismo job, que ordena 8 respuestas con
-el banco; N respuestas en paralelo al traducir, elegidas por el banco; más oraciones reales de Guatemala
-y Colombia; y un set de desarrollo (73 pares reales) para decidir sin tocar el set de prueba, con
-métricas de significado registradas antes de calcularlas. Resultado: pendiente de la corrida.
+correcto estaba en el glosario solo el 45 % de las veces. Esta ronda cambió los datos: contrapartes
+validadas por significado (`data/counterparts.jsonl`; sin contraparte se dice el significado), 1,500
+pares sintéticos regenerados con ellas ($0.71), un glosario de léxico con cada término, su contraparte,
+términos cercanos y uno de otro país marcado «NO de aquí» (la respuesta está en el 85 % de los ejemplos),
+más oraciones reales de Guatemala y Colombia (ronda 3: 532 términos de 26 fuentes) y un set de desarrollo
+con métricas de significado registradas antes de calcularlas.
+
+**Dev, 79 pares que ningún David vio** (10b entrenó con 67 de los 146 pares de dev, así que su número en
+el dev completo es optimista):
+
+| | chrF++ | Jerga resuelta | Cambios acertados | Jerga correcta | p50 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `genlingo-2026-10b-e2b` (glosario) | 59.1 | 86 % | 18 % | 34 % | 601 ms |
+| `genlingo-2026-10c-e2b` (léxico, con pares de 2–3 términos) | 62.8 | 86 % | 26 % | 35 % | 2.04 s |
+| **`genlingo-2026-10c-e2b-nomulti`** (léxico, sin esos pares) | **65.9** | 86 % | 26 % | 35 % | 765 ms |
+| `…-nomulti-orpo` (+ preferencias ORPO) | 66.2 | 76 % | 28 % | 31 % | 852 ms |
+| Goliath (`gemini-3.8-flash`) | 49.3 | 74 % | 21 % | 18 % | 3.36 s |
+| Goliath + el léxico de David | 58.1 | 89 % | 41 % | 42 % | 2.92 s |
+
+- **Los pares de 2–3 términos no ayudaron:** sin ellos, chrF++ sube 3.1 y la latencia baja de 2.04 s a
+  765 ms (el modelo dejó de alargar las respuestas).
+- **ORPO no ayudó:** +0.3 de chrF++, pero la jerga resuelta en papás → Gen Z baja de 74 % a 55 %. Queda
+  fuera. Antes de llegar a entrenar falló dos veces: el modelo se cargaba en la CPU para muestrear y,
+  con lote 4, los logits de Gemma no cabían en la L4 (ahora lote 1 × 16).
+- **Costo:** 10c $1.41, nomulti $0.97, ORPO $0.56 (más $1.81 de los dos intentos fallidos).
 
 ## Dónde gana David hoy, y dónde no
 
@@ -93,7 +109,7 @@ pareado ([evals/niche_report.md](../evals/niche_report.md)).
 ## Costo de reentrenar cada mes
 
 Un reentrenamiento de E2B, de punta a punta en la nube, cuesta **$0.71** (25 min de L4 + 9 min de CPU).
-En total, las corridas con registro costaron $4.40, incluidas tres de las cuatro fallidas ($1.63; la cuarta, `kqlxv`, no dejó registro). La
+En total, las ejecuciones con registro costaron $4.40, incluidas tres de las cuatro fallidas ($1.63; la cuarta, `kqlxv`, no dejó registro). La
 inferencia de David cuesta $0; Goliath, $1.08 por 1,000 frases con la tarifa de hoy y $2.17 con la de 2027.
 
 ## Qué haríamos después
