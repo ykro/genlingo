@@ -288,6 +288,7 @@ def preference_only(args, model, tokenizer, work: Path, n_examples: int, device:
 def preference_stage(args, model, tokenizer, work: Path, adapter_dir: Path) -> dict:
     """Sample, rank with the term bank, ORPO on the same adapter; skipped if the job is short on time."""
     import preference
+    import torch
 
     t0 = time.time()
     rows = preference.load_rows(fetch(args.pref_data, work / "pref.jsonl"))[: args.pref_max]
@@ -300,8 +301,10 @@ def preference_stage(args, model, tokenizer, work: Path, adapter_dir: Path) -> d
     if left < args.orpo_min_s or not pairs:
         log(f"skipping ORPO: {left:.0f}s left, {len(pairs)} pairs")
         return {"pref": {**stats, "orpo": "skipped"}}
+    torch.cuda.empty_cache()  # free the sampling KV caches before training
+    # Batch 1 x 16: ORPO stacks chosen + rejected, and Gemma's 262k-vocab logits in fp32 at batch 4 (8 rows) ran out of the L4.
     stats.update(preference.orpo(model, tokenizer, pairs, work / "orpo", lr=args.orpo_lr, beta=args.orpo_beta,
-                                 epochs=args.orpo_epochs, batch_size=4, grad_accum=4, max_length=args.max_length + 64,
+                                 epochs=args.orpo_epochs, batch_size=1, grad_accum=16, max_length=args.max_length + 64,
                                  seed=args.seed, max_steps=args.max_steps))
     model.save_pretrained(adapter_dir)  # SFT + ORPO
     return {"pref": stats}
