@@ -53,15 +53,15 @@ chrF++ premia parecerse a la referencia, y una reescritura de registro conserva 
 | gemini-3.8-flash | 97 % (n=226) | 51 % (n=173) | 77 % (n=399) | 25 % | 26 % (n=399) | 27 % |
 | gemini-3.8-flash + glosario | 100 % (n=226) | 58 % (n=171) | 82 % (n=397) | 29 % | 38 % (n=397) | 31 % |
 
-**David en escena:** `genlingo-2026-10b-e2b + glosario` (3.62 GB, p50 557 ms): el archivo más pequeño a ≤ 2 puntos de `genlingo-2026-10c-e2b-nomulti + léxico` (82 % de jerga resuelta), con p50 < 1 s. Resuelve 82 %.
+**David en escena:** `genlingo-2026-10c-e2b-nomulti + léxico` (3.62 GB, p50 670 ms): el archivo más pequeño a ≤ 2 puntos de `genlingo-2026-10c-e2b-nomulti + léxico` (82 % de jerga resuelta), con p50 < 1 s (empate de tamaño: gana el mayor chrF++). Resuelve 82 %.
 
-Cara a cara con `gemini-3.8-flash` en jerga resuelta: David la resuelve y Goliath no en **45** frases; al revés en **27**.
+Cara a cara con `gemini-3.8-flash` en jerga resuelta: David la resuelve y Goliath no en **49** frases; al revés en **31**.
 
-Cara a cara con `gemini-3.8-flash + glosario` en jerga resuelta: David la resuelve y Goliath no en **34** frases; al revés en **34**.
+Cara a cara con `gemini-3.8-flash + glosario` en jerga resuelta: David la resuelve y Goliath no en **36** frases; al revés en **36**.
 
 Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): gemma4:e2b-it-qat 8, gemma4:e2b-it-qat + glosario 7, gemma4:e4b 18, genlingo-2026-10b-e2b + glosario 14, genlingo-2026-10-e2b-q5_k_m + glosario 19, genlingo-2026-10-e2b + glosario 21, genlingo-2026-09 22, genlingo-2026-10c-e2b-nomulti + léxico 16, gemini-3.8-flash 3, gemini-3.8-flash + glosario 1 (de 173).
 
-**Lectura honesta:** resultado mixto: cada uno gana en una de las dos métricas de jerga.
+**Lectura honesta:** David gana también en jerga, no solo en parecido de superficie, frente a Goliath sin glosario. Compáralo con Goliath + glosario para separar lo que aporta el modelo de lo que aporta el dato.
 
 Con el mismo glosario, Goliath resuelve 82 % de la jerga frente al 82 % de David: la ventaja de David viene de **sus datos** (el banco de términos), no de ser mejor modelo; y esos datos los tiene él, no Goliath.
 

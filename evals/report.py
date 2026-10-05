@@ -117,11 +117,12 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
         ref = next((n for n in candidates if n.removesuffix(" + glosario") == f"{family}-f16"), best)
         near = [n for n in candidates if handled_total(computed[n]) >= handled_total(computed[ref]) - 0.02
                 and summary[n].get("size_bytes")]
-        david = min(near, key=lambda n: summary[n]["size_bytes"], default=best)
+        # Ties on size (same quantization) go to the higher chrF++.
+        david = min(near, key=lambda n: (summary[n]["size_bytes"], -(summary[n]["chrf"] or 0)), default=best)
         lines += [
             f"**David en escena:** `{david}` ({_gb(summary[david].get('size_bytes'))}, p50 {_ms(summary[david]['p50'])}): "
             f"el archivo más pequeño a ≤ 2 puntos de `{ref}` ({100 * handled_total(computed[ref]):.0f} % de jerga resuelta), "
-            f"con p50 < 1 s. Resuelve {100 * handled_total(computed[david]):.0f} %.",
+            f"con p50 < 1 s (empate de tamaño: gana el mayor chrF++). Resuelve {100 * handled_total(computed[david]):.0f} %.",
             "",
         ]
     if rates is not None:  # read by compression_section
