@@ -146,7 +146,7 @@ Las diez peores derrotas de David y los cortes por país y dirección están en 
 | Tecla `M`: el David anterior | Wi-Fi apagado |
 | --- | --- |
 | ![El David anterior (tecla M)](demo/08-david-anterior.png) | ![Sin internet: Goliath sin conexión, David sigue](demo/09-sin-internet.png) |
-| Tecla `M`: el David anterior (`genlingo-2026-10-e2b-q5_k_m`) contra Goliath con la misma frase («no manches, la peli estuvo bien mid y me dio cringe»); el marcador cuenta solo sus rondas. | Sin red: Goliath aparece «sin conexión» y el David de escena responde en 0.81 s («ese bolo anda chupando desde la tarde…» → «Ese muchacho anda borrachísimo desde la tarde…»). |
+| Tecla `M`: el David anterior (`genlingo-2026-10-e2b-q5_k_m`) contra Goliath con la misma frase («no manches, la peli estuvo bien mid y me dio cringe»); el marcador cuenta solo sus rondas. | Sin red: Goliath aparece «sin conexión» y el David de escena responde en 0.85 s («ese bolo anda chupando desde la tarde…» → «Ese muchacho anda borrachísimo desde la tarde…»). |
 
 ## Costo de entrenamiento por ejecución
 

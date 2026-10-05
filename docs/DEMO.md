@@ -84,7 +84,7 @@ Qué onda, maje, no traigo pisto para el chinique, estoy bien pisado
 Enter
 ```
 
-> David responde en menos de un segundo y gratis; Goliath tarda varios segundos y cobra por cada frase.
+> David responde en menos de un segundo y gratis; Goliath depende de la red y cobra por cada frase.
 
 ### 5 · Frase escrita, papás → Gen Z (1 min)
 
@@ -121,7 +121,7 @@ V
 
 `Enter` lanza la ronda con la frase del público, el público vota desde el teléfono y `V` cierra la votación.
 
-> La frase llegó del teléfono a la pantalla en menos de 3 segundos; el voto decide quién ganó.
+> La frase llegó del teléfono a la pantalla en segundos; el voto decide quién ganó.
 
 ### 7 · El David anterior (1 min)
 

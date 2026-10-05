@@ -329,13 +329,19 @@ function FitText({ text, start, min = 36, className }: { text: string; start: nu
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    let size = start;
-    el.style.fontSize = `${size}px`;
-    // Display glyphs poke a little above/below a tight line box; only a hidden line counts as overflow.
-    while (size > min && el.scrollHeight - el.clientHeight > size * 0.4) {
-      size -= 4;
+    const fit = () => {
+      let size = start;
       el.style.fontSize = `${size}px`;
-    }
+      // Display glyphs poke a little above/below a tight line box (about a tenth of the size); more
+      // than that is a line cut off at the bottom.
+      while (size > min && el.scrollHeight - el.clientHeight > size * 0.15) {
+        size -= 4;
+        el.style.fontSize = `${size}px`;
+      }
+    };
+    fit();
+    // The display font may arrive after the first measurement and wrap differently.
+    document.fonts?.ready.then(fit);
   }, [text, start, min]);
   return (
     <p ref={ref} className={className} style={{ fontSize: start }}>

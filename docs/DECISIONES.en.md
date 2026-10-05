@@ -146,7 +146,7 @@ David's ten worst losses and the per-country and per-direction breakdowns are in
 | `M` key: the previous David | Wi-Fi off |
 | --- | --- |
 | ![The previous David (M key)](demo/08-david-anterior.png) | ![No internet: Goliath offline, David keeps going](demo/09-sin-internet.png) |
-| `M` key: the previous David (`genlingo-2026-10-e2b-q5_k_m`) against Goliath on the same phrase ("no manches, la peli estuvo bien mid y me dio cringe"); the scoreboard counts only his rounds. | No network: Goliath shows as "sin conexión" (offline) and the on-stage David answers in 0.81 s ("ese bolo anda chupando desde la tarde…" → "Ese muchacho anda borrachísimo desde la tarde…", that guy has been very drunk since the afternoon). |
+| `M` key: the previous David (`genlingo-2026-10-e2b-q5_k_m`) against Goliath on the same phrase ("no manches, la peli estuvo bien mid y me dio cringe"); the scoreboard counts only his rounds. | No network: Goliath shows as "sin conexión" (offline) and the on-stage David answers in 0.85 s ("ese bolo anda chupando desde la tarde…" → "Ese muchacho anda borrachísimo desde la tarde…", that guy has been very drunk since the afternoon). |
 
 ## Training cost per run
 
