@@ -2,7 +2,7 @@
 //   node e2e/demo-shots.mjs <presenterBase> <outDir> <step>
 // steps: stage (01–05), audience (07: waits for the phrase sent from the emulator, runs it),
 // previous (08), offline (09: duel service started with FORCE_OFFLINE=1). The phone screenshot
-// (06) comes from the emulator itself: adb -s emulator-5556 exec-out screencap -p > 06-publico-telefono.png
+// (06) comes from the emulator itself (Pixel_9_API_36_1): adb exec-out screencap -p > 06-publico-telefono.png
 import { chromium } from "@playwright/test";
 
 const [base = "http://127.0.0.1:3000", out = "../docs/demo", step = "stage"] = process.argv.slice(2);
@@ -60,7 +60,7 @@ if (step === "stage") {
   await stage.keyboard.press("m");
   await stage.waitForTimeout(800);
   await typed("no manches, la peli estuvo bien mid y me dio cringe");
-  await shot("08-mes-anterior");
+  await shot("08-david-anterior");
   await stage.keyboard.press("m");
 } else if (step === "offline") {
   await typed("ese bolo anda chupando desde la tarde, qué pena con los vecinos");

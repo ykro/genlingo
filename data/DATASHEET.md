@@ -114,8 +114,7 @@ count ambiguous terms, not a source of terms or sentences).
    (`scripts/validate_test_set.py`, no human needed): Gen Z → papás sources must contain a Gen Z
    term of their country and the reference must replace it; papás → Gen Z references must contain
    Gen Z slang of the country; no other-country terms; sane length; no overlap with training.
-   Passing pairs are `auto_validated`, failing ones `rejected` with the reason. A human pass
-   (`make review-test`) is optional and overrides the automatic decision.
+   Passing pairs are `auto_validated`, failing ones `rejected` with the reason.
 5. **Dev pairs** (`origin=web`, `split=dev`, `data/pairs/dev_real.jsonl`, 146 pairs). One real sentence in five
    from the training side (stable hash of the sentence id, both directions together) is held out to
    decide data rounds and ablations, so the test set is touched once per round. Dev never overlaps a
@@ -138,8 +137,7 @@ count ambiguous terms, not a source of terms or sentences).
 ## Uses
 
 Training David (`split=train`, status `auto_validated` or `approved`), duel evaluation rounds and
-`make eval` (`split=test`, status `auto_validated`: validated automatically, no human needed; a
-human pass with `make review-test` is optional and its `approved`/`rejected` decisions win).
+`make eval` (`split=test`, status `auto_validated`: validated automatically, no human needed).
 `pending_review` pairs are used only in rehearsal reports, labelled as such.
 
 ## Known limitations

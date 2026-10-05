@@ -141,7 +141,7 @@ Regla: el más pequeño que cumpla p50 < 1 s con el mejor chrF++.
 
 ## Compresión: f16 vs cuantizado
 
-El David de escena no se evaluó en f16 en esta corrida; estas son las comparaciones que sí tiene, cada David con su propio f16 y el mismo prompt.
+El David de escena no se evaluó en f16 en esta ejecución; estas son las comparaciones que sí tiene, cada David con su propio f16 y el mismo prompt.
 
 | modelo | versión | tamaño | p50 | chrF++ | jerga resuelta |
 | --- | --- | --- | --- | --- | --- |

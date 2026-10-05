@@ -144,10 +144,9 @@ make test-set                 # 1. set de prueba desde oraciones reales, validad
 make real-pairs               #    pares de entrenamiento anclados en oraciones reales
 make export                   # 2. (si hubo público) pares aprobados en /admin -> data/pairs/human.jsonl
 make pairs                    # 3. (opcional) regenerar los pares sintéticos con Gemini (~$0.71, ~10 min)
-make train TAG=genlingo-2026-11-e2b                         # 4. LoRA (L4) + merge y GGUF (CPU) en Cloud Run -> train/runs/<tag>.json
-make train TAG=genlingo-2026-11-e4b GEMMA_BASE_MODEL=gemma-4-E4B-it   # E4B: el job de CPU no alcanza...
-make train-finish TAG=genlingo-2026-11-e4b                  # 5. ...respaldo: merge + GGUF en la laptop
-make pull-model TAG=genlingo-2026-11-e2b FP16=1             # 6. a Ollama
+make train                    # 4. LoRA (L4) + merge y GGUF (CPU) en Cloud Run -> train/runs/genlingo-<año>-<mes>.json
+make train-finish             # 5. (solo si falla el job de CPU) merge + GGUF en la laptop, mismo TAG
+make pull-model TAG=genlingo-<año>-<mes> FP16=1   # 6. a Ollama
 make eval                     # 7. evals/report.md (con DAVID_TAGS que incluya los tags nuevos)
 ```
 
@@ -155,7 +154,7 @@ make eval                     # 7. evals/report.md (con DAVID_TAGS que incluya l
 
 Qué pasa en cada paso:
 
-1. **Set de prueba sin humanos.** `scripts/validate_test_set.py` valida cada par contra el banco de términos (la jerga del origen existe y se reemplaza, o la referencia usa jerga Gen Z del país; nada de otro país; longitud; sin solapes con entrenamiento) y lo marca `auto_validated` o `rejected` con el motivo. Las rondas `E` y el eval usan los `auto_validated`. `make review-test` queda como pasada humana opcional, y sus decisiones mandan sobre las automáticas. `make real-pairs` arma pares de entrenamiento con la otra mitad de las oraciones reales de la segunda ronda de investigación.
+1. **Set de prueba sin humanos.** `scripts/validate_test_set.py` valida cada par contra el banco de términos (la jerga del origen existe y se reemplaza, o la referencia usa jerga Gen Z del país; nada de otro país; longitud; sin solapes con entrenamiento) y lo marca `auto_validated` o `rejected` con el motivo. Las rondas `E` y el eval usan los `auto_validated`. `make real-pairs` arma pares de entrenamiento con la otra mitad de las oraciones reales de la segunda ronda de investigación.
 2. **`make export`** lee `pairs` con `status == approved` de Firestore, los convierte en pares `origin=human` (procedencia: evento e id) y manda 20 % al split de prueba con un hash estable del id.
 3. **`make counterparts`** y **`make pairs`**: `scripts/build_counterparts.py` arma la tabla de contrapartes validadas por significado (`data/counterparts.jsonl`: vecinos mutuos con coseno ≥ 0.65, o la elección de Gemini entre 5 candidatos confirmada por una palabra de significado compartida). `scripts/generate_pairs.py` genera los pares sintéticos: cada llamada nombra un término y, solo si la tabla la tiene, su contraparte; sin contraparte, el lado de papás dice el significado. Los pares llevan trampas de otro país como negativos difíciles; cada par se valida contra el banco y los rechazos se cuentan por motivo en `data/pairs/synthetic.meta.json`. `scripts/generate_multi_pairs.py` (pares que cambian 2–3 términos a la vez, `data/pairs/synthetic_multi.jsonl`) no entra en la receta de escena ni en `make pairs`: sus pares solo se usan en ablaciones con `MULTI=1`.
 4. **`make train`** primero corre `make train-data` (`scripts/build_train_set.py`): renderiza los pares de entrenamiento con el prompt del duelo (estilo `lexicon` por defecto: país + léxico, con la respuesta en el glosario en el 85 % de los ejemplos) a `data/train/chat.jsonl`, sin los pares de varios términos, y anota el estilo y lo excluido en `chat.meta.json`; solo con `ORPO=1`, `scripts/build_pref_set.py` arma `data/train/pref.jsonl`, las frases de la etapa de preferencias (ORPO) del mismo job. Después `train/submit_job.py` sube el JSONL al bucket de staging, asegura la imagen (02) y el job (03), ejecuta `genlingo-train` (L4: entrena y guarda el adaptador en `gs://…-train-eu/genlingo/runs/<tag>/adapter`) y, si termina bien, `genlingo-finish` (CPU: `train/finish.py` fusiona, convierte a GGUF f16, cuantiza a `QUANT` y publica en el bucket de modelos con su `Modelfile`). Espera a los dos, calcula el costo de cada etapa y escribe `train/runs/<tag>.json` con duración, máquina, costo por etapa (`stages`) y total, métricas y `prompt_style`. `QUANT=Q5_K_M` y `KEEP_F16=1` vienen de `.env`. `TAG` lleva la fecha de los datos, no la del entrenamiento: por defecto `genlingo-<año>-<mes>` del día; si el mes ya tiene una versión de datos, agrega una letra (`genlingo-2026-10b`). Usa el sufijo de la base (`-e2b`, `-e4b`) cuando compares bases.
@@ -231,7 +230,7 @@ El script entra a `/admin` con `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, aprueba
 
 | Síntoma | Causa y solución |
 | --- | --- |
-| `make up` dice «… no está en Ollama» | Ese tag no está registrado: `make pull-model TAG=…`. |
+| `make up` dice «… no está en Ollama» | Ese tag no está registrado: `make pull-model TAG=` con el tag que nombra el mensaje. |
 | La latencia de David sube a 2–3 s y la del glosario a ~850 ms | Ollama está descargando y recargando modelos. `make up` pide `OLLAMA_MAX_LOADED_MODELS=4`, pero solo aplica si `make up` arrancó Ollama (si ya corría, configúralo allí); cualquier otro modelo (otra demo, un `make eval`) puede desalojar alguno. Revisa con `ollama ps` y descarga lo que sobre con `curl http://127.0.0.1:11434/api/generate -d '{"model":"<modelo>","keep_alive":0}'`. |
 | La primera ronda con `M` tarda varios segundos | El David anterior no estaba cargado. `make warmup` lo vuelve a cargar (ver la lista del día de la charla). |
 | `E` muestra «No quedan frases de prueba para esa combinación» | Ya se usaron todos los pares `auto_validated` de esa combinación (o falta `make test-set`). `make reset` libera las ya usadas. |
@@ -241,7 +240,7 @@ El script entra a `/admin` con `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, aprueba
 | Una frase aprobada no llega a la pantalla | `AUDIENCE_FEED=0` o `EVENT_ID` distinto entre `.env` y Cloud Run. `GET http://127.0.0.1:8787/health` muestra `audience_feed`, `event` y `feed_last_sync`. |
 | El teléfono muestra una ronda vieja de un ensayo | El teléfono muestra la última ronda del evento. `make reset` con `AUDIENCE_FEED=1` y red borra las rondas del evento; o usa un `EVENT_ID` nuevo por evento. |
 | `make test` falla con «Firestore rules tests can't run» | Falta JDK 21 (`brew install openjdk@21`) o `web/node_modules` (`cd web && npm install`). `SKIP_RULES=1` las omite a propósito. |
-| `genlingo-finish` muere con «memory limit was reached» | Base demasiado grande para fusionar en 32 GiB (E4B). El adaptador ya está en el bucket: termina con `make train-finish TAG=…`. |
+| `genlingo-finish` muere con «memory limit was reached» | Base demasiado grande para fusionar en 32 GiB (E4B). El adaptador ya está en el bucket: termina con `make train-finish` y el mismo `TAG`. |
 | `make train-finish` falla con «No space left on device» | Fusionar E2B ocupa ~10 GB y el GGUF f16 otros ~9 GB. Borra `models/.work/<tag>/merged` y GGUF viejos de `models/` (Ollama guarda su propia copia). |
 | `make train` falla al descargar pesos con 429 | Descargas anónimas de Hugging Face desde la nube. Crea `hf-token` en Secret Manager y vuelve a correr `infra/01-train-service-account.sh`. |
 

@@ -408,8 +408,8 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
         lines += ["> **MOCK_AI=1**: números de ensayo con modelos simulados, no reales.", ""]
     if raw.get("latency"):
         L = raw["latency"]
-        lines += [f"> **Latencias** (p50, p95): de la corrida exclusiva `{L['file']}` ({L['n']} frases, nada más cargado en "
-                  "Ollama). La calidad sale de esta corrida, que pudo compartir la máquina con otros modelos.", ""]
+        lines += [f"> **Latencias** (p50, p95): de la ejecución exclusiva `{L['file']}` ({L['n']} frases, nada más cargado en "
+                  "Ollama). La calidad sale de esta ejecución, que pudo compartir la máquina con otros modelos.", ""]
     if not raw["reviewed"]:
         lines += [
             "> **Ensayo:** este eval incluyó referencias sin validar (`pending_review`); "
@@ -488,7 +488,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
         lines += [
             "## Compresión: f16 vs cuantizado",
             "",
-            "El David de escena no se evaluó en f16 en esta corrida; estas son las comparaciones que sí tiene, "
+            "El David de escena no se evaluó en f16 en esta ejecución; estas son las comparaciones que sí tiene, "
             "cada David con su propio f16 y el mismo prompt.",
             "",
             table(
@@ -500,7 +500,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
         ]
     else:
         lines += [f"## Compresión: f16 vs {quant}", "",
-                  "Pendiente: se necesita David en f16 y cuantizado en Ollama (`make pull-model FP16=1`).", ""]
+                  "Esta ejecución no incluyó ningún David en f16; para compararlo, `make pull-model TAG=<tag> FP16=1` antes de `make eval`.", ""]
 
     lines += ["## Entrenamiento", ""]
     run = None
@@ -529,7 +529,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
             "",
         ]
     else:
-        lines += ["Aún no hay una corrida de entrenamiento terminada para el tag actual de David.", ""]
+        lines += ["Aún no hay una ejecución de entrenamiento terminada para el tag actual de David.", ""]
 
     goliath = next((s for s in summary.values() if s["role"] == "goliath"), None)
     if david and goliath:

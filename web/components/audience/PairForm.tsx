@@ -58,7 +58,7 @@ export function PairForm({ user, country }: { user: User; country: PublicConfig[
       <div id="teach-form" className={s.collapse} data-open={open}>
         <form className={s.form} onSubmit={submit} noValidate inert={!open}>
           <p className={s.help}>
-            Escribe una frase y cómo la diría la otra generación en {COUNTRY_LABEL[country]}. Así se arma el set de entrenamiento.
+            Escribe una frase y cómo la diría la otra generación en {COUNTRY_LABEL[country]}. Si el presentador la aprueba, entra al próximo entrenamiento de David.
           </p>
           <fieldset className={s.segmented}>
             <legend className="sr-only">Dirección del par</legend>

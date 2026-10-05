@@ -6,11 +6,10 @@ The source side is a sentence someone actually wrote (found on the web, see SOUR
 reference is the dataset curator's rewrite of that sentence into the other generation's speech,
 based on the meaning the source gives. Gemini never writes a test reference: if it did, chrF++
 would reward Goliath for sounding like himself. scripts/validate_test_set.py then validates every
-pair automatically against the term bank (`auto_validated` or `rejected`, no human needed); a
-human pass with `make review-test` is optional.
+pair automatically against the term bank (`auto_validated` or `rejected`, no human needed).
 
-Existing decisions are kept: re-running never resets a pair that was already validated,
-approved or rejected.
+Existing decisions are kept: re-running never resets a pair that was already validated
+or rejected.
 """
 
 from __future__ import annotations
@@ -63,7 +62,7 @@ def build(usage_rows: list[dict], licenses: dict[str, dict[str, str]], previous:
         }
         prev = previous.get(pid)
         if prev and prev["status"] != "pending_review":
-            pair["status"], pair["target"] = prev["status"], prev["target"]  # keep review decisions
+            pair["status"], pair["target"] = prev["status"], prev["target"]  # keep earlier validation decisions
             if "validation" in prev.get("provenance", {}):
                 pair["provenance"]["validation"] = prev["provenance"]["validation"]
         Pair.model_validate(pair)

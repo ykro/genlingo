@@ -9,7 +9,7 @@ DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
 # JDK 21 for the Firestore emulator (rules tests), only inside make: brew install openjdk@21
 JAVA21    := $(shell brew --prefix openjdk@21 2>/dev/null)/libexec/openjdk.jdk/Contents/Home
 
-.PHONY: help up reset test eval eval-dev niches counterparts train train-local train-finish train-data quant-sweep pull-model export review-test review-test-apply \
+.PHONY: help up reset test eval eval-dev niches counterparts train train-local train-finish train-data quant-sweep pull-model export \
         test-set real-pairs ambiguous-terms pairs datasheet data deploy stage-on stage-off warmup preflight
 
 help:
@@ -77,12 +77,6 @@ datasheet: ## Recount data/DATASHEET.md
 
 data: test-set real-pairs pairs datasheet ## Rebuild all data (test set, real-anchored pairs, synthetic pairs, datasheet)
 
-review-test: ## (Optional) export the test set to a CSV for a human pass over the automatic validation
-	$(UV) python scripts/review_test.py export
-
-review-test-apply: ## Apply the decisions from data/review/test_review.csv
-	$(UV) python scripts/review_test.py apply
-
 export: ## Pull presenter-approved audience pairs from Firestore into data/pairs/human.jsonl
 	$(UV) python scripts/export_human.py
 	$(UV) python scripts/datasheet.py
@@ -95,7 +89,7 @@ train-data: ## Render training pairs into chat JSONL with the lexicon glossary (
 	$(UV) python scripts/build_train_set.py $(TRAIN_EXCLUDE)
 	$(if $(filter 1,$(ORPO)),$(UV) python scripts/build_pref_set.py)
 
-train: train-data ## Fine-tune in the cloud (L4 job trains, CPU job merges + GGUF): make train TAG=genlingo-2027-03 [QUANT=Q5_K_M] [TRAIN_ARGS=…]
+train: train-data ## Fine-tune in the cloud (L4 job trains, CPU job merges + GGUF): make train [TAG=genlingo-YYYY-MM, default today] [QUANT=Q5_K_M] [TRAIN_ARGS=…]
 	$(UV) python train/submit_job.py --app genlingo --tag $(TAG) --data data/train/chat.jsonl \
 	  $(if $(filter 1,$(ORPO)),--pref data/train/pref.jsonl) -- $(TRAIN_ARGS)
 
@@ -103,14 +97,14 @@ train-local: train-data ## Same training on this Mac (MPS), for experiments
 	uv run --python 3.12 --with-requirements train/requirements.txt --with torch==2.14.0 \
 	  python train/train_local.py $(TAG) data/train/chat.jsonl
 
-train-finish: ## Fallback: merge + GGUF a cloud-trained adapter on this Mac: make train-finish TAG=… [QUANT=…] [KEEP_F16=1]
+train-finish: ## Fallback: merge + GGUF a cloud-trained adapter on this Mac: same TAG as make train [QUANT=Q5_K_M] [KEEP_F16=1]
 	uv run --python 3.12 --with-requirements train/requirements.txt --with torch==2.14.0 \
 	  python train/finish_local.py $(TAG)
 
 quant-sweep: ## Q5/Q6/Q8 + imatrix-calibrated Q4/Q5 from a David's f16 GGUF, registered in Ollama
 	train/setup_llama_cpp.sh >/dev/null && uv run --project duel python train/quant_sweep.py $(TAG)
 
-pull-model: ## Download a trained David into Ollama: make pull-model TAG=... [FP16=1]
+pull-model: ## Download a trained David into Ollama: make pull-model TAG=genlingo-2026-10c-e2b-nomulti [FP16=1]
 	MODELS_BUCKET=$(MODELS_BUCKET) train/pull_model.sh $(TAG)
 
 deploy: ## Deploy the audience web app to Cloud Run (min-instances=0; make stage-on warms it on talk days)

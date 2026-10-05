@@ -4,7 +4,7 @@
 
 Generado por `make eval` el 2026-09-30 15:30. 319 pares de prueba (web; nunca sintéticos).
 
-> **Ensayo:** las referencias de prueba aún están en `pending_review` (sin revisión del presentador). Los números cambiarán al aprobar/corregir el set con `make review-test`.
+> **Ensayo:** en esa fecha las referencias de prueba aún no pasaban por la validación automática (estado `pending_review`).
 
 ## Resumen
 

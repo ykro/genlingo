@@ -12,8 +12,6 @@ in provenance.validation:
 - no duplicates inside the test set and no overlap with any training file (synthetic, real-anchored,
   audience), including a test sentence quoted inside a longer training sentence or vice versa
   (raw and normalized substrings, genlingo_duel.overlap).
-A human pass is optional: decisions a person made with `make review-test` (approved/rejected)
-are never overwritten.
 """
 
 from __future__ import annotations
@@ -70,9 +68,6 @@ def main() -> None:
     train_text = training_index()
     rows, seen, reasons = list(read_jsonl(TEST)), set(), Counter()
     for r in rows:
-        if r["status"] in ("approved", "rejected") and r["provenance"].get("validation", {}).get("by") != "auto":
-            seen.add(norm(r["source"]))
-            continue  # a person decided; keep it
         if r["provenance"].get("validation", {}).get("reason") == "overlaps_training":
             seen.add(norm(r["source"]))
             continue  # once leaked, always out: an earlier David trained on it (even if that data is archived now)

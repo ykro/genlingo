@@ -22,15 +22,13 @@ Every `Makefile` command. `make help` lists them with their description. Back to
 | `make pairs` | Generates the single-term synthetic training pairs with `GEMINI_MODEL` (paid; `SYNTHETIC_PAIRS_TARGET`, currently 1,500). The 2–3-term pairs (`scripts/generate_multi_pairs.py`, `data/pairs/synthetic_multi.jsonl`) are not part of the stage recipe and are not regenerated here. |
 | `make datasheet` | Recounts `data/DATASHEET.md`. |
 | `make data` | `test-set` + `real-pairs` + `pairs` + `datasheet`. |
-| `make review-test` | (Optional) exports the test set to a CSV for a human pass over the automatic validation. |
-| `make review-test-apply` | Applies the CSV decisions (`a` approve, `r` reject, optional corrected reference). |
 | `make export` | Pulls the audience pairs approved in `/admin` from Firestore into `data/pairs/human.jsonl` and recounts the datasheet. |
 | `make train-data` | Renders the training pairs into chat JSONL with the duel's exact prompt (and lexicon), following the on-stage David's recipe: no 2–3-term pairs and no ORPO stage. `MULTI=1` includes those pairs and `ORPO=1` also builds `data/train/pref.jsonl` (rejected variants, for ablations). |
-| `make train` | Trains on a Cloud Run Job with one L4, then merges and converts to GGUF on a CPU job: `make train TAG=genlingo-2027-03 [QUANT=Q5_K_M] [GEMMA_BASE_MODEL=…] [TRAIN_ARGS=…]`. Runs `make train-data` first (accepts `MULTI=1` and `ORPO=1`; with `ORPO=1` the job adds the preference stage). Writes `train/runs/<tag>.json`. |
-| `make train-finish` | Fallback: merges and exports to GGUF on the laptop an adapter trained in the cloud, and publishes it: `make train-finish TAG=…`. |
+| `make train` | Trains on a Cloud Run Job with one L4, then merges and converts to GGUF on a CPU job: `make train [TAG=…] [QUANT=Q5_K_M] [TRAIN_ARGS=…]`; `TAG` defaults to `genlingo-<year>-<month>` of the day. Runs `make train-data` first (accepts `MULTI=1` and `ORPO=1`; with `ORPO=1` the job adds the preference stage). Writes `train/runs/<tag>.json`. |
+| `make train-finish` | Fallback: merges and exports to GGUF on the laptop an adapter trained in the cloud, and publishes it: `make train-finish` with the job's same `TAG`. |
 | `make train-local` | The same training on the Mac (MPS), for experiments. |
 | `make quant-sweep` | From a David's f16 GGUF: Q5_K_M, Q6_K, Q8_0 and imatrix-calibrated Q4/Q5 (calibrated on training pairs), registered in Ollama. |
-| `make pull-model` | Downloads a David from the bucket and registers it in Ollama: `make pull-model TAG=… [FP16=1]`. |
+| `make pull-model` | Downloads a David from the bucket and registers it in Ollama: `make pull-model TAG=genlingo-2026-10c-e2b-nomulti [FP16=1]`. |
 | `make deploy` | Creates the web service account and deploys the audience app to Cloud Run (`min-instances=0`; `make stage-on` keeps it warm on talk days). |
 
 ## Quickstart

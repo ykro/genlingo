@@ -2,7 +2,7 @@
 
 End to end, one command (runs inside the Cloud Run GPU job, in Colab Enterprise, or locally):
 
-    python train_lora.py --data gs://…/train.jsonl --tag genlingo-2027-03 \
+    python train_lora.py --data gs://…/train.jsonl --tag genlingo-2026-10c-e2b-nomulti \
         --base-model $GEMMA_BASE_MODEL --weights-uri $GEMMA_WEIGHTS_URI --ollama-renderer $OLLAMA_RENDERER \
         --output-uri gs://ai-experiments-487722-genlingo-models
 
@@ -356,7 +356,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     env = os.environ.get
     ap = argparse.ArgumentParser(description="LoRA fine-tune -> merge -> GGUF -> Ollama Modelfile -> GCS")
     ap.add_argument("--data", required=True, help="chat JSONL (local path or gs://)")
-    ap.add_argument("--tag", required=True, help="model tag with the data date, e.g. genlingo-2027-03")
+    ap.add_argument("--tag", required=True, help="model tag with the data date, e.g. genlingo-2026-10c-e2b-nomulti")
     ap.add_argument("--base-model", default=env("GEMMA_BASE_MODEL"), required=not env("GEMMA_BASE_MODEL"))
     # No model or family names in code: they come from the env (.env) or the command line.
     ap.add_argument("--weights-uri", default=env("GEMMA_WEIGHTS_URI"), required=not env("GEMMA_WEIGHTS_URI"),

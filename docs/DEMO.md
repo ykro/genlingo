@@ -29,8 +29,8 @@ Una hora antes, en la laptop del escenario (M1 Max, cargada):
       «preflight ok»; cada `[FALLA]` dice cómo arreglarlo.
 - [ ] Proyector: pantalla duplicada o extendida a 1920×1080, Chrome en `http://127.0.0.1:3000/presenter`,
       zoom 100 %, `F` para pantalla completa. Mira desde el fondo de la sala que el QR se lea.
-- [ ] App del público: abre la URL de Cloud Run en el Chrome del emulador
-      (`adb -s emulator-5556`) y en tu teléfono. Tiene que cargar «El duelo está por empezar.».
+- [ ] App del público: abre la URL de Cloud Run en el Chrome del emulador `Pixel_9_API_36_1`. Tiene
+      que cargar «El duelo está por empezar.».
 - [ ] Prueba de Wi-Fi apagado: apaga el Wi-Fi, escribe una frase, comprueba «Sin conexión» y que David
       responde; vuelve a encender el Wi-Fi y espera a que el indicador diga «En línea».
 - [ ] `make reset`: marcador en cero (tarda menos de un segundo; si Firestore falla, lo dice). Deja la
@@ -125,7 +125,7 @@ V
 
 ### 7 · El David anterior (1 min)
 
-![El David anterior](demo/08-mes-anterior.png)
+![El David anterior](demo/08-david-anterior.png)
 
 ```
 M

@@ -1,6 +1,6 @@
 """Run the same training on this laptop (Apple Silicon, MPS) and record it like a cloud run.
 
-    make train-local TAG=genlingo-2027-03
+    make train-local TAG=genlingo-2026-10c-e2b-nomulti
 
 For experiments without the cloud GPU: identical script, identical
 outputs (GGUF QUANT + f16, Modelfile, uploaded to the models bucket), so `make pull-model` and the

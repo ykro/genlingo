@@ -4,7 +4,7 @@ Runs as its own Cloud Run Job (CPU only, `${APP}-finish`), right after the GPU j
 adapter (`${APP}-train`, `ADAPTER_ONLY=1`). `make train` chains both; `make train-finish` runs this
 same code on a laptop as a fallback (finish_local.py).
 
-    python finish.py --tag genlingo-2027-03 --adapter-uri /mnt/work/genlingo/runs/genlingo-2027-03/adapter \
+    python finish.py --tag genlingo-2026-10c-e2b-nomulti --adapter-uri /mnt/work/genlingo/runs/genlingo-2026-10c-e2b-nomulti/adapter \
         --base-model $GEMMA_BASE_MODEL --weights-uri $GEMMA_WEIGHTS_URI --ollama-renderer $OLLAMA_RENDERER \
         --quant Q5_K_M --keep-f16 --output-uri gs://ai-experiments-487722-genlingo-models
 

@@ -33,7 +33,7 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
   2. **Term bank** (`data/terms.jsonl`): term, meaning, country, generation, example, source; terms that are also ordinary words are flagged `ambiguous` from general-speech counts.
   3. **Real sentences** (`data/raw/web_usage*.jsonl`): round 1 goes to test; round 2 is split by a stable hash of the id, half test, half training pairs anchored in the real sentence (`make real-pairs`).
   4. **Synthetic pairs** from `GEMINI_MODEL` anchored on the term bank (`make pairs`), validated against the bank; model, prompt version and seed recorded.
-  5. **Test set**: `origin=web` only, never synthetic (a Gemini reference would bias chrF++ toward Goliath). `make test-set` validates every pair against the term bank and marks it `auto_validated` or `rejected` with the reason, including any overlap with training (also as a substring). A human pass (`make review-test`) is optional.
+  5. **Test set**: `origin=web` only, never synthetic (a Gemini reference would bias chrF++ toward Goliath). `make test-set` validates every pair against the term bank and marks it `auto_validated` or `rejected` with the reason, including any overlap with training (also as a substring).
 - The audience app can add `origin=human` pairs at an event (approved in `/admin`; `make export`).
 - The prompt receives `country` and a glossary from the term bank, so each event can use its local variant.
 
@@ -42,7 +42,7 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
 - `train/train_lora.py` fine-tunes `GEMMA_BASE_MODEL` with LoRA (r=32, alpha=16, rsLoRA, lr 2e-4, 3 epochs) on the chat JSONL rendered with the duel's prompt (`make train-data`, style `lexicon`: country + lexicon).
 - `train/finish.py` merges the adapter, writes the f16 and `QUANT` (Q5_K_M) GGUFs and the Modelfile, and uploads to `gs://ai-experiments-487722-genlingo-models/<tag>/`.
 - `make train` runs both as Cloud Run Jobs from one image (`infra/03-train-job.sh`) and writes `train/runs/<tag>.json` with duration and estimated cost per stage. `TRAIN_RUNTIME=vertex` runs everything as one Vertex AI Custom Job; `train/genlingo.ipynb` wraps it for Colab; `make train-finish` redoes the merge on the laptop.
-- `make pull-model TAG=…` downloads the GGUF and runs `ollama create`.
+- `make pull-model TAG=genlingo-2026-10c-e2b-nomulti` downloads the GGUF and runs `ollama create`.
 - Tags carry the data date (`genlingo-YYYY-MM`, plus a letter for a second data version in the same month, e.g. `genlingo-2026-10c-e2b-nomulti`, the third data version of October without the multi-term pairs).
 - `make eval` picks the on-stage David: the smallest export within 2 points of its f16 on slang handled, with p50 < 1 s.
 

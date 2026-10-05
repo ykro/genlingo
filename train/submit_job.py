@@ -1,6 +1,6 @@
 """Run the LoRA fine-tune in the cloud, wait, and record how long it took and what it cost.
 
-    python train/submit_job.py --app genlingo --tag genlingo-2027-03 --data data/train/chat.jsonl
+    python train/submit_job.py --app genlingo --tag genlingo-2026-10c-e2b-nomulti --data data/train/chat.jsonl
 
 Default runtime: two **Cloud Run Jobs** from the same image (infra/03-train-job.sh): `<app>-train`
 with one NVIDIA L4 trains the LoRA adapter, then `<app>-finish` (CPU only) merges it and writes the

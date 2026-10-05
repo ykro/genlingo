@@ -75,7 +75,7 @@ The monthly cycle, from data to stage and back (labels in Spanish):
 
 ### `make train-finish`: the laptop fallback
 
-`make train-finish TAG=…` runs the same `train/finish.py` on the 64 GB Mac: it downloads the adapter from the bucket, merges, converts, quantizes (`QUANT`, `KEEP_F16=1` to publish the f16 too) and publishes to the same bucket, so `make pull-model` doesn't care where the merge happened. Use it when the CPU job can't run, and for E4B: its 16 GB merged checkpoint plus the model in memory don't fit in 32 GiB, not even in the CPU job. E4B did not go on stage: with 67% slang handled and a p50 of 836 ms it doesn't beat the E2B f16.
+`make train-finish` runs the same `train/finish.py` on the 64 GB Mac: it downloads the adapter from the bucket, merges, converts, quantizes (`QUANT`, `KEEP_F16=1` to publish the f16 too) and publishes to the same bucket, so `make pull-model` doesn't care where the merge happened. Use it when the CPU job can't run, and for E4B: its 16 GB merged checkpoint plus the model in memory don't fit in 32 GiB, not even in the CPU job. E4B did not go on stage: with 67% slang handled and a p50 of 836 ms it doesn't beat the E2B f16.
 
 ### Quantization: why Q5_K_M
 
@@ -105,7 +105,7 @@ A reference written by Gemini would reward Goliath for sounding like itself. The
 
 ### Dated Gemini price schedule
 
-Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` is a list of prices by date: every round and every eval uses the price in force that day and records which one it used. The report also shows what the same eval would cost at the 2027 price ($2.26 per 1,000 phrases instead of $1.13). Thinking tokens are billed as output. David's inference costs $0; the presenter view shows his training cost amortized per round. Exports of one training run (`-f16`, `-q5_k_m`, `-iq-q4_k_m`…) share its `train/runs/<tag>.json`.
+Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` is a list of prices by date: every round and every eval uses the price in force that day and records which one it used. The report also shows what the same eval would cost at the 2027 price ($2.26 per 1,000 phrases instead of $1.13). Thinking tokens are billed as output. David's inference costs $0; the presenter view shows his training cost amortized per round. Exports of one training run (`-f16`, `-q5_k_m`) share its `train/runs/<tag>.json`.
 
 ### App Check enforcement is project-wide
 
@@ -145,7 +145,7 @@ David's ten worst losses and the per-country and per-direction breakdowns are in
 
 | `M` key: the previous David | Wi-Fi off |
 | --- | --- |
-| ![The previous David (M key)](demo/08-mes-anterior.png) | ![No internet: Goliath offline, David keeps going](demo/09-sin-internet.png) |
+| ![The previous David (M key)](demo/08-david-anterior.png) | ![No internet: Goliath offline, David keeps going](demo/09-sin-internet.png) |
 | `M` key: the previous David (`genlingo-2026-10-e2b-q5_k_m`) against Goliath on the same phrase ("no manches, la peli estuvo bien mid y me dio cringe"); the scoreboard counts only his rounds. | No network: Goliath shows as "sin conexión" (offline) and the on-stage David answers in 0.81 s ("ese bolo anda chupando desde la tarde…" → "Ese muchacho anda borrachísimo desde la tarde…", that guy has been very drunk since the afternoon). |
 
 ## Training cost per run

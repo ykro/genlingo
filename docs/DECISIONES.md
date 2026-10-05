@@ -75,7 +75,7 @@ El ciclo de cada mes, de los datos al escenario y de vuelta:
 
 ### `make train-finish`: el respaldo en la laptop
 
-`make train-finish TAG=…` corre el mismo `train/finish.py` en la Mac de 64 GB: baja el adaptador del bucket, fusiona, convierte, cuantiza (`QUANT`, `KEEP_F16=1` para publicar también el f16) y publica en el mismo bucket, así que `make pull-model` no distingue dónde se hizo la fusión. Sirve cuando el job de CPU no puede correr, y para E4B: su checkpoint fusionado de 16 GB más el modelo en memoria no caben en 32 GiB ni en el job de CPU. E4B no salió a escena: con 67 % de jerga resuelta y p50 de 836 ms no supera al E2B f16.
+`make train-finish` corre el mismo `train/finish.py` en la Mac de 64 GB: baja el adaptador del bucket, fusiona, convierte, cuantiza (`QUANT`, `KEEP_F16=1` para publicar también el f16) y publica en el mismo bucket, así que `make pull-model` no distingue dónde se hizo la fusión. Sirve cuando el job de CPU no puede correr, y para E4B: su checkpoint fusionado de 16 GB más el modelo en memoria no caben en 32 GiB ni en el job de CPU. E4B no salió a escena: con 67 % de jerga resuelta y p50 de 836 ms no supera al E2B f16.
 
 ### Cuantización: por qué Q5_K_M
 
@@ -105,7 +105,7 @@ Una referencia escrita por Gemini premiaría a Goliath por sonar como él mismo.
 
 ### Tarifas de Gemini con fecha
 
-Los precios cambian, y eso es parte de la historia. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` es una lista de tarifas por fecha: cada ronda y cada eval usan la tarifa vigente ese día y registran cuál usaron. El reporte muestra además lo que costaría el mismo eval con la tarifa de 2027 ($2.26 por 1,000 frases en vez de $1.13). Los tokens de razonamiento se cobran como salida. La inferencia de David cuesta $0; el presentador muestra su costo de entrenamiento amortizado por ronda. Las exportaciones de una misma ejecución (`-f16`, `-q5_k_m`, `-iq-q4_k_m`…) comparten su `train/runs/<tag>.json`.
+Los precios cambian, y eso es parte de la historia. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` es una lista de tarifas por fecha: cada ronda y cada eval usan la tarifa vigente ese día y registran cuál usaron. El reporte muestra además lo que costaría el mismo eval con la tarifa de 2027 ($2.26 por 1,000 frases en vez de $1.13). Los tokens de razonamiento se cobran como salida. La inferencia de David cuesta $0; el presentador muestra su costo de entrenamiento amortizado por ronda. Las exportaciones de una misma ejecución (`-f16`, `-q5_k_m`) comparten su `train/runs/<tag>.json`.
 
 ### App Check se aplica a todo el proyecto
 
@@ -145,7 +145,7 @@ Las diez peores derrotas de David y los cortes por país y dirección están en 
 
 | Tecla `M`: el David anterior | Wi-Fi apagado |
 | --- | --- |
-| ![El David anterior (tecla M)](demo/08-mes-anterior.png) | ![Sin internet: Goliath sin conexión, David sigue](demo/09-sin-internet.png) |
+| ![El David anterior (tecla M)](demo/08-david-anterior.png) | ![Sin internet: Goliath sin conexión, David sigue](demo/09-sin-internet.png) |
 | Tecla `M`: el David anterior (`genlingo-2026-10-e2b-q5_k_m`) contra Goliath con la misma frase («no manches, la peli estuvo bien mid y me dio cringe»); el marcador cuenta solo sus rondas. | Sin red: Goliath aparece «sin conexión» y el David de escena responde en 0.81 s («ese bolo anda chupando desde la tarde…» → «Ese muchacho anda borrachísimo desde la tarde…»). |
 
 ## Costo de entrenamiento por ejecución
