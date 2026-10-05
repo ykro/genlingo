@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Deploy the audience app (web/) to Cloud Run. min-instances=1: the QR code is scanned by a
-# whole room at once, and a cold start would greet them with a spinner.
+# Deploy the audience app (web/) to Cloud Run. min-instances=0, so a deploy never leaves it
+# billing around the clock; on talk days `make stage-on` keeps one warm instance (the QR code is
+# scanned by a whole room at once, and a cold start would greet them with a spinner) and
+# `make stage-off` scales it back to zero afterwards.
 #   EVENT_ID=gdg-guate-2027-03 EVENT_COUNTRY=GT RECAPTCHA_SITE_KEY=... infra/05-deploy-web.sh
 # With RECAPTCHA_SITE_KEY set, the API routes require a valid App Check token (APP_CHECK_ENFORCE=1).
 source "$(dirname "$0")/env.sh"
@@ -14,7 +16,7 @@ URL="https://${SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app"   # deterministic C
 deploy_run "$SERVICE" "$WEB_DIR" \
   --service-account "${APP}-web@${PROJECT_ID}.iam.gserviceaccount.com" \
   --allow-unauthenticated \
-  --min-instances 1 --max-instances 10 \
+  --min-instances 0 --max-instances 10 \
   --cpu 1 --memory 512Mi --concurrency 200 \
   --set-env-vars "^@^GOOGLE_CLOUD_PROJECT=${PROJECT_ID}@FIRESTORE_DATABASE=${FIRESTORE_DATABASE:-genlingo}@EVENT_ID=${EVENT_ID:-ensayo}@EVENT_COUNTRY=${EVENT_COUNTRY:-GT}@FIREBASE_API_KEY=${FIREBASE_API_KEY}@FIREBASE_AUTH_DOMAIN=${PROJECT_ID}.firebaseapp.com@FIREBASE_APP_ID=${FIREBASE_APP_ID}@AUDIENCE_URL=${URL}@ADMIN_EMAILS=${ADMIN_EMAILS:-}@RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}@AUTO_APPROVE_PHRASES=${AUTO_APPROVE_PHRASES:-1}@APP_CHECK_ENFORCE=${APP_CHECK_ENFORCE:-$([ -n "${RECAPTCHA_SITE_KEY:-}" ] && echo 1 || echo 0)}"
 echo "$URL"

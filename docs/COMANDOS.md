@@ -6,7 +6,11 @@ Todos los comandos del `Makefile`. `make help` los lista con su descripción. Vo
 | --- | --- |
 | `make help` | Lista los comandos con su descripción. |
 | `make up` | Arranca Ollama (con `OLLAMA_MAX_LOADED_MODELS=4`), precarga los tres modelos de escena (David, el del mes pasado y EmbeddingGemma), levanta el duelo y la vista del presentador (la recompila si cambió su código). Funciona sin Wi-Fi y sin público. |
-| `make reset` | Pone en cero rondas, votos, cola y marcador locales; con `AUDIENCE_FEED=1` y red, también borra las rondas del evento en Firestore. |
+| `make reset` | Pone en cero rondas, votos, cola y marcador locales; con `AUDIENCE_FEED=1`, también borra las rondas del evento en Firestore (hasta 3 intentos). Si Firestore falla (por ejemplo, sin red), lo dice con la causa y termina con error; el marcador local queda en cero igual. |
+| `make stage-on` | Día de charla: `min-instances=1` en la app del público (`infra/60-stage.sh on`), para que el QR no espere un arranque en frío. Muestra el valor que quedó en Cloud Run. |
+| `make stage-off` | Después de la charla: `min-instances=0` (escala a cero, nada cobra en reposo). |
+| `make warmup` | Despierta la app del público (200 en `/` y `/api/config`), carga en Ollama los dos Davids y EmbeddingGemma, y hace una llamada a David y otra a Goliath: por el duelo si está corriendo (`POST /warmup`, no se registra como ronda) o directo si no. |
+| `make preflight` | Revisión antes de subir: Ollama con los dos Davids y EmbeddingGemma, `/health` del duelo, `/api/config` de la vista del presentador, banco de términos, léxico, set de prueba y ficha de entrenamiento de David, 10 GB libres en disco, app del público con 200, `min-instances` ≥ 1 y el mismo `EVENT_ID`, Gemini (una llamada mínima) y Firestore del evento. Una línea `[ok]` o `[FALLA]` por revisión, con el arreglo; el código de salida es el número de fallas. |
 | `make test` | Pruebas de Python (`MOCK_AI=1`), Vitest, `tsc`, ESLint y, con JDK 21, las reglas de Firestore en el emulador. |
 | `make eval` | Pasa el set de prueba por los modelos base, cada David y Goliath (con y sin glosario) y escribe `evals/report.md`. Acepta `EVAL_ARGS="--limit 50 --no-goliath"`. |
 | `make eval-dev` | Pasa el set de desarrollo (decisiones de datos, ablaciones) y escribe `evals/report_dev.md`: `make eval-dev [EVAL_ARGS="--nbest 4"]`. |
@@ -27,7 +31,7 @@ Todos los comandos del `Makefile`. `make help` los lista con su descripción. Vo
 | `make train-local` | El mismo entrenamiento en la Mac (MPS), para experimentos. |
 | `make quant-sweep` | Desde el GGUF f16 de un David: Q5_K_M, Q6_K, Q8_0 y Q4/Q5 calibrados con imatrix (pares de entrenamiento), registrados en Ollama. |
 | `make pull-model` | Descarga un David del bucket y lo registra en Ollama: `make pull-model TAG=… [FP16=1]`. |
-| `make deploy` | Crea la cuenta de servicio web y despliega la app del público en Cloud Run (`min-instances=1`). |
+| `make deploy` | Crea la cuenta de servicio web y despliega la app del público en Cloud Run (`min-instances=0`; `make stage-on` la mantiene tibia el día de la charla). |
 
 ## Arranque rápido
 
@@ -47,5 +51,15 @@ make up       # Ollama + David precalentado + duelo (:8787) + vista del presenta
 ```
 
 Ensayo sin red ni GPU: pon `MOCK_AI=1` en `.env` y corre `make up` (modelos simulados y deterministas).
+
+## Día de la charla
+
+```bash
+make up                                          # terminal 1: se queda corriendo
+make stage-on && make warmup && make preflight   # terminal 2: app tibia, modelos cargados, todo en [ok]
+make reset                                       # marcador en cero
+# … la charla …
+make stage-off                                   # después: la app del público vuelve a escalar a cero
+```
 
 El guion de la demo en escena, pantalla por pantalla (teclas, frases, qué decir, tiempos y qué hacer si algo falla), está en [DEMO.md](DEMO.md).

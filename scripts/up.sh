@@ -60,7 +60,9 @@ fi
 cd "$ROOT"
 for _ in $(seq 1 120); do curl -sf http://127.0.0.1:3000/api/config >/dev/null && break; sleep 0.5; done
 curl -sf http://127.0.0.1:3000/api/config >/dev/null || fail "la vista del presentador no respondió en :3000 (¿puerto ocupado?)"
-curl -sf "http://127.0.0.1:${PORT}/health" >/dev/null || fail "el servicio del duelo no respondió en :${PORT}"
+# The duel can answer later than the presenter: with AUDIENCE_FEED=1 it first connects to Firestore.
+for _ in $(seq 1 120); do curl -sf "http://127.0.0.1:${PORT}/health" >/dev/null && break; sleep 0.5; done
+curl -sf "http://127.0.0.1:${PORT}/health" >/dev/null || fail "el servicio del duelo no respondió en :${PORT} en 60 s (¿puerto ocupado? mira el log de uvicorn arriba)"
 echo
 echo "  Duelo:      http://127.0.0.1:${PORT}/health"
 echo "  Pantalla:   http://127.0.0.1:3000/presenter   (F pantalla completa, E set de prueba, / escribir, M mes pasado)"

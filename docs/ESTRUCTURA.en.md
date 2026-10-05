@@ -33,10 +33,10 @@ web/                  Next.js: audience app (/), moderation (/admin), presenter 
   e2e/                Rehearsals with Playwright and with the Android emulator
   firestore.rules     No client writes directly; everything goes through the API
 data/                 terms.jsonl, raw/web_usage.jsonl, pairs/, review/, SOURCES.md, DATASHEET.md
-scripts/              Data building, review, export, reset, make up
+scripts/              Data building, review, export, reset, make up, warmup, preflight
 train/                train_lora.py, finish.py, submit_job.py, finish_local.py, train_local.py, notebook, runs/
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/
-infra/                Numbered gcloud scripts (01–06) and shared env.sh
+infra/                Numbered gcloud scripts (01–06, 60 stage on/off) and shared env.sh
 docs/                 DEMO, ONBOARDING, BITACORA, DECISIONES, COMANDOS, ESTRUCTURA, CREDITOS,
                       diagrams/ (HTML + SVG + PNG), screenshots/
 ```

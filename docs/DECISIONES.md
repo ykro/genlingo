@@ -47,7 +47,7 @@ Si hay red, el duelo también llama a Goliath y, con `AUDIENCE_FEED=1`, recibe f
 
 ### Qué corre en la nube
 
-- **App del público** en Cloud Run (`us-central1`, `min-instances=1` para que el QR no reciba a la sala con un arranque en frío). Auth anónima de Firebase (sin registro), App Check con reCAPTCHA Enterprise, límite de una frase cada 20 s aplicado en una transacción del servidor, blocklist y moderación del presentador en `/admin`.
+- **App del público** en Cloud Run (`us-central1`, `min-instances=0` fuera de las charlas; el día de la charla `make stage-on` lo sube a 1 para que el QR no reciba a la sala con un arranque en frío y `make stage-off` lo baja después). Auth anónima de Firebase (sin registro), App Check con reCAPTCHA Enterprise, límite de una frase cada 20 s aplicado en una transacción del servidor, blocklist y moderación del presentador en `/admin`.
 - **Firestore**, base de datos `genlingo`: frases, rondas, votos (uno por persona) y pares del público. Las reglas niegan toda escritura de clientes; la cuenta de servicio `genlingo-web` solo puede tocar esa base (condición de IAM).
 - **Goliath**: Gemini en Vertex AI con ADC, `GOOGLE_CLOUD_LOCATION=global`, razonamiento `low`.
 - **Entrenamiento**: dos Cloud Run Jobs en `europe-west4` (L4 para entrenar, CPU para fusionar y convertir a GGUF); imagen construida con Cloud Build en Artifact Registry `charlas2027`.

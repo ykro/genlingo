@@ -12,22 +12,33 @@ mes anterior / de este mes · `F` pantalla completa.
 
 Una hora antes, en la laptop del escenario (M1 Max, cargada):
 
-- [ ] `make up`. Arranca Ollama, precarga los dos Davids y EmbeddingGemma, levanta el duelo (`:8787`) y la
-      vista del presentador (`:3000/presenter`). Si algo falla, dice qué y en qué línea.
-- [ ] Salud: `curl -s localhost:8787/health`. Tiene que decir `"ollama": true`, `"online": true` y, en
-      `david_models`, `Q5_K_M` para `genlingo-2026-10c-e2b-nomulti` y `genlingo-2026-10-e2b-q5_k_m`.
-- [ ] Precalentamiento: una ronda `E`, una frase escrita en cada dirección, `M`, una frase, `M` de
-      vuelta. `ollama ps` debe mostrar los dos Davids y `embeddinggemma`, nada más.
-- [ ] `make reset`: marcador en cero (tarda menos de un segundo).
+- [ ] Con público: `AUDIENCE_FEED=1` en `.env`. Con `AUTO_APPROVE_PHRASES=1` (por defecto en Cloud Run)
+      las frases que pasan el filtro llegan solas a la fila. Sin público, déjalo en `0`.
+- [ ] `make up` en una terminal. Arranca Ollama, precarga los dos Davids y EmbeddingGemma, levanta el
+      duelo (`:8787`) y la vista del presentador (`:3000/presenter`). Si algo falla, dice qué y en qué línea.
+- [ ] En otra terminal:
+
+      ```bash
+      make stage-on && make warmup && make preflight
+      ```
+
+      `stage-on` deja una instancia tibia de la app del público. `warmup` la despierta, carga los modelos
+      y hace una llamada a David y otra a Goliath por el duelo (no cuenta como ronda). `preflight` revisa
+      Ollama y los modelos, el duelo, la vista del presentador, los datos, el disco, la app del público
+      (200, `min-instances` ≥ 1, mismo evento), Gemini y Firestore. Tiene que terminar en
+      «preflight ok»; cada `[FALLA]` dice cómo arreglarlo.
 - [ ] Proyector: pantalla duplicada o extendida a 1920×1080, Chrome en `http://127.0.0.1:3000/presenter`,
       zoom 100 %, `F` para pantalla completa. Mira desde el fondo de la sala que el QR se lea.
 - [ ] App del público: abre la URL de Cloud Run en el Chrome del emulador
       (`adb -s emulator-5556`) y en tu teléfono. Tiene que cargar «El duelo está por empezar.».
-- [ ] Con público: `AUDIENCE_FEED=1` en `.env` y `make up` otra vez; con `AUTO_APPROVE_PHRASES=1` (por
-      defecto en Cloud Run) las frases que pasan el filtro llegan solas a la fila.
 - [ ] Prueba de Wi-Fi apagado: apaga el Wi-Fi, escribe una frase, comprueba «Sin conexión» y que David
       responde; vuelve a encender el Wi-Fi y espera a que el indicador diga «En línea».
-- [ ] `make reset` otra vez, y deja la pantalla de bienvenida proyectada.
+- [ ] `make reset`: marcador en cero (tarda menos de un segundo; si Firestore falla, lo dice). Deja la
+      pantalla de bienvenida proyectada.
+
+Después de la charla:
+
+- [ ] `make stage-off`: la app del público vuelve a `min-instances=0` y deja de cobrar en reposo.
 
 ## Paso a paso
 

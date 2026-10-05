@@ -10,7 +10,7 @@ DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
 JAVA21    := $(shell brew --prefix openjdk@21 2>/dev/null)/libexec/openjdk.jdk/Contents/Home
 
 .PHONY: help up reset test eval eval-dev niches counterparts train train-local train-finish train-data quant-sweep pull-model export review-test review-test-apply \
-        test-set real-pairs ambiguous-terms pairs datasheet data deploy
+        test-set real-pairs ambiguous-terms pairs datasheet data deploy stage-on stage-off warmup preflight
 
 help:
 	@grep -hE '^[a-z-]+:.*## ' Makefile | awk -F':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
@@ -18,8 +18,22 @@ help:
 up: ## Start Ollama + warm David + duel service + presenter view (works with Wi-Fi off)
 	@scripts/up.sh
 
-reset: ## Clear rounds, votes and scoreboard (local + this event's Firestore rounds)
+reset: ## Clear rounds, votes and scoreboard (local + this event's Firestore rounds; says so if Firestore fails)
 	@$(UV) python scripts/reset.py
+
+# Talk day, in a second terminal while `make up` runs: make stage-on && make warmup && make preflight.
+# After the talk: make stage-off (nothing bills 24/7).
+stage-on: ## Talk day: min-instances=1 on the audience app (no cold start when the room scans the QR)
+	@./infra/60-stage.sh on
+
+stage-off: ## After the talk: min-instances=0 on the audience app (scales to zero, nothing bills at rest)
+	@./infra/60-stage.sh off
+
+warmup: ## Wake the audience app, preload the stage models, one David + one Goliath call (not recorded)
+	@$(UV) python scripts/warmup.py
+
+preflight: ## Talk-day gate: Ollama + models, duel, presenter, data, disk, audience app warm, Gemini, Firestore
+	@$(UV) python scripts/preflight.py
 
 test: ## Run all tests (no network: MOCK_AI in tests). SKIP_WEB=1 / SKIP_RULES=1 skip a suite on purpose
 	cd duel && MOCK_AI=1 uv run pytest -q
@@ -96,6 +110,6 @@ quant-sweep: ## Q5/Q6/Q8 + imatrix-calibrated Q4/Q5 from a David's f16 GGUF, reg
 pull-model: ## Download a trained David into Ollama: make pull-model TAG=... [FP16=1]
 	MODELS_BUCKET=$(MODELS_BUCKET) train/pull_model.sh $(TAG)
 
-deploy: ## Deploy the audience web app to Cloud Run (min-instances=1)
+deploy: ## Deploy the audience web app to Cloud Run (min-instances=0; make stage-on warms it on talk days)
 	bash infra/04-web-service-account.sh
 	bash infra/05-deploy-web.sh

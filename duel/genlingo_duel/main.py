@@ -50,6 +50,8 @@ class DuelRequest(BaseModel):
 
 # The specialty round draws from the «slang chapín» niche of evals/niche.md: the GT test pairs ("slang chapín").
 SPECIALTY = {"country": "GT", "label": "Ronda de especialidad: slang chapín"}
+# Fixed phrase for `make warmup` (never shown on stage).
+WARMUP_PHRASE = "qué onda, ese plan estuvo bien chilero"
 
 
 class EvaluationRequest(BaseModel):
@@ -96,8 +98,8 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
 
     @app.middleware("http")
     async def local_only_writes(request: Request, call_next):
-        """/reset wipes the scoreboard: only from this machine (any browser origin must be localhost)."""
-        if request.url.path == "/reset":
+        """/reset wipes the scoreboard and /warmup pays a Gemini call: only from this machine (any browser origin must be localhost)."""
+        if request.url.path in ("/reset", "/warmup"):
             origin = request.headers.get("origin")
             client = request.client.host if request.client else ""
             if (origin and not re.match(LOCAL_ORIGIN, origin)) or client not in ("127.0.0.1", "::1", "localhost", "testclient"):
@@ -167,6 +169,16 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
             "event": s.event_id,
             "audience_feed": feed is not None,
             "feed_last_sync": feed.last_sync if feed else None,
+        }
+
+    @app.post("/warmup")
+    async def warmup() -> dict:
+        """`make warmup`: one David call (with his glossary) and one Goliath call through this
+        process, so the first round on stage is not cold. Nothing is recorded or published."""
+        results = await arena.duel(WARMUP_PHRASE, "genz_to_parent", "GT")
+        return {
+            name: {"status": r.status, "model": r.model, "latency_ms": r.latency_ms, "text": r.text, "error": r.error}
+            for name, r in results.items()
         }
 
     @app.post("/duel")

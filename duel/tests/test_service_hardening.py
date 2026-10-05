@@ -120,3 +120,12 @@ def test_specialty_rounds_take_gt_pairs_in_a_fixed_seeded_order(settings, make_p
     assert [r["pair_id"] for r in first] == [r["pair_id"] for r in second]  # same seed, same order
     assert all(r["country"] == "GT" and r["label"] == "Ronda de especialidad: slang chapín" for r in first)
     assert len({r["pair_id"] for r in first}) == 3
+
+
+def test_warmup_calls_both_sides_records_nothing_and_is_local_only(settings):
+    with TestClient(create_app(settings)) as c:
+        assert c.post("/warmup", headers={"Origin": "https://evil.example"}).status_code == 403
+        r = c.post("/warmup").json()
+        assert r["david"]["status"] == "ok" and r["goliath"]["status"] == "ok"
+        assert r["david"]["latency_ms"] > 0 and r["goliath"]["model"] == "goliath-model"
+        assert c.get("/rounds").json() == []  # a warmup is not a round on the scoreboard
