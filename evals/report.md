@@ -61,7 +61,7 @@ Cara a cara con `gemini-3.8-flash + glosario` en jerga resuelta: David la resuel
 
 Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): gemma4:e2b-it-qat 8, gemma4:e2b-it-qat + glosario 7, gemma4:e4b 18, genlingo-2026-10b-e2b + glosario 14, genlingo-2026-10-e2b-q5_k_m + glosario 19, genlingo-2026-10-e2b + glosario 21, genlingo-2026-09 22, genlingo-2026-10c-e2b-nomulti + léxico 16, gemini-3.8-flash 3, gemini-3.8-flash + glosario 1 (de 173).
 
-**Lectura honesta:** David gana también en jerga, no solo en parecido de superficie, frente a Goliath sin glosario. Compáralo con Goliath + glosario para separar lo que aporta el modelo de lo que aporta el dato.
+**Lectura:** David gana también en jerga, no solo en parecido de superficie, frente a Goliath sin glosario. Compáralo con Goliath + glosario para separar lo que aporta el modelo de lo que aporta el dato.
 
 Con el mismo glosario, Goliath resuelve 82 % de la jerga frente al 82 % de David: la ventaja de David viene de **sus datos** (el banco de términos), no de ser mejor modelo; y esos datos los tiene él, no Goliath.
 
@@ -139,15 +139,25 @@ Regla: el más pequeño que cumpla p50 < 1 s con el mejor chrF++.
 
 **gemma4:e2b-it-qat**: mejor chrF++ (50.2) entre los que cumplen p50 < 1 s (p50 364 ms, 4.34 GB).
 
-## Compresión: f16 vs Q5_K_M
+## Compresión: f16 vs cuantizado
 
-Pendiente: se necesita David en f16 y cuantizado en Ollama (`make pull-model FP16=1`).
+El David de escena no se evaluó en f16 en esta corrida; estas son las comparaciones que sí tiene, cada David con su propio f16 y el mismo prompt.
+
+| modelo | versión | tamaño | p50 | chrF++ | jerga resuelta |
+| --- | --- | --- | --- | --- | --- |
+| `genlingo-2026-10b-e2b + glosario` | Q5_K_M | 3.62 GB | 557 ms | 56.6 | 82 % |
+| `genlingo-2026-10b-e2b-f16 + glosario` | F16 | 9.27 GB | 543 ms | 56.7 | 81 % |
+| `genlingo-2026-10-e2b + glosario` | Q4_K_M | 3.42 GB | 512 ms | 55.7 | 67 % |
+| `genlingo-2026-10-e2b-q5_k_m + glosario` | Q5_K_M | 3.62 GB | 564 ms | 55.4 | 74 % |
+| `genlingo-2026-10-e2b-f16 + glosario` | F16 | 9.27 GB | 566 ms | 56.3 | 74 % |
+| `genlingo-2026-09` | Q4_K_M | 3.42 GB | 391 ms | 55.0 | 62 % |
+| `genlingo-2026-09-f16` | F16 | 9.27 GB | 435 ms | 55.4 | 64 % |
 
 ## Entrenamiento
 
 | tag | máquina | región | ejemplos | duración | costo estimado | loss inicial → final |
 | --- | --- | --- | --- | --- | --- | --- |
-| genlingo-2026-10b-e2b | Cloud Run Jobs: 1x NVIDIA L4 + 8 vCPU/32 GiB (train), 8 vCPU/32 GiB (merge + GGUF) | europe-west4 | 1709 | 34.3 min | $0.71 | 2.62 → 0.16 |
+| genlingo-2026-10c-e2b-nomulti | Cloud Run Jobs: 1x NVIDIA L4 + 8 vCPU/32 GiB (train), 8 vCPU/32 GiB (merge + GGUF) | europe-west4 | 2271 | 45.9 min | $0.97 | 1.97 → 0.06 |
 
 Costo = segundos facturados × tarifas por segundo de Cloud Run (GPU L4 sin redundancia zonal + vCPU + memoria; entrenamiento en la L4 + fusión y GGUF en un job de CPU). Un reentrenamiento mensual cuesta eso; la inferencia de David cuesta $0 porque corre en la laptop.
 

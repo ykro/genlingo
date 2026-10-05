@@ -3,11 +3,11 @@
 La historia de David, iteración por iteración: qué cambió, por qué, qué salió, cuánto costó y cuándo.
 Incluye los callejones sin salida, porque explican las decisiones que quedaron.
 
-Los números de jerga resuelta son todos del **mismo set de prueba** (399 frases web `auto_validated`,
-eval del 2026-10-02; la ronda 3, del 2026-10-04 sobre las mismas frases), así que se pueden comparar entre sí.
-La jerga correcta (el término producido significa lo mismo) nació con la ronda 3: su columna es del eval del
-2026-10-04 para todas las filas. Las ejecuciones viejas se reevaluaron sobre ese
-set; los números de su momento (sobre sets anteriores) están en el historial de `evals/report.md`.
+Los números de jerga resuelta y jerga correcta son todos del **mismo set de prueba** (399 frases web
+`auto_validated`) en el eval del 2026-10-04 ([evals/report.md](../evals/report.md)), así que se pueden comparar
+entre sí. La jerga correcta (el término producido significa lo mismo) nació con la ronda 3. Las ejecuciones
+viejas se reevaluaron sobre ese set; los números de su momento (sobre sets anteriores) están en el historial
+de `evals/report.md`.
 
 ![Jerga resuelta por iteración](diagrams/bitacora-jerga.svg)
 
@@ -21,8 +21,8 @@ set; los números de su momento (sobre sets anteriores) están en el historial d
 | 2026-10-01 | Barrido de cuantización | Q5_K_M en vez de Q4_K_M | 74 % | 27 % | $0 (laptop) |
 | 2026-10-02 | `genlingo-2026-10b-e2b` | Oraciones reales + banco de 406 términos | 82 % | 34 % | $0.71 |
 | 2026-10-04 | `genlingo-2026-10c-e2b-nomulti` | Contrapartes por significado + prompt de léxico + ronda 3 de oraciones reales | **82 %** | **42 %** | $0.97 |
-| | Goliath (referencia) | `gemini-3.8-flash`, sin glosario | 78 % | 26 % | $1.08 / 1,000 frases |
-| | Goliath + el mismo glosario | El banco de David en el prompt de Gemini | 82 % | 38 % | $1.24 / 1,000 frases |
+| | Goliath (referencia) | `gemini-3.8-flash`, sin glosario | 77 % | 26 % | $1.13 / 1,000 frases |
+| | Goliath + el mismo glosario | El banco de David en el prompt de Gemini | 82 % | 38 % | $1.27 / 1,000 frases |
 
 ## Callejones sin salida, en una línea
 
@@ -31,8 +31,8 @@ set; los números de su momento (sobre sets anteriores) están en el historial d
 - **Q4_K_M**: perdía 7 puntos de jerga contra f16; Q5_K_M no pierde nada y pesa 3.62 GB.
 - **Entrenar, fusionar y convertir en un solo job** (`zct96`, $0.63): murió por memoria, porque en Cloud Run el disco vive en la memoria; ahora son dos jobs.
 - **Contrapartes por *embedding***: 175 de 217 enlaces significaban otra cosa («brainrot → patatús») y estaban en 1,065 de 1,375 pares sintéticos; quedan archivados solo como respuestas rechazadas.
-- **Pares con 2–3 términos a la vez** (2026-10-02, $1.41): en dev, chrF++ 3.1 puntos más bajo y p50 de 2.04 s; el David de escena se entrenó sin ellos.
-- **Preferencias ORPO** (2026-10-04, $0.56 más $1.81 en dos intentos fallidos): +0.3 de chrF++ en dev, pero la jerga resuelta papás → Gen Z bajó de 74 % a 55 %.
+- **Pares con 2–3 términos a la vez** (2026-10-02, $1.41): en dev, chrF++ 1.3 puntos más bajo y p50 de 1.99 s (809 ms sin ellos); el David de escena se entrenó sin ellos.
+- **Preferencias ORPO** (2026-10-04, $0.56 más $1.81 en dos intentos fallidos): +0.5 de chrF++ en dev, pero la jerga resuelta papás → Gen Z bajó de 70 % a 57 %.
 
 ## 1 · Pares de edición mínima (`genlingo-2026-09`)
 
@@ -54,7 +54,7 @@ $0.67 de entrenamiento y $0.80 de pares.
 Segunda ronda de investigación web: 22 fuentes, 146 términos y 420 oraciones reales. La mitad fue al set
 de prueba; la otra mitad, a 334 pares de entrenamiento anclados en la oración real, en las dos
 direcciones. **82 %**, +8 puntos, casi todo en papás → Gen Z (43 % → 59 %): supera a Goliath sin glosario
-(78 %) y empata con Goliath + glosario (82 %). Entrenar, fusionar y cuantizar de punta a punta en la nube
+(77 %) y empata con Goliath + glosario (82 %). Entrenar, fusionar y cuantizar de punta a punta en la nube
 costó **$0.71**. Se entrenó como `genlingo-2026-11-e2b` y se renombró: los tags llevan la fecha de los
 datos (segunda versión de octubre).
 
@@ -68,28 +68,31 @@ fuera (403 → 399), quitados del set de prueba y no del entrenamiento porque Da
 
 La revisión de datos encontró el error de las contrapartes (arriba) y que, al entrenar, el término
 correcto estaba en el glosario solo el 45 % de las veces. Esta ronda cambió los datos: contrapartes
-validadas por significado (`data/counterparts.jsonl`; sin contraparte se dice el significado), 1,500
-pares sintéticos regenerados con ellas ($0.71), un glosario de léxico con cada término, su contraparte,
+validadas por significado (`data/counterparts.jsonl`; sin contraparte se dice el significado), 1,715
+pares sintéticos regenerados con ellas (1,431 de los 1,500 generados pasaron el filtro con el banco de la
+ronda 3, más 284 para los términos nuevos; $0.71 + $0.15, `data/pairs/synthetic.meta.json`), un glosario de léxico con cada término, su contraparte,
 términos cercanos y uno de otro país marcado «NO de aquí» (la respuesta está en el 85 % de los ejemplos),
 más oraciones reales de Guatemala y Colombia (ronda 3: 532 términos de 26 fuentes) y un set de desarrollo
 con métricas de significado registradas antes de calcularlas.
 
-**Dev, 79 pares que ningún David vio** (10b entrenó con 67 de los 146 pares de dev, así que su número en
-el dev completo es optimista):
+**Dev, 146 pares** (eval del 2026-10-04, [evals/report_dev.md](../evals/report_dev.md)). 10b entrenó con 70
+de estos pares (estaban en sus pares reales antes de que existiera el split de dev), así que su número es
+optimista; los Davids de la ronda 3 no vieron ninguno.
 
 | | chrF++ | Jerga resuelta | Cambios acertados | Jerga correcta | p50 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `genlingo-2026-10b-e2b` (glosario) | 59.1 | 86 % | 18 % | 34 % | 601 ms |
-| `genlingo-2026-10c-e2b` (léxico, con pares de 2–3 términos) | 62.8 | 86 % | 26 % | 35 % | 2.04 s |
-| **`genlingo-2026-10c-e2b-nomulti`** (léxico, sin esos pares) | **65.9** | 86 % | 26 % | 35 % | 765 ms |
-| `…-nomulti-orpo` (+ preferencias ORPO) | 66.2 | 76 % | 28 % | 31 % | 852 ms |
-| Goliath (`gemini-3.8-flash`) | 49.3 | 74 % | 21 % | 18 % | 3.36 s |
-| Goliath + el léxico de David | 58.1 | 89 % | 41 % | 42 % | 2.92 s |
+| `genlingo-2026-10b-e2b` (glosario; vio 70 de los 146) | 65.3 | 91 % | 34 % | 41 % | 592 ms |
+| `genlingo-2026-10c-e2b` (léxico, con pares de 2–3 términos) | 61.9 | 86 % | 27 % | 36 % | 1.99 s |
+| **`genlingo-2026-10c-e2b-nomulti`** (léxico, sin esos pares) | **63.2** | 85 % | 25 % | 33 % | 809 ms |
+| `…-nomulti-orpo` (+ preferencias ORPO) | 63.7 | 78 % | 26 % | 31 % | 866 ms |
+| Goliath (`gemini-3.8-flash`) | 51.1 | 76 % | 18 % | 14 % | 3.60 s |
+| Goliath + el léxico de David | 58.4 | 88 % | 33 % | 42 % | 3.10 s |
 
-- **Los pares de 2–3 términos no ayudaron:** sin ellos, chrF++ sube 3.1 y la latencia baja de 2.04 s a
-  765 ms (el modelo dejó de alargar las respuestas).
-- **ORPO no ayudó:** +0.3 de chrF++, pero la jerga resuelta en papás → Gen Z baja de 74 % a 55 %. Queda
-  fuera. Antes de llegar a entrenar falló dos veces: el modelo se cargaba en la CPU para muestrear y,
+- **Los pares de 2–3 términos no ayudaron:** sin ellos, chrF++ sube 1.3, la jerga queda igual (85 % contra
+  86 % resuelta, 33 % contra 36 % correcta) y la latencia baja de 1.99 s a 809 ms (el modelo dejó de alargar
+  las respuestas): con ellos, David no cabe en el presupuesto de 1 s.
+- **ORPO no ayudó:** +0.5 de chrF++, pero la jerga resuelta en papás → Gen Z baja de 70 % a 57 % y la jerga
+  correcta de 33 % a 31 %. Queda fuera. Antes de llegar a entrenar falló dos veces: el modelo se cargaba en la CPU para muestrear y,
   con lote 4, los logits de Gemma no cabían en la L4 (ahora lote 1 × 16).
 - **Costo:** 10c $1.41, nomulti $0.97, ORPO $0.56 (más $1.81 de los dos intentos fallidos).
 
@@ -97,15 +100,16 @@ el dev completo es optimista):
 sola vez. Contra Goliath sin glosario, como en escena, con IC 95 % por bootstrap pareado:
 
 - **chrF++:** 59.7 contra 53.5 (+6.2 [+4.3, +8.1]); contra Goliath con el mismo glosario, 57.0 (+2.7
-  [+0.8, +4.7]); contra el David anterior, 56.6 (+3.1 [+1.7, +4.4]).
+  [+0.8, +4.7]); contra el David de la ronda 2 (10b), 56.6 (+3.1 [+1.7, +4.4]).
 - **Jerga correcta:** 42 % contra 26 % (+16.3 [+10.8, +21.8]); 101 frases las acierta solo David y 36 solo
-  Goliath. El David anterior acertaba el 34 %.
+  Goliath. El David de la ronda 2 acertaba el 34 %.
 - **Jerga resuelta:** 82 % contra 77 % (+4.5 [+0.0, +8.8]), empate. **Cambios acertados:** 28 % contra 25 %.
 - **p50** 670 ms contra 2.60 s; **costo** $0 contra $1.13 por 1,000 frases.
 
-**Decisión:** `genlingo-2026-10c-e2b-nomulti` pasa a escena (`LOCAL_MODEL_TAG`). Gana en dev y la prueba lo
-confirma en chrF++ y jerga correcta, con p50 < 1 s y el mismo tamaño (3.62 GB). `genlingo-2026-10b-e2b`
-queda en `DAVID_TAGS` como David anterior.
+**Decisión:** `genlingo-2026-10c-e2b-nomulti` pasa a escena (`LOCAL_MODEL_TAG`). Es el mejor de la ronda 3 en
+dev dentro del presupuesto de p50 < 1 s, y la prueba lo confirma contra 10b en chrF++ y jerga correcta, con el
+mismo tamaño (3.62 GB). `genlingo-2026-10b-e2b` queda en `DAVID_TAGS` para comparar rondas; el David anterior
+de la tecla `M` (`DAVID_PREVIOUS_TAG`) sigue siendo `genlingo-2026-10-e2b-q5_k_m`.
 
 ## Dónde gana David hoy, y dónde no
 

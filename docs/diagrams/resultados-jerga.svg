@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 1080 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="resultados-jerga-title resultados-jerga-desc">
       <title id="resultados-jerga-title">Jerga correcta por variante</title>
-      <desc id="resultados-jerga-desc">Porcentaje de las 399 frases del set de prueba web en que cada modelo produjo jerga con el significado correcto: David en escena (2026-10c-nomulti, Q5_K_M) 42 %, Goliath con el mismo glosario 38 %, Gemma base con glosario 38 %, David anterior (2026-10b) 34 %, Goliath sin glosario 26 %, David de 2026-09 18 %, Gemma base 14 % y copiar la frase 1 %.</desc>
+      <desc id="resultados-jerga-desc">Porcentaje de las 399 frases del set de prueba web en que cada modelo produjo jerga con el significado correcto: David en escena (2026-10c-nomulti, Q5_K_M) 42 %, Goliath con el mismo glosario 38 %, Gemma base con glosario 38 %, David de la ronda 2 (2026-10b) 34 %, Goliath sin glosario 26 %, David de 2026-09 18 %, Gemma base 14 % y copiar la frase 1 %.</desc>
       <defs>
         <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;display=swap');</style>
       </defs>
@@ -36,7 +36,7 @@
       <rect x="300" y="210" width="353.6" height="24" fill="#f5f5f5"/>
       <rect x="300" y="210" width="353.6" height="24" fill="#4f5d75" fill-opacity="0.15" stroke="#4f5d75" stroke-width="1"/>
       <text x="661.6" y="225" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="start">34 %</text>
-      <text x="284" y="220" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="end" font-weight="600">David anterior</text>
+      <text x="284" y="220" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="end" font-weight="600">David de la ronda 2</text>
       <text x="284" y="233" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="end">2026-10b · E2B · Q5_K_M · + glosario</text>
       <rect x="300" y="262" width="270.4" height="24" fill="#f5f5f5"/>
       <rect x="300" y="262" width="270.4" height="24" fill="#2e5aa8" fill-opacity="0.12" stroke="#2e5aa8" stroke-width="1"/>

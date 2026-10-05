@@ -8,7 +8,7 @@ Genlingo fine-tunes a small Gemma model ("David") to translate between Gen Z Spa
 speech of their parents, in both directions, for four variants: Mexico (MX), Guatemala (GT),
 Colombia (CO) and neutral Latin American Spanish (LATAM). The dataset exists to show that a
 small model trained on **its own, well-documented data** can compete with a frontier model on a
-narrow task — and to evaluate that claim honestly.
+narrow task — and to evaluate that claim against references no model wrote.
 
 ## Composition
 
@@ -25,31 +25,31 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 
 |  | genz_to_parent | parent_to_genz | total |
 | --- | --- | --- | --- |
-| dev · web | 77 | 71 | 148 |
+| dev · web | 76 | 70 | 146 |
 | test · web | 294 | 228 | 522 |
-| train · synthetic | 765 | 1427 | 2192 |
+| train · synthetic | 881 | 1535 | 2416 |
 | train · web | 281 | 275 | 556 |
-| **total** | 1417 | 2001 | 3418 |
+| **total** | 1532 | 2108 | 3640 |
 
 ### Pairs by split and origin × country
 
 |  | MX | GT | CO | LATAM | total |
 | --- | --- | --- | --- | --- | --- |
-| dev · web | 8 | 71 | 67 | 2 | 148 |
+| dev · web | 8 | 69 | 67 | 2 | 146 |
 | test · web | 101 | 150 | 185 | 86 | 522 |
-| train · synthetic | 459 | 746 | 517 | 470 | 2192 |
+| train · synthetic | 442 | 844 | 660 | 470 | 2416 |
 | train · web | 9 | 268 | 255 | 24 | 556 |
-| **total** | 577 | 1235 | 1024 | 582 | 3418 |
+| **total** | 560 | 1331 | 1167 | 582 | 3640 |
 
 ### Pairs by split and origin × status
 
 |  | auto_validated | approved | pending_review | rejected | total |
 | --- | --- | --- | --- | --- | --- |
-| dev · web | 148 | 0 | 0 | 0 | 148 |
+| dev · web | 146 | 0 | 0 | 0 | 146 |
 | test · web | 399 | 0 | 0 | 123 | 522 |
-| train · synthetic | 0 | 2192 | 0 | 0 | 2192 |
+| train · synthetic | 0 | 2416 | 0 | 0 | 2416 |
 | train · web | 556 | 0 | 0 | 0 | 556 |
-| **total** | 1103 | 2192 | 0 | 123 | 3418 |
+| **total** | 1101 | 2416 | 0 | 123 | 3640 |
 
 ### Term bank (`data/terms.jsonl`)
 
@@ -86,7 +86,7 @@ count ambiguous terms, not a source of terms or sentences).
    call names the slang term and, only when it exists, its **meaning-validated** counterpart in the other
    generation, both from the pair's country (`data/counterparts.jsonl`, `scripts/build_counterparts.py`:
    mutual nearest neighbours by meaning with cosine ≥ 0.65, or Gemini's pick among the top 5 confirmed by
-   a shared content word in the meanings or cosine ≥ 0.60; 63 of 382 terms have one). Without a
+   a shared content word in the meanings or cosine ≥ 0.60; 112 of 504 terms have one). Without a
    counterpart, the parents' side says the term's meaning in plain words, and kinds that need a parents'
    term are skipped. Pair kinds:
    `g2p_genz` 531, `g2p_parent` 69, `p2g_genz` 542, `p2g_parent` 32, `p2g_trap` 326. `p2g_trap` pairs are **hard negatives**: they name a similar term from another country
@@ -98,10 +98,11 @@ count ambiguous terms, not a source of terms or sentences).
    test-set leakage. Last run: 2464 generated, 1745 valid,
    1500 kept after rebalancing; rejected by reason: target_missing_term 210, source_missing_term 154, foreign_term 116, genz_slang_in_source 99, slang_left_in_target 79, parent_term_left_in_target 27, duplicate 27, test_leak 7. Cost
    ≈ $0.7067 in 585.1 s.
-   Re-validated against the grown term bank (532 terms): 1445 kept, dropped foreign_term 45, parent_term_left_in_target 8, genz_slang_in_source 1, slang_left_in_target 1.
-   **Multi-term pairs** (`data/pairs/synthetic_multi.jsonl`, `synthetic-multi-2026-10b`, 800 pairs,
+   Re-validated against the grown term bank (532 terms): 1431 kept, dropped foreign_term 45, parent_term_left_in_target 8, genz_slang_in_source 1, slang_left_in_target 1.
+   **Multi-term pairs** (`data/pairs/synthetic_multi.jsonl`, `synthetic-multi-2026-10b`, 701 pairs,
    `scripts/generate_multi_pairs.py`): 2–3 slang terms change in the same sentence and every expected
-   counterpart must be present; ≈ $0.5127.
+   counterpart must be present; ≈ $0.5127. Not in the stage recipe: `make train-data`
+   leaves them out unless `MULTI=1` (they lowered dev chrF++ and pushed p50 past 1 s).
    Dead ends, one line each: free paraphrases (git history, `train/runs/experiments/`) taught David to
    rewrite everything; minimal edits (`genlingo-2026-09`) left the slang alone; counterparts picked by
    embedding meant something else (175 of 217 links, 1,065 pairs, archived in
@@ -115,7 +116,7 @@ count ambiguous terms, not a source of terms or sentences).
    Gen Z slang of the country; no other-country terms; sane length; no overlap with training.
    Passing pairs are `auto_validated`, failing ones `rejected` with the reason. A human pass
    (`make review-test`) is optional and overrides the automatic decision.
-5. **Dev pairs** (`origin=web`, `split=dev`, `data/pairs/dev_real.jsonl`, 148 pairs). One real sentence in five
+5. **Dev pairs** (`origin=web`, `split=dev`, `data/pairs/dev_real.jsonl`, 146 pairs). One real sentence in five
    from the training side (stable hash of the sentence id, both directions together) is held out to
    decide data rounds and ablations, so the test set is touched once per round. Dev never overlaps a
    test, niche or training sentence (also checked as substrings). Davids trained before 2026-10-02 saw
@@ -145,6 +146,6 @@ human pass with `make review-test` is optional and its `approved`/`rejected` dec
 
 - Guatemalan Gen Z slang is thinly documented online; GT has fewer terms and test pairs.
 - Slang ages fast: a term bank dated today will sound old in a year. Models are tagged by data
-  date (`genlingo-YYYY-MM`) so the talk can compare last month's David with this month's.
+  date (`genlingo-YYYY-MM`) so the talk can pit an earlier David against the current one.
 - Test references are one person's rewrite; chrF++ against a single reference underestimates
   valid alternative translations. Results are reported per origin and per direction.

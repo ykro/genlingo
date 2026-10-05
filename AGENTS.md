@@ -12,7 +12,7 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
 | Efficient fine-tuning in the cloud | `train/` (commented LoRA), two Cloud Run Jobs (L4 trains, CPU merges + GGUF), cost and duration per stage in `train/runs/<tag>.json` and `evals/report.md` |
 | Compress to run on a laptop | quantization sweep (Q4_K_M, Q5_K_M, Q6_K, Q8_0, imatrix) vs f16: size, latency and slang lost |
 | Term-level evals | chrF++ plus a copy-the-phrase baseline, correct slang (meaning-validated), slang handled and reference-change recall, a separate dev set for data decisions, Goliath with and without David's glossary, David's losses shown |
-| Big models age | model tags by data date (on stage: `genlingo-2026-10c-e2b-nomulti`), `david_tag` duel last month vs this month |
+| Big models age | model tags by data date (on stage: `genlingo-2026-10c-e2b-nomulti`), `david_tag` duel: previous David (`DAVID_PREVIOUS_TAG`) vs on-stage David |
 
 ## Components
 

@@ -9,9 +9,9 @@ Demo for the talk *"David vs. Goliath: cómo un modelo pequeño le gana a un mod
 1. **Own data with `origin`:** every pair says where it came from (`web`, `synthetic` or `human`); without that you can neither evaluate nor retrain every month.
 2. **Term bank and real sentences:** 532 terms from 76 sources, counterparts validated by meaning and 556 pairs anchored in real sentences; David's advantage is his data.
 3. **LoRA on Cloud Run Jobs:** an L4 trains and a CPU job merges and exports GGUF; every run records its duration and cost.
-4. **The compression trade-off:** f16 vs Q4_K_M, Q5_K_M, Q6_K, Q8_0 and imatrix, in size, latency and slang lost.
+4. **The compression trade-off:** f16 vs Q4_K_M, Q5_K_M, Q6_K, Q8_0 and imatrix, in size, latency and slang lost ([sweep and why Q5_K_M](docs/DECISIONES.en.md#quantization-why-q5_k_m)).
 5. **Evals with term metrics:** chrF++ plus *correct slang*, *slang handled* and *reference-change recall*, with a separate dev set for decisions; David's losses are published.
-6. **Monthly retrain and offline by design:** the `M` key brings in last month's David; with no network, Goliath shows as "sin conexión" (offline) and David keeps going.
+6. **Monthly retrain and offline by design:** the `M` key brings in the previous David against the on-stage one; with no network, Goliath shows as "sin conexión" (offline) and David keeps going.
 
 ![What runs on the laptop and what runs in the cloud](docs/diagrams/arquitectura.png)
 
@@ -26,7 +26,8 @@ Eval of 2026-10-04 on 399 `auto_validated` web test phrases ([full table and cav
 | Variant | Correct slang | Slang handled | chrF++ | p50 | Cost / 1,000 phrases |
 | --- | --- | --- | --- | --- | --- |
 | **On-stage David** (`genlingo-2026-10c-e2b-nomulti`, Q5_K_M, 3.62 GB) | **42%** | **82%** | **59.7** | 670 ms | **$0** |
-| Previous David (`genlingo-2026-10b-e2b`) | 34% | 82% | 56.6 | 557 ms | $0 |
+| Round-2 David (`genlingo-2026-10b-e2b`) | 34% | 82% | 56.6 | 557 ms | $0 |
+| Previous David, `M` key (`genlingo-2026-10-e2b-q5_k_m`) | 27% | 74% | 55.4 | 564 ms | $0 |
 | Goliath `gemini-3.8-flash` | 26% | 77% | 53.5 | 2.60 s | $1.13 |
 | Goliath + the same glossary | 38% | 82% | 57.0 | 3.05 s | $1.27 |
 | Copy the phrase (baseline) | 1% | 1% | 53.2 | — | — |
@@ -54,7 +55,7 @@ make up       # Ollama + warmed-up David + duel (:8787) + presenter view (:3000/
 make test     # tests with no network (MOCK_AI=1)
 ```
 
-Rehearsal with no network or GPU: `MOCK_AI=1` in `.env` and `make up`. Requirements, last month's David and the full version in [docs/COMANDOS.en.md](docs/COMANDOS.en.md#quickstart).
+Rehearsal with no network or GPU: `MOCK_AI=1` in `.env` and `make up`. Requirements, the previous David and the full version in [docs/COMANDOS.en.md](docs/COMANDOS.en.md#quickstart).
 
 ## Deployed app
 

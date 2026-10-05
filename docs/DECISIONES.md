@@ -6,13 +6,13 @@ Por qué Genlingo está hecho así: el resultado completo, el detalle de lo que 
 
 El resultado es mixto, y la charla lo cuenta así:
 
-- **Los datos con significado movieron la aguja.** El David de escena (`genlingo-2026-10c-e2b-nomulti`) se entrenó con contrapartes validadas por significado, un prompt de léxico (cada término con su contraparte, términos cercanos y uno de otro país marcado «NO de aquí»), 1,715 pares sintéticos regenerados con esas contrapartes y 556 pares anclados en oraciones reales, con más Guatemala y Colombia. Produce jerga con el significado correcto en el **42 %** de las 399 frases de prueba, contra **34 %** del David anterior (`genlingo-2026-10b-e2b`), y chrF++ sube de 56.6 a **59.7**. La ronda se decidió en un set de desarrollo aparte; el set de prueba solo confirmó.
+- **Los datos con significado movieron la aguja.** El David de escena (`genlingo-2026-10c-e2b-nomulti`) se entrenó con contrapartes validadas por significado, un prompt de léxico (cada término con su contraparte, términos cercanos y uno de otro país marcado «NO de aquí»), 1,715 pares sintéticos regenerados con esas contrapartes y 556 pares anclados en oraciones reales, con más Guatemala y Colombia. Produce jerga con el significado correcto en el **42 %** de las 399 frases de prueba, contra **34 %** del David de la ronda 2 (`genlingo-2026-10b-e2b`), y chrF++ sube de 56.6 a **59.7**. La ronda se decidió en un set de desarrollo aparte; el set de prueba solo confirmó.
 - **David gana a Gemini en jerga correcta:** 42 % contra **26 %** (+16.3 puntos, IC 95 % [+10.8, +21.8]; 101 frases las acierta solo David y 36 solo Goliath). Gana en slang chapín (52 % contra 23 %), en papás → Gen Z de Guatemala y Colombia (44 % contra 20 %) y en Colombia; en México empatan. En *jerga resuelta*, que no mira el significado, empatan (82 % contra 77 %). Responde en **~0.7 s** (p50 670 ms) y cuesta **$0** por frase; Goliath tarda **~2.6 s** y cuesta **$1.13 por 1,000 frases**.
 - **Con el mismo glosario, Goliath empata en el set completo** (42 % contra 38 %), pero David sigue ganando en slang chapín (+17.4) y en papás → Gen Z (+16.0); en el español neutro (LATAM) gana Goliath (55 % contra 32 %). En cambios acertados quedan parejos (28 % David, 25 % Goliath, 29 % Goliath con glosario). La ventaja de David son **sus datos** (el banco de términos, las contrapartes y las oraciones reales, con fuentes y fecha) y haberse entrenado con ellos.
-- **Comprimir no cuesta jerga:** el David de escena es el Q5_K_M (3.62 GB); con el David anterior, el Q5_K_M quedó a un punto del f16 (9.27 GB) con la misma latencia.
+- **Comprimir no cuesta jerga:** el David de escena es el Q5_K_M (3.62 GB); con el David de la ronda 2, el Q5_K_M quedó a un punto del f16 (9.27 GB) con la misma latencia.
 - **chrF++ casi no distingue a nadie:** devolver la frase sin traducir ya saca **53.2**; David 59.7, Goliath 53.5, Goliath con glosario 57.0. Por eso existen las métricas a nivel de término.
 - **Reentrenar cada mes cuesta menos de $1, todo en la nube:** $0.97 de punta a punta (L4 para entrenar + CPU para fusionar y cuantizar).
-- **Los modelos grandes envejecen:** con la tecla `M` el David de hace dos rondas (`genlingo-2026-10-e2b-q5_k_m`, 27 % de jerga correcta) se enfrenta en vivo al de escena (42 %).
+- **Los modelos grandes envejecen:** con la tecla `M` el David anterior (`genlingo-2026-10-e2b-q5_k_m`, de hace dos rondas, 27 % de jerga correcta) se enfrenta en vivo al de escena (42 %).
 
 La historia completa, iteración por iteración (callejones sin salida incluidos), está en [BITACORA.md](BITACORA.md); los nichos donde David se mide contra Goliath, definidos antes de mirar resultados, en [evals/niche.md](../evals/niche.md).
 
@@ -27,9 +27,9 @@ La historia completa, iteración por iteración (callejones sin salida incluidos
 | **Datos propios con `origin`.** Cada par dice de dónde salió: `web` (URL + licencia), `synthetic` (modelo + versión de prompt + semilla) o `human` (evento). Sin eso no se puede confiar en la evaluación ni reentrenar cada mes. | `duel/genlingo_duel/dataset.py` (esquema `Pair` que valida la procedencia), [data/SOURCES.md](../data/SOURCES.md), [data/DATASHEET.md](../data/DATASHEET.md) |
 | **Banco de términos, oraciones reales y pares sintéticos validados.** 532 términos de 76 fuentes y una tabla de contrapartes validadas por significado; Gemini genera pares de *sustitución de término* anclados en el banco, y cada par se valida contra el banco (término esperado presente, nada de jerga de otro país, la jerga del origen desaparece): el David de escena usa 1,715. A eso se suman 556 pares anclados en oraciones reales de la web. | `data/terms.jsonl`, `data/counterparts.jsonl`, `scripts/generate_pairs.py`, `duel/genlingo_duel/terms.py` |
 | **LoRA en Cloud Run Jobs.** La misma imagen entrena en una L4 (TRL + PEFT, r=32, alpha=16 con rsLoRA, lr 2e-4, 3 épocas) y, en un job de CPU, fusiona, exporta GGUF con llama.cpp y publica un Modelfile para Ollama. Cada ejecución deja su duración y costo por etapa en un archivo. | `train/train_lora.py`, `train/finish.py`, `train/submit_job.py`, `infra/03-train-job.sh`, `train/runs/` |
-| **El costo de comprimir.** f16 contra Q4_K_M, Q5_K_M, Q6_K, Q8_0 e imatrix: tamaño, latencia y cuánta jerga se pierde. | `train_lora.to_gguf`, sección «Compresión» de `evals/report.md` |
+| **El costo de comprimir.** f16 contra Q4_K_M, Q5_K_M, Q6_K, Q8_0 e imatrix: tamaño, latencia y cuánta jerga se pierde. | `train/quant_sweep.py`, `train_lora.to_gguf`, [Cuantización: por qué Q5_K_M](#cuantización-por-qué-q5_k_m) |
 | **Evals con métricas de término.** chrF++ más una línea base de «copiar la frase», *jerga correcta*, *jerga resuelta* y *cambios acertados* contra el banco; las decisiones de datos se toman en un set de desarrollo aparte y las derrotas de David se publican. Ningún modelo juzga a otro. | `evals/run_eval.py`, `evals/term_accuracy.py`, `evals/report.py` |
-| **Reentrenamiento mensual y `david_tag`.** Los modelos llevan la fecha de sus datos (`genlingo-AAAA-MM`, con una letra si hay dos versiones de datos en el mes: `genlingo-2026-10b-e2b` es la segunda ronda de investigación de octubre y `genlingo-2026-10c-e2b-nomulti` la tercera, sin los pares de varios términos); el duelo acepta `david_tag` para enfrentar al David del mes pasado con el de este mes. | `Makefile` (`TAG`), `DuelRequest.david_tag` en `duel/genlingo_duel/main.py`, tecla `M` en `web/components/presenter/PresenterApp.tsx` |
+| **Reentrenamiento mensual y `david_tag`.** Los modelos llevan la fecha de sus datos (`genlingo-AAAA-MM`, con una letra si hay dos versiones de datos en el mes: `genlingo-2026-10b-e2b` es la segunda ronda de investigación de octubre y `genlingo-2026-10c-e2b-nomulti` la tercera, sin los pares de varios términos); el duelo acepta `david_tag` para enfrentar al David anterior (`DAVID_PREVIOUS_TAG`) con el de escena. | `Makefile` (`TAG`), `DuelRequest.david_tag` en `duel/genlingo_duel/main.py`, tecla `M` en `web/components/presenter/PresenterApp.tsx` |
 | **Offline por diseño.** El chequeo de red es una conexión TCP de 0.8 s; sin red, Goliath aparece «sin conexión» y David sigue. El glosario se recupera con EmbeddingGemma local y embeddings en caché. | `duel/duel_core/connectivity.py`, `duel/duel_core/duel.py`, `duel/genlingo_duel/glossary.py` |
 
 ## Decisiones
@@ -77,9 +77,25 @@ El ciclo de cada mes, de los datos al escenario y de vuelta:
 
 `make train-finish TAG=…` corre el mismo `train/finish.py` en la Mac de 64 GB: baja el adaptador del bucket, fusiona, convierte, cuantiza (`QUANT`, `KEEP_F16=1` para publicar también el f16) y publica en el mismo bucket, así que `make pull-model` no distingue dónde se hizo la fusión. Sirve cuando el job de CPU no puede correr, y para E4B: su checkpoint fusionado de 16 GB más el modelo en memoria no caben en 32 GiB ni en el job de CPU. E4B no salió a escena: con 67 % de jerga resuelta y p50 de 836 ms no supera al E2B f16.
 
+### Cuantización: por qué Q5_K_M
+
+Barrido del 2026-10-01 (`make quant-sweep`, `train/quant_sweep.py`) sobre las exportaciones de `genlingo-2026-10-e2b`, todas con el mismo prompt con glosario, en el set de prueba de ese día (319 pares). imatrix se calibró con pares de entrenamiento, nunca con el set de prueba. Resultados por frase en `evals/results/20261001-152529.json` (fuera del repo); la tabla completa está en el historial de `evals/report.md` (commit `bb3f9fb`).
+
+| Cuantización | imatrix | Tamaño | Jerga resuelta | Cambios acertados | chrF++ | p50 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Q4_K_M | no | 3.42 GB | 67 % | 13 % | 51.2 | 496 ms |
+| Q4_K_M | sí | 3.42 GB | 72 % | 14 % | 51.6 | 539 ms |
+| **Q5_K_M** | no | 3.62 GB | **76 %** | 14 % | 51.5 | 587 ms |
+| Q5_K_M | sí | 3.62 GB | 75 % | 15 % | 52.2 | 624 ms |
+| Q6_K | no | 3.83 GB | 74 % | 15 % | 51.9 | 527 ms |
+| Q8_0 | no | 4.95 GB | 75 % | 14 % | 51.9 | 532 ms |
+| f16 | — | 9.27 GB | 75 % | 15 % | 51.9 | 534 ms |
+
+La regla (la misma de `evals/report.py`): el archivo más pequeño a ≤ 2 puntos del f16 en jerga resuelta, con p50 < 1 s. Q4_K_M pierde 8 puntos contra el f16; imatrix recupera 5 (72 %), pero sigue 3 por debajo. Q5_K_M es el más pequeño que no pierde jerga, con 0.2 GB más que Q4_K_M; Q6_K y Q8_0 pesan más sin mejorar. Por eso `.env` fija `QUANT=Q5_K_M` para `make train` y el David de escena es Q5_K_M. El eval del 2026-10-04 (399 frases) repite el resultado: Q4_K_M 67 %, Q5_K_M 74 % y f16 74 % con `genlingo-2026-10-e2b`; Q5_K_M 82 % y f16 81 % con `genlingo-2026-10b-e2b`.
+
 ### El prompt con glosario
 
-El prompt con país empieza por el país («Variante: español de Guatemala. Usa solo expresiones de Guatemala…») porque «chido» y «chilero» son la misma palabra en lugares distintos. Al final lleva un glosario del banco de términos, del país o neutro. El David de escena usa el estilo `lexicon` (léxico): seis entradas, cada término de la generación de origen que aparece en la frase con su contraparte validada por significado (`data/counterparts.jsonl`; sin contraparte, su significado), los términos de la otra generación más cercanos según EmbeddingGemma y uno de otro país marcado «NO de aquí». Los Davids anteriores usan el estilo `glossary`: cuatro entradas sin contrapartes, primero los términos que aparecen literalmente en la frase y después los más cercanos. El tiempo de recuperación se suma a la latencia de David.
+El prompt con país empieza por el país («Variante: español de Guatemala. Usa solo expresiones de Guatemala…») porque «chido» y «chilero» son la misma palabra en lugares distintos. Al final lleva un glosario del banco de términos, del país o neutro. El David de escena usa el estilo `lexicon` (léxico): seis entradas, cada término de la generación de origen que aparece en la frase con su contraparte validada por significado (`data/counterparts.jsonl`; sin contraparte, su significado), los términos de la otra generación más cercanos según EmbeddingGemma y uno de otro país marcado «NO de aquí». Los Davids de rondas anteriores usan el estilo `glossary`: cuatro entradas sin contrapartes, primero los términos que aparecen literalmente en la frase y después los más cercanos. El tiempo de recuperación se suma a la latencia de David.
 
 David se entrena con exactamente ese formato (`make train-data` usa el estilo `lexicon` por defecto) y el duelo lee de `train/runs/<tag>.json` con qué prompt se entrenó cada David: no hay diferencia entre entrenamiento y escena. Goliath recibe el prompt con país, sin glosario, por defecto (`GOLIATH_PROMPT_STYLE`), porque el banco es dato de David; `make eval` corre además a Goliath con el mismo glosario, y así se ve cuánto del resultado es modelo y cuánto es dato.
 
@@ -117,20 +133,20 @@ Eval del 2026-10-04 sobre 399 pares de prueba web `auto_validated` (de 522 candi
 | `genlingo-2026-10-e2b` + glosario (Q4) | 25 % | 67 % | 95 % | 31 % | 16 % | 55.7 | 512 ms | $0 | 3.42 GB |
 | `genlingo-2026-10-e2b-q5_k_m` + glosario (tecla `M`) | 27 % | 74 % | 97 % | 43 % | 18 % | 55.4 | 564 ms | $0 | 3.62 GB |
 | `genlingo-2026-10-e2b-f16` + glosario | 28 % | 74 % | 99 % | 42 % | 19 % | 56.3 | 566 ms | $0 | 9.27 GB |
-| `genlingo-2026-10b-e2b` + glosario (Q5_K_M, anterior) | 34 % | 82 % | 99 % | 59 % | 22 % | 56.6 | 557 ms | $0 | 3.62 GB |
+| `genlingo-2026-10b-e2b` + glosario (Q5_K_M, ronda 2) | 34 % | 82 % | 99 % | 59 % | 22 % | 56.6 | 557 ms | $0 | 3.62 GB |
 | `genlingo-2026-10b-e2b-f16` + glosario | 34 % | 81 % | 98 % | 59 % | 22 % | 56.7 | 543 ms | $0 | 9.27 GB |
 | **`genlingo-2026-10c-e2b-nomulti` + léxico (Q5_K_M, en escena)** | **42 %** | **82 %** | 100 % | 58 % | 28 % | **59.7** | 670 ms | **$0** | 3.62 GB |
 | Goliath `gemini-3.8-flash` | 26 % | 77 % | 97 % | 51 % | 25 % | 53.5 | 2.60 s | $1.13 | — |
 | Goliath + el mismo glosario | 38 % | 82 % | 100 % | 58 % | 29 % | 57.0 | 3.05 s | $1.27 | — |
 
-**Lectura de los resultados.** Frase por frase, David produce la jerga correcta y Goliath no en 101 frases; al revés, en 36. Contra Goliath con glosario la cuenta se acerca (79 contra 63) y el set completo queda en empate; David sigue ganando en slang chapín y en papás → Gen Z, y Goliath gana en el español neutro (LATAM). En *jerga resuelta* (que cambió el registro, sin mirar el significado) David y Goliath empatan, y David todavía mete jerga de otro país en 16 de 173 frases papás → Gen Z (Goliath: 3). El salto de esta ronda está en el significado: el David anterior ya resolvía el 82 %, pero acertaba el término en el 34 %. David gana en velocidad, costo y privacidad, y gana en jerga correcta mientras el banco de términos, las contrapartes y las oraciones reales sean solo suyos. chrF++ queda cerca de la línea base de copiar (53.2) porque una reescritura de registro conserva casi todas las palabras: no sirve para decidir quién tradujo la jerga. Los IC por nicho están en [evals/niche_report.md](../evals/niche_report.md).
+**Lectura de los resultados.** Frase por frase, David produce la jerga correcta y Goliath no en 101 frases; al revés, en 36. Contra Goliath con glosario la cuenta se acerca (79 contra 63) y el set completo queda en empate; David sigue ganando en slang chapín y en papás → Gen Z, y Goliath gana en el español neutro (LATAM). En *jerga resuelta* (que cambió el registro, sin mirar el significado) David y Goliath empatan, y David todavía mete jerga de otro país en 16 de 173 frases papás → Gen Z (Goliath: 3). El salto de esta ronda está en el significado: el David de la ronda 2 ya resolvía el 82 %, pero acertaba el término en el 34 %. David gana en velocidad, costo y privacidad, y gana en jerga correcta mientras el banco de términos, las contrapartes y las oraciones reales sean solo suyos. chrF++ queda cerca de la línea base de copiar (53.2) porque una reescritura de registro conserva casi todas las palabras: no sirve para decidir quién tradujo la jerga. Los IC por nicho están en [evals/niche_report.md](../evals/niche_report.md).
 
 Las diez peores derrotas de David y los cortes por país y dirección están en [evals/report.md](../evals/report.md). La primera versión de los datos (paráfrasis libre) dejó a David *por debajo* de la base (chrF++ 39.1): está documentado en [evals/experiments/2026-09-parafrasis-libres.md](../evals/experiments/2026-09-parafrasis-libres.md).
 
-| Tecla `M`: el David del mes pasado | Wi-Fi apagado |
+| Tecla `M`: el David anterior | Wi-Fi apagado |
 | --- | --- |
-| ![El David del mes pasado (tecla M)](screenshots/presentador-mes-pasado.png) | ![Sin internet: Goliath sin conexión, David sigue](screenshots/presentador-sin-internet.png) |
-| Tecla `M`: el David anterior (`genlingo-2026-10-e2b-q5_k_m`) contra Goliath con la misma frase; el marcador cuenta solo sus rondas. | Sin red: Goliath aparece «sin conexión» y David responde en 0.53 s («bolo» → «borrachín»; «chupando» queda como «de fiesta», cerca pero no exacto: es bebiendo). |
+| ![El David anterior (tecla M)](demo/08-mes-anterior.png) | ![Sin internet: Goliath sin conexión, David sigue](demo/09-sin-internet.png) |
+| Tecla `M`: el David anterior (`genlingo-2026-10-e2b-q5_k_m`) contra Goliath con la misma frase («no manches, la peli estuvo bien mid y me dio cringe»); el marcador cuenta solo sus rondas. | Sin red: Goliath aparece «sin conexión» y el David de escena responde en 0.81 s («ese bolo anda chupando desde la tarde…» → «Ese muchacho anda borrachísimo desde la tarde…»). |
 
 ## Costo de entrenamiento por ejecución
 
@@ -142,7 +158,7 @@ Cloud Run Jobs en `europe-west4`: entrenamiento en 1× NVIDIA L4 sin redundancia
 | `genlingo-2026-10-e2b` | E2B | 1,500 (anclados en el banco) | listo (loss 2.26 → 0.12) | 28.2 min | $0.67 |
 | `genlingo-2026-10-e4b` | E4B | 1,500 (anclados en el banco) | entrenó; sin memoria al fusionar → `make train-finish` | 41.3 min | $0.98 |
 | `genlingo-2026-10b-e2b` | E2B | 1,709 (1,375 sintéticos + 334 anclados en oraciones reales) | listo en la nube, dos jobs (loss 2.62 → 0.16): entrenamiento 25.3 min $0.60 + fusión/GGUF Q5_K_M y f16 9.0 min $0.11 | 34.3 min | $0.71 |
-| `genlingo-2026-10c-e2b` | E2B | 2,972 (2,416 sintéticos, 701 de ellos de 2–3 términos, + 556 anclados en oraciones reales) | listo (loss 2.19 → 0.04): entrenamiento 54.0 min $1.28 + fusión/GGUF 10.3 min $0.13; quedó fuera por latencia (p50 2.04 s en dev) | 64.2 min | $1.41 |
+| `genlingo-2026-10c-e2b` | E2B | 2,972 (2,416 sintéticos, 701 de ellos de 2–3 términos, + 556 anclados en oraciones reales) | listo (loss 2.19 → 0.04): entrenamiento 54.0 min $1.28 + fusión/GGUF 10.3 min $0.13; quedó fuera por latencia (p50 1.99 s en dev) | 64.2 min | $1.41 |
 | `genlingo-2026-10c-e2b-nomulti` | E2B | 2,271 (1,715 sintéticos + 556 anclados en oraciones reales) | listo, **en escena** (loss 1.97 → 0.06): entrenamiento 35.7 min $0.85 + fusión/GGUF 10.2 min $0.13 | 45.9 min | $0.97 |
 | `genlingo-2026-10c-e2b-nomulti-orpo` | E2B | 264 pares de preferencia sobre el adaptador de nomulti | listo: muestreo + ORPO 18.4 min $0.44 + fusión/GGUF 9.9 min $0.12; fuera (bajó la jerga papás → Gen Z en dev) | 28.3 min | $0.56 |
 | `failed/genlingo-2026-10b-e2b-zct96` | E2B | 1,709 | entrenó; muerta por memoria al convertir a GGUF f16 en el job único → motivó la división en dos jobs | 26.8 min | $0.63 |
@@ -153,4 +169,4 @@ Cloud Run Jobs en `europe-west4`: entrenamiento en 1× NVIDIA L4 sin redundancia
 | `failed/genlingo-2026-09-kqlxv` | E2B | 1,000 | cancelada a ~28 min (misma causa, al leer) | — | sin registro |
 | `experiments/genlingo-2026-09-parafrasis` | E2B | 1,000 (paráfrasis libre) | laptop, MPS | 36.9 min | $0 |
 
-Generar 1,500 pares sintéticos con Gemini cuesta menos de $1 (unos 6 min). Un reentrenamiento mensual de E2B, de punta a punta en la nube (entrenamiento → GGUF), cuesta menos de $1; la inferencia de David, $0.
+Generar 1,500 pares sintéticos con Gemini cuesta menos de $1 ($0.71 y unos 10 min en la ronda 3, `data/pairs/synthetic.meta.json`). Un reentrenamiento mensual de E2B, de punta a punta en la nube (entrenamiento → GGUF), cuesta menos de $1; la inferencia de David, $0.

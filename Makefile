@@ -69,14 +69,13 @@ real-pairs: ## Training pairs anchored in real web sentences (both directions), 
 counterparts: ## Term -> counterpart table validated by meaning (mutual nearest + Gemini top-5 check) -> data/counterparts.jsonl
 	$(UV) python scripts/build_counterparts.py
 
-pairs: ## Generate synthetic training pairs with GEMINI_MODEL from validated counterparts (paid, ~1,500 + 800 multi-term)
+pairs: ## Generate synthetic training pairs with GEMINI_MODEL from validated counterparts (paid, ~1,500)
 	$(UV) python scripts/generate_pairs.py
-	$(UV) python scripts/generate_multi_pairs.py
 
 datasheet: ## Recount data/DATASHEET.md
 	$(UV) python scripts/datasheet.py
 
-data: test-set real-pairs pairs datasheet ## Rebuild all data (test set, synthetic pairs, datasheet)
+data: test-set real-pairs pairs datasheet ## Rebuild all data (test set, real-anchored pairs, synthetic pairs, datasheet)
 
 review-test: ## (Optional) export the test set to a CSV for a human pass over the automatic validation
 	$(UV) python scripts/review_test.py export
@@ -88,13 +87,17 @@ export: ## Pull presenter-approved audience pairs from Firestore into data/pairs
 	$(UV) python scripts/export_human.py
 	$(UV) python scripts/datasheet.py
 
-train-data: ## Render training pairs into chat JSONL (v2+lex glossary) + preference prompts for ORPO
-	$(UV) python scripts/build_train_set.py
-	$(UV) python scripts/build_pref_set.py
+# Stage recipe (genlingo-2026-10c-e2b-nomulti): no multi-term pairs, no ORPO stage. Both were tried
+# and left out (no gain on the dev set); MULTI=1 / ORPO=1 bring them back for an ablation.
+TRAIN_EXCLUDE := $(if $(filter 1,$(MULTI)),,--exclude synthetic_multi)
+
+train-data: ## Render training pairs into chat JSONL with the lexicon glossary (stage recipe) [MULTI=1] [ORPO=1]
+	$(UV) python scripts/build_train_set.py $(TRAIN_EXCLUDE)
+	$(if $(filter 1,$(ORPO)),$(UV) python scripts/build_pref_set.py)
 
 train: train-data ## Fine-tune in the cloud (L4 job trains, CPU job merges + GGUF): make train TAG=genlingo-2027-03 [QUANT=Q5_K_M] [TRAIN_ARGS=…]
 	$(UV) python train/submit_job.py --app genlingo --tag $(TAG) --data data/train/chat.jsonl \
-	  $(if $(wildcard data/train/pref.jsonl),--pref data/train/pref.jsonl) -- $(TRAIN_ARGS)
+	  $(if $(filter 1,$(ORPO)),--pref data/train/pref.jsonl) -- $(TRAIN_ARGS)
 
 train-local: train-data ## Same training on this Mac (MPS), for experiments
 	uv run --python 3.12 --with-requirements train/requirements.txt --with torch==2.14.0 \

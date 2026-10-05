@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # `make up`: everything the stage needs on the laptop, working with Wi-Fi off.
-#   Ollama (David, last month's David, EmbeddingGemma) -> duel service (:8787) -> presenter view (:3000/presenter)
+#   Ollama (David, the previous David, EmbeddingGemma) -> duel service (:8787) -> presenter view (:3000/presenter)
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -13,7 +13,7 @@ trap 'echo "!! make up se detuvo en scripts/up.sh:${LINENO}: ${BASH_COMMAND}" >&
 if [ "${MOCK_AI:-0}" = 1 ]; then
   echo "(MOCK_AI=1: modelos simulados, sin Ollama)"
 else
-  # Three models must stay loaded at once (David now, David last month, EmbeddingGemma); Ollama's
+  # Three models must stay loaded at once (on-stage David, previous David, EmbeddingGemma); Ollama's
   # default can evict one mid-talk. The setting only applies to an Ollama we start ourselves.
   export OLLAMA_MAX_LOADED_MODELS="${OLLAMA_MAX_LOADED_MODELS:-4}"
   export OLLAMA_KEEP_ALIVE="${OLLAMA_KEEP_ALIVE:-2h}"
@@ -65,7 +65,7 @@ for _ in $(seq 1 120); do curl -sf "http://127.0.0.1:${PORT}/health" >/dev/null 
 curl -sf "http://127.0.0.1:${PORT}/health" >/dev/null || fail "el servicio del duelo no respondió en :${PORT} en 60 s (¿puerto ocupado? mira el log de uvicorn arriba)"
 echo
 echo "  Duelo:      http://127.0.0.1:${PORT}/health"
-echo "  Pantalla:   http://127.0.0.1:3000/presenter   (F pantalla completa, E set de prueba, / escribir, M mes pasado)"
+echo "  Pantalla:   http://127.0.0.1:3000/presenter   (F pantalla completa, E set de prueba, / escribir, M David anterior)"
 echo
 [ "${NO_OPEN:-0}" = 1 ] || { command -v open >/dev/null && open "http://127.0.0.1:3000/presenter" || true; }
 wait

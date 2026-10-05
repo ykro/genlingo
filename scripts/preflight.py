@@ -3,7 +3,7 @@
   make preflight        (after `make up` in another terminal and `make stage-on && make warmup`)
 
 One Spanish line per check, `[ok]` or `[FALLA]` with the fix. Exit code = number of failures.
-  Laptop: Ollama with David, last month's David and the embedding model; the duel service; the
+  Laptop: Ollama with David, the previous David and the embedding model; the duel service; the
           presenter view; the term bank, lexicon and test set; David's run file; free disk.
   Cloud:  the audience app answers, is kept warm (min-instances >= 1) and runs this event;
           Gemini answers (one tiny call); Firestore answers for this event.
@@ -51,7 +51,7 @@ def check_ollama(r: Report, s) -> None:
         return
     names = {(m.get("name") or "").removesuffix(":latest") for m in models}
     r.ok(f"Ollama responde ({len(names)} modelos)")
-    wanted = [(s.david_tag, "David"), (s.david_previous_tag, "David del mes pasado"), (s.embedding_model, "embeddings")]
+    wanted = [(s.david_tag, "David"), (s.david_previous_tag, "David anterior"), (s.embedding_model, "embeddings")]
     for tag, role in wanted:
         if not tag:
             r.fail(f"{role}: sin tag en .env", "define LOCAL_MODEL_TAG, DAVID_PREVIOUS_TAG y EMBEDDING_MODEL en .env")

@@ -14,9 +14,11 @@ El ciclo de cada mes, de los datos al escenario y de vuelta:
 
 ## Pantallas
 
-![Vista del presentador: David y Goliath traducen la misma frase](screenshots/presentador-ronda.png)
+![Vista del presentador: ronda de evaluación, David y Goliath traducen la misma frase](demo/02-ronda-evaluacion.png)
 
-![App del público en un teléfono](screenshots/audiencia.png)
+![App del público en un teléfono: frase enviada y voto](demo/06-publico-telefono.png)
+
+Todas las pantallas, paso a paso, en [DEMO.md](DEMO.md).
 
 ## Mapa del repositorio
 
@@ -38,7 +40,7 @@ train/                train_lora.py, finish.py, submit_job.py, finish_local.py, 
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/
 infra/                Scripts gcloud numerados (01–06, 60 stage on/off) y env.sh compartido
 docs/                 DEMO, ONBOARDING, BITACORA, DECISIONES, COMANDOS, ESTRUCTURA, CREDITOS,
-                      diagrams/ (HTML + SVG + PNG), screenshots/
+                      diagrams/ (HTML + SVG + PNG), demo/ (capturas del guion)
 ```
 
 ## Versiones

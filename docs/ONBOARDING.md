@@ -23,7 +23,7 @@ git clone <este repo> genlingo && cd genlingo
 cp .env.example .env                      # el Makefile y scripts/up.sh leen este archivo
 (cd duel && uv sync)                      # crea duel/.venv con las dependencias de duel/uv.lock
 (cd web && npm install && cp .env.example .env.local)
-make test                                 # 73 pruebas de Python, 17 de Vitest, tsc, ESLint y 4 de reglas (falla si no puede correr web o reglas; SKIP_WEB=1 / SKIP_RULES=1 para omitirlas a propósito)
+make test                                 # 85 pruebas de Python, 17 de Vitest, tsc, ESLint y 4 de reglas (falla si no puede correr web o reglas; SKIP_WEB=1 / SKIP_RULES=1 para omitirlas a propósito)
 ```
 
 `.env` trae los valores reales del proyecto (`GOOGLE_CLOUD_PROJECT=ai-experiments-487722`, modelos, tarifas, buckets). No lleva secretos: la autenticación es ADC. `web/.env.local` sí lleva valores locales que no van al repo (token de depuración de App Check, credenciales de e2e).
@@ -34,8 +34,8 @@ make test                                 # 73 pruebas de Python, 17 de Vitest, 
 | --- | --- | --- |
 | `embeddinggemma` | `ollama pull embeddinggemma` | Glosario del banco de términos (`EMBEDDING_MODEL`). Necesario en escena. |
 | `genlingo-2026-10c-e2b-nomulti` y `-nomulti-f16` | `make pull-model TAG=genlingo-2026-10c-e2b-nomulti FP16=1` | David de escena (`LOCAL_MODEL_TAG`): Q5_K_M, 3.62 GB, prompt de léxico, entrenado y cuantizado en la nube (`make train` publica `QUANT` bajo el tag sin sufijo). El f16 es la referencia de compresión. |
-| `genlingo-2026-10b-e2b` y `-e2b-f16` | `make pull-model TAG=genlingo-2026-10b-e2b FP16=1` | El David anterior (prompt con glosario), en `DAVID_TAGS` para comparar las rondas de datos. |
-| `genlingo-2026-10-e2b-q5_k_m` | `make pull-model TAG=genlingo-2026-10-e2b-q5_k_m` | David del mes pasado (`DAVID_PREVIOUS_TAG`, tecla `M`): Q5_K_M del barrido de cuantización. |
+| `genlingo-2026-10b-e2b` y `-e2b-f16` | `make pull-model TAG=genlingo-2026-10b-e2b FP16=1` | El David de la ronda 2 (prompt con glosario), en `DAVID_TAGS` para comparar las rondas de datos. |
+| `genlingo-2026-10-e2b-q5_k_m` | `make pull-model TAG=genlingo-2026-10-e2b-q5_k_m` | David anterior (`DAVID_PREVIOUS_TAG`, tecla `M`): Q5_K_M del barrido de cuantización de la ronda 1. |
 | `genlingo-2026-10-e2b` y `-e2b-f16` | `make pull-model TAG=genlingo-2026-10-e2b FP16=1` | El David de 2026-10 en Q4 y f16, para el barrido de compresión (`make quant-sweep` parte del f16). |
 | `genlingo-2026-09` | `make pull-model TAG=genlingo-2026-09` (agrega `FP16=1` para el eval de compresión) | David de 2026-09 (prompt básico), en `DAVID_TAGS` para mostrar la evolución. |
 | `genlingo-2026-10-e4b` | `make pull-model TAG=genlingo-2026-10-e4b` (sin `FP16`: `make train-finish` publica solo el Q4) | Candidato E4B (agrégalo a `DAVID_TAGS` para evaluarlo; quedó fuera del eval final: 67 %, p50 836 ms). |
@@ -143,7 +143,7 @@ Si la cuenta no existe, la crea con una contraseña aleatoria que nadie ve; el p
 make test-set                 # 1. set de prueba desde oraciones reales, validado contra el banco (sin humanos)
 make real-pairs               #    pares de entrenamiento anclados en oraciones reales
 make export                   # 2. (si hubo público) pares aprobados en /admin -> data/pairs/human.jsonl
-make pairs                    # 3. (opcional) regenerar los pares sintéticos con Gemini (~$0.80, 6 min)
+make pairs                    # 3. (opcional) regenerar los pares sintéticos con Gemini (~$0.71, ~10 min)
 make train TAG=genlingo-2026-11-e2b                         # 4. LoRA (L4) + merge y GGUF (CPU) en Cloud Run -> train/runs/<tag>.json
 make train TAG=genlingo-2026-11-e4b GEMMA_BASE_MODEL=gemma-4-E4B-it   # E4B: el job de CPU no alcanza...
 make train-finish TAG=genlingo-2026-11-e4b                  # 5. ...respaldo: merge + GGUF en la laptop
@@ -151,24 +151,19 @@ make pull-model TAG=genlingo-2026-11-e2b FP16=1             # 6. a Ollama
 make eval                     # 7. evals/report.md (con DAVID_TAGS que incluya los tags nuevos)
 ```
 
-El David de escena (`genlingo-2026-10c-e2b-nomulti`) se entrenó sin los pares de varios términos y sin la etapa ORPO, porque ninguno de los dos mejoró el set de desarrollo:
-
-```bash
-uv run --project duel python scripts/build_train_set.py --exclude synthetic_multi --out data/train/chat_nomulti.jsonl
-uv run --project duel python train/submit_job.py --app genlingo --tag genlingo-2026-10c-e2b-nomulti --data data/train/chat_nomulti.jsonl
-```
+`make train` sigue la receta del David de escena (`genlingo-2026-10c-e2b-nomulti`): sin los pares de varios términos (`--exclude synthetic_multi`) y sin la etapa ORPO, porque ninguno de los dos mejoró el set de desarrollo. Con los datos de hoy, `make train-data` da los mismos 2,271 ejemplos (1,715 sintéticos + 556 anclados en oraciones reales) que registra `train/runs/genlingo-2026-10c-e2b-nomulti.json`. Para repetir una variante descartada en una ablación: `MULTI=1` incluye `data/pairs/synthetic_multi.jsonl` y `ORPO=1` arma `data/train/pref.jsonl` y agrega la etapa de preferencias al job.
 
 Qué pasa en cada paso:
 
 1. **Set de prueba sin humanos.** `scripts/validate_test_set.py` valida cada par contra el banco de términos (la jerga del origen existe y se reemplaza, o la referencia usa jerga Gen Z del país; nada de otro país; longitud; sin solapes con entrenamiento) y lo marca `auto_validated` o `rejected` con el motivo. Las rondas `E` y el eval usan los `auto_validated`. `make review-test` queda como pasada humana opcional, y sus decisiones mandan sobre las automáticas. `make real-pairs` arma pares de entrenamiento con la otra mitad de las oraciones reales de la segunda ronda de investigación.
 2. **`make export`** lee `pairs` con `status == approved` de Firestore, los convierte en pares `origin=human` (procedencia: evento e id) y manda 20 % al split de prueba con un hash estable del id.
-3. **`make counterparts`** y **`make pairs`**: `scripts/build_counterparts.py` arma la tabla de contrapartes validadas por significado (`data/counterparts.jsonl`: vecinos mutuos con coseno ≥ 0.65, o la elección de Gemini entre 5 candidatos confirmada por una palabra de significado compartida). `scripts/generate_pairs.py` y `scripts/generate_multi_pairs.py` generan los pares sintéticos: cada llamada nombra un término y, solo si la tabla la tiene, su contraparte; sin contraparte, el lado de papás dice el significado. Los de varios términos cambian 2–3 a la vez. Llevan trampas de otro país como negativos difíciles; cada par se valida contra el banco y los rechazos se cuentan por motivo en `data/pairs/synthetic*.meta.json`.
-4. **`make train`** primero corre `make train-data` (`scripts/build_train_set.py`): renderiza los pares de entrenamiento con el prompt del duelo (estilo `lexicon` por defecto: país + léxico, con la respuesta en el glosario en el 85 % de los ejemplos) a `data/train/chat.jsonl` y anota el estilo en `chat.meta.json`; `scripts/build_pref_set.py` arma `data/train/pref.jsonl`, las frases de la etapa de preferencias (ORPO) del mismo job. Después `train/submit_job.py` sube el JSONL al bucket de staging, asegura la imagen (02) y el job (03), ejecuta `genlingo-train` (L4: entrena y guarda el adaptador en `gs://…-train-eu/genlingo/runs/<tag>/adapter`) y, si termina bien, `genlingo-finish` (CPU: `train/finish.py` fusiona, convierte a GGUF f16, cuantiza a `QUANT` y publica en el bucket de modelos con su `Modelfile`). Espera a los dos, calcula el costo de cada etapa y escribe `train/runs/<tag>.json` con duración, máquina, costo por etapa (`stages`) y total, métricas y `prompt_style`. `QUANT=Q5_K_M` y `KEEP_F16=1` vienen de `.env`. `TAG` lleva la fecha de los datos, no la del entrenamiento: por defecto `genlingo-<año>-<mes>` del día; si el mes ya tiene una versión de datos, agrega una letra (`genlingo-2026-10b`). Usa el sufijo de la base (`-e2b`, `-e4b`) cuando compares bases.
+3. **`make counterparts`** y **`make pairs`**: `scripts/build_counterparts.py` arma la tabla de contrapartes validadas por significado (`data/counterparts.jsonl`: vecinos mutuos con coseno ≥ 0.65, o la elección de Gemini entre 5 candidatos confirmada por una palabra de significado compartida). `scripts/generate_pairs.py` genera los pares sintéticos: cada llamada nombra un término y, solo si la tabla la tiene, su contraparte; sin contraparte, el lado de papás dice el significado. Los pares llevan trampas de otro país como negativos difíciles; cada par se valida contra el banco y los rechazos se cuentan por motivo en `data/pairs/synthetic.meta.json`. `scripts/generate_multi_pairs.py` (pares que cambian 2–3 términos a la vez, `data/pairs/synthetic_multi.jsonl`) no entra en la receta de escena ni en `make pairs`: sus pares solo se usan en ablaciones con `MULTI=1`.
+4. **`make train`** primero corre `make train-data` (`scripts/build_train_set.py`): renderiza los pares de entrenamiento con el prompt del duelo (estilo `lexicon` por defecto: país + léxico, con la respuesta en el glosario en el 85 % de los ejemplos) a `data/train/chat.jsonl`, sin los pares de varios términos, y anota el estilo y lo excluido en `chat.meta.json`; solo con `ORPO=1`, `scripts/build_pref_set.py` arma `data/train/pref.jsonl`, las frases de la etapa de preferencias (ORPO) del mismo job. Después `train/submit_job.py` sube el JSONL al bucket de staging, asegura la imagen (02) y el job (03), ejecuta `genlingo-train` (L4: entrena y guarda el adaptador en `gs://…-train-eu/genlingo/runs/<tag>/adapter`) y, si termina bien, `genlingo-finish` (CPU: `train/finish.py` fusiona, convierte a GGUF f16, cuantiza a `QUANT` y publica en el bucket de modelos con su `Modelfile`). Espera a los dos, calcula el costo de cada etapa y escribe `train/runs/<tag>.json` con duración, máquina, costo por etapa (`stages`) y total, métricas y `prompt_style`. `QUANT=Q5_K_M` y `KEEP_F16=1` vienen de `.env`. `TAG` lleva la fecha de los datos, no la del entrenamiento: por defecto `genlingo-<año>-<mes>` del día; si el mes ya tiene una versión de datos, agrega una letra (`genlingo-2026-10b`). Usa el sufijo de la base (`-e2b`, `-e4b`) cuando compares bases.
 5. **`make train-finish`** (respaldo, `train/finish_local.py`) corre el mismo `train/finish.py` en la laptop: baja el adaptador de `gs://…-train-eu/genlingo/runs/<tag>/adapter`, fusiona en bf16, convierte con llama.cpp `b11292` (`train/setup_llama_cpp.sh` lo descarga en `train/.llama.cpp`), cuantiza a `QUANT` (y deja el f16 con `KEEP_F16=1`), publica en el bucket de modelos y agrega un bloque `finish` al run file. Úsalo si `genlingo-finish` falla (el adaptador ya está en el bucket, no hay que reentrenar) y para E4B, cuyo checkpoint fusionado de 16 GB no cabe en los 32 GiB del job de CPU. Necesita ~40 GB libres en disco.
 6. **`make pull-model`**: ver la tabla de modelos de Ollama.
 7. **`make eval`** (`evals/run_eval.py`): modelos base (`BASE_MODEL_TAGS`, el primero también con glosario), cada David de `DAVID_TAGS` con el prompt con que se entrenó (más su `-f16` si está en Ollama), y Goliath con y sin glosario. Los modelos locales se precalientan y corren de a uno, a temperatura 0. Los resultados por frase quedan en `evals/results/<fecha>.json` y el reporte en `evals/report.md`. El reporte elige al David de escena: el archivo más pequeño a ≤ 2 puntos del f16 en jerga resuelta, con p50 < 1 s (sección «Compresión»). `make quant-sweep TAG=…` construye Q5_K_M, Q6_K, Q8_0 y Q4/Q5 calibrados con imatrix (sobre pares de entrenamiento) para ese barrido.
 
-Después del eval, actualiza `.env`: `LOCAL_MODEL_TAG` (David de escena), `DAVID_PREVIOUS_TAG` (el del mes anterior) y `DAVID_TAGS`.
+Después del eval, actualiza `.env`: `LOCAL_MODEL_TAG` (David de escena), `DAVID_PREVIOUS_TAG` (el David anterior, tecla `M`) y `DAVID_TAGS`.
 
 ## 5. Correr el duelo sin internet
 
@@ -187,7 +182,7 @@ Teclas de la vista del presentador:
 | `Enter` / `N` / `AvPág` | Siguiente frase aprobada del público. |
 | `/` | Escribir una frase (`Tab` o el botón alternan la dirección; `Esc` cancela). Usa el país `EVENT_COUNTRY` (`GT` por defecto: la charla es en Guatemala). |
 | `V` | Cerrar la votación de la ronda del público. |
-| `M` | Alternar entre el David de este mes y el del mes pasado (`DAVID_PREVIOUS_TAG`). |
+| `M` | Alternar entre el David de escena y el David anterior (`DAVID_PREVIOUS_TAG`). |
 | `F` | Pantalla completa. |
 
 Para ensayar «Wi-Fi apagado» sin tocar el sistema operativo, pon `FORCE_OFFLINE=1` en `.env` y reinicia `make up`: el indicador pasa a «Sin conexión», Goliath aparece desconectado y David sigue respondiendo. Con `MOCK_AI=1` no hacen falta ni Ollama ni red.
@@ -238,7 +233,7 @@ El script entra a `/admin` con `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, aprueba
 | --- | --- |
 | `make up` dice «… no está en Ollama» | Ese tag no está registrado: `make pull-model TAG=…`. |
 | La latencia de David sube a 2–3 s y la del glosario a ~850 ms | Ollama está descargando y recargando modelos. `make up` pide `OLLAMA_MAX_LOADED_MODELS=4`, pero solo aplica si `make up` arrancó Ollama (si ya corría, configúralo allí); cualquier otro modelo (otra demo, un `make eval`) puede desalojar alguno. Revisa con `ollama ps` y descarga lo que sobre con `curl http://127.0.0.1:11434/api/generate -d '{"model":"<modelo>","keep_alive":0}'`. |
-| La primera ronda con `M` tarda varios segundos | El David del mes pasado no estaba cargado. Precaliéntalo (ver la lista del día de la charla). |
+| La primera ronda con `M` tarda varios segundos | El David anterior no estaba cargado. `make warmup` lo vuelve a cargar (ver la lista del día de la charla). |
 | `E` muestra «No quedan frases de prueba para esa combinación» | Ya se usaron todos los pares `auto_validated` de esa combinación (o falta `make test-set`). `make reset` libera las ya usadas. |
 | Goliath aparece «sin conexión» con internet | `FORCE_OFFLINE=1` en `.env`, o no hay salida TCP a `aiplatform.googleapis.com:443` (VPN, proxy, red del evento). |
 | Goliath da error en vez de traducir | ADC vencido: `gcloud auth application-default login`. Un timeout de 20 s se muestra como error, no como «sin conexión». |
@@ -263,9 +258,13 @@ El script entra a `/admin` con `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, aprueba
 **En el lugar, antes de abrir la sala**
 
 - [ ] ADC vigente: `gcloud auth application-default print-access-token`.
-- [ ] `make up`; la vista en el proyector a 1920×1080, `F` para pantalla completa.
-- [ ] Precalentamiento: una ronda escrita (`/`) en cada dirección con el David de escena, `M` y una ronda con el del mes pasado, `M` de vuelta. `ollama ps` debe mostrar solo David, EmbeddingGemma y el David del mes pasado; cierra cualquier otro cliente de Ollama.
+- [ ] `make up` en una terminal; la vista en el proyector a 1920×1080, `F` para pantalla completa.
+- [ ] En otra terminal, `make stage-on && make warmup && make preflight`: la app del público queda tibia (`min-instances=1`), `warmup` carga los dos Davids y EmbeddingGemma y hace una llamada a David y otra a Goliath (no cuentan como ronda), y `preflight` tiene que terminar en «preflight ok» (cada `[FALLA]` dice cómo arreglarlo). Cierra cualquier otro cliente de Ollama: `ollama ps` debe mostrar solo los dos Davids y EmbeddingGemma.
 - [ ] Prueba con Wi-Fi apagado: apaga el Wi-Fi, espera «Sin conexión» (la vista consulta cada 3 s), escribe una frase: David responde en menos de 1 s y Goliath aparece desconectado. Vuelve a encender el Wi-Fi y espera «En línea».
 - [ ] (Opcional, si hay público) escanea el QR, manda una frase y comprueba que llegue a la pantalla en menos de 3 s (con `AUTO_APPROVE_PHRASES=1` no hace falta aprobarla).
 - [ ] `make reset` con red (pone en cero el marcador local y borra las rondas del evento en Firestore).
 - [ ] La laptop no se duerme (`caffeinate -d` en otra terminal) y está conectada a la corriente.
+
+**Después de la charla**
+
+- [ ] `make stage-off`: la app del público vuelve a `min-instances=0` y deja de cobrar en reposo.

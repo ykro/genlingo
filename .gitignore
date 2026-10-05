@@ -10,9 +10,6 @@ __pycache__/
 *.safetensors
 infra/.generated/
 .DS_Store
-build/
-.gradle/
-local.properties
 *.db-journal
 models/
 data/train/

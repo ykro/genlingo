@@ -109,7 +109,7 @@ function Duel({ config }: { config: PublicConfig }) {
   const [running, setRunning] = useState<{ phrase: string; direction: Direction; startedAt: number } | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const [composer, setComposer] = useState(false);
-  // "Last month vs this month": M switches which David duels (tags from the duel service).
+  // "Previous vs on-stage David": M switches which David duels (tags from the duel service).
   const [tagIndex, setTagIndex] = useState(0);
   const davidTags = health?.david_tags?.length ? health.david_tags : health?.david_tag ? [health.david_tag] : [];
   const activeTag = davidTags[tagIndex % Math.max(1, davidTags.length)];
@@ -256,7 +256,7 @@ function Duel({ config }: { config: PublicConfig }) {
           <span className={`${s.chip} ${previous ? s.previousChip : ""}`}>
             David · <b>{davidTag || "sin modelo"}</b>
             {modelNote && <span className={`${s.chipNote} tabular`}>{modelNote}</span>}
-            {previous && <span className={s.chipNote}>el del mes pasado</span>}
+            {previous && <span className={s.chipNote}>el anterior</span>}
           </span>
           <span className={`${s.chip} ${online ? s.online : s.offline}`} aria-live="polite">
             <span className={s.dot} aria-hidden />
@@ -628,7 +628,7 @@ function ControlBar({
         </span>
       )}
       <span className={s.keys}>
-        <kbd>E</kbd> set de prueba <kbd>G</kbd> especialidad chapín <kbd>↵</kbd> siguiente del público {voting && (<><kbd>V</kbd> cerrar votos</>)} <kbd>/</kbd> escribir {canSwitch && (<><kbd>M</kbd> mes pasado / este mes</>)} <kbd>F</kbd> pantalla completa
+        <kbd>E</kbd> set de prueba <kbd>G</kbd> especialidad chapín <kbd>↵</kbd> siguiente del público {voting && (<><kbd>V</kbd> cerrar votos</>)} <kbd>/</kbd> escribir {canSwitch && (<><kbd>M</kbd> David anterior / de escena</>)} <kbd>F</kbd> pantalla completa
       </span>
     </footer>
   );

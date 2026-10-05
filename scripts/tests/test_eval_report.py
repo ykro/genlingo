@@ -49,3 +49,28 @@ def test_compression_svg_plots_every_variant():
     ]
     svg = compression_svg(rows)
     assert svg.startswith("<svg") and svg.count("<circle") == 3 and "Q4_K_M imatrix · 70 %" in svg
+
+
+def test_without_the_stage_f16_the_report_shows_the_f16_pairs_it_has_and_the_stage_run(tmp_path):
+    import json
+
+    r = raw()
+    r["david_tag"] = "genlingo-old"  # merged results keep an older tag; the run shown must be the evaluated "david"
+    r["models"] = [{**m, "name": "genlingo-new", "label": "david"} if m["role"] == "david" else m
+                   for m in r["models"] if m["name"] != "david-f16"] + [
+        {"name": "genlingo-old", "role": "david_alt", "kind": "ollama", "size_bytes": 3e9, "quant": "Q5_K_M"},
+        {"name": "genlingo-old-f16", "role": "david_alt_f16", "kind": "ollama", "size_bytes": 9e9},
+    ]
+    r["results"] += [
+        {"pair_id": p["id"], "model": m, "text": "está regular", "latency_ms": 500, "input_tokens": 50, "output_tokens": 5, "cost_usd": 0.0}
+        for p in r["pairs"] for m in ("genlingo-old", "genlingo-old-f16")
+    ]
+    runs = tmp_path / "runs"
+    runs.mkdir()
+    for tag, examples in (("genlingo-new", 2271), ("genlingo-old", 1709)):
+        (runs / f"{tag}.json").write_text(json.dumps({"tag": tag, "machine": "L4", "region": "europe-west4", "examples": examples,
+                                                      "duration_s": 600, "estimated_cost_usd": 0.5, "metrics": {}}))
+    text = write_report(r, tmp_path / "r.md", runs_dir=runs)
+    assert "## Compresión: f16 vs cuantizado" in text and "Pendiente" not in text
+    assert "| `genlingo-old` | Q5_K_M |" in text and "| `genlingo-old-f16` | F16 |" in text
+    assert "| genlingo-new | L4 | europe-west4 | 2271 |" in text

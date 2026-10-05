@@ -3,7 +3,7 @@
     uv run --project duel python scripts/export_human.py
 
 Audience pairs are `origin=human` with the event as provenance. A stable 20% (by id hash) goes
-to the test split: real people's sentences are the most honest test data we can get.
+to the test split: sentences written by people in the room are test data no model wrote.
 """
 
 from __future__ import annotations

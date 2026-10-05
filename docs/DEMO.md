@@ -5,8 +5,8 @@ decir y cuánto dura. Unos 11 minutos en total. La demo funciona sin público (p
 internet para David (paso 8).
 
 Teclas de la vista del presentador: `E` set de prueba · `G` especialidad chapín · `/` escribir (`Tab`
-cambia la dirección, `Esc` cancela) · `Enter` siguiente frase del público · `V` cerrar votos · `M` David del
-mes anterior / de este mes · `F` pantalla completa.
+cambia la dirección, `Esc` cancela) · `Enter` siguiente frase del público · `V` cerrar votos · `M` David
+anterior / de escena · `F` pantalla completa.
 
 ## Antes de la demo
 
@@ -123,9 +123,9 @@ V
 
 > La frase llegó del teléfono a la pantalla en menos de 3 segundos; el voto decide quién ganó.
 
-### 7 · El David del mes anterior (1 min)
+### 7 · El David anterior (1 min)
 
-![El David del mes anterior](demo/08-mes-anterior.png)
+![El David anterior](demo/08-mes-anterior.png)
 
 ```
 M

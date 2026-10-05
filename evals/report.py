@@ -119,8 +119,9 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
                 and summary[n].get("size_bytes")]
         # Ties on size (same quantization) go to the higher chrF++.
         david = min(near, key=lambda n: (summary[n]["size_bytes"], -(summary[n]["chrf"] or 0)), default=best)
+        label = "Mejor David en desarrollo" if raw.get("split") == "dev" else "David en escena"
         lines += [
-            f"**David en escena:** `{david}` ({_gb(summary[david].get('size_bytes'))}, p50 {_ms(summary[david]['p50'])}): "
+            f"**{label}:** `{david}` ({_gb(summary[david].get('size_bytes'))}, p50 {_ms(summary[david]['p50'])}): "
             f"el archivo más pequeño a ≤ 2 puntos de `{ref}` ({100 * handled_total(computed[ref]):.0f} % de jerga resuelta), "
             f"con p50 < 1 s (empate de tamaño: gana el mayor chrF++). Resuelve {100 * handled_total(computed[david]):.0f} %.",
             "",
@@ -155,13 +156,13 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
             "",
         ]
         if handled_total(cg) > handled_total(cd) and recall(cg) > recall(cd):
-            lines += ["**Lectura honesta:** en jerga gana Goliath, incluso frente al mejor David. La ventaja de David en chrF++ "
+            lines += ["**Lectura:** en jerga gana Goliath, incluso frente al mejor David. La ventaja de David en chrF++ "
                       "viene sobre todo de quedarse cerca de la frase original, no de traducir mejor el término.", ""]
         elif handled_total(cd) >= handled_total(cg) and recall(cd) >= recall(cg):
-            lines += ["**Lectura honesta:** David gana también en jerga, no solo en parecido de superficie, frente a Goliath sin glosario. "
+            lines += ["**Lectura:** David gana también en jerga, no solo en parecido de superficie, frente a Goliath sin glosario. "
                       "Compáralo con Goliath + glosario para separar lo que aporta el modelo de lo que aporta el dato.", ""]
         else:
-            lines += ["**Lectura honesta:** resultado mixto: cada uno gana en una de las dos métricas de jerga.", ""]
+            lines += ["**Lectura:** resultado mixto: cada uno gana en una de las dos métricas de jerga.", ""]
         gg = next((n for n, sm in summary.items() if sm["role"] == "goliath_glossary"), None)
         if gg:
             better = handled_total(computed[gg]) > handled_total(cd)
@@ -293,6 +294,25 @@ def slice_table(summary, key, title):
     groups = sorted({g for s in summary.values() for g in s[key]})
     rows = [[name, *[f"{_n(s[key][g][0])} (n={s[key][g][1]})" if g in s[key] else "—" for g in groups]] for name, s in summary.items()]
     return f"### chrF++ por {title}\n\n" + table(["modelo", *groups], rows)
+
+
+def f16_pairs(summary: dict) -> list[str]:
+    """Local variants grouped with their own f16 (e.g. `x + glosario`, `x-q5_k_m + glosario`, `x-f16 + glosario`),
+    smallest family member first; only families where both an f16 and a quantized export were evaluated."""
+    import re
+
+    local = [n for n, s in summary.items() if s["role"].startswith("david") and s.get("size_bytes") and not s.get("nbest")]
+
+    def family(n: str) -> str:
+        tag, _, rest = n.partition(" + ")
+        return re.sub(r"-(?:iq-)?(?:q\d_k_m|q\d_k|q8_0|f16)$", "", tag) + (" + " + rest if rest else "")
+
+    out: list[str] = []
+    for fam in dict.fromkeys(family(n) for n in local):
+        members = sorted((n for n in local if family(n) == fam), key=lambda n: summary[n]["size_bytes"])
+        if len(members) > 1 and any("-f16" in n for n in members):
+            out += members
+    return out
 
 
 def compression_section(summary: dict, rates: dict, out_dir: Path) -> list[str]:
@@ -451,9 +471,11 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
     david = next((s for s in summary.values() if s["role"] == "david"), None)
     f16 = next((s for s in summary.values() if s["role"] == "david_f16"), None)
     quant = next((quant_label(m.get("label", m["name"]), m) for m in raw["models"] if m.get("role") == "david"), "Q4_K_M")
-    lines += [f"## Compresión: f16 vs {quant}", ""]
+    pairs_f16 = f16_pairs(summary)
     if david and f16:
         lines += [
+            f"## Compresión: f16 vs {quant}",
+            "",
             table(
                 ["versión", "tamaño", "p50", "chrF++"],
                 [["f16", _gb(f16.get("size_bytes")), _ms(f16["p50"]), _n(f16["chrf"])],
@@ -461,15 +483,33 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
             ),
             "",
         ]
+    elif pairs_f16:
+        # The stage David's f16 wasn't in this eval: show the f16-vs-quantized pairs that were.
+        lines += [
+            "## Compresión: f16 vs cuantizado",
+            "",
+            "El David de escena no se evaluó en f16 en esta corrida; estas son las comparaciones que sí tiene, "
+            "cada David con su propio f16 y el mismo prompt.",
+            "",
+            table(
+                ["modelo", "versión", "tamaño", "p50", "chrF++", "jerga resuelta"],
+                [[f"`{n}`", quant_label(n, summary[n]), _gb(summary[n].get("size_bytes")), _ms(summary[n]["p50"]), _n(summary[n]["chrf"]),
+                  f"{100 * rates[n]['handled']:.0f} %" if n in rates else "—"] for n in pairs_f16],
+            ),
+            "",
+        ]
     else:
-        lines += ["Pendiente: se necesita David en f16 y cuantizado en Ollama (`make pull-model FP16=1`).", ""]
+        lines += [f"## Compresión: f16 vs {quant}", "",
+                  "Pendiente: se necesita David en f16 y cuantizado en Ollama (`make pull-model FP16=1`).", ""]
 
     lines += ["## Entrenamiento", ""]
     run = None
-    if runs_dir and raw.get("david_tag"):
+    # The run of the David evaluated as "david" (merged results can carry an older raw["david_tag"]).
+    stage_tag = next((m["name"] for m in raw["models"] if m.get("role") == "david" and not m.get("skip")), None) or raw.get("david_tag")
+    if runs_dir and stage_tag:
         from genlingo_duel.runs import load_run
 
-        run = load_run(runs_dir, raw["david_tag"])
+        run = load_run(runs_dir, stage_tag)
     if run and run.get("duration_s"):
         met = run.get("metrics", {})
         lines += [

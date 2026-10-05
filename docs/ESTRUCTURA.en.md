@@ -14,9 +14,11 @@ The monthly cycle, from data to stage and back:
 
 ## Screens
 
-![Presenter view: David and Goliath translate the same phrase](screenshots/presentador-ronda.png)
+![Presenter view: evaluation round, David and Goliath translate the same phrase](demo/02-ronda-evaluacion.png)
 
-![Audience app on a phone](screenshots/audiencia.png)
+![Audience app on a phone: phrase sent and vote cast](demo/06-publico-telefono.png)
+
+Every screen, step by step, in [DEMO.md](DEMO.md) (Spanish).
 
 ## Repo map
 
@@ -38,7 +40,7 @@ train/                train_lora.py, finish.py, submit_job.py, finish_local.py, 
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/
 infra/                Numbered gcloud scripts (01–06, 60 stage on/off) and shared env.sh
 docs/                 DEMO, ONBOARDING, BITACORA, DECISIONES, COMANDOS, ESTRUCTURA, CREDITOS,
-                      diagrams/ (HTML + SVG + PNG), screenshots/
+                      diagrams/ (HTML + SVG + PNG), demo/ (demo-script screenshots)
 ```
 
 ## Versions

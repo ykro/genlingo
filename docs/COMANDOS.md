@@ -5,7 +5,7 @@ Todos los comandos del `Makefile`. `make help` los lista con su descripción. Vo
 | Comando | Qué hace |
 | --- | --- |
 | `make help` | Lista los comandos con su descripción. |
-| `make up` | Arranca Ollama (con `OLLAMA_MAX_LOADED_MODELS=4`), precarga los tres modelos de escena (David, el del mes pasado y EmbeddingGemma), levanta el duelo y la vista del presentador (la recompila si cambió su código). Funciona sin Wi-Fi y sin público. |
+| `make up` | Arranca Ollama (con `OLLAMA_MAX_LOADED_MODELS=4`), precarga los tres modelos de escena (David, el David anterior y EmbeddingGemma), levanta el duelo y la vista del presentador (la recompila si cambió su código). Funciona sin Wi-Fi y sin público. |
 | `make reset` | Pone en cero rondas, votos, cola y marcador locales; con `AUDIENCE_FEED=1`, también borra las rondas del evento en Firestore (hasta 3 intentos). Si Firestore falla (por ejemplo, sin red), lo dice con la causa y termina con error; el marcador local queda en cero igual. |
 | `make stage-on` | Día de charla: `min-instances=1` en la app del público (`infra/60-stage.sh on`), para que el QR no espere un arranque en frío. Muestra el valor que quedó en Cloud Run. |
 | `make stage-off` | Después de la charla: `min-instances=0` (escala a cero, nada cobra en reposo). |
@@ -19,14 +19,14 @@ Todos los comandos del `Makefile`. `make help` los lista con su descripción. Vo
 | `make real-pairs` | Pares de entrenamiento anclados en oraciones reales (las dos direcciones), validados contra el banco. |
 | `make ambiguous-terms` | Marca los términos del banco que también son palabras comunes («cámara», «servir»), para que las métricas no los cuenten. |
 | `make counterparts` | Tabla término → contraparte validada por significado (vecinos más cercanos mutuos + revisión del top 5 con Gemini) en `data/counterparts.jsonl`. |
-| `make pairs` | Genera los pares sintéticos de entrenamiento con `GEMINI_MODEL` (de pago; `SYNTHETIC_PAIRS_TARGET`, hoy 1,500). |
+| `make pairs` | Genera los pares sintéticos de un término con `GEMINI_MODEL` (de pago; `SYNTHETIC_PAIRS_TARGET`, hoy 1,500). Los pares de 2–3 términos (`scripts/generate_multi_pairs.py`, `data/pairs/synthetic_multi.jsonl`) no entran en la receta de escena y no se regeneran aquí. |
 | `make datasheet` | Recuenta `data/DATASHEET.md`. |
-| `make data` | `test-set` + `pairs` + `datasheet`. |
+| `make data` | `test-set` + `real-pairs` + `pairs` + `datasheet`. |
 | `make review-test` | (Opcional) exporta el set de prueba a un CSV para una pasada humana sobre la validación automática. |
 | `make review-test-apply` | Aplica las decisiones del CSV (`a` aprobar, `r` rechazar, referencia corregida opcional). |
 | `make export` | Baja de Firestore los pares del público aprobados en `/admin` a `data/pairs/human.jsonl` y recuenta el datasheet. |
-| `make train-data` | Renderiza los pares aprobados al JSONL de chat con el mismo prompt (y glosario) del duelo. |
-| `make train` | Entrena en un Cloud Run Job con una L4 y después fusiona y convierte a GGUF en un job de CPU: `make train TAG=genlingo-2027-03 [QUANT=Q5_K_M] [GEMMA_BASE_MODEL=…] [TRAIN_ARGS=…]`. Escribe `train/runs/<tag>.json`. |
+| `make train-data` | Renderiza los pares de entrenamiento al JSONL de chat con el mismo prompt (y léxico) del duelo, con la receta del David de escena: sin los pares de 2–3 términos y sin etapa ORPO. `MULTI=1` incluye esos pares y `ORPO=1` arma también `data/train/pref.jsonl` (variantes descartadas, para ablaciones). |
+| `make train` | Entrena en un Cloud Run Job con una L4 y después fusiona y convierte a GGUF en un job de CPU: `make train TAG=genlingo-2027-03 [QUANT=Q5_K_M] [GEMMA_BASE_MODEL=…] [TRAIN_ARGS=…]`. Corre `make train-data` antes (acepta `MULTI=1` y `ORPO=1`; con `ORPO=1` agrega la etapa de preferencias al job). Escribe `train/runs/<tag>.json`. |
 | `make train-finish` | Respaldo: fusiona y exporta a GGUF en la laptop un adaptador entrenado en la nube y lo publica: `make train-finish TAG=…`. |
 | `make train-local` | El mismo entrenamiento en la Mac (MPS), para experimentos. |
 | `make quant-sweep` | Desde el GGUF f16 de un David: Q5_K_M, Q6_K, Q8_0 y Q4/Q5 calibrados con imatrix (pares de entrenamiento), registrados en Ollama. |
@@ -45,7 +45,7 @@ gcloud auth application-default login                 # Goliath (Vertex AI) y de
 
 ollama pull embeddinggemma                            # recuperación del léxico
 make pull-model TAG=genlingo-2026-10c-e2b-nomulti     # David de escena (Q5_K_M, 3.62 GB)
-make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # David del mes pasado (tecla M)
+make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # David anterior (tecla M)
 
 make up       # Ollama + David precalentado + duelo (:8787) + vista del presentador (:3000/presenter)
 ```

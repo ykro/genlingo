@@ -64,7 +64,7 @@ Genlingo fine-tunes a small Gemma model ("David") to translate between Gen Z Spa
 speech of their parents, in both directions, for four variants: Mexico (MX), Guatemala (GT),
 Colombia (CO) and neutral Latin American Spanish (LATAM). The dataset exists to show that a
 small model trained on **its own, well-documented data** can compete with a frontier model on a
-narrow task — and to evaluate that claim honestly.
+narrow task — and to evaluate that claim against references no model wrote.
 
 ## Composition
 
@@ -127,9 +127,10 @@ count ambiguous terms, not a source of terms or sentences).
    {meta.get("kept", 0)} kept after rebalancing; rejected by reason: {dropped_text}. Cost
    ≈ ${meta.get("cost_usd", 0)} in {meta.get("duration_s", "?")} s.
    {refilter_text}
-   **Multi-term pairs** (`data/pairs/synthetic_multi.jsonl`, `{meta4.get("prompt_version", "?")}`, {meta4.get("kept", 0)} pairs,
+   **Multi-term pairs** (`data/pairs/synthetic_multi.jsonl`, `{meta4.get("prompt_version", "?")}`, {meta4.get("refiltered", {}).get("kept", meta4.get("kept", 0))} pairs,
    `scripts/generate_multi_pairs.py`): 2–3 slang terms change in the same sentence and every expected
-   counterpart must be present; ≈ ${meta4.get("cost_usd", 0)}.
+   counterpart must be present; ≈ ${meta4.get("cost_usd", 0)}. Not in the stage recipe: `make train-data`
+   leaves them out unless `MULTI=1` (they lowered dev chrF++ and pushed p50 past 1 s).
    Dead ends, one line each: free paraphrases (git history, `train/runs/experiments/`) taught David to
    rewrite everything; minimal edits (`genlingo-2026-09`) left the slang alone; counterparts picked by
    embedding meant something else (175 of 217 links, 1,065 pairs, archived in
@@ -173,7 +174,7 @@ human pass with `make review-test` is optional and its `approved`/`rejected` dec
 
 - Guatemalan Gen Z slang is thinly documented online; GT has fewer terms and test pairs.
 - Slang ages fast: a term bank dated today will sound old in a year. Models are tagged by data
-  date (`genlingo-YYYY-MM`) so the talk can compare last month's David with this month's.
+  date (`genlingo-YYYY-MM`) so the talk can pit an earlier David against the current one.
 - Test references are one person's rewrite; chrF++ against a single reference underestimates
   valid alternative translations. Results are reported per origin and per direction.
 """

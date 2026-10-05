@@ -9,9 +9,9 @@ Demo de la charla *«David vs. Goliath: cómo un modelo pequeño le gana a un mo
 1. **Datos propios con `origin`:** cada par dice de dónde salió (`web`, `synthetic` o `human`); sin eso no se puede evaluar ni reentrenar cada mes.
 2. **Banco de términos y oraciones reales:** 532 términos de 76 fuentes, contrapartes validadas por significado y 556 pares anclados en oraciones reales; la ventaja de David son sus datos.
 3. **LoRA en Cloud Run Jobs:** una L4 entrena y un job de CPU fusiona y exporta GGUF; cada ejecución registra su duración y costo.
-4. **El costo de comprimir:** f16 contra Q4_K_M, Q5_K_M, Q6_K, Q8_0 e imatrix, en tamaño, latencia y jerga perdida.
+4. **El costo de comprimir:** f16 contra Q4_K_M, Q5_K_M, Q6_K, Q8_0 e imatrix, en tamaño, latencia y jerga perdida ([barrido y por qué Q5_K_M](docs/DECISIONES.md#cuantización-por-qué-q5_k_m)).
 5. **Evals con métricas de término:** chrF++ más *jerga correcta*, *jerga resuelta* y *cambios acertados*, con un set de desarrollo aparte para decidir; las derrotas de David se publican.
-6. **Reentrenamiento mensual y offline por diseño:** la tecla `M` enfrenta al David del mes pasado; sin red, Goliath sale «sin conexión» y David sigue.
+6. **Reentrenamiento mensual y offline por diseño:** la tecla `M` enfrenta al David anterior con el de escena; sin red, Goliath sale «sin conexión» y David sigue.
 
 ![Qué corre en la laptop y qué en la nube](docs/diagrams/arquitectura.png)
 
@@ -24,7 +24,8 @@ Eval del 2026-10-04 sobre 399 frases de prueba web `auto_validated` ([tabla comp
 | Variante | Jerga correcta | Jerga resuelta | chrF++ | p50 | Costo / 1,000 frases |
 | --- | --- | --- | --- | --- | --- |
 | **David en escena** (`genlingo-2026-10c-e2b-nomulti`, Q5_K_M, 3.62 GB) | **42 %** | **82 %** | **59.7** | 670 ms | **$0** |
-| David anterior (`genlingo-2026-10b-e2b`) | 34 % | 82 % | 56.6 | 557 ms | $0 |
+| David de la ronda 2 (`genlingo-2026-10b-e2b`) | 34 % | 82 % | 56.6 | 557 ms | $0 |
+| David anterior, tecla `M` (`genlingo-2026-10-e2b-q5_k_m`) | 27 % | 74 % | 55.4 | 564 ms | $0 |
 | Goliath `gemini-3.8-flash` | 26 % | 77 % | 53.5 | 2.60 s | $1.13 |
 | Goliath + el mismo glosario | 38 % | 82 % | 57.0 | 3.05 s | $1.27 |
 | Copiar la frase (línea base) | 1 % | 1 % | 53.2 | — | — |
@@ -52,7 +53,7 @@ make up       # Ollama + David precalentado + duelo (:8787) + vista del presenta
 make test     # pruebas sin red (MOCK_AI=1)
 ```
 
-Ensayo sin red ni GPU: `MOCK_AI=1` en `.env` y `make up`. Requisitos, el David del mes pasado y la versión completa en [docs/COMANDOS.md](docs/COMANDOS.md#arranque-rápido).
+Ensayo sin red ni GPU: `MOCK_AI=1` en `.env` y `make up`. Requisitos, el David anterior y la versión completa en [docs/COMANDOS.md](docs/COMANDOS.md#arranque-rápido).
 
 ## App desplegada
 

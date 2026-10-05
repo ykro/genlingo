@@ -7,8 +7,8 @@ samples N candidates. A term-bank score ranks them:
     score = 2 · (expected target terms present) − 2 · (source slang left + other countries' slang)
             + similarity to the reference (0–1, tie-breaker)
 
-chosen = the best sample; rejected = the row's fixed reject when it has one (a pairs-v3 target that
-used a wrong-meaning counterpart), else the worst sample. Pairs where chosen doesn't beat rejected
+chosen = the best sample; rejected = the row's fixed reject when it has one (an archived synthetic target
+that used a wrong-meaning counterpart), else the worst sample. Pairs where chosen doesn't beat rejected
 are dropped. Then ORPO (odds-ratio preference optimization, TRL) continues training the same LoRA
 adapter. Everything is regex + difflib: no model judges the samples.
 """

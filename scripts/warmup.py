@@ -1,7 +1,7 @@
 """`make warmup`: wake everything the first round touches, so nothing on stage is cold.
 
   1. the audience app on Cloud Run (HTTP 200; run `make stage-on` first so it stays warm);
-  2. the stage models in Ollama: David, last month's David and the embedding model;
+  2. the stage models in Ollama: David, the previous David and the embedding model;
   3. one David call (with his glossary) and one Goliath call: through the duel service when it is
      running (POST /warmup, nothing is recorded), otherwise directly with the same code.
 

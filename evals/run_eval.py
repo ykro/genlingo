@@ -7,7 +7,7 @@ Models compared (all from env vars):
   - David            LOCAL_MODEL_TAG      (fine-tuned, Q4) and LOCAL_MODEL_TAG-f16 if pulled
   - Goliath          GEMINI_MODEL
 
-Honest-eval rules baked in: same prompt for everyone, test pairs are never synthetic, local
+Eval rules baked in: same prompt for everyone, test pairs are never synthetic, local
 models are warmed up first (a cold load is not "latency"), and every per-sentence result is
 saved so David's losses can be shown, not just his wins.
 """

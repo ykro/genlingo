@@ -1,5 +1,5 @@
 """The pair schema and loaders. Every pair says where it came from (`origin` + `provenance`):
-you can't evaluate honestly, or retrain monthly, on data whose origin you don't know."""
+you can't trust an evaluation, or retrain monthly, on data whose origin you don't know."""
 
 from __future__ import annotations
 

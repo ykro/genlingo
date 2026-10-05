@@ -1,4 +1,4 @@
-"""v2+lex glossary, term-bank reranking and the meaning-aware metrics."""
+"""Lexicon glossary (country + counterparts), term-bank reranking and the meaning-aware metrics."""
 
 import asyncio
 import sys

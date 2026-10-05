@@ -67,11 +67,11 @@ def test_no_test_or_dev_sentence_leaks_into_training():
 
 
 @needs("pairs/synthetic.jsonl")
-def test_synthetic_v3_leans_to_parent_to_genz_and_every_pair_passes_the_term_bank():
+def test_single_term_synthetic_pairs_lean_to_parent_to_genz_and_pass_the_term_bank():
     from generate_pairs import validate
     from genlingo_duel.terms import TermBank
 
-    syn = load_pairs(DATA, ["pairs/synthetic.jsonl"])  # pairs-v3 only; later versions have their own file
+    syn = load_pairs(DATA, ["pairs/synthetic.jsonl"])  # single-term pairs; multi-term pairs have their own file
     c = Counter(p.direction for p in syn)
     assert 0.55 <= c["parent_to_genz"] / len(syn) <= 0.65
     meta = json.loads((DATA / "pairs" / "synthetic.meta.json").read_text())
