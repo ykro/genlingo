@@ -1,6 +1,6 @@
 # Genlingo — evaluación
 
-Generado por `make eval` el 2026-10-02 08:39. 399 pares de prueba (web; nunca sintéticos), 399 auto_validated. `auto_validated` = validada automáticamente contra el banco de términos (`scripts/validate_test_set.py`).
+Generado por `make eval` el 2026-10-04 19:28. 399 pares de prueba (web; nunca sintéticos), 399 auto_validated. `auto_validated` = validada automáticamente contra el banco de términos (`scripts/validate_test_set.py`).
 
 ## Resumen
 
@@ -11,18 +11,19 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 | gemma4:e2b-it-qat | base (sin ajuste) | país | 50.2 | 364 ms | 490 ms | $0 | $0 | 4.34 GB | 0 |
 | gemma4:e2b-it-qat + glosario | base (sin ajuste) | país + glosario | 55.0 | 452 ms | 592 ms | $0 | $0 | 4.34 GB | 0 |
 | gemma4:e4b | base (sin ajuste) | país | 48.2 | 802 ms | 1.10 s | $0 | $0 | 6.58 GB | 0 |
-| genlingo-2026-10b-e2b + glosario | David (LoRA, Q5_K_M) | país + glosario | 56.6 | 557 ms | 751 ms | $0 | $0 | 3.62 GB | 0 |
-| genlingo-2026-10b-e2b-f16 + glosario | David (LoRA, f16) | país + glosario | 56.7 | 543 ms | 786 ms | $0 | $0 | 9.27 GB | 0 |
+| genlingo-2026-10b-e2b + glosario | David candidato (LoRA, Q5_K_M) | país + glosario | 56.6 | 557 ms | 751 ms | $0 | $0 | 3.62 GB | 0 |
+| genlingo-2026-10b-e2b-f16 + glosario | David candidato (LoRA, f16) | país + glosario | 56.7 | 543 ms | 786 ms | $0 | $0 | 9.27 GB | 0 |
 | genlingo-2026-10-e2b-q5_k_m + glosario | David candidato (LoRA, Q5_K_M) | país + glosario | 55.4 | 564 ms | 744 ms | $0 | $0 | 3.62 GB | 0 |
 | genlingo-2026-10-e2b + glosario | David candidato (LoRA, Q4_K_M) | país + glosario | 55.7 | 512 ms | 696 ms | $0 | $0 | 3.42 GB | 0 |
 | genlingo-2026-10-e2b-f16 + glosario | David candidato (LoRA, f16) | país + glosario | 56.3 | 566 ms | 807 ms | $0 | $0 | 9.27 GB | 0 |
 | genlingo-2026-09 | David candidato (LoRA, Q4_K_M) | básico | 55.0 | 391 ms | 545 ms | $0 | $0 | 3.42 GB | 0 |
 | genlingo-2026-09-f16 | David candidato (LoRA, f16) | básico | 55.4 | 435 ms | 639 ms | $0 | $0 | 9.27 GB | 0 |
-| gemini-3.8-flash | Goliath | país | 53.1 | 3.26 s | 8.82 s | $0.43 | $1.08 | — | 1 |
-| gemini-3.8-flash + glosario | Goliath con el glosario de David | país + glosario | 56.5 | 3.84 s | 9.00 s | $0.49 | $1.24 | — | 0 |
+| genlingo-2026-10c-e2b-nomulti + léxico | David (LoRA, Q5_K_M) | país + léxico | 59.7 | 670 ms | 954 ms | $0 | $0 | 3.62 GB | 0 |
+| gemini-3.8-flash | Goliath | país | 53.5 | 2.60 s | 7.64 s | $0.45 | $1.13 | — | 0 |
+| gemini-3.8-flash + glosario | Goliath con el glosario de David | país + glosario | 57.0 | 3.05 s | 7.37 s | $0.51 | $1.27 | — | 2 |
 
 Costo de Goliath con la tarifa del día del eval: $0.75 entrada / $3.75 salida por millón de tokens (vigente desde 2026-09-30).
-Con la tarifa desde 2027-01-01 ($1.50 / $7.50), este mismo eval costaría $0.86 ($2.17 por 1,000 frases).
+Con la tarifa desde 2027-01-01 ($1.50 / $7.50), este mismo eval costaría $0.90 ($2.26 por 1,000 frases).
 
 **Línea base "copiar la frase"** (devolver el texto original sin traducir): chrF++ 53.2. Un modelo que no supera esta línea no está traduciendo mejor que no hacer nada; mide cuánto del puntaje viene de palabras que la referencia comparte con el original.
 
@@ -33,29 +34,32 @@ chrF++ premia parecerse a la referencia, y una reescritura de registro conserva 
 - **Jerga resuelta**: Gen Z → papás, no queda en la salida ningún término Gen Z del banco que tenía la frase; papás → Gen Z, la salida usa al menos un término Gen Z del banco del país. Mide que cambió el registro, no que el significado sea correcto.
 - **Cambios acertados**: de las palabras que la referencia humana cambió respecto al original, cuántas aparecen en la salida. Mide significado, pero solo con palabras exactas: un sinónimo válido cuenta como fallo para todos.
 
-| modelo | jerga resuelta Gen Z → papás | jerga resuelta papás → Gen Z | jerga resuelta total | cambios acertados |
-| --- | --- | --- | --- | --- |
-| copiar la frase (línea base) | 0 % (n=226) | 3 % (n=173) | 1 % (n=399) | 0 % |
-| gemma4:e2b-it-qat | 95 % (n=226) | 10 % (n=173) | 58 % (n=399) | 14 % |
-| gemma4:e2b-it-qat + glosario | 94 % (n=226) | 20 % (n=173) | 62 % (n=399) | 23 % |
-| gemma4:e4b | 97 % (n=226) | 31 % (n=173) | 68 % (n=399) | 17 % |
-| genlingo-2026-10b-e2b + glosario | 99 % (n=226) | 59 % (n=173) | 82 % (n=399) | 22 % |
-| genlingo-2026-10b-e2b-f16 + glosario | 98 % (n=226) | 59 % (n=173) | 81 % (n=399) | 22 % |
-| genlingo-2026-10-e2b-q5_k_m + glosario | 97 % (n=226) | 43 % (n=173) | 74 % (n=399) | 18 % |
-| genlingo-2026-10-e2b + glosario | 95 % (n=226) | 31 % (n=173) | 67 % (n=399) | 16 % |
-| genlingo-2026-10-e2b-f16 + glosario | 99 % (n=226) | 42 % (n=173) | 74 % (n=399) | 19 % |
-| genlingo-2026-09 | 94 % (n=226) | 20 % (n=173) | 62 % (n=399) | 14 % |
-| genlingo-2026-09-f16 | 93 % (n=226) | 27 % (n=173) | 64 % (n=399) | 14 % |
-| gemini-3.8-flash | 99 % (n=226) | 51 % (n=172) | 78 % (n=398) | 25 % |
-| gemini-3.8-flash + glosario | 98 % (n=226) | 62 % (n=173) | 82 % (n=399) | 30 % |
+- **Jerga correcta** y **cambios acertados con sinónimos** (enmienda 1 de `evals/niche.md`): el término producido tiene que significar lo mismo, según la tabla de contrapartes validada por significado (`data/counterparts.jsonl`); con sinónimos, una palabra cuenta si coincide la raíz o es un término enlazado.
 
-**David en escena:** `genlingo-2026-10b-e2b + glosario` (3.62 GB, p50 557 ms): el archivo más pequeño a ≤ 2 puntos de `genlingo-2026-10b-e2b-f16 + glosario` (81 % de jerga resuelta), con p50 < 1 s. Resuelve 82 %.
+| modelo | jerga resuelta Gen Z → papás | jerga resuelta papás → Gen Z | jerga resuelta total | cambios acertados | jerga correcta | cambios acertados (sinónimos) |
+| --- | --- | --- | --- | --- | --- | --- |
+| copiar la frase (línea base) | 0 % (n=226) | 3 % (n=173) | 1 % (n=399) | 0 % | 1 % (n=399) | 4 % |
+| gemma4:e2b-it-qat | 95 % (n=226) | 10 % (n=173) | 58 % (n=399) | 14 % | 14 % (n=399) | 17 % |
+| gemma4:e2b-it-qat + glosario | 94 % (n=226) | 20 % (n=173) | 62 % (n=399) | 23 % | 38 % (n=399) | 27 % |
+| gemma4:e4b | 97 % (n=226) | 31 % (n=173) | 68 % (n=399) | 17 % | 19 % (n=399) | 21 % |
+| genlingo-2026-10b-e2b + glosario | 99 % (n=226) | 59 % (n=173) | 82 % (n=399) | 22 % | 34 % (n=399) | 26 % |
+| genlingo-2026-10b-e2b-f16 + glosario | 98 % (n=226) | 59 % (n=173) | 81 % (n=399) | 22 % | 34 % (n=399) | 27 % |
+| genlingo-2026-10-e2b-q5_k_m + glosario | 97 % (n=226) | 43 % (n=173) | 74 % (n=399) | 18 % | 27 % (n=399) | 20 % |
+| genlingo-2026-10-e2b + glosario | 95 % (n=226) | 31 % (n=173) | 67 % (n=399) | 16 % | 25 % (n=399) | 19 % |
+| genlingo-2026-10-e2b-f16 + glosario | 99 % (n=226) | 42 % (n=173) | 74 % (n=399) | 19 % | 28 % (n=399) | 22 % |
+| genlingo-2026-09 | 94 % (n=226) | 20 % (n=173) | 62 % (n=399) | 14 % | 18 % (n=399) | 18 % |
+| genlingo-2026-09-f16 | 93 % (n=226) | 27 % (n=173) | 64 % (n=399) | 14 % | 18 % (n=399) | 18 % |
+| genlingo-2026-10c-e2b-nomulti + léxico | 100 % (n=226) | 58 % (n=173) | 82 % (n=399) | 28 % | 42 % (n=399) | 32 % |
+| gemini-3.8-flash | 97 % (n=226) | 51 % (n=173) | 77 % (n=399) | 25 % | 26 % (n=399) | 27 % |
+| gemini-3.8-flash + glosario | 100 % (n=226) | 58 % (n=171) | 82 % (n=397) | 29 % | 38 % (n=397) | 31 % |
 
-Cara a cara con `gemini-3.8-flash` en jerga resuelta: David la resuelve y Goliath no en **46** frases; al revés en **31**.
+**David en escena:** `genlingo-2026-10b-e2b + glosario` (3.62 GB, p50 557 ms): el archivo más pequeño a ≤ 2 puntos de `genlingo-2026-10c-e2b-nomulti + léxico` (82 % de jerga resuelta), con p50 < 1 s. Resuelve 82 %.
 
-Cara a cara con `gemini-3.8-flash + glosario` en jerga resuelta: David la resuelve y Goliath no en **36** frases; al revés en **39**.
+Cara a cara con `gemini-3.8-flash` en jerga resuelta: David la resuelve y Goliath no en **45** frases; al revés en **27**.
 
-Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): gemma4:e2b-it-qat 8, gemma4:e2b-it-qat + glosario 7, gemma4:e4b 18, genlingo-2026-10b-e2b + glosario 14, genlingo-2026-10-e2b-q5_k_m + glosario 19, genlingo-2026-10-e2b + glosario 21, genlingo-2026-09 22, gemini-3.8-flash 2, gemini-3.8-flash + glosario 2 (de 173).
+Cara a cara con `gemini-3.8-flash + glosario` en jerga resuelta: David la resuelve y Goliath no en **34** frases; al revés en **34**.
+
+Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): gemma4:e2b-it-qat 8, gemma4:e2b-it-qat + glosario 7, gemma4:e4b 18, genlingo-2026-10b-e2b + glosario 14, genlingo-2026-10-e2b-q5_k_m + glosario 19, genlingo-2026-10-e2b + glosario 21, genlingo-2026-09 22, genlingo-2026-10c-e2b-nomulti + léxico 16, gemini-3.8-flash 3, gemini-3.8-flash + glosario 1 (de 173).
 
 **Lectura honesta:** resultado mixto: cada uno gana en una de las dos métricas de jerga.
 
@@ -89,8 +93,9 @@ Las exportaciones de `genlingo-2026-10-e2b` con el mismo prompt y glosario. La c
 | genlingo-2026-10-e2b-f16 + glosario | 56.3 (n=399) |
 | genlingo-2026-09 | 55.0 (n=399) |
 | genlingo-2026-09-f16 | 55.4 (n=399) |
-| gemini-3.8-flash | 53.1 (n=398) |
-| gemini-3.8-flash + glosario | 56.5 (n=399) |
+| genlingo-2026-10c-e2b-nomulti + léxico | 59.7 (n=399) |
+| gemini-3.8-flash | 53.5 (n=399) |
+| gemini-3.8-flash + glosario | 57.0 (n=397) |
 
 ### chrF++ por dirección
 
@@ -106,8 +111,9 @@ Las exportaciones de `genlingo-2026-10-e2b` con el mismo prompt y glosario. La c
 | genlingo-2026-10-e2b-f16 + glosario | 63.3 (n=226) | 46.4 (n=173) |
 | genlingo-2026-09 | 62.3 (n=226) | 44.8 (n=173) |
 | genlingo-2026-09-f16 | 62.8 (n=226) | 45.0 (n=173) |
-| gemini-3.8-flash | 59.6 (n=226) | 43.8 (n=172) |
-| gemini-3.8-flash + glosario | 63.2 (n=226) | 47.3 (n=173) |
+| genlingo-2026-10c-e2b-nomulti + léxico | 67.4 (n=226) | 49.1 (n=173) |
+| gemini-3.8-flash | 61.0 (n=226) | 43.0 (n=173) |
+| gemini-3.8-flash + glosario | 63.8 (n=226) | 47.6 (n=171) |
 
 ### chrF++ por país
 
@@ -123,8 +129,9 @@ Las exportaciones de `genlingo-2026-10-e2b` con el mismo prompt y glosario. La c
 | genlingo-2026-10-e2b-f16 + glosario | 56.7 (n=131) | 61.7 (n=115) | 53.1 (n=75) | 50.7 (n=78) |
 | genlingo-2026-09 | 54.5 (n=131) | 58.2 (n=115) | 54.3 (n=75) | 51.6 (n=78) |
 | genlingo-2026-09-f16 | 55.7 (n=131) | 59.0 (n=115) | 54.0 (n=75) | 50.5 (n=78) |
-| gemini-3.8-flash | 52.6 (n=130) | 51.4 (n=115) | 57.7 (n=75) | 51.3 (n=78) |
-| gemini-3.8-flash + glosario | 54.2 (n=131) | 58.5 (n=115) | 62.6 (n=75) | 51.6 (n=78) |
+| genlingo-2026-10c-e2b-nomulti + léxico | 60.4 (n=131) | 65.3 (n=115) | 56.5 (n=75) | 53.6 (n=78) |
+| gemini-3.8-flash | 53.8 (n=131) | 52.9 (n=115) | 55.4 (n=75) | 51.5 (n=78) |
+| gemini-3.8-flash + glosario | 54.3 (n=130) | 60.1 (n=115) | 58.9 (n=75) | 56.0 (n=77) |
 
 ## Modelo base: E2B vs E4B
 
@@ -134,10 +141,7 @@ Regla: el más pequeño que cumpla p50 < 1 s con el mejor chrF++.
 
 ## Compresión: f16 vs Q5_K_M
 
-| versión | tamaño | p50 | chrF++ |
-| --- | --- | --- | --- |
-| f16 | 9.27 GB | 543 ms | 56.7 |
-| Q5_K_M | 3.62 GB | 557 ms | 56.6 |
+Pendiente: se necesita David en f16 y cuantizado en Ollama (`make pull-model FP16=1`).
 
 ## Entrenamiento
 
@@ -149,20 +153,20 @@ Costo = segundos facturados × tarifas por segundo de Cloud Run (GPU L4 sin redu
 
 ## Dónde pierde David
 
-David gana 207 de 398 frases por chrF++ de oración. Las 10 peores derrotas:
+David gana 231 de 399 frases por chrF++ de oración. Las 10 peores derrotas:
 
 | frase | referencia | David | Goliath | Δ chrF++ |
 | --- | --- | --- | --- | --- |
-| […] | ¡Ese muchacho es muy buenmozo! | ¡Ese señor es muy jacarandoso! | ¡Ese muchacho es muy buenmozo! | -71.7 |
-| […] | La película estuvo regular, nada del otro mundo. | La película fue aburrida y nada especial. | La película estuvo regular—nada del otro mundo. | -54.9 |
-| Qué buena onda sos, me llegas. | Qué buena persona sos, me caés muy bien. | Qué bueno sos, me caes a todo dar. | Qué rebuena persona sos, me caés muy bien. | -53.0 |
-| […] | Esa morra es red flag, bro. | Esa chava no te conviene, güey. | Esa morra es pura red flag. | -48.6 |
-| […] | Se me borró el trabajo final. ¡Qué desgracia! | Qué lástima que se me haya perdido el trabajo final. Me da pena ajena. | Se me borró el trabajo final. Qué desgracia. | -44.6 |
-| […] | Se me antojan unas cervecitas. | Se me antoja una cerveza. | Se me antojan unas cervecitas bien frías. | -43.5 |
-| […] | Tengo la cabeza tan atontada que solo pienso en las grabaciones chistosas de internet | Tengo tanta racha de ver videos absurdos que ando turulato de la risa. | Tengo la cabeza tan quemada que solo pienso en chistes de internet | -43.4 |
-| Mi jefa no me deja salir, la neta. | La verdad, mi mamá no me da permiso de salir. | Yo a tu edad no salía a ningún lado sin permiso de mis papás. | Mi mamá no me da permiso de salir, de veras. | -42.3 |
-| […] | Esa gente no tiene personalidad propia. | Esa gente es muy robótica. | Esa gente parece un robot, no tiene personalidad. | -41.2 |
-| ¡Malaya fuera rico para comprarme esa casa! | ¡Ojalá tuviera un montón de pisto para comprarme esa casa! | F que me compre esa casa | ¡Ojalá estuviera forrado para comprarme esa casa! | -39.2 |
+| […] | se te trabó la aplicación | Tu aplicación se congeló. | Se te trabó la aplicación. | -50.5 |
+| […] | ¿Qué te pasó que hoy andas con tan buena vibra? | ¿Qué te ha pasado que hoy estás tan linda? | ¿Qué te pasó que hoy andas con tanta vibra? | -48.3 |
+| […] | Eres un as en ese juego | Eres el mejor en ese juego | Eres un as en ese juego | -44.3 |
+| Ya andate, maje, me estás haciendo tierra con ella. | Ya andate, me estás estorbando con ella. | Ya hacéte sho, me estás haciendo perder el tiempo. | Ya andate, mano, me estás quemando con ella. | -39.8 |
+| […] | Neta ya no quiero más desmadre en la casa, ¿eh? | No quiero más drama en casa. | Ya no quiero más desmadre en la casa. | -38.7 |
+| […] | ¡Ese es mi morro! | ¡No manches, maje! | ¡Ese es mi gallo, la neta! | -36.8 |
+| […] | Porque yo lo digo y ya, bro | Porque yo digo y pa' de una | Porque yo lo digo y ya, soporte. | -36.4 |
+| […] | ¿Por qué me deja en visto, parce? | ¿Por qué no me contesta el celular, parce? | ¿Por qué me deja en visto, marica? | -35.5 |
+| Mi jefa no me deja salir, la neta. | La verdad, mi mamá no me da permiso de salir. | Mi mamá no me deja salir, de verdad. | Mi mamá no me da permiso de salir, la verdad. | -33.6 |
+| […] | Muy bien hecho, muchachos, se lucieron. | Se la rifaron, muchachos, qué chidos. | Muy bien hecho, muchachos, qué padre. | -32.6 |
 
 ## Metodología
 

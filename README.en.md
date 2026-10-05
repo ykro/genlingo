@@ -7,10 +7,10 @@ Demo for the talk *"David vs. Goliath: cómo un modelo pequeño le gana a un mod
 ## What you'll learn
 
 1. **Own data with `origin`:** every pair says where it came from (`web`, `synthetic` or `human`); without that you can neither evaluate nor retrain every month.
-2. **Term bank and real sentences:** 406 terms from 57 sources and 334 pairs anchored in real sentences; David's advantage is his data.
+2. **Term bank and real sentences:** 532 terms from 76 sources, counterparts validated by meaning and 556 pairs anchored in real sentences; David's advantage is his data.
 3. **LoRA on Cloud Run Jobs:** an L4 trains and a CPU job merges and exports GGUF; every run records its duration and cost.
 4. **The compression trade-off:** f16 vs Q4_K_M, Q5_K_M, Q6_K, Q8_0 and imatrix, in size, latency and slang lost.
-5. **Evals with term metrics:** chrF++ plus *slang handled* and *reference-change recall*; David's losses are published.
+5. **Evals with term metrics:** chrF++ plus *correct slang*, *slang handled* and *reference-change recall*, with a separate dev set for decisions; David's losses are published.
 6. **Monthly retrain and offline by design:** the `M` key brings in last month's David; with no network, Goliath shows as "sin conexión" (offline) and David keeps going.
 
 ![What runs on the laptop and what runs in the cloud](docs/diagrams/arquitectura.png)
@@ -21,17 +21,17 @@ Diagram labels are in Spanish.
 
 ## Result
 
-Eval of 2026-10-02 on 399 `auto_validated` web test phrases ([full table and caveats](docs/DECISIONES.en.md#results)):
+Eval of 2026-10-04 on 399 `auto_validated` web test phrases ([full table and caveats](docs/DECISIONES.en.md#results)):
 
-| Variant | Slang handled | parents → Gen Z | chrF++ | p50 | Cost / 1,000 phrases |
+| Variant | Correct slang | Slang handled | chrF++ | p50 | Cost / 1,000 phrases |
 | --- | --- | --- | --- | --- | --- |
-| **On-stage David** (`genlingo-2026-10b-e2b`, Q5_K_M, 3.62 GB) | **82%** | **59%** | **56.6** | **557 ms** | **$0** |
-| Previous David (`genlingo-2026-10-e2b-q5_k_m`, `M` key) | 74% | 43% | 55.4 | 564 ms | $0 |
-| Goliath `gemini-3.8-flash` | 78% | 51% | 53.1 | 3.26 s | $1.08 |
-| Goliath + the same glossary | 82% | 62% | 56.5 | 3.84 s | $1.24 |
-| Copy the phrase (baseline) | 1% | 3% | 53.2 | — | — |
+| **On-stage David** (`genlingo-2026-10c-e2b-nomulti`, Q5_K_M, 3.62 GB) | **42%** | **82%** | **59.7** | 670 ms | **$0** |
+| Previous David (`genlingo-2026-10b-e2b`) | 34% | 82% | 56.6 | 557 ms | $0 |
+| Goliath `gemini-3.8-flash` | 26% | 77% | 53.5 | 2.60 s | $1.13 |
+| Goliath + the same glossary | 38% | 82% | 57.0 | 3.05 s | $1.27 |
+| Copy the phrase (baseline) | 1% | 1% | 53.2 | — | — |
 
-With the same glossary they tie on slang: David's advantage is not being a better model, it is his data. Retraining every month costs $0.71 end to end in the cloud ([cost per run](docs/DECISIONES.en.md#training-cost-per-run)).
+*Correct slang*: the slang produced means what the original said. David beats Goliath by 16 points (95% CI [+10.8, +21.8]) and by 30 on Guatemalan slang. With the same glossary Goliath ties on the whole set, but David still wins in Guatemala and in parents → Gen Z: David's advantage is his data. Retraining costs $0.97 end to end in the cloud ([cost per run](docs/DECISIONES.en.md#training-cost-per-run)).
 
 ## What didn't work
 
@@ -42,13 +42,14 @@ One line per dead end; the details are in [docs/BITACORA.md](docs/BITACORA.md) (
 - **Q4_K_M:** lost 7 points of slang against f16.
 - **Training, merging and converting in a single job:** died of memory; now it is two jobs.
 - **Counterparts by *embedding*:** most of the links meant something else.
+- **Pairs with 2–3 terms at once and ORPO preferences:** neither improved the dev set; both left out.
 
 ## Quickstart
 
 ```bash
 cp .env.example .env && (cd duel && uv sync) && (cd web && npm install && cp .env.example .env.local)
 gcloud auth application-default login                 # Goliath (Vertex AI) and model downloads
-ollama pull embeddinggemma && make pull-model TAG=genlingo-2026-10b-e2b   # glossary + on-stage David
+ollama pull embeddinggemma && make pull-model TAG=genlingo-2026-10c-e2b-nomulti   # lexicon + on-stage David
 make up       # Ollama + warmed-up David + duel (:8787) + presenter view (:3000/presenter)
 make test     # tests with no network (MOCK_AI=1)
 ```

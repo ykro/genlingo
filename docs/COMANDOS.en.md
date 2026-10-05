@@ -39,8 +39,8 @@ cp .env.example .env                                  # models, prices and paths
 (cd web && npm install && cp .env.example .env.local) # presenter view and audience app
 gcloud auth application-default login                 # Goliath (Vertex AI) and model downloads
 
-ollama pull embeddinggemma                            # glossary retrieval
-make pull-model TAG=genlingo-2026-10b-e2b             # on-stage David (Q5_K_M, 3.62 GB)
+ollama pull embeddinggemma                            # lexicon retrieval
+make pull-model TAG=genlingo-2026-10c-e2b-nomulti     # on-stage David (Q5_K_M, 3.62 GB)
 make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # last month's David (M key)
 
 make up       # Ollama + warmed-up David + duel (:8787) + presenter view (:3000/presenter)

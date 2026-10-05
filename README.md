@@ -7,10 +7,10 @@ Demo de la charla *«David vs. Goliath: cómo un modelo pequeño le gana a un mo
 ## Qué vas a aprender
 
 1. **Datos propios con `origin`:** cada par dice de dónde salió (`web`, `synthetic` o `human`); sin eso no se puede evaluar ni reentrenar cada mes.
-2. **Banco de términos y oraciones reales:** 406 términos de 57 fuentes y 334 pares anclados en oraciones reales; la ventaja de David son sus datos.
+2. **Banco de términos y oraciones reales:** 532 términos de 76 fuentes, contrapartes validadas por significado y 556 pares anclados en oraciones reales; la ventaja de David son sus datos.
 3. **LoRA en Cloud Run Jobs:** una L4 entrena y un job de CPU fusiona y exporta GGUF; cada ejecución registra su duración y costo.
 4. **El costo de comprimir:** f16 contra Q4_K_M, Q5_K_M, Q6_K, Q8_0 e imatrix, en tamaño, latencia y jerga perdida.
-5. **Evals con métricas de término:** chrF++ más *jerga resuelta* y *cambios acertados*; las derrotas de David se publican.
+5. **Evals con métricas de término:** chrF++ más *jerga correcta*, *jerga resuelta* y *cambios acertados*, con un set de desarrollo aparte para decidir; las derrotas de David se publican.
 6. **Reentrenamiento mensual y offline por diseño:** la tecla `M` enfrenta al David del mes pasado; sin red, Goliath sale «sin conexión» y David sigue.
 
 ![Qué corre en la laptop y qué en la nube](docs/diagrams/arquitectura.png)
@@ -19,17 +19,17 @@ Demo de la charla *«David vs. Goliath: cómo un modelo pequeño le gana a un mo
 
 ## Resultado
 
-Eval del 2026-10-02 sobre 399 frases de prueba web `auto_validated` ([tabla completa y salvedades](docs/DECISIONES.md#resultados)):
+Eval del 2026-10-04 sobre 399 frases de prueba web `auto_validated` ([tabla completa y salvedades](docs/DECISIONES.md#resultados)):
 
-| Variante | Jerga resuelta | papás → Gen Z | chrF++ | p50 | Costo / 1,000 frases |
+| Variante | Jerga correcta | Jerga resuelta | chrF++ | p50 | Costo / 1,000 frases |
 | --- | --- | --- | --- | --- | --- |
-| **David en escena** (`genlingo-2026-10b-e2b`, Q5_K_M, 3.62 GB) | **82 %** | **59 %** | **56.6** | **557 ms** | **$0** |
-| David anterior (`genlingo-2026-10-e2b-q5_k_m`, tecla `M`) | 74 % | 43 % | 55.4 | 564 ms | $0 |
-| Goliath `gemini-3.8-flash` | 78 % | 51 % | 53.1 | 3.26 s | $1.08 |
-| Goliath + el mismo glosario | 82 % | 62 % | 56.5 | 3.84 s | $1.24 |
-| Copiar la frase (línea base) | 1 % | 3 % | 53.2 | — | — |
+| **David en escena** (`genlingo-2026-10c-e2b-nomulti`, Q5_K_M, 3.62 GB) | **42 %** | **82 %** | **59.7** | 670 ms | **$0** |
+| David anterior (`genlingo-2026-10b-e2b`) | 34 % | 82 % | 56.6 | 557 ms | $0 |
+| Goliath `gemini-3.8-flash` | 26 % | 77 % | 53.5 | 2.60 s | $1.13 |
+| Goliath + el mismo glosario | 38 % | 82 % | 57.0 | 3.05 s | $1.27 |
+| Copiar la frase (línea base) | 1 % | 1 % | 53.2 | — | — |
 
-Con el mismo glosario empatan en jerga: la ventaja de David no es ser mejor modelo, son sus datos. Reentrenar cada mes cuesta $0.71 de punta a punta en la nube ([costo por ejecución](docs/DECISIONES.md#costo-de-entrenamiento-por-ejecución)).
+*Jerga correcta*: la jerga producida significa lo que decía el original. David le saca 16 puntos a Goliath (IC 95 % [+10.8, +21.8]) y 30 en slang chapín. Con el mismo glosario, Goliath empata en el set completo, pero David sigue ganando en Guatemala y en papás → Gen Z: la ventaja de David son sus datos. Reentrenar cuesta $0.97 de punta a punta en la nube ([costo por ejecución](docs/DECISIONES.md#costo-de-entrenamiento-por-ejecución)).
 
 ## Lo que no funcionó
 
@@ -40,13 +40,14 @@ Una línea por callejón sin salida; el detalle está en [docs/BITACORA.md](docs
 - **Q4_K_M:** perdía 7 puntos de jerga contra f16.
 - **Entrenar, fusionar y convertir en un solo job:** murió por memoria; ahora son dos jobs.
 - **Contrapartes por *embedding*:** la mayoría de los enlaces significaban otra cosa.
+- **Pares con 2–3 términos a la vez y preferencias ORPO:** ninguno mejoró el set de desarrollo; quedaron fuera.
 
 ## Arranque rápido
 
 ```bash
 cp .env.example .env && (cd duel && uv sync) && (cd web && npm install && cp .env.example .env.local)
 gcloud auth application-default login                 # Goliath (Vertex AI) y descarga de modelos
-ollama pull embeddinggemma && make pull-model TAG=genlingo-2026-10b-e2b   # glosario + David de escena
+ollama pull embeddinggemma && make pull-model TAG=genlingo-2026-10c-e2b-nomulti   # léxico + David de escena
 make up       # Ollama + David precalentado + duelo (:8787) + vista del presentador (:3000/presenter)
 make test     # pruebas sin red (MOCK_AI=1)
 ```

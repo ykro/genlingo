@@ -39,8 +39,8 @@ cp .env.example .env                                  # modelos, precios y rutas
 (cd web && npm install && cp .env.example .env.local) # vista del presentador y app del público
 gcloud auth application-default login                 # Goliath (Vertex AI) y descarga de modelos
 
-ollama pull embeddinggemma                            # recuperación del glosario
-make pull-model TAG=genlingo-2026-10b-e2b             # David de escena (Q5_K_M, 3.62 GB)
+ollama pull embeddinggemma                            # recuperación del léxico
+make pull-model TAG=genlingo-2026-10c-e2b-nomulti     # David de escena (Q5_K_M, 3.62 GB)
 make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # David del mes pasado (tecla M)
 
 make up       # Ollama + David precalentado + duelo (:8787) + vista del presentador (:3000/presenter)

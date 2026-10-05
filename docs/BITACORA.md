@@ -4,22 +4,25 @@ La historia de David, iteración por iteración: qué cambió, por qué, qué sa
 Incluye los callejones sin salida, porque explican las decisiones que quedaron.
 
 Los números de jerga resuelta son todos del **mismo set de prueba** (399 frases web `auto_validated`,
-eval del 2026-10-02), así que se pueden comparar entre sí. Las ejecuciones viejas se reevaluaron sobre ese
+eval del 2026-10-02; la ronda 3, del 2026-10-04 sobre las mismas frases), así que se pueden comparar entre sí.
+La jerga correcta (el término producido significa lo mismo) nació con la ronda 3: su columna es del eval del
+2026-10-04 para todas las filas. Las ejecuciones viejas se reevaluaron sobre ese
 set; los números de su momento (sobre sets anteriores) están en el historial de `evals/report.md`.
 
 ![Jerga resuelta por iteración](diagrams/bitacora-jerga.svg)
 
 ## Resumen
 
-| Fecha | Iteración | Qué cambió | Jerga resuelta | Costo |
-| --- | --- | --- | --- | --- |
-| 2026-09-30 | Base sin afinar | Gemma 4 E2B tal cual | 58 % | $0 |
-| 2026-10-01 | `genlingo-2026-09` | Pares de edición mínima | 62 % | $0.41 |
-| 2026-10-01 | `genlingo-2026-10-e2b` | Pares anclados en el banco + prompt con glosario | 67 % (Q4) | $0.67 |
-| 2026-10-01 | Barrido de cuantización | Q5_K_M en vez de Q4_K_M | 74 % | $0 (laptop) |
-| 2026-10-02 | `genlingo-2026-10b-e2b` | Oraciones reales + banco de 406 términos | **82 %** | $0.71 |
-| | Goliath (referencia) | `gemini-3.8-flash`, sin glosario | 78 % | $1.08 / 1,000 frases |
-| | Goliath + el mismo glosario | El banco de David en el prompt de Gemini | 82 % | $1.24 / 1,000 frases |
+| Fecha | Iteración | Qué cambió | Jerga resuelta | Jerga correcta | Costo |
+| --- | --- | --- | --- | --- | --- |
+| 2026-09-30 | Base sin afinar | Gemma 4 E2B tal cual | 58 % | 14 % | $0 |
+| 2026-10-01 | `genlingo-2026-09` | Pares de edición mínima | 62 % | 18 % | $0.41 |
+| 2026-10-01 | `genlingo-2026-10-e2b` | Pares anclados en el banco + prompt con glosario | 67 % (Q4) | 25 % | $0.67 |
+| 2026-10-01 | Barrido de cuantización | Q5_K_M en vez de Q4_K_M | 74 % | 27 % | $0 (laptop) |
+| 2026-10-02 | `genlingo-2026-10b-e2b` | Oraciones reales + banco de 406 términos | 82 % | 34 % | $0.71 |
+| 2026-10-04 | `genlingo-2026-10c-e2b-nomulti` | Contrapartes por significado + prompt de léxico + ronda 3 de oraciones reales | **82 %** | **42 %** | $0.97 |
+| | Goliath (referencia) | `gemini-3.8-flash`, sin glosario | 78 % | 26 % | $1.08 / 1,000 frases |
+| | Goliath + el mismo glosario | El banco de David en el prompt de Gemini | 82 % | 38 % | $1.24 / 1,000 frases |
 
 ## Callejones sin salida, en una línea
 
@@ -28,6 +31,8 @@ set; los números de su momento (sobre sets anteriores) están en el historial d
 - **Q4_K_M**: perdía 7 puntos de jerga contra f16; Q5_K_M no pierde nada y pesa 3.62 GB.
 - **Entrenar, fusionar y convertir en un solo job** (`zct96`, $0.63): murió por memoria, porque en Cloud Run el disco vive en la memoria; ahora son dos jobs.
 - **Contrapartes por *embedding***: 175 de 217 enlaces significaban otra cosa («brainrot → patatús») y estaban en 1,065 de 1,375 pares sintéticos; quedan archivados solo como respuestas rechazadas.
+- **Pares con 2–3 términos a la vez** (2026-10-02, $1.41): en dev, chrF++ 3.1 puntos más bajo y p50 de 2.04 s; el David de escena se entrenó sin ellos.
+- **Preferencias ORPO** (2026-10-04, $0.56 más $1.81 en dos intentos fallidos): +0.3 de chrF++ en dev, pero la jerga resuelta papás → Gen Z bajó de 74 % a 55 %.
 
 ## 1 · Pares de edición mínima (`genlingo-2026-09`)
 
@@ -44,7 +49,7 @@ glosario de cuatro entradas recuperadas con EmbeddingGemma; David se entrena con
 **67 %** en Q4_K_M y **74 %** en Q5_K_M tras el barrido de cuantización; papás → Gen Z sube de 20 % a 43 %.
 $0.67 de entrenamiento y $0.80 de pares.
 
-## 3 · Oraciones reales (`genlingo-2026-10b-e2b`, en escena)
+## 3 · Oraciones reales (`genlingo-2026-10b-e2b`)
 
 Segunda ronda de investigación web: 22 fuentes, 146 términos y 420 oraciones reales. La mitad fue al set
 de prueba; la otra mitad, a 334 pares de entrenamiento anclados en la oración real, en las dos
@@ -59,7 +64,7 @@ Dos frases de prueba estaban citadas dentro de pares de entrenamiento más largo
 compara subcadenas, crudas y normalizadas, contra todos los archivos de entrenamiento: 4 pares de prueba
 fuera (403 → 399), quitados del set de prueba y no del entrenamiento porque David ya estaba entrenado.
 
-## 5 · Contrapartes por significado (`genlingo-2026-10c-e2b-nomulti`)
+## 5 · Contrapartes por significado (`genlingo-2026-10c-e2b-nomulti`, en escena)
 
 La revisión de datos encontró el error de las contrapartes (arriba) y que, al entrenar, el término
 correcto estaba en el glosario solo el 45 % de las veces. Esta ronda cambió los datos: contrapartes
@@ -88,35 +93,58 @@ el dev completo es optimista):
   con lote 4, los logits de Gemma no cabían en la L4 (ahora lote 1 × 16).
 - **Costo:** 10c $1.41, nomulti $0.97, ORPO $0.56 (más $1.81 de los dos intentos fallidos).
 
+**Prueba, 399 frases (eval del 2026-10-04).** Con el mejor del dev elegido, el set de prueba se corrió una
+sola vez. Contra Goliath sin glosario, como en escena, con IC 95 % por bootstrap pareado:
+
+- **chrF++:** 59.7 contra 53.5 (+6.2 [+4.3, +8.1]); contra Goliath con el mismo glosario, 57.0 (+2.7
+  [+0.8, +4.7]); contra el David anterior, 56.6 (+3.1 [+1.7, +4.4]).
+- **Jerga correcta:** 42 % contra 26 % (+16.3 [+10.8, +21.8]); 101 frases las acierta solo David y 36 solo
+  Goliath. El David anterior acertaba el 34 %.
+- **Jerga resuelta:** 82 % contra 77 % (+4.5 [+0.0, +8.8]), empate. **Cambios acertados:** 28 % contra 25 %.
+- **p50** 670 ms contra 2.60 s; **costo** $0 contra $1.13 por 1,000 frases.
+
+**Decisión:** `genlingo-2026-10c-e2b-nomulti` pasa a escena (`LOCAL_MODEL_TAG`). Gana en dev y la prueba lo
+confirma en chrF++ y jerga correcta, con p50 < 1 s y el mismo tamaño (3.62 GB). `genlingo-2026-10b-e2b`
+queda en `DAVID_TAGS` como David anterior.
+
 ## Dónde gana David hoy, y dónde no
 
-Nichos definidos antes de mirar resultados ([evals/niche.md](../evals/niche.md)); IC 95 % por bootstrap
-pareado ([evals/niche_report.md](../evals/niche_report.md)).
+Nichos definidos antes de mirar resultados ([evals/niche.md](../evals/niche.md)); métrica: jerga correcta
+(enmienda 1, registrada antes de calcularla); IC 95 % por bootstrap pareado
+([evals/niche_report.md](../evals/niche_report.md)). David en escena contra Goliath sin glosario:
 
 | Nicho | n | David | Goliath | Δ | IC 95 % | Veredicto |
 | --- | --- | --- | --- | --- | --- | --- |
-| Slang chapín (GT) | 115 | 78 % | 70 % | +7.8 | [+0.0, +15.7] | empate estadístico |
-| Papás → Gen Z (GT/CO) | 106 | 65 % | 49 % | +16.0 | [+3.8, +28.3] | **gana David** |
-| Todo el set | 398 | 82 % | 78 % | +3.8 | [−0.5, +8.0] | empate estadístico |
+| Slang chapín (GT) | 115 | 52 % | 23 % | +29.6 | [+19.1, +40.0] | **gana David** |
+| Papás → Gen Z (GT/CO) | 107 | 44 % | 20 % | +24.3 | [+12.1, +36.4] | **gana David** |
+| País CO | 131 | 37 % | 19 % | +17.6 | [+8.4, +27.5] | **gana David** |
+| País MX | 78 | 46 % | 37 % | +9.0 | [−2.6, +21.8] | empate estadístico |
+| País LATAM | 75 | 32 % | 31 % | +1.3 | [−9.3, +12.0] | empate estadístico |
+| Todo el set | 399 | 42 % | 26 % | +16.3 | [+10.8, +21.8] | **gana David** |
 
-- **Gana** en papás → Gen Z para Guatemala y Colombia: es justo lo que enseñan los pares reales.
-- **En Guatemala** el límite inferior queda exactamente en 0: no alcanza para declarar victoria, aunque
-  resuelve la jerga donde Goliath no en 16 frases contra 7 (chrF++ 61.2 contra 51.4).
-- **Pierde o empata** contra Goliath con el mismo glosario en todos los cortes, y Goliath acierta más
-  palabras de la referencia (30 % contra 22 %). Con los mismos datos, el modelo grande alcanza al pequeño:
-  la ventaja de David son sus datos.
+- **Gana** en slang chapín, en papás → Gen Z, en Colombia y en el set completo; empata en México y en el
+  español neutro (LATAM).
+- **En jerga resuelta**, que no mira el significado, gana solo en papás → Gen Z (67 % contra 52 %, +15.0
+  [+2.8, +27.1]); en Guatemala y en el set completo el límite inferior queda en 0: empate.
+- **Contra Goliath con el mismo glosario** (referencia, no decide): David gana en slang chapín (+17.4
+  [+7.0, +28.7]) y en papás → Gen Z (+16.0 [+3.8, +28.3]), empata en el set completo (+4.0) y pierde en el
+  español neutro (32 % contra 55 %). Con los mismos datos el modelo grande se acerca, pero no alcanza a David
+  en lo que David estudió.
 
 ## Costo de reentrenar cada mes
 
-Un reentrenamiento de E2B, de punta a punta en la nube, cuesta **$0.71** (25 min de L4 + 9 min de CPU).
-En total, las ejecuciones con registro costaron $4.40, incluidas tres de las cuatro fallidas ($1.63; la cuarta, `kqlxv`, no dejó registro). La
-inferencia de David cuesta $0; Goliath, $1.08 por 1,000 frases con la tarifa de hoy y $2.17 con la de 2027.
+El David de escena costó **$0.97** de punta a punta en la nube (36 min de L4 + 10 min de CPU).
+En total, las ejecuciones con registro costaron $9.15, incluidas cinco de las seis fallidas ($3.44; la sexta, `kqlxv`, no dejó registro de costo). La
+inferencia de David cuesta $0; Goliath, $1.13 por 1,000 frases con la tarifa de hoy y $2.26 con la de 2027.
 
 ## Qué haríamos después
 
-- **Más datos reales de Guatemala.** Es el nicho que todavía empata, y donde la web tiene menos.
-- **Pares con varios términos a la vez.** David cambia menos palabras de la referencia que Goliath (22 %
-  contra 30 %); los pares de un solo término le enseñan a cambiar uno.
+- **Más datos reales de Guatemala.** Con la ronda 3, David gana el nicho chapín en jerga correcta, pero en
+  jerga resuelta sigue en empate, y la web tiene menos de Guatemala que de los demás países.
+- **El español neutro (LATAM).** Es donde Goliath con el mismo glosario le gana a David (55 % contra 32 %
+  de jerga correcta): faltan pares reales sin país.
 - **Selección con el glosario.** Generar varias respuestas y quedarse con la que contiene más
-  contrapartes esperadas del banco, sin pasarse de 1 s.
-- **Un set de desarrollo propio**, para que las decisiones de datos nunca miren el set de prueba.
+  contrapartes esperadas del banco, sin pasarse de 1 s: en dev, con 4 respuestas, la jerga resuelta de 10c subió de 86 % a 94 %, pero
+  el p50 llegó a 4.40 s.
+- Ya hecho en la ronda 3: el set de desarrollo propio (las decisiones de datos ya no miran el set de prueba)
+  y los pares con varios términos a la vez (no ayudaron: quedaron fuera).

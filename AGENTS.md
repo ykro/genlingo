@@ -11,8 +11,8 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
 | Own, quality data | `origin` per pair, `data/DATASHEET.md`, term bank, real sentences, automatic validation against the bank, non-synthetic test set |
 | Efficient fine-tuning in the cloud | `train/` (commented LoRA), two Cloud Run Jobs (L4 trains, CPU merges + GGUF), cost and duration per stage in `train/runs/<tag>.json` and `evals/report.md` |
 | Compress to run on a laptop | quantization sweep (Q4_K_M, Q5_K_M, Q6_K, Q8_0, imatrix) vs f16: size, latency and slang lost |
-| Honest evals | chrF++ plus a copy-the-phrase baseline, slang handled and reference-change recall, Goliath with and without David's glossary, David's losses shown |
-| Big models age | model tags by data date (`genlingo-2026-10b-e2b`), `david_tag` duel last month vs this month |
+| Term-level evals | chrF++ plus a copy-the-phrase baseline, correct slang (meaning-validated), slang handled and reference-change recall, a separate dev set for data decisions, Goliath with and without David's glossary, David's losses shown |
+| Big models age | model tags by data date (on stage: `genlingo-2026-10c-e2b-nomulti`), `david_tag` duel last month vs this month |
 
 ## Components
 
@@ -21,7 +21,7 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
 | Audience web app (`web/`) | Next.js, Firebase Auth (anonymous), Firestore db `genlingo`, App Check (reCAPTCHA Enterprise) | Cloud Run | Phones must reach it |
 | Admin (`web/` route `/admin`) | Same app, email auth for the presenter | Cloud Run | Optional: moderate phrases when auto-approve is off, approve contributed pairs |
 | Training (`train/`) | TRL + PEFT LoRA (`train_lora.py`), merge + llama.cpp GGUF `QUANT` (Q5_K_M) + f16 + Modelfile (`finish.py`) | Cloud Run Jobs in europe-west4: `genlingo-train` (1× L4) then `genlingo-finish` (CPU); notebook for Colab; `make train-finish` on the laptop as fallback | Serverless GPU billed per second; the split keeps each job within 32 GiB |
-| David | Ollama with custom Modelfile, EmbeddingGemma glossary | Laptop | The thesis: runs offline on your laptop |
+| David | Ollama with custom Modelfile, EmbeddingGemma lexicon (term bank + meaning-validated counterparts) | Laptop | The thesis: runs offline on your laptop |
 | Duel service (`duel/`) | Python, FastAPI, Ollama client, `google-genai`, `sacrebleu`, SQLite scoreboard | Laptop | Must work with Wi-Fi off; latency measured on stage hardware |
 | Presenter view (`web/` route `/presenter`, served locally) | Next.js calling the duel service | Laptop | Offline mode |
 
@@ -39,11 +39,11 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
 
 ## Training
 
-- `train/train_lora.py` fine-tunes `GEMMA_BASE_MODEL` with LoRA (r=16, alpha=32, lr 2e-4, 3 epochs) on the chat JSONL rendered with the duel's prompt (`make train-data`, `v2+glossary`).
+- `train/train_lora.py` fine-tunes `GEMMA_BASE_MODEL` with LoRA (r=32, alpha=16, rsLoRA, lr 2e-4, 3 epochs) on the chat JSONL rendered with the duel's prompt (`make train-data`, style `lexicon`: country + lexicon).
 - `train/finish.py` merges the adapter, writes the f16 and `QUANT` (Q5_K_M) GGUFs and the Modelfile, and uploads to `gs://ai-experiments-487722-genlingo-models/<tag>/`.
 - `make train` runs both as Cloud Run Jobs from one image (`infra/03-train-job.sh`) and writes `train/runs/<tag>.json` with duration and estimated cost per stage. `TRAIN_RUNTIME=vertex` runs everything as one Vertex AI Custom Job; `train/genlingo.ipynb` wraps it for Colab; `make train-finish` redoes the merge on the laptop.
 - `make pull-model TAG=…` downloads the GGUF and runs `ollama create`.
-- Tags carry the data date (`genlingo-YYYY-MM`, plus a letter for a second data version in the same month, e.g. `genlingo-2026-10b-e2b`).
+- Tags carry the data date (`genlingo-YYYY-MM`, plus a letter for a second data version in the same month, e.g. `genlingo-2026-10c-e2b-nomulti`, the third data version of October without the multi-term pairs).
 - `make eval` picks the on-stage David: the smallest export within 2 points of its f16 on slang handled, with p50 < 1 s.
 
 ## Duel service

@@ -6,30 +6,30 @@ Why Genlingo is built this way: the full result, the detail behind what the demo
 
 The result is mixed, and the talk tells it that way:
 
-- **Real data moved the needle.** The on-stage David (`genlingo-2026-10b-e2b`) was trained on the second research round: 334 pairs anchored in real sentences, the term bank grown to 406 terms in the glossary, and the synthetic pairs re-filtered against that bank. It handles the slang in **82%** of the 399 test phrases, against **74%** for the previous David at the same compression. Almost all of the gain is in the hard direction, parents → Gen Z: from 43% to **59%**. It is one run per David, without isolating how much each change contributes.
-- **David now beats plain Gemini on slang:** 82% against **78%**, and 56.6 against 53.1 on chrF++. He answers in **~0.6 s** (p50 557 ms) and costs **$0** per phrase; Goliath takes **~3.3 s** and costs **$1.08 per 1,000 phrases**.
-- **With the same glossary, they tie on slang (82%)**, and Goliath matches more of the reference's words (30% against 22%). David's advantage is not being a better model: it is **his data** (the term bank and the real sentences, sourced and dated).
-- **Compression no longer costs slang:** the on-stage David is the Q5_K_M (3.62 GB), one point from the f16 (9.27 GB), at the same latency.
-- **chrF++ barely tells anyone apart:** returning the phrase untranslated already scores **53.2**; David 56.6, Goliath 53.1, Goliath with glossary 56.5. That is why the term-level metric exists.
-- **Retraining every month costs under $1, all in the cloud:** $0.71 end to end (L4 to train + CPU to merge and quantize).
-- **Big models age:** with the `M` key, the previous David (`genlingo-2026-10-e2b-q5_k_m`, 74%) faces the on-stage one (82%) live.
+- **Data with meaning moved the needle.** The on-stage David (`genlingo-2026-10c-e2b-nomulti`) was trained with counterparts validated by meaning, a lexicon prompt (each term with its counterpart, nearby terms and one from another country marked "NO de aquí", not from here), 1,715 synthetic pairs regenerated with those counterparts and 556 pairs anchored in real sentences, with more Guatemala and Colombia. It produces slang with the correct meaning in **42%** of the 399 test phrases, against **34%** for the previous David (`genlingo-2026-10b-e2b`), and chrF++ goes from 56.6 to **59.7**. The round was decided on a separate dev set; the test set only confirmed it.
+- **David beats Gemini on correct slang:** 42% against **26%** (+16.3 points, 95% CI [+10.8, +21.8]; 101 phrases only David gets right, 36 only Goliath). He wins on Guatemalan slang (52% against 23%), on parents → Gen Z for Guatemala and Colombia (44% against 20%) and in Colombia; Mexico is a tie. On *slang handled*, which ignores meaning, they tie (82% against 77%). He answers in **~0.7 s** (p50 670 ms) and costs **$0** per phrase; Goliath takes **~2.6 s** and costs **$1.13 per 1,000 phrases**.
+- **With the same glossary, Goliath ties on the whole set** (42% against 38%), but David still wins on Guatemalan slang (+17.4) and parents → Gen Z (+16.0); on neutral Spanish (LATAM) Goliath wins (55% against 32%). On reference-change recall they are close (28% David, 25% Goliath, 29% Goliath with glossary). David's advantage is **his data** (the term bank, the counterparts and the real sentences, sourced and dated) and having been trained on it.
+- **Compression doesn't cost slang:** the on-stage David is the Q5_K_M (3.62 GB); with the previous David, the Q5_K_M landed one point from the f16 (9.27 GB) at the same latency.
+- **chrF++ barely tells anyone apart:** returning the phrase untranslated already scores **53.2**; David 59.7, Goliath 53.5, Goliath with glossary 57.0. That is why the term-level metrics exist.
+- **Retraining every month costs under $1, all in the cloud:** $0.97 end to end (L4 to train + CPU to merge and quantize).
+- **Big models age:** with the `M` key, the David from two rounds ago (`genlingo-2026-10-e2b-q5_k_m`, 27% correct slang) faces the on-stage one (42%) live.
 
 The full story, iteration by iteration (dead ends included), is in [BITACORA.md](BITACORA.md) (Spanish); the niches where David is measured against Goliath, defined before looking at results, in [evals/niche.md](../evals/niche.md).
 
 > The test-set references are validated automatically against the term bank (`auto_validated`); no person reviewed them. No test pair appears in the training data, not even inside a longer sentence. The test sentences and the real training pairs come from the same research round (disjoint halves by hash), so part of the gain may be closeness to those sources. Full details in [evals/report.md](../evals/report.md).
 
-![Slang handled per variant](diagrams/resultados-jerga.png)
+![Correct slang per variant](diagrams/resultados-jerga.png)
 
 ## What you'll learn, in detail
 
 | Lesson | Where it lives in the code |
 | --- | --- |
 | **Own data with `origin`.** Every pair says where it came from: `web` (URL + license), `synthetic` (model + prompt version + seed) or `human` (event). Without that you can neither trust the evaluation nor retrain every month. | `duel/genlingo_duel/dataset.py` (the `Pair` schema validates provenance), [data/SOURCES.md](../data/SOURCES.md), [data/DATASHEET.md](../data/DATASHEET.md) |
-| **Term bank, real sentences and validated synthetic pairs.** 406 terms from 57 sources; Gemini generates *term-substitution* pairs anchored on the bank, and every pair is validated against the bank (expected term present, no slang from another country, the source slang is gone): 1,375 remain. On top of that, 334 pairs anchored in real web sentences. | `data/terms.jsonl`, `scripts/generate_pairs.py`, `duel/genlingo_duel/terms.py` |
-| **LoRA on Cloud Run Jobs.** One image trains on an L4 (TRL + PEFT, r=16, alpha=32, lr 2e-4, 3 epochs) and, on a CPU job, merges, exports GGUF with llama.cpp and publishes an Ollama Modelfile. Every run records its duration and cost per stage in a file. | `train/train_lora.py`, `train/finish.py`, `train/submit_job.py`, `infra/03-train-job.sh`, `train/runs/` |
+| **Term bank, real sentences and validated synthetic pairs.** 532 terms from 76 sources and a table of counterparts validated by meaning; Gemini generates *term-substitution* pairs anchored on the bank, and every pair is validated against the bank (expected term present, no slang from another country, the source slang is gone): the on-stage David uses 1,715. On top of that, 556 pairs anchored in real web sentences. | `data/terms.jsonl`, `data/counterparts.jsonl`, `scripts/generate_pairs.py`, `duel/genlingo_duel/terms.py` |
+| **LoRA on Cloud Run Jobs.** One image trains on an L4 (TRL + PEFT, r=32, alpha=16 with rsLoRA, lr 2e-4, 3 epochs) and, on a CPU job, merges, exports GGUF with llama.cpp and publishes an Ollama Modelfile. Every run records its duration and cost per stage in a file. | `train/train_lora.py`, `train/finish.py`, `train/submit_job.py`, `infra/03-train-job.sh`, `train/runs/` |
 | **The compression trade-off.** f16 vs Q4_K_M, Q5_K_M, Q6_K, Q8_0 and imatrix: size, latency and how much slang is lost. | `train_lora.to_gguf`, "Compresión" section of `evals/report.md` |
-| **Evals with term metrics.** chrF++ plus a "copy the phrase" baseline, *slang handled* and *reference-change recall* against the bank; David's losses are published. No model judges another. | `evals/run_eval.py`, `evals/term_accuracy.py`, `evals/report.py` |
-| **Monthly retrain and `david_tag`.** Models carry the date of their data (`genlingo-YYYY-MM`, with a letter when a month has two data versions: `genlingo-2026-10b-e2b` is October's second research round); the duel accepts `david_tag` to pit last month's David against this month's. | `Makefile` (`TAG`), `DuelRequest.david_tag` in `duel/genlingo_duel/main.py`, `M` key in `web/components/presenter/PresenterApp.tsx` |
+| **Evals with term metrics.** chrF++ plus a "copy the phrase" baseline, *correct slang*, *slang handled* and *reference-change recall* against the bank; data decisions are made on a separate dev set and David's losses are published. No model judges another. | `evals/run_eval.py`, `evals/term_accuracy.py`, `evals/report.py` |
+| **Monthly retrain and `david_tag`.** Models carry the date of their data (`genlingo-YYYY-MM`, with a letter when a month has two data versions: `genlingo-2026-10b-e2b` is October's second research round and `genlingo-2026-10c-e2b-nomulti` the third, without the multi-term pairs); the duel accepts `david_tag` to pit last month's David against this month's. | `Makefile` (`TAG`), `DuelRequest.david_tag` in `duel/genlingo_duel/main.py`, `M` key in `web/components/presenter/PresenterApp.tsx` |
 | **Offline by design.** The network check is a 0.8 s TCP connect; with no network, Goliath shows as "sin conexión" (offline) and David keeps going. The glossary is retrieved with a local EmbeddingGemma and cached embeddings. | `duel/duel_core/connectivity.py`, `duel/duel_core/duel.py`, `duel/genlingo_duel/glossary.py` |
 
 ## Decisions
@@ -79,9 +79,9 @@ The monthly cycle, from data to stage and back (labels in Spanish):
 
 ### The glossary prompt
 
-The country prompt starts with the country ("Variante: español de Guatemala. Usa solo expresiones de Guatemala…") because "chido" and "chilero" are the same word in different places. It ends with a four-entry glossary from the term bank, country-specific or neutral: first the source-generation terms that appear verbatim in the phrase, then the closest ones by meaning according to EmbeddingGemma. Retrieval time is added to David's latency.
+The country prompt starts with the country ("Variante: español de Guatemala. Usa solo expresiones de Guatemala…") because "chido" and "chilero" are the same word in different places. It ends with a glossary from the term bank, country-specific or neutral. The on-stage David uses the `lexicon` style: six entries, each source-generation term that appears in the phrase with its counterpart validated by meaning (`data/counterparts.jsonl`; with no counterpart, its meaning), the closest other-generation terms according to EmbeddingGemma and one from another country marked "NO de aquí" (not from here). Earlier Davids use the `glossary` style: four entries without counterparts, first the terms that appear verbatim in the phrase, then the closest ones. Retrieval time is added to David's latency.
 
-David is trained on exactly that format (`make train-data` uses the glossary style by default) and the duel reads from `train/runs/<tag>.json` which prompt each David was trained with: there is no gap between training and stage. Goliath gets the country prompt, without a glossary, by default (`GOLIATH_PROMPT_STYLE`), because the bank is David's data; `make eval` also runs Goliath with the same glossary, which shows how much of the result is the model and how much is the data.
+David is trained on exactly that format (`make train-data` uses the `lexicon` style by default) and the duel reads from `train/runs/<tag>.json` which prompt each David was trained with: there is no gap between training and stage. Goliath gets the country prompt, without a glossary, by default (`GOLIATH_PROMPT_STYLE`), because the bank is David's data; `make eval` also runs Goliath with the same glossary, which shows how much of the result is the model and how much is the data.
 
 ### The test set is web-only, never synthetic
 
@@ -89,7 +89,7 @@ A reference written by Gemini would reward Goliath for sounding like itself. The
 
 ### Dated Gemini price schedule
 
-Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` is a list of prices by date: every round and every eval uses the price in force that day and records which one it used. The report also shows what the same eval would cost at the 2027 price ($2.17 per 1,000 phrases instead of $1.08). Thinking tokens are billed as output. David's inference costs $0; the presenter view shows his training cost amortized per round. Exports of one training run (`-f16`, `-q5_k_m`, `-iq-q4_k_m`…) share its `train/runs/<tag>.json`.
+Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` is a list of prices by date: every round and every eval uses the price in force that day and records which one it used. The report also shows what the same eval would cost at the 2027 price ($2.26 per 1,000 phrases instead of $1.13). Thinking tokens are billed as output. David's inference costs $0; the presenter view shows his training cost amortized per round. Exports of one training run (`-f16`, `-q5_k_m`, `-iq-q4_k_m`…) share its `train/runs/<tag>.json`.
 
 ### App Check enforcement is project-wide
 
@@ -105,24 +105,25 @@ Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:
 
 ## Results
 
-Eval of 2026-10-02 on 399 `auto_validated` web test pairs (out of 522 candidates; 123 rejected by the automatic validation, 4 of them for appearing inside a training pair). Every local model with the prompt it was trained on, one at a time on the M1 Max; Goliath at temperature 0 (1 error without glossary).
+Eval of 2026-10-04 on 399 `auto_validated` web test pairs (out of 522 candidates; 123 rejected by the automatic validation, 4 of them for appearing inside a training pair). Every local model with the prompt it was trained on, one at a time on the M1 Max; Goliath at temperature 0 (2 errors with glossary). *Correct slang* (amendment 1 of [evals/niche.md](../evals/niche.md)): the term produced means the same, according to the counterpart table validated by meaning.
 
-| Variant | Slang handled | Gen Z → parents | parents → Gen Z | Reference-change recall | chrF++ | p50 | Cost / 1,000 phrases | Size |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Copy the phrase (baseline) | 1% | 0% | 3% | 0% | 53.2 | — | — | — |
-| `gemma4:e2b-it-qat` (base) | 58% | 95% | 10% | 14% | 50.2 | 364 ms | $0 | 4.34 GB |
-| `gemma4:e2b-it-qat` + glossary | 62% | 94% | 20% | 23% | 55.0 | 452 ms | $0 | 4.34 GB |
-| `gemma4:e4b` (base) | 68% | 97% | 31% | 17% | 48.2 | 802 ms | $0 | 6.58 GB |
-| `genlingo-2026-09` (Q4, plain prompt) | 62% | 94% | 20% | 14% | 55.0 | 391 ms | $0 | 3.42 GB |
-| `genlingo-2026-10-e2b` + glossary (Q4) | 67% | 95% | 31% | 16% | 55.7 | 512 ms | $0 | 3.42 GB |
-| `genlingo-2026-10-e2b-q5_k_m` + glossary (previous) | 74% | 97% | 43% | 18% | 55.4 | 564 ms | $0 | 3.62 GB |
-| `genlingo-2026-10-e2b-f16` + glossary | 74% | 99% | 42% | 19% | 56.3 | 566 ms | $0 | 9.27 GB |
-| **`genlingo-2026-10b-e2b` + glossary (Q5_K_M, on stage)** | **82%** | 99% | **59%** | 22% | **56.6** | **557 ms** | **$0** | 3.62 GB |
-| `genlingo-2026-10b-e2b-f16` + glossary | 81% | 98% | 59% | 22% | 56.7 | 543 ms | $0 | 9.27 GB |
-| Goliath `gemini-3.8-flash` | 78% | 99% | 51% | 25% | 53.1 | 3.26 s | $1.08 | — |
-| Goliath + the same glossary | 82% | 98% | 62% | 30% | 56.5 | 3.84 s | $1.24 | — |
+| Variant | Correct slang | Slang handled | Gen Z → parents | parents → Gen Z | Reference-change recall | chrF++ | p50 | Cost / 1,000 phrases | Size |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Copy the phrase (baseline) | 1% | 1% | 0% | 3% | 0% | 53.2 | — | — | — |
+| `gemma4:e2b-it-qat` (base) | 14% | 58% | 95% | 10% | 14% | 50.2 | 364 ms | $0 | 4.34 GB |
+| `gemma4:e2b-it-qat` + glossary | 38% | 62% | 94% | 20% | 23% | 55.0 | 452 ms | $0 | 4.34 GB |
+| `gemma4:e4b` (base) | 19% | 68% | 97% | 31% | 17% | 48.2 | 802 ms | $0 | 6.58 GB |
+| `genlingo-2026-09` (Q4, plain prompt) | 18% | 62% | 94% | 20% | 14% | 55.0 | 391 ms | $0 | 3.42 GB |
+| `genlingo-2026-10-e2b` + glossary (Q4) | 25% | 67% | 95% | 31% | 16% | 55.7 | 512 ms | $0 | 3.42 GB |
+| `genlingo-2026-10-e2b-q5_k_m` + glossary (`M` key) | 27% | 74% | 97% | 43% | 18% | 55.4 | 564 ms | $0 | 3.62 GB |
+| `genlingo-2026-10-e2b-f16` + glossary | 28% | 74% | 99% | 42% | 19% | 56.3 | 566 ms | $0 | 9.27 GB |
+| `genlingo-2026-10b-e2b` + glossary (Q5_K_M, previous) | 34% | 82% | 99% | 59% | 22% | 56.6 | 557 ms | $0 | 3.62 GB |
+| `genlingo-2026-10b-e2b-f16` + glossary | 34% | 81% | 98% | 59% | 22% | 56.7 | 543 ms | $0 | 9.27 GB |
+| **`genlingo-2026-10c-e2b-nomulti` + lexicon (Q5_K_M, on stage)** | **42%** | **82%** | 100% | 58% | 28% | **59.7** | 670 ms | **$0** | 3.62 GB |
+| Goliath `gemini-3.8-flash` | 26% | 77% | 97% | 51% | 25% | 53.5 | 2.60 s | $1.13 | — |
+| Goliath + the same glossary | 38% | 82% | 100% | 58% | 29% | 57.0 | 3.05 s | $1.27 | — |
 
-**Reading the results.** Phrase by phrase, David handles the slang and Goliath doesn't in 46 phrases; the other way round, in 31. Against Goliath with the glossary the count flips: 36 against 39. On *reference-change recall* (exact words of the reference) Goliath beats David with and without the glossary, and David still slips in another country's slang in 14 of 173 parents → Gen Z phrases (Goliath: 2). The second-round data gave David 8 points of slang handled, almost all in parents → Gen Z, which is what the real pairs teach in that direction (a real Gen Z sentence as the output). David wins on speed, cost and privacy, and wins on slang as long as the term bank and the real sentences are his alone. chrF++ stays glued to the copy baseline (53.2) because a register rewrite keeps almost every word: it can't decide who translated the slang.
+**Reading the results.** Phrase by phrase, David produces the correct slang and Goliath doesn't in 101 phrases; the other way round, in 36. Against Goliath with the glossary the count narrows (79 against 63) and the whole set is a tie; David still wins on Guatemalan slang and parents → Gen Z, and Goliath wins on neutral Spanish (LATAM). On *slang handled* (the register changed, regardless of meaning) David and Goliath tie, and David still slips in another country's slang in 16 of 173 parents → Gen Z phrases (Goliath: 3). This round's jump is in meaning: the previous David already handled 82%, but got the term right in 34%. David wins on speed, cost and privacy, and wins on correct slang as long as the term bank, the counterparts and the real sentences are his alone. chrF++ stays close to the copy baseline (53.2) because a register rewrite keeps almost every word: it can't decide who translated the slang. The per-niche CIs are in [evals/niche_report.md](../evals/niche_report.md).
 
 David's ten worst losses and the per-country and per-direction breakdowns are in [evals/report.md](../evals/report.md). The first version of the data (free paraphrase) left David *below* the base model (chrF++ 39.1): it is documented in [evals/experiments/2026-09-parafrasis-libres.md](../evals/experiments/2026-09-parafrasis-libres.md).
 
@@ -141,7 +142,12 @@ Cloud Run Jobs in `europe-west4`: training on 1× NVIDIA L4 without zonal redund
 | `genlingo-2026-10-e2b` | E2B | 1,500 (anchored on the bank) | done (loss 2.26 → 0.12) | 28.2 min | $0.67 |
 | `genlingo-2026-10-e4b` | E4B | 1,500 (anchored on the bank) | trained; out of memory while merging → `make train-finish` | 41.3 min | $0.98 |
 | `genlingo-2026-10b-e2b` | E2B | 1,709 (1,375 synthetic + 334 anchored in real sentences) | done in the cloud, two jobs (loss 2.62 → 0.16): train 25.3 min $0.60 + merge/GGUF Q5_K_M and f16 9.0 min $0.11 | 34.3 min | $0.71 |
+| `genlingo-2026-10c-e2b` | E2B | 2,972 (2,416 synthetic, 701 of them with 2–3 terms, + 556 anchored in real sentences) | done (loss 2.19 → 0.04): train 54.0 min $1.28 + merge/GGUF 10.3 min $0.13; left out for latency (p50 2.04 s on dev) | 64.2 min | $1.41 |
+| `genlingo-2026-10c-e2b-nomulti` | E2B | 2,271 (1,715 synthetic + 556 anchored in real sentences) | done, **on stage** (loss 1.97 → 0.06): train 35.7 min $0.85 + merge/GGUF 10.2 min $0.13 | 45.9 min | $0.97 |
+| `genlingo-2026-10c-e2b-nomulti-orpo` | E2B | 264 preference pairs on the nomulti adapter | done: sampling + ORPO 18.4 min $0.44 + merge/GGUF 9.9 min $0.12; left out (parents → Gen Z slang dropped on dev) | 28.3 min | $0.56 |
 | `failed/genlingo-2026-10b-e2b-zct96` | E2B | 1,709 | trained; killed for memory converting to GGUF f16 in the single job → led to the split into two jobs | 26.8 min | $0.63 |
+| `failed/genlingo-2026-10c-e2b-nomulti-orpo-8995k` | E2B | 2,271 | timed out: the model was loaded on the CPU for sampling | 60.4 min | $1.43 |
+| `failed/genlingo-2026-10c-e2b-nomulti-orpo-jwt8d` | E2B | 2,271 | out of memory on the L4: with batch 4 Gemma's logits didn't fit (now batch 1 × 16) | 16.2 min | $0.38 |
 | `failed/genlingo-2026-09-nv5r5` | E2B | 1,000 | failed at start (`gcc` missing for Triton) | 10.9 min | $0.26 |
 | `failed/genlingo-2026-09-kcwqz` | E2B | 1,000 | cancelled: GGUF written to the bucket mount, too slow | 31.2 min | $0.74 |
 | `failed/genlingo-2026-09-kqlxv` | E2B | 1,000 | cancelled at ~28 min (same cause, on read) | — | not recorded |

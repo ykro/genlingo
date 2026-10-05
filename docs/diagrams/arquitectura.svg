@@ -3,7 +3,7 @@
       <title id="arquitectura-title">Genlingo: qué corre en la laptop y qué en la nube</title>
       <desc id="arquitectura-desc">Arquitectura de Genlingo: la vista del presentador, el servicio del duelo y David (Gemma afinado en Ollama) corren en la laptop y funcionan sin internet; la app de la audiencia, Firestore, Gemini (Goliath) y el entrenamiento mensual corren en Google Cloud, y el duelo solo los usa cuando hay red.</desc>
       <defs>
-<style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;family=Noto+Sans+KR:wght@400;500;600&amp;family=Noto+Serif+KR:wght@400&amp;family=Noto+Sans+TC:wght@400;500;600&amp;family=Noto+Serif+TC:wght@400&amp;display=swap');</style>
+        <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;display=swap');</style>
       <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
       <marker id="arrow-start" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto-start-reverse"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
       <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#C23D19"/></marker>
@@ -59,8 +59,8 @@
       <rect x="88" y="454" width="40" height="12" rx="2" fill="none" stroke="#C23D19" stroke-opacity="0.4" stroke-width="0.8"/>
       <text x="108.0" y="463" fill="#C23D19" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">LOCAL</text>
       <text x="240.0" y="480.0" fill="#C23D19" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">David · Gemma 4 E2B + LoRA</text>
-      <text x="240.0" y="496.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Ollama · genlingo-2026-10b-e2b · Q5_K_M</text>
-      <text x="240.0" y="508.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">glosario: EmbeddingGemma + terms.jsonl</text>
+      <text x="240.0" y="496.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Ollama · genlingo-2026-10c-e2b-nomulti · Q5_K_M</text>
+      <text x="240.0" y="508.0" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">léxico: EmbeddingGemma + terms.jsonl</text>
       <rect x="600" y="160" width="320" height="64" rx="6" fill="#f5f5f5"/>
       <rect x="600" y="160" width="320" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <rect x="608" y="166" width="28" height="12" rx="2" fill="none" stroke="#2d3142" stroke-opacity="0.4" stroke-width="0.8"/>

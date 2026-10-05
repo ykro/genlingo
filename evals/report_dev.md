@@ -2,7 +2,7 @@
 
 > **Set de desarrollo** (`data/pairs/dev_real.jsonl`): para decidir rondas de datos. Los Davids entrenados antes del 2026-10-02 vieron estos pares al entrenar, así que su número aquí es optimista.
 
-Generado por `make eval` el 2026-10-04 15:37. 146 pares de desarrollo (web; nunca sintéticos), 146 auto_validated. `auto_validated` = validada automáticamente contra el banco de términos (`scripts/validate_test_set.py`).
+Generado por `make eval` el 2026-10-04 19:11. 146 pares de desarrollo (web; nunca sintéticos), 146 auto_validated. `auto_validated` = validada automáticamente contra el banco de términos (`scripts/validate_test_set.py`).
 
 ## Resumen
 
@@ -18,6 +18,7 @@ chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia 
 | gemini-3.8-flash | Goliath | país | 51.1 | 3.60 s | 7.68 s | $0.21 | $1.43 | — | 0 |
 | gemini-3.8-flash + léxico | Goliath con el glosario de David | país + léxico | 58.4 | 3.10 s | 7.71 s | $0.20 | $1.38 | — | 0 |
 | genlingo-2026-10c-e2b-nomulti + léxico | David candidato (LoRA, Q5_K_M) | país + léxico | 63.2 | 809 ms | 1.14 s | $0 | $0 | 3.62 GB | 0 |
+| genlingo-2026-10c-e2b-nomulti-orpo + léxico | David candidato (LoRA, Q5_K_M) | país + léxico | 63.7 | 866 ms | 1.20 s | $0 | $0 | 3.62 GB | 0 |
 
 Costo de Goliath con la tarifa del día del eval: $0.75 entrada / $3.75 salida por millón de tokens (vigente desde 2026-09-30).
 Con la tarifa desde 2027-01-01 ($1.50 / $7.50), este mismo eval costaría $0.42 ($2.87 por 1,000 frases).
@@ -44,6 +45,7 @@ chrF++ premia parecerse a la referencia, y una reescritura de registro conserva 
 | gemini-3.8-flash | 96 % (n=69) | 57 % (n=70) | 76 % (n=139) | 18 % | 14 % (n=132) | 23 % |
 | gemini-3.8-flash + léxico | 100 % (n=69) | 76 % (n=70) | 88 % (n=139) | 33 % | 42 % (n=132) | 38 % |
 | genlingo-2026-10c-e2b-nomulti + léxico | 100 % (n=69) | 70 % (n=70) | 85 % (n=139) | 25 % | 33 % (n=132) | 30 % |
+| genlingo-2026-10c-e2b-nomulti-orpo + léxico | 100 % (n=69) | 57 % (n=70) | 78 % (n=139) | 26 % | 31 % (n=132) | 30 % |
 
 **David en escena:** `genlingo-2026-10b-e2b + glosario` (3.62 GB, p50 592 ms): el archivo más pequeño a ≤ 2 puntos de `genlingo-2026-10b-e2b + glosario` (91 % de jerga resuelta), con p50 < 1 s. Resuelve 91 %.
 
@@ -53,7 +55,7 @@ Cara a cara con `gemini-3.8-flash` en jerga resuelta: David la resuelve y Goliat
 
 Cara a cara con `gemini-3.8-flash + léxico` en jerga resuelta: David la resuelve y Goliath no en **11** frases; al revés en **7**.
 
-Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): genlingo-2026-10b-e2b + glosario 1, gemini-3.8-flash + glosario 4, genlingo-2026-10c-e2b + léxico 3, gemini-3.8-flash 2, gemini-3.8-flash + léxico 2, genlingo-2026-10c-e2b-nomulti + léxico 1 (de 70).
+Jerga de otro país en papás → Gen Z (p. ej. «pisto» guatemalteco en una frase mexicana): genlingo-2026-10b-e2b + glosario 1, gemini-3.8-flash + glosario 4, genlingo-2026-10c-e2b + léxico 3, gemini-3.8-flash 2, gemini-3.8-flash + léxico 2, genlingo-2026-10c-e2b-nomulti + léxico 1, genlingo-2026-10c-e2b-nomulti-orpo + léxico 1 (de 70).
 
 **Lectura honesta:** David gana también en jerga, no solo en parecido de superficie, frente a Goliath sin glosario. Compáralo con Goliath + glosario para separar lo que aporta el modelo de lo que aporta el dato.
 
@@ -71,6 +73,7 @@ Con el mismo glosario, Goliath resuelve 86 % de la jerga frente al 91 % de David
 | gemini-3.8-flash | 51.1 (n=146) |
 | gemini-3.8-flash + léxico | 58.4 (n=146) |
 | genlingo-2026-10c-e2b-nomulti + léxico | 63.2 (n=146) |
+| genlingo-2026-10c-e2b-nomulti-orpo + léxico | 63.7 (n=146) |
 
 ### chrF++ por dirección
 
@@ -84,6 +87,7 @@ Con el mismo glosario, Goliath resuelve 86 % de la jerga frente al 91 % de David
 | gemini-3.8-flash | 56.8 (n=76) | 45.0 (n=70) |
 | gemini-3.8-flash + léxico | 61.7 (n=76) | 54.9 (n=70) |
 | genlingo-2026-10c-e2b-nomulti + léxico | 62.8 (n=76) | 63.6 (n=70) |
+| genlingo-2026-10c-e2b-nomulti-orpo + léxico | 64.1 (n=76) | 63.4 (n=70) |
 
 ### chrF++ por país
 
@@ -97,6 +101,7 @@ Con el mismo glosario, Goliath resuelve 86 % de la jerga frente al 91 % de David
 | gemini-3.8-flash | 47.6 (n=67) | 54.1 (n=69) | 69.6 (n=2) | 56.3 (n=8) |
 | gemini-3.8-flash + léxico | 54.8 (n=67) | 61.9 (n=69) | 74.7 (n=2) | 61.6 (n=8) |
 | genlingo-2026-10c-e2b-nomulti + léxico | 60.2 (n=67) | 66.8 (n=69) | 68.0 (n=2) | 64.1 (n=8) |
+| genlingo-2026-10c-e2b-nomulti-orpo + léxico | 61.4 (n=67) | 65.6 (n=69) | 71.3 (n=2) | 68.8 (n=8) |
 
 ## Modelo base: E2B vs E4B
 

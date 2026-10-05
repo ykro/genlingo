@@ -15,7 +15,7 @@ Una hora antes, en la laptop del escenario (M1 Max, cargada):
 - [ ] `make up`. Arranca Ollama, precarga los dos Davids y EmbeddingGemma, levanta el duelo (`:8787`) y la
       vista del presentador (`:3000/presenter`). Si algo falla, dice qué y en qué línea.
 - [ ] Salud: `curl -s localhost:8787/health`. Tiene que decir `"ollama": true`, `"online": true` y, en
-      `david_models`, `Q5_K_M` para `genlingo-2026-10b-e2b` y `genlingo-2026-10-e2b-q5_k_m`.
+      `david_models`, `Q5_K_M` para `genlingo-2026-10c-e2b-nomulti` y `genlingo-2026-10-e2b-q5_k_m`.
 - [ ] Precalentamiento: una ronda `E`, una frase escrita en cada dirección, `M`, una frase, `M` de
       vuelta. `ollama ps` debe mostrar los dos Davids y `embeddinggemma`, nada más.
 - [ ] `make reset`: marcador en cero (tarda menos de un segundo).
@@ -73,7 +73,7 @@ Qué onda, maje, no traigo pisto para el chinique, estoy bien pisado
 Enter
 ```
 
-> David responde en medio segundo y gratis; Goliath tarda varios segundos y cobra por cada frase.
+> David responde en menos de un segundo y gratis; Goliath tarda varios segundos y cobra por cada frase.
 
 ### 5 · Frase escrita, papás → Gen Z (1 min)
 
@@ -126,7 +126,7 @@ M
 
 `M` cambia al David anterior (`genlingo-2026-10-e2b-q5_k_m`); el marcador cuenta solo sus rondas. `M` otra vez vuelve al de escena.
 
-> Reentrenar a David con los datos del mes cuesta 71 centavos de dólar; los modelos grandes envejecen al ritmo de su próxima versión.
+> Reentrenar a David con los datos del mes cuesta 97 centavos de dólar; los modelos grandes envejecen al ritmo de su próxima versión.
 
 ### 8 · Wi-Fi apagado (1 min)
 
@@ -149,7 +149,7 @@ Goliath aparece «Sin conexión» y David responde igual. Vuelve a encender el W
 Sin teclas: el marcador queda en pantalla con victorias, chrF++ medio, latencia p50 y costo acumulado de
 cada uno.
 
-> Con los mismos datos, Gemini alcanza a David; la ventaja de David son sus datos, y esos son nuestros.
+> Con los mismos datos, Gemini se acerca a David, pero en jerga chapina David sigue ganando; la ventaja de David son sus datos, y esos son nuestros.
 
 ## Si algo falla
 

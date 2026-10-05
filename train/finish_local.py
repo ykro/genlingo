@@ -1,6 +1,6 @@
 """Fallback: finish a cloud fine-tune on this Mac (adapter from the bucket -> merge -> GGUF -> models bucket).
 
-    QUANT=Q5_K_M KEEP_F16=1 make train-finish TAG=genlingo-2026-10b-e2b
+    QUANT=Q5_K_M KEEP_F16=1 make train-finish TAG=genlingo-2026-10c-e2b-nomulti
 
 `make train` already does this in the cloud (the `${APP}-finish` Cloud Run Job, finish.py). Use this
 only when that job can't run, or to re-quantize an existing adapter without paying for a job. Same

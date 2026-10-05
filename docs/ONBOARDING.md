@@ -33,7 +33,8 @@ make test                                 # 73 pruebas de Python, 17 de Vitest, 
 | Modelo | Cómo se obtiene | Para qué |
 | --- | --- | --- |
 | `embeddinggemma` | `ollama pull embeddinggemma` | Glosario del banco de términos (`EMBEDDING_MODEL`). Necesario en escena. |
-| `genlingo-2026-10b-e2b` y `-e2b-f16` | `make pull-model TAG=genlingo-2026-10b-e2b FP16=1` | David de escena (`LOCAL_MODEL_TAG`): Q5_K_M, 3.62 GB, entrenado y cuantizado en la nube (`make train` publica `QUANT` bajo el tag sin sufijo). El f16 es la referencia de compresión. |
+| `genlingo-2026-10c-e2b-nomulti` y `-nomulti-f16` | `make pull-model TAG=genlingo-2026-10c-e2b-nomulti FP16=1` | David de escena (`LOCAL_MODEL_TAG`): Q5_K_M, 3.62 GB, prompt de léxico, entrenado y cuantizado en la nube (`make train` publica `QUANT` bajo el tag sin sufijo). El f16 es la referencia de compresión. |
+| `genlingo-2026-10b-e2b` y `-e2b-f16` | `make pull-model TAG=genlingo-2026-10b-e2b FP16=1` | El David anterior (prompt con glosario), en `DAVID_TAGS` para comparar las rondas de datos. |
 | `genlingo-2026-10-e2b-q5_k_m` | `make pull-model TAG=genlingo-2026-10-e2b-q5_k_m` | David del mes pasado (`DAVID_PREVIOUS_TAG`, tecla `M`): Q5_K_M del barrido de cuantización. |
 | `genlingo-2026-10-e2b` y `-e2b-f16` | `make pull-model TAG=genlingo-2026-10-e2b FP16=1` | El David de 2026-10 en Q4 y f16, para el barrido de compresión (`make quant-sweep` parte del f16). |
 | `genlingo-2026-09` | `make pull-model TAG=genlingo-2026-09` (agrega `FP16=1` para el eval de compresión) | David de 2026-09 (prompt básico), en `DAVID_TAGS` para mostrar la evolución. |
@@ -142,11 +143,18 @@ make test-set                 # 1. set de prueba desde oraciones reales, validad
 make real-pairs               #    pares de entrenamiento anclados en oraciones reales
 make export                   # 2. (si hubo público) pares aprobados en /admin -> data/pairs/human.jsonl
 make pairs                    # 3. (opcional) regenerar los pares sintéticos con Gemini (~$0.80, 6 min)
-make train TAG=genlingo-2026-10b-e2b                        # 4. LoRA (L4) + merge y GGUF (CPU) en Cloud Run -> train/runs/<tag>.json
-make train TAG=genlingo-2026-10b-e4b GEMMA_BASE_MODEL=gemma-4-E4B-it   # E4B: el job de CPU no alcanza...
-make train-finish TAG=genlingo-2026-10b-e4b                 # 5. ...respaldo: merge + GGUF en la laptop
-make pull-model TAG=genlingo-2026-10b-e2b FP16=1            # 6. a Ollama
+make train TAG=genlingo-2026-11-e2b                         # 4. LoRA (L4) + merge y GGUF (CPU) en Cloud Run -> train/runs/<tag>.json
+make train TAG=genlingo-2026-11-e4b GEMMA_BASE_MODEL=gemma-4-E4B-it   # E4B: el job de CPU no alcanza...
+make train-finish TAG=genlingo-2026-11-e4b                  # 5. ...respaldo: merge + GGUF en la laptop
+make pull-model TAG=genlingo-2026-11-e2b FP16=1             # 6. a Ollama
 make eval                     # 7. evals/report.md (con DAVID_TAGS que incluya los tags nuevos)
+```
+
+El David de escena (`genlingo-2026-10c-e2b-nomulti`) se entrenó sin los pares de varios términos y sin la etapa ORPO, porque ninguno de los dos mejoró el set de desarrollo:
+
+```bash
+uv run --project duel python scripts/build_train_set.py --exclude synthetic_multi --out data/train/chat_nomulti.jsonl
+uv run --project duel python train/submit_job.py --app genlingo --tag genlingo-2026-10c-e2b-nomulti --data data/train/chat_nomulti.jsonl
 ```
 
 Qué pasa en cada paso:
