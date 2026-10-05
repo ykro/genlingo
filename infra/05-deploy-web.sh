@@ -10,6 +10,14 @@ WEB_DIR="$(cd "$INFRA_DIR/../web" && pwd)"
 SERVICE="${APP}"
 PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
 URL="https://${SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app"   # deterministic Cloud Run URL
+# The public Firebase web config lives in web/.env.local (written once by the web setup); read it
+# from there when the environment doesn't set it, so a deploy needs no manual exports.
+for k in FIREBASE_API_KEY FIREBASE_APP_ID RECAPTCHA_SITE_KEY ADMIN_EMAILS; do
+  if [ -z "${!k:-}" ] && [ -f "$WEB_DIR/.env.local" ]; then
+    v="$(sed -n "s/^${k}=//p" "$WEB_DIR/.env.local" | tail -1)"
+    [ -n "$v" ] && export "$k=$v"
+  fi
+done
 : "${FIREBASE_API_KEY:?set FIREBASE_API_KEY (public web config, see web/.env.example)}"
 : "${FIREBASE_APP_ID:?set FIREBASE_APP_ID}"
 
