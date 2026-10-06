@@ -98,7 +98,20 @@ def quant_of(s, tag: str) -> str:
     return run.get("quant") or (run.get("finish") or {}).get("quant") or (run.get("metrics") or {}).get("quant") or "Q4_K_M"
 
 
-WARMUP_PHRASES = 5  # throwaway generations per Ollama model before timing (not recorded)
+# For the first minutes after a Cloud Run GPU instance starts (or a model loads) generations are slow:
+# seconds instead of hundreds of ms. Throwaway translations until WARM_IN_A_ROW in a row answer under
+# WARM_FAST_MS (or WARM_BUDGET_S runs out), so the report times the model, not the warm-up.
+WARM_FAST_MS, WARM_IN_A_ROW, WARM_BUDGET_S = 1500, 3, 300
+
+
+async def warm_until_fast(m: dict, client, pairs, context: dict, bank) -> int:
+    t0, fast, i = time.time(), 0, 0
+    while fast < WARM_IN_A_ROW and time.time() - t0 < WARM_BUDGET_S:
+        rows = await run_model(m, client, [pairs[i % len(pairs)]], Price.free(), 1, context, bank)
+        i += 1
+        fast = fast + 1 if (rows[0].get("latency_ms") or 1e9) < WARM_FAST_MS else 0
+    print(f"   {m['label']}: warm after {i} throwaway translations, {time.time() - t0:.0f} s")
+    return i
 
 
 def models_dir() -> Path | None:
@@ -172,7 +185,14 @@ async def glossary_context(s, pairs, styles: set[str]) -> tuple[dict, object]:
 
     arena = Arena.from_settings(s)
     g = await arena.get_glossary()
-    await g.embed(["calentamiento"])  # load the embedding model before timing
+    # Load the embedding model and warm it before timing retrieval (on a GPU that just started, the
+    # first embeddings take seconds): until three in a row take under 300 ms.
+    t0, fast, i = time.time(), 0, 0
+    while fast < 3 and time.time() - t0 < WARM_BUDGET_S:
+        t = time.perf_counter()
+        await g.embed([f"calentamiento {i}"])
+        i += 1
+        fast = fast + 1 if (time.perf_counter() - t) < 0.3 else 0
     out: dict[str, dict] = {}
     for style in styles:
         out[style] = {}
@@ -243,9 +263,7 @@ async def main_async(args) -> None:
                     fetched.add(m["name"])
                     sizes = {x["name"]: x.get("size") for x in await ollama.list_models()}
                 await ollama.warm_up(m["name"])
-                # The first generations after a load are slow on the GPU (seconds, not hundreds of ms):
-                # a few throwaway ones first, so the latency is the model's, not the warm-up's.
-                await run_model(m, client, pairs[:WARMUP_PHRASES], price, 1, context, bank)
+                await warm_until_fast(m, client, pairs, context, bank)
             m["size_bytes"] = sizes.get(m["name"]) or sizes.get(f"{m['name']}:latest")
         t0 = time.time()
         rows = await run_model(m, client, pairs, price, conc, context, bank)

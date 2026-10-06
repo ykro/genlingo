@@ -2,61 +2,40 @@
 
 Todos los comandos del `Makefile`. `make help` los lista con su descripción. Volver al [README](../README.md). [English version](COMANDOS.en.md).
 
+Para usar la demo no hace falta ninguno: la página está en **https://genlingo-611681112050.us-central1.run.app** ([DEMO.md](DEMO.md)). Estos comandos sirven para reconstruirla, entrenar a David y evaluarlo. Todo corre en Google Cloud; la laptop solo manda los trabajos.
+
 | Comando | Qué hace |
 | --- | --- |
 | `make help` | Lista los comandos con su descripción. |
-| `make up` | Arranca Ollama (con `OLLAMA_MAX_LOADED_MODELS=4`), precarga David, el David anterior (`DAVID_PREVIOUS_TAG`) y EmbeddingGemma, levanta el servicio del duelo (`:8787`, que sirve la página de comparación `/traducir`) y la vista del presentador (`:3000`, la recompila si cambió su código), y abre la página de comparación. Funciona sin Wi-Fi. |
-| `make reset` | Pone en cero el historial del servicio del duelo (rondas, votos, cola y marcador; la página de comparación no los usa); con `AUDIENCE_FEED=1`, también borra las rondas del evento en Firestore (hasta 3 intentos). Si Firestore falla (por ejemplo, sin red), lo dice con la causa y termina con error; el marcador local queda en cero igual. |
-| `make stage-on` | `min-instances=1` en la app del público de Cloud Run (`infra/60-stage.sh on`). La demo no la usa, pero `make preflight` revisa que esté tibia. Muestra el valor que quedó en Cloud Run. |
-| `make stage-off` | Después de la charla: `min-instances=0` (escala a cero, nada cobra en reposo). |
-| `make warmup` | Despierta la app del público (200 en `/` y `/api/config`), carga en Ollama los dos Davids y EmbeddingGemma, y hace una llamada a David y otra a Goliath: por el servicio si está corriendo (`POST /warmup`, no se registra) o directo si no. |
-| `make preflight` | Revisión antes de subir: Ollama con los dos Davids y EmbeddingGemma, `/health` del duelo, `/api/config` de la vista del presentador, banco de términos, léxico, set de prueba y ficha de entrenamiento de David, 10 GB libres en disco, la página de comparación y cada ejemplo traducido en vivo por los dos (David acierta la jerga y Goliath no), app del público con 200, `min-instances` ≥ 1 y el mismo `EVENT_ID`, Gemini (una llamada mínima) y Firestore del evento. Una línea `[ok]` o `[FALLA]` por revisión, con el arreglo; el código de salida es el número de fallas. |
-| `make test` | Pruebas de Python (`MOCK_AI=1`), Vitest, `tsc`, ESLint y, con JDK 21, las reglas de Firestore en el emulador. |
-| `make eval` | Pasa el set de prueba por los modelos base, cada David y Goliath (con y sin glosario) y escribe `evals/report.md`. Acepta `EVAL_ARGS="--limit 50 --no-goliath"`. |
-| `make eval-dev` | Pasa el set de desarrollo (decisiones de datos, ablaciones) y escribe `evals/report_dev.md`: `make eval-dev [EVAL_ARGS="--nbest 4"]`. |
+| `make deploy` | Despliega a David (`infra/04-david.sh`: imagen de Ollama con el David de `DAVID_MODEL_TAG` y EmbeddingGemma dentro, servicio privado de Cloud Run con una GPU L4 en `europe-west4`, `min-instances=0`, `max-instances=1`) y la página (`infra/05-page.sh`: servicio público en `us-central1` cuya cuenta de servicio solo puede llamar a Gemini y a David). La imagen de David solo se reconstruye si cambió su receta o el modelo. |
+| `make check` | Revisa la página en vivo como la usa el navegador: la abre, despierta a David (dice cuánto tardó) y traduce cada ejemplo con los dos. Falla si David no acierta toda la jerga de un ejemplo o si Goliath la acierta. |
+| `make screenshots` | Capturas de la página en vivo en un navegador real (1920×1080 y 1280×800, tema claro) en `docs/demo/`. |
+| `make test` | Pruebas de Python sin red (`MOCK_AI=1`): la página, la revisión por término, los datos, el eval y el reporte. |
+| `make eval` | Pasa el set de prueba por los modelos base, cada David y Goliath (con y sin glosario) en un Cloud Run Job con una GPU L4 (`infra/06-eval-job.sh`): el job corre Ollama adentro, carga cada modelo desde el bucket de modelos de uno en uno y deja el reporte en el bucket; el comando lo copia a `evals/report.md` y `evals/results/`. Acepta `EVAL_ARGS="--limit 50 --no-goliath"`. |
+| `make eval-dev` | Lo mismo con el set de desarrollo (decisiones de datos, ablaciones): `evals/report_dev.md`. `make eval-dev [EVAL_ARGS="--nbest 4"]`. |
 | `make niches` | Calcula los nichos registrados de antemano ([evals/niche.md](../evals/niche.md)) a partir del último eval de prueba y escribe `evals/niche_report.md`. |
 | `make test-set` | Construye los pares de prueba a partir de oraciones reales de la web y los valida contra el banco de términos (`auto_validated` o `rejected`, sin intervención humana). |
 | `make real-pairs` | Pares de entrenamiento anclados en oraciones reales (las dos direcciones), validados contra el banco. |
 | `make ambiguous-terms` | Marca los términos del banco que también son palabras comunes («cámara», «servir»), para que las métricas no los cuenten. |
 | `make counterparts` | Tabla término → contraparte validada por significado (vecinos más cercanos mutuos + revisión del top 5 con Gemini) en `data/counterparts.jsonl`. |
-| `make pairs` | Genera los pares sintéticos de un término con `GEMINI_MODEL` (de pago; `SYNTHETIC_PAIRS_TARGET`, hoy 1,500). Los pares de 2–3 términos (`scripts/generate_multi_pairs.py`, `data/pairs/synthetic_multi.jsonl`) no entran en la receta de escena y no se regeneran aquí. |
+| `make pairs` | Genera los pares sintéticos de un término con `GEMINI_MODEL` (de pago; `SYNTHETIC_PAIRS_TARGET`, hoy 1,500). Los pares de 2–3 términos (`scripts/generate_multi_pairs.py`, `data/pairs/synthetic_multi.jsonl`) no entran en la receta de David y no se regeneran aquí. |
 | `make datasheet` | Recuenta `data/DATASHEET.md`. |
 | `make data` | `test-set` + `real-pairs` + `pairs` + `datasheet`. |
-| `make export` | Baja de Firestore los pares del público aprobados en `/admin` a `data/pairs/human.jsonl` y recuenta el datasheet. |
-| `make train-data` | Renderiza los pares de entrenamiento al JSONL de chat con el mismo prompt (y léxico) del duelo, con la receta del David de escena: sin los pares de 2–3 términos y sin etapa ORPO. `MULTI=1` incluye esos pares y `ORPO=1` arma también `data/train/pref.jsonl` (variantes descartadas, para ablaciones). |
-| `make train` | Entrena en un Cloud Run Job con una L4 y después fusiona y convierte a GGUF en un job de CPU: `make train [TAG=…] [QUANT=Q5_K_M] [TRAIN_ARGS=…]`; `TAG` vale por defecto `genlingo-<año>-<mes>` del día. Corre `make train-data` antes (acepta `MULTI=1` y `ORPO=1`; con `ORPO=1` agrega la etapa de preferencias al job). Escribe `train/runs/<tag>.json`. |
-| `make train-finish` | Respaldo: fusiona y exporta a GGUF en la laptop un adaptador entrenado en la nube y lo publica: `make train-finish` con el mismo `TAG` del job. |
-| `make train-local` | El mismo entrenamiento en la Mac (MPS), para experimentos. |
-| `make quant-sweep` | Desde el GGUF f16 de un David: Q5_K_M, Q6_K, Q8_0 y Q4/Q5 calibrados con imatrix (pares de entrenamiento), registrados en Ollama. |
-| `make pull-model` | Descarga un David del bucket y lo registra en Ollama: `make pull-model TAG=genlingo-2026-10c-e2b-nomulti [FP16=1]`. |
-| `make deploy` | Crea la cuenta de servicio web y despliega la app del público en Cloud Run (`min-instances=0`; `make stage-on` la mantiene tibia el día de la charla). |
+| `make train-data` | Renderiza los pares de entrenamiento al JSONL de chat con el mismo prompt (y léxico) que usa la página, con la receta de David: sin los pares de 2–3 términos y sin etapa ORPO. El léxico usa el modelo de embeddings del servicio de David (`DAVID_URL`). `MULTI=1` incluye esos pares y `ORPO=1` arma también `data/train/pref.jsonl` (variantes descartadas, para ablaciones). |
+| `make train` | Entrena en un Cloud Run Job con una L4 y después fusiona y convierte a GGUF en un job de CPU: `make train [TAG=…] [QUANT=Q5_K_M] [TRAIN_ARGS=…]`; `TAG` vale por defecto `genlingo-<año>-<mes>` del día. Corre `make train-data` antes (acepta `MULTI=1` y `ORPO=1`). Escribe `train/runs/<tag>.json`. Para poner el modelo nuevo en la página: `DAVID_MODEL_TAG=<tag>` en `.env` y `make deploy`. |
 
 ## Arranque rápido
 
-Requisitos (versiones en [ONBOARDING.md](ONBOARDING.md)): macOS con Apple Silicon, `uv`, Node 24, Ollama, `gcloud` con ADC.
+Requisitos (versiones en [ONBOARDING.md](ONBOARDING.md)): `uv` y `gcloud` con ADC en el proyecto `ai-experiments-487722`.
 
 ```bash
-cp .env.example .env                                  # modelos, precios y rutas
-(cd duel && uv sync)                                  # servicio del duelo (Python 3.12)
-(cd web && npm install && cp .env.example .env.local) # vista del presentador, app del público y capturas
-gcloud auth application-default login                 # Goliath (Vertex AI) y descarga de modelos
-
-ollama pull embeddinggemma                            # recuperación del léxico
-make pull-model TAG=genlingo-2026-10c-e2b-nomulti     # David de escena (Q5_K_M, 3.62 GB)
-make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # David anterior (make up y make preflight lo esperan)
-
-make up       # Ollama + David precalentado + servicio (:8787); abre la página de comparación
+cp .env.example .env                  # modelos, precios y buckets
+(cd duel && uv sync)                  # código de la página y del eval (Python 3.12)
+gcloud auth application-default login
+make deploy                           # David (GPU) + la página
+make check                            # la página en vivo, de punta a punta
 ```
-
-Ensayo sin red ni GPU: pon `MOCK_AI=1` en `.env` y corre `make up` (modelos simulados y deterministas).
 
 ## Día de la charla
 
-```bash
-make up                                          # terminal 1: se queda corriendo
-make stage-on && make warmup && make preflight   # terminal 2: modelos cargados, ejemplos verificados, todo en [ok]
-# … la charla …
-make stage-off                                   # después: la app del público vuelve a escalar a cero
-```
-
-El guion de la demo (la página de comparación: cómo abrirla, qué ejemplos tocar, qué decir y qué hacer si algo falla) está en [DEMO.md](DEMO.md).
+Nada que ejecutar: abre la página unos diez minutos antes ([DEMO.md](DEMO.md)).

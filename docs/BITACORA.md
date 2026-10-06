@@ -18,7 +18,7 @@ de `evals/report.md`.
 | 2026-09-30 | Base sin afinar | Gemma 4 E2B tal cual | 58 % | 14 % | $0 |
 | 2026-10-01 | `genlingo-2026-09` | Pares de edición mínima | 62 % | 18 % | $0.41 |
 | 2026-10-01 | `genlingo-2026-10-e2b` | Pares anclados en el banco + prompt con glosario | 67 % (Q4) | 25 % | $0.67 |
-| 2026-10-01 | Barrido de cuantización | Q5_K_M en vez de Q4_K_M | 74 % | 27 % | $0 (laptop) |
+| 2026-10-01 | Barrido de cuantización | Q5_K_M en vez de Q4_K_M | 74 % | 27 % | $0 (en la Mac) |
 | 2026-10-02 | `genlingo-2026-10b-e2b` | Oraciones reales + banco de 406 términos | 82 % | 34 % | $0.71 |
 | 2026-10-04 | `genlingo-2026-10c-e2b-nomulti` | Contrapartes por significado + prompt de léxico + ronda 3 de oraciones reales | **82 %** | **42 %** | $0.97 |
 | | Goliath (referencia) | `gemini-3.8-flash`, sin glosario | 77 % | 26 % | $1.13 / 1,000 frases |
@@ -137,9 +137,10 @@ Nichos definidos antes de mirar resultados ([evals/niche.md](../evals/niche.md))
 
 ## Costo de reentrenar cada mes
 
-El David de escena costó **$0.97** de punta a punta en la nube (36 min de L4 + 10 min de CPU).
-En total, las ejecuciones con registro costaron $9.15, incluidas cinco de las seis fallidas ($3.44; la sexta, `kqlxv`, no dejó registro de costo). La
-inferencia de David cuesta $0; Goliath, $1.13 por 1,000 frases con la tarifa de hoy y $2.26 con la de 2027.
+El David de la página costó **$0.97** de punta a punta en la nube (36 min de L4 + 10 min de CPU).
+En total, las ejecuciones con registro costaron $9.15, incluidas cinco de las seis fallidas ($3.44; la sexta, `kqlxv`, no dejó registro de costo). Goliath
+cuesta $1.13 por 1,000 frases con la tarifa de hoy y $2.26 con la de 2027. Servir a David en la nube cuesta lo
+que está encendida su GPU, ~$1.05 por hora (sección 7).
 
 ## Qué haríamos después
 
@@ -156,10 +157,33 @@ inferencia de David cuesta $0; Goliath, $1.13 por 1,000 frases con la tarifa de 
 ## 6 · La demo pasa a ser la página de comparación (2026-10-06)
 
 La demo de la charla dejó las rondas, el marcador, los votos del público y la tecla `M`. Ahora es una sola
-página, `/traducir`, donde David y Goliath traducen la misma frase lado a lado con su tiempo y su costo. Los
+página donde David y Goliath traducen la misma frase lado a lado con su tiempo y su costo. Los
 ejemplos son jerga chapina del set de prueba: se probaron en vivo las 51 frases chapinas cortas que la revisión
 término por término puede juzgar, 3 veces con cada modelo, y quedaron 4, las que David tradujo bien y Goliath
 mal las 3 veces. Se descartaron las frases donde Goliath acertó alguna vez o dijo algo razonable con otras
 palabras («échale un ojo» por «chotea», «qué tufo» por «chish», «emocionado» por «engasado»): la revisión las
-marcaba mal y la página habría dicho algo falso. La vista del presentador y la app del público siguen en el
-repositorio, pero la charla no las usa.
+marcaba mal y la página habría dicho algo falso. La vista del presentador y la app del público quedaron sin uso (se
+quitaron el mismo día, sección 7).
+
+## 7 · Todo pasa a la nube (2026-10-06)
+
+David dejó la laptop. Ahora corre con Ollama en un servicio privado de Cloud Run con una GPU L4 en
+`europe-west4`, con el modelo y EmbeddingGemma dentro de la imagen, y escala a cero cuando nadie lo usa. La
+página de comparación también está en Cloud Run, pública, y es lo único que se abre el día de la charla: al
+abrirse despierta a David y lo mantiene encendido mientras sigue abierta. El eval pasó a un Cloud Run Job con
+una L4 que carga cada modelo desde el bucket de uno en uno. En la laptop no queda ningún modelo.
+
+- **Tiempo:** con la GPU encendida, David responde en ~0.5 s a través de la página (en la Mac eran 670 ms de
+  p50); Goliath tardó entre 0.8 y 18.6 s ese día. Encender la GPU desde cero, cargar el modelo y calentarlo tarda unos
+  cuatro minutos.
+- **Los ejemplos:** los 4 se volvieron a probar 3 veces cada uno contra el David de la nube: 12 de 12 aciertos
+  de David, 0 de Goliath. En una prueba a temperatura 0.2 David dijo «muy regular» en vez de «muy mala» (mal); la página pasó a temperatura 0, como el eval, y con eso da siempre la misma respuesta: 12 de 12 bien.
+- **Costo:** en la nube David ya no es gratis. La GPU cuesta ~$1.05 por hora encendida, y con el uso de una
+  charla eso es más que lo que cobra Gemini por las mismas frases. La página dejó de mostrar el costo y muestra
+  solo el tiempo.
+- **Lo que se quitó:** la app del público (QR, frases y votos; servicio de Cloud Run, código, cuenta de
+  servicio, app web de Firebase y su llave de reCAPTCHA), la vista del presentador con rondas y marcador, el
+  modo sin internet, `make up`, `make stage-on/off`, `make warmup`, `make preflight`, `make reset`,
+  `make pull-model`, `make train-local`, `make train-finish` y `make quant-sweep`. Todo sigue en el historial
+  de git.
+

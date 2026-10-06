@@ -1,5 +1,5 @@
 {
- "about": "Ejemplos de la página de comparación. Son frases de jerga chapina (Guatemala) del set de prueba: David nunca las vio al entrenar. Se probaron en vivo las 51 frases chapinas cortas que la revisión término por término puede juzgar, 3 veces con cada modelo (2026-10-06). Solo quedaron las que David tradujo bien y Goliath mal las 3 veces, y donde una persona ve lo mismo que la revisión: Goliath deja jerga o cambia el significado. Se descartaron las frases donde Goliath acertó alguna vez o dijo algo razonable con otras palabras (por ejemplo «échale un ojo» por «chotea», «qué tufo» por «chish»). Después de pasar a David a la nube se volvieron a probar los 4 contra el David de Cloud Run (GPU L4), 3 veces cada uno con los dos modelos (2026-10-06): David acertó la jerga las 12 veces y Goliath ninguna. Esas son las respuestas guardadas en live_runs.",
+ "about": "Ejemplos de la página de comparación. Son frases de jerga chapina (Guatemala) del set de prueba: David nunca las vio al entrenar. Se probaron en vivo las 51 frases chapinas cortas que la revisión término por término puede juzgar, 3 veces con cada modelo (2026-10-06). Solo quedaron las que David tradujo bien y Goliath mal las 3 veces, y donde una persona ve lo mismo que la revisión: Goliath deja jerga o cambia el significado. Se descartaron las frases donde Goliath acertó alguna vez o dijo algo razonable con otras palabras (por ejemplo «échale un ojo» por «chotea», «qué tufo» por «chish»). Después de pasar a David a la nube se volvieron a probar los 4 en la página, contra el David de Cloud Run (GPU L4), 3 veces cada uno con los dos modelos a temperatura 0, como en el eval (2026-10-06): David acertó la jerga las 12 veces, siempre con la misma respuesta, y Goliath ninguna de las 10 que respondió (2 veces tardó más de 20 s). Esas son las respuestas guardadas en live_runs (goliath: null cuando no respondió).",
  "david_model": "genlingo-2026-10c-e2b-nomulti",
  "goliath_model": "gemini-3.8-flash",
  "verified": "2026-10-06",
@@ -15,15 +15,15 @@
    "live_runs": [
     {
      "david": "Esa tarea tuya te quedó muy mala",
-     "goliath": "Esa tu tarea te quedó bien garra."
+     "goliath": "Esa tu tarea te quedó bien pura lata"
     },
     {
      "david": "Esa tarea tuya te quedó muy mala",
      "goliath": "Esa tu tarea te quedó pura lata"
     },
     {
-     "david": "Esa tarea tuya te quedó muy mal hecha",
-     "goliath": "Esa tu tarea te quedó bien pura lata"
+     "david": "Esa tarea tuya te quedó muy mala",
+     "goliath": "Esa tu tarea te quedó bien pura lata."
     }
    ],
    "david": "Esa tarea tuya te quedó muy mala"
@@ -43,11 +43,11 @@
     },
     {
      "david": "No te creo vos, ¡ya sé que vos solo mentís!",
-     "goliath": "No te creo vos, ¡si ya sé que pura casaca sos!"
+     "goliath": "No te creo mano, ¡ya sé que vos pura casaca sos!"
     },
     {
      "david": "No te creo vos, ¡ya sé que vos solo mentís!",
-     "goliath": "No te creo vos, ¡si ya sé que pura casaca sos!"
+     "goliath": "No te creo, mano, ¡si ya sé que vos pura casaca sos!"
     }
    ],
    "david": "No te creo vos, ¡ya sé que vos solo mentís!"
@@ -63,7 +63,7 @@
    "live_runs": [
     {
      "david": "Sí, seguro llego al partido.",
-     "goliath": "Cabal, sin falta llego al partido."
+     "goliath": null
     },
     {
      "david": "Sí, seguro llego al partido.",
@@ -71,7 +71,7 @@
     },
     {
      "david": "Sí, seguro llego al partido.",
-     "goliath": "Cabal, sin falta llego al partido."
+     "goliath": null
     }
    ],
    "david": "Sí, seguro llego al partido."
@@ -87,15 +87,15 @@
    "live_runs": [
     {
      "david": "Voy a comprar algo de refa para media mañana.",
-     "goliath": null
-    },
-    {
-     "david": "Voy a comprar algo de refa para media mañana.",
      "goliath": "Voy a conseguir un munchies para el bajón de media mañana."
     },
     {
      "david": "Voy a comprar algo de refa para media mañana.",
      "goliath": "Voy a conseguir un munchies para el bajón de media mañana."
+    },
+    {
+     "david": "Voy a comprar algo de refa para media mañana.",
+     "goliath": "Voy a conseguirme un monchies para el bajón de media mañana."
     }
    ],
    "david": "Voy a comprar algo de refa para media mañana."

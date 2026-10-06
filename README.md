@@ -1,18 +1,22 @@
 # Genlingo — traductor generacional: Gen Z ↔ papás
 
-Demo de la charla *«David vs. Goliath: cómo un modelo pequeño le gana a un modelo frontier»*. «no manches, la peli estuvo bien chilera pero el final me dio cringe» ↔ «la película estuvo bien chévere pero el final me dio pena ajena». **David** es Gemma 4 E2B afinado con LoRA sobre pares propios y corre en la laptop con Ollama, **sin internet**. **Goliath** es Gemini (`GEMINI_MODEL`, hoy `gemini-3.8-flash`) en Vertex AI.
+Demo de la charla *«David vs. Goliath: cómo un modelo pequeño le gana a un modelo frontier»*. «no manches, la peli estuvo bien chilera pero el final me dio cringe» ↔ «la película estuvo bien chévere pero el final me dio pena ajena». **David** es Gemma 4 E2B afinado con LoRA sobre pares propios y corre con Ollama en un servidor con GPU (Cloud Run, NVIDIA L4) que es solo suyo. **Goliath** es Gemini (`GEMINI_MODEL`, hoy `gemini-3.8-flash`) en Vertex AI. Todo corre en la nube: la laptop solo abre una página.
 
 [English version](README.en.md)
 
 ## La demo: David y Goliath lado a lado
 
-Una sola página, `http://127.0.0.1:8787/traducir` (la abre `make up`). Se elige la dirección (Gen Z → papás o papás → Gen Z), se escribe una frase o se toca un ejemplo, y los dos traducen la misma frase al mismo tiempo. Cada columna muestra su traducción, cuánto tardó y cuánto costó. En los ejemplos, la página muestra además la traducción de referencia hecha por personas y, debajo de cada columna, si acertó cada término de jerga (✓ o ✗). Sin internet, Goliath dice «Sin conexión» y David sigue traduciendo.
+Una sola página pública en Cloud Run: **https://genlingo-611681112050.us-central1.run.app**. No hay nada que instalar ni que ejecutar el día de la charla: se abre la página unos minutos antes y listo.
 
-![La página de comparación: David y Goliath traducen «esa tu tarea te quedó bien chafa»](docs/demo/10-comparar-genz-a-papas.png)
+- Se elige la dirección (Gen Z → papás o papás → Gen Z), se escribe una frase o se toca un ejemplo, y los dos traducen la misma frase al mismo tiempo. Cada columna muestra su traducción y cuánto tardó.
+- En los ejemplos, la página muestra además la traducción de referencia hecha por personas y, debajo de cada columna, si acertó cada término de jerga (✓ o ✗).
+- David se apaga solo cuando nadie lo usa, para no cobrar entre charlas. Al abrir la página, arriba a la derecha dice «Preparando a David…» con un reloj mientras se enciende su GPU; tarda unos cuatro minutos desde cero ([medido](docs/DECISIONES.md#david-en-la-nube)). Cuando dice «David listo», todo responde al instante, y la página lo mantiene encendido mientras esté abierta.
 
-Los cuatro ejemplos son jerga chapina del set de prueba, el caso donde David gana. Probé en vivo las 51 frases chapinas cortas que la revisión término por término puede juzgar, 3 veces con cada modelo. Quedaron solo las que David tradujo bien y Goliath mal las 3 veces ([`data/translate_examples.json`](data/translate_examples.json), con la fuente y la razón de cada una). El guion está en [docs/DEMO.md](docs/DEMO.md).
+![La página de comparación: David y Goliath traducen «esa tu tarea te quedó bien chafa»](docs/demo/02-comparar-genz-a-papas.png)
 
-![Qué corre en la laptop y qué en la nube](docs/diagrams/arquitectura.png)
+Los cuatro ejemplos son jerga chapina del set de prueba, el caso donde David gana. Probé en vivo las 51 frases chapinas cortas que la revisión término por término puede juzgar, 3 veces con cada modelo, y quedaron solo las que David tradujo bien y Goliath mal las 3 veces. Después de pasar a David a la nube los volví a probar 3 veces contra el David de Cloud Run: David acertó las 12 veces y Goliath ninguna ([`data/translate_examples.json`](data/translate_examples.json), con la fuente y la razón de cada uno). El guion está en [docs/DEMO.md](docs/DEMO.md).
+
+![Qué corre dónde: la página, David y Goliath en la nube](docs/diagrams/arquitectura.png)
 
 ## Qué vas a aprender
 
@@ -21,7 +25,7 @@ Los cuatro ejemplos son jerga chapina del set de prueba, el caso donde David gan
 3. **LoRA en Cloud Run Jobs:** una L4 entrena y un job de CPU fusiona y exporta GGUF; cada ejecución registra su duración y costo.
 4. **El costo de comprimir:** f16 contra Q4_K_M, Q5_K_M, Q6_K, Q8_0 e imatrix, en tamaño, latencia y jerga perdida.
 5. **Evals con métricas de término:** chrF++ más *jerga correcta*, *jerga resuelta* y *cambios acertados*, con un set de desarrollo aparte para decidir y nichos definidos antes de mirar resultados.
-6. **Offline por diseño:** el modelo, el glosario y la página viven en la laptop; la nube solo entrena una vez al mes.
+6. **Tu modelo en tu propia GPU:** David corre con Ollama en Cloud Run con una L4, privado, y escala a cero entre charlas; la página lo despierta al abrirse. Entrenar, evaluar y servir: todo en la nube, nada en la laptop.
 
 ## Las métricas
 
@@ -30,21 +34,21 @@ Los cuatro ejemplos son jerga chapina del set de prueba, el caso donde David gan
 - **Cambios acertados:** de las palabras que cambió la referencia humana, cuántas aparecen en la salida.
 - **chrF++:** parecido de caracteres con la referencia. Una reescritura de registro conserva casi todas las palabras, así que copiar la frase sin traducir ya saca 53.2; por eso no decide por sí sola.
 
-Todo es determinista: ningún modelo juzga a otro. Los números del set de prueba son del eval del 2026-10-04 sobre 399 frases web `auto_validated` que David nunca vio ([evals/report.md](evals/report.md)), salvo donde se indica otra fecha.
+Todo es determinista: ningún modelo juzga a otro. Los números del set de prueba son del eval del 2026-10-04 sobre 399 frases web `auto_validated` que David nunca vio ([evals/report.md](evals/report.md)), salvo donde se indica otra fecha. Ese eval corrió a David en Ollama en una Mac (antes de pasarlo a la nube): las latencias de las tablas son de ahí, y el costo de David que se muestra es el de esa máquina. En la nube, David responde en ~0.5 s y su costo es el de la GPU ([David en la nube](#david-en-la-nube)).
 
 ## Resultado final
 
-| | Jerga correcta | Jerga resuelta | chrF++ | p50 | Costo / 1,000 frases |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| **David** (`genlingo-2026-10c-e2b-nomulti`, Q5_K_M, 3.62 GB) | **42 %** | **82 %** | **59.7** | **670 ms** | **$0** |
-| Goliath `gemini-3.8-flash` | 26 % | 77 % | 53.5 | 2.60 s | $1.13 |
-| Goliath con el glosario de David (referencia) | 38 % | 82 % | 57.0 | 3.05 s | $1.27 |
-| Copiar la frase (línea base) | 1 % | 1 % | 53.2 | — | — |
+| | Jerga correcta | Jerga resuelta | chrF++ | p50 (eval) |
+| --- | ---: | ---: | ---: | ---: |
+| **David** (`genlingo-2026-10c-e2b-nomulti`, Q5_K_M, 3.62 GB) | **42 %** | **82 %** | **59.7** | **670 ms** |
+| Goliath `gemini-3.8-flash` | 26 % | 77 % | 53.5 | 2.60 s |
+| Goliath con el glosario de David (referencia) | 38 % | 82 % | 57.0 | 3.05 s |
+| Copiar la frase (línea base) | 1 % | 1 % | 53.2 | — |
 
 - **Jerga correcta:** +16.3 puntos sobre Goliath (IC 95 % [+10.8, +21.8]). 101 frases las acierta solo David y 36 solo Goliath.
 - **chrF++:** +6.2 [+4.3, +8.1] sobre Goliath y +2.7 [+0.8, +4.7] sobre Goliath con el glosario.
 - **Jerga resuelta:** +4.5 [+0.0, +8.8], empate estadístico.
-- **Costo de Goliath:** con la tarifa desde el 2027-01-01 sería $2.26 por 1,000 frases.
+- **Costo de Goliath:** $1.13 por 1,000 frases en ese eval; con la tarifa desde el 2027-01-01 serían $2.26.
 
 ### Por nicho (jerga correcta, David contra Goliath sin glosario)
 
@@ -180,37 +184,43 @@ Detalle y fechas en [docs/BITACORA.md](docs/BITACORA.md); decisiones técnicas e
     - *Qué probó:* generar 4 respuestas y quedarse con la que tiene más contrapartes esperadas del banco.
     - *Resultado:* en dev, la jerga resuelta de 10c subió de 86 % a 94 %, pero el p50 llegó a 4.40 s.
     - *Qué aprendimos:* no entra en el presupuesto de 1 s; está apagado (`DAVID_NBEST=1`).
+16. **David en la nube** (2026-10-06).
+    - *Qué probó:* servir el mismo David con Ollama en Cloud Run con una GPU L4 (europe-west4), privado y con escala a cero, y que la página pública lo llame con un token de identidad.
+    - *Resultado:* con la GPU encendida, David responde en ~0.5 s a través de la página (Goliath, entre 0.8 y 18.6 s ese día). Encender la GPU desde cero, cargar el modelo y calentarlo tarda unos cuatro minutos. Los 4 ejemplos dieron lo mismo que en la Mac: 12 de 12 aciertos de David, 0 de Goliath.
+    - *Qué aprendimos:* en la nube David sigue siendo más rápido, pero ya no es gratis: la GPU cuesta unos $1.05 por hora mientras está encendida, y con el uso de una charla eso es más que lo que cobra Gemini por las mismas frases. Por eso la página muestra el tiempo y no el costo ([detalle](docs/DECISIONES.md#david-en-la-nube)).
 
-**Costo total:** las ejecuciones de entrenamiento con registro costaron $9.15, incluidas cinco de las seis fallidas ($3.44; la sexta no dejó registro de costo). La inferencia de David cuesta $0.
+**Costo total:** las ejecuciones de entrenamiento con registro costaron $9.15, incluidas cinco de las seis fallidas ($3.44; la sexta no dejó registro de costo).
 
 ## Por qué la demo usa solo el modelo final
 
 La página usa `genlingo-2026-10c-e2b-nomulti` en Q5_K_M con el prompt de léxico, y ningún otro David:
 
 - **Es el mejor en lo que la demo enseña.** Tiene la jerga correcta más alta de todas las variantes: 42 %, contra 34 % de `10b`, 27 % de `10-e2b` y 18 % de `2026-09`. También tiene el chrF++ más alto (59.7).
-- **Cabe en el presupuesto de la laptop.** p50 de 670 ms y 3.62 GB. La variante con pares de varios términos rondaba los 2 s en dev, y la selección entre 4 respuestas los 4.4 s.
+- **Cabe en el presupuesto de 1 s.** p50 de 670 ms en el eval y ~0.5 s en la GPU de la nube, con 3.62 GB. La variante con pares de varios términos rondaba los 2 s en dev, y la selección entre 4 respuestas los 4.4 s.
 - **Q5_K_M no pierde jerga contra f16** y pesa 2.6 veces menos. Q4_K_M sí perdía jerga.
-- **Los anteriores ya no enseñan nada nuevo en escena.** Su historia (de 14 % a 42 % de jerga correcta, a $0.41–$0.97 por ronda) está en las tablas de arriba y en la bitácora. En escena solo se compara el David de hoy con Goliath.
+- **Los anteriores ya no enseñan nada nuevo en la página.** Su historia (de 14 % a 42 % de jerga correcta, a $0.41–$0.97 por ronda de entrenamiento) está en las tablas de arriba y en la bitácora. En la página solo se compara el David de hoy con Goliath.
 - **Los ejemplos de la página son del nicho donde gana** (slang chapín, +29.6 puntos de jerga correcta). México y el español neutro, donde David empata o donde Goliath con glosario le gana, quedan documentados aquí y no se muestran en la demo.
 
 ## Arranque rápido
 
+Para usar la demo no hace falta nada: abre la página. Para reconstruirla (Google Cloud con `gcloud` y ADC, `uv`):
+
 ```bash
-cp .env.example .env && (cd duel && uv sync) && (cd web && npm install && cp .env.example .env.local)
-gcloud auth application-default login                 # Goliath (Vertex AI) y descarga de modelos
-ollama pull embeddinggemma && make pull-model TAG=genlingo-2026-10c-e2b-nomulti   # léxico + David
-make up       # Ollama + David precalentado + servicio (:8787); abre la página de comparación
+cp .env.example .env && (cd duel && uv sync)
+gcloud auth application-default login
+make deploy   # David en Cloud Run con GPU (europe-west4) + la página pública (us-central1)
+make check    # la página en vivo: despierta a David y traduce cada ejemplo con los dos
 make test     # pruebas sin red (MOCK_AI=1)
 ```
 
-Ensayo sin red ni GPU: `MOCK_AI=1` en `.env` y `make up`. Requisitos y la versión completa en [docs/COMANDOS.md](docs/COMANDOS.md#arranque-rápido).
+Comandos completos en [docs/COMANDOS.md](docs/COMANDOS.md).
 
 ## Documentación
 
-- [docs/DEMO.md](docs/DEMO.md): el guion de la demo (cómo abrir la página, qué ejemplos tocar, qué decir y qué hacer si algo falla).
+- [docs/DEMO.md](docs/DEMO.md): el guion de la demo (qué abrir, qué ejemplos tocar, qué decir y qué hacer si algo falla).
 - [docs/BITACORA.md](docs/BITACORA.md): la historia de David iteración por iteración.
 - [docs/DECISIONES.md](docs/DECISIONES.md): cada decisión técnica, los resultados completos y el costo de entrenamiento.
-- [docs/ONBOARDING.md](docs/ONBOARDING.md): instalación, nube, cadena de datos y entrenamiento, recorrido del código y problemas frecuentes.
+- [docs/ONBOARDING.md](docs/ONBOARDING.md): la nube, la cadena de datos y el entrenamiento, recorrido del código y problemas frecuentes.
 - [docs/COMANDOS.md](docs/COMANDOS.md): todos los comandos `make`.
 - [docs/ESTRUCTURA.md](docs/ESTRUCTURA.md): arquitectura, ciclo mensual, mapa del repositorio y versiones.
 - [docs/CREDITOS.md](docs/CREDITOS.md): procedencia de los datos y licencias.

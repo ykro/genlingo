@@ -83,8 +83,11 @@ class Arena:
         if s.mock_ai:
             return cls(s, MockClient(_mock_responder(_MOCK_DAVID), latency_ms=320),
                        MockClient(_mock_responder(_MOCK_GOLIATH), latency_ms=1450))
-        return cls(s, david_client_for(s.david_url, timeout_s=120.0),
-                   GeminiClient(s.project, s.location, thinking_level=s.gemini_thinking_level or None))
+        # Temperature 0 on both sides, as in `make eval`: the page shows what the eval measured, and the
+        # same phrase gets the same answer every time it is shown.
+        return cls(s, david_client_for(s.david_url, timeout_s=120.0, temperature=0.0),
+                   GeminiClient(s.project, s.location, temperature=0.0, thinking_level=s.gemini_thinking_level or None,
+                                timeout_s=30.0))  # Gemini sometimes takes 15–20 s; let it answer
 
     def contenders(self, david_client: ModelClient | None = None) -> list[Contender]:
         s = self.settings

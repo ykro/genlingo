@@ -4,7 +4,10 @@
 # staging bucket, read back by `make eval`).
 set -euo pipefail
 : "${EVAL_OUT:?set EVAL_OUT}"
-ollama serve >/tmp/ollama.log 2>&1 &
+# Same Ollama settings as David's service (david/Dockerfile), so latencies are comparable; its log goes
+# to the job's log.
+export OLLAMA_KEEP_ALIVE=-1 OLLAMA_NUM_PARALLEL=4 OLLAMA_MAX_LOADED_MODELS=2 OLLAMA_CONTEXT_LENGTH=2048
+ollama serve 2>&1 | sed 's/^/[ollama] /' &
 for _ in $(seq 1 60); do ollama list >/dev/null 2>&1 && break; sleep 1; done
 ollama pull "${EMBEDDING_MODEL}"
 cd /app

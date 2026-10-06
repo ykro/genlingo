@@ -102,11 +102,29 @@ def test_opening_the_page_wakes_david_once_and_reports_when_he_is_ready(settings
     with TestClient(_cloud_app(settings, fake)) as c:
         assert c.get("/api/status").json()["david"]["phase"] == "idle"
         assert c.post("/api/david/wake").json()["phase"] == "ready"
-        # load both models, then one throwaway translation per direction (the first ones after a load are slow)
-        assert fake.calls == ["ps", "load genlingo-test", "load emb", "translate genlingo-test", "translate genlingo-test"]
+        # load both models, then throwaway translations until three in a row are fast (here: the first three)
+        assert fake.calls == ["ps", "load genlingo-test", "load emb"] + ["translate genlingo-test"] * 3
         # while the page stays open, its pings only check that he is still loaded
         assert c.post("/api/david/wake").json()["phase"] == "ready"
         assert fake.calls[-1] == "ps" and fake.calls.count("load genlingo-test") == 1
+
+
+def test_david_is_ready_only_once_he_answers_fast(settings):
+    from genlingo_duel import main
+
+    fake = FakeDavid()
+    latencies = iter([4000, 300, 5000, 400, 450, 380])
+
+    async def complete(messages, *, model):
+        from duel_core import Completion
+
+        fake.calls.append("translate")
+        return Completion(text="estuvo regular", model=model, latency_ms=next(latencies))
+
+    fake.complete = complete
+    with TestClient(_cloud_app(settings, fake)) as c:
+        assert c.post("/api/david/wake").json()["phase"] == "ready"
+    assert fake.calls.count("translate") == 6 and main.FAST_IN_A_ROW == 3
 
 
 def test_a_failed_wake_up_says_so_and_the_next_call_retries(settings):

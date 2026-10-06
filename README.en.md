@@ -1,18 +1,22 @@
 # Genlingo — generational translator: Gen Z ↔ parents
 
-Demo for the talk *"David vs. Goliath: how a small model beats a frontier model"*. «no manches, la peli estuvo bien chilera pero el final me dio cringe» ↔ «la película estuvo bien chévere pero el final me dio pena ajena». **David** is Gemma 4 E2B fine-tuned with LoRA on our own pairs and runs on the laptop with Ollama, **without internet**. **Goliath** is Gemini (`GEMINI_MODEL`, today `gemini-3.8-flash`) on Vertex AI.
+Demo for the talk *"David vs. Goliath: how a small model beats a frontier model"*. «no manches, la peli estuvo bien chilera pero el final me dio cringe» ↔ «la película estuvo bien chévere pero el final me dio pena ajena». **David** is Gemma 4 E2B fine-tuned with LoRA on our own pairs and runs with Ollama on a GPU server of his own (Cloud Run, NVIDIA L4). **Goliath** is Gemini (`GEMINI_MODEL`, today `gemini-3.8-flash`) on Vertex AI. Everything runs in the cloud: the laptop only opens a page.
 
 [Versión en español](README.md)
 
 ## The demo: David and Goliath side by side
 
-One page, `http://127.0.0.1:8787/traducir` (`make up` opens it). Pick the direction (Gen Z → parents or parents → Gen Z), type a phrase or tap an example, and both translate the same phrase at the same time. Each column shows its translation, how long it took and what it cost. For the examples, the page also shows the human reference translation and, under each column, whether it got each slang term right (✓ or ✗). Without internet, Goliath says «Sin conexión» and David keeps translating.
+One public page on Cloud Run: **https://genlingo-611681112050.us-central1.run.app**. Nothing to install or run on talk day: open the page a few minutes before and that's it.
 
-![The comparison page: David and Goliath translate «esa tu tarea te quedó bien chafa»](docs/demo/10-comparar-genz-a-papas.png)
+- Pick the direction (Gen Z → parents or parents → Gen Z), type a phrase or tap an example, and both translate the same phrase at the same time. Each column shows its translation and how long it took.
+- For the examples, the page also shows the human reference translation and, under each column, whether it got each slang term right (✓ or ✗).
+- David shuts down on his own when nobody uses him, so nothing bills between talks. When the page opens, the top right says «Preparando a David…» with a clock while his GPU starts; from zero it takes about four minutes ([measured](docs/DECISIONES.en.md#david-in-the-cloud)). Once it says «David listo» everything answers right away, and the page keeps him on while it stays open.
 
-The four examples are Guatemalan slang from the test set, the case where David wins. I ran live the 51 short Guatemalan phrases the term-by-term check can judge, 3 times with each model. Only the ones David got right and Goliath got wrong all 3 times were kept ([`data/translate_examples.json`](data/translate_examples.json), with the source and the reason for each one). The script is in [docs/DEMO.en.md](docs/DEMO.en.md).
+![The comparison page: David and Goliath translate «esa tu tarea te quedó bien chafa»](docs/demo/02-comparar-genz-a-papas.png)
 
-![What runs on the laptop and what runs in the cloud](docs/diagrams/arquitectura.png)
+The four examples are Guatemalan slang from the test set, the case where David wins. I ran live the 51 short Guatemalan phrases the term-by-term check can judge, 3 times with each model, and kept only the ones David got right and Goliath got wrong all 3 times. After moving David to the cloud I ran them 3 more times against the Cloud Run David: David got all 12 right and Goliath none ([`data/translate_examples.json`](data/translate_examples.json), with the source and the reason for each one). The script is in [docs/DEMO.en.md](docs/DEMO.en.md).
+
+![What runs where: the page, David and Goliath in the cloud](docs/diagrams/arquitectura.png)
 
 ## What you'll learn
 
@@ -21,7 +25,7 @@ The four examples are Guatemalan slang from the test set, the case where David w
 3. **LoRA on Cloud Run Jobs:** an L4 trains and a CPU job merges and exports GGUF; each run records its duration and cost.
 4. **The cost of compression:** f16 vs Q4_K_M, Q5_K_M, Q6_K, Q8_0 and imatrix, in size, latency and lost slang.
 5. **Evals with term metrics:** chrF++ plus *correct slang*, *slang handled* and *reference changes*, with a separate dev set for decisions and niches defined before looking at results.
-6. **Offline by design:** the model, the glossary and the page live on the laptop; the cloud only trains once a month.
+6. **Your model on your own GPU:** David runs with Ollama on Cloud Run with an L4, private, and scales to zero between talks; the page wakes him when it opens. Training, evaluating and serving: all in the cloud, nothing on the laptop.
 
 ## The metrics
 
@@ -30,21 +34,21 @@ The four examples are Guatemalan slang from the test set, the case where David w
 - **Reference changes** (*cambios acertados*): of the words the human reference changed, how many appear in the output.
 - **chrF++:** character overlap with the reference. A register rewrite keeps most words, so copying the phrase untranslated already scores 53.2; that's why it doesn't decide on its own.
 
-All deterministic: no model judges another. Test-set numbers come from the 2026-10-04 eval on 399 `auto_validated` web phrases David never saw ([evals/report.md](evals/report.md)), unless another date is given.
+All deterministic: no model judges another. Test-set numbers come from the 2026-10-04 eval on 399 `auto_validated` web phrases David never saw ([evals/report.md](evals/report.md)), unless another date is given. That eval ran David in Ollama on a Mac (before he moved to the cloud): the latencies in the tables are from there. In the cloud David answers in ~0.5 s and his cost is the GPU's ([David in the cloud](#david-in-the-cloud)).
 
 ## Final result
 
-| | Correct slang | Slang handled | chrF++ | p50 | Cost / 1,000 phrases |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| **David** (`genlingo-2026-10c-e2b-nomulti`, Q5_K_M, 3.62 GB) | **42 %** | **82 %** | **59.7** | **670 ms** | **$0** |
-| Goliath `gemini-3.8-flash` | 26 % | 77 % | 53.5 | 2.60 s | $1.13 |
-| Goliath with David's glossary (reference) | 38 % | 82 % | 57.0 | 3.05 s | $1.27 |
-| Copy the phrase (baseline) | 1 % | 1 % | 53.2 | — | — |
+| | Correct slang | Slang handled | chrF++ | p50 (eval) |
+| --- | ---: | ---: | ---: | ---: |
+| **David** (`genlingo-2026-10c-e2b-nomulti`, Q5_K_M, 3.62 GB) | **42 %** | **82 %** | **59.7** | **670 ms** |
+| Goliath `gemini-3.8-flash` | 26 % | 77 % | 53.5 | 2.60 s |
+| Goliath with David's glossary (reference) | 38 % | 82 % | 57.0 | 3.05 s |
+| Copy the phrase (baseline) | 1 % | 1 % | 53.2 | — |
 
 - **Correct slang:** +16.3 points over Goliath (95 % CI [+10.8, +21.8]). 101 phrases only David gets right; 36 only Goliath.
 - **chrF++:** +6.2 [+4.3, +8.1] over Goliath and +2.7 [+0.8, +4.7] over Goliath with the glossary.
 - **Slang handled:** +4.5 [+0.0, +8.8], a statistical tie.
-- **Goliath's cost:** at the price from 2027-01-01 it would be $2.26 per 1,000 phrases.
+- **Goliath's cost:** $1.13 per 1,000 phrases in that eval; at the price from 2027-01-01, $2.26.
 
 ### By niche (correct slang, David vs Goliath without glossary)
 
@@ -180,37 +184,43 @@ Details and dates in [docs/BITACORA.md](docs/BITACORA.md) (Spanish); technical d
     - *Tested:* generating 4 answers and keeping the one with the most expected counterparts from the bank.
     - *Result:* on dev, 10c's slang handled rose from 86 % to 94 %, but p50 reached 4.40 s.
     - *Learned:* it doesn't fit the 1 s budget; it's off (`DAVID_NBEST=1`).
+16. **David in the cloud** (2026-10-06).
+    - *Tested:* serving the same David with Ollama on Cloud Run with an L4 GPU (europe-west4), private and scaling to zero, with the public page calling him with an identity token.
+    - *Result:* with the GPU on, David answers in ~0.5 s through the page (Goliath, between 0.8 and 18.6 s that day). Starting the GPU from zero, loading the model and warming it takes about four minutes. The 4 examples came out as on the Mac: David 12 of 12 right, Goliath 0.
+    - *Learned:* in the cloud David is still faster, but no longer free: the GPU costs about $1.05 per hour while it's on, and at a talk's volume that's more than what Gemini charges for the same phrases. So the page shows time, not cost ([details](docs/DECISIONES.en.md#david-in-the-cloud)).
 
-**Total cost:** the logged training runs cost $9.15, including five of the six failed ones ($3.44; the sixth left no cost record). David's inference costs $0.
+**Total cost:** the logged training runs cost $9.15, including five of the six failed ones ($3.44; the sixth left no cost record).
 
 ## Why the demo uses only the final model
 
 The page uses `genlingo-2026-10c-e2b-nomulti` in Q5_K_M with the lexicon prompt, and no other David:
 
 - **It's the best at what the demo shows.** It has the highest correct slang of all variants: 42 %, vs 34 % for `10b`, 27 % for `10-e2b` and 18 % for `2026-09`. It also has the highest chrF++ (59.7).
-- **It fits the laptop's budget.** 670 ms p50 and 3.62 GB. The multi-term variant was around 2 s on dev, and picking among 4 answers around 4.4 s.
+- **It fits the 1 s budget.** 670 ms p50 in the eval and ~0.5 s on the cloud GPU, with 3.62 GB. The multi-term variant was around 2 s on dev, and picking among 4 answers around 4.4 s.
 - **Q5_K_M loses no slang vs f16** and is 2.6 times smaller. Q4_K_M did lose slang.
-- **The earlier ones teach nothing new on stage.** Their story (from 14 % to 42 % correct slang, at $0.41–$0.97 per round) is in the tables above and in the logbook. On stage only today's David is compared with Goliath.
+- **The earlier ones teach nothing new on the page.** Their story (from 14 % to 42 % correct slang, at $0.41–$0.97 per training round) is in the tables above and in the logbook. The page only compares today's David with Goliath.
 - **The page's examples come from the niche where it wins** (Guatemalan slang, +29.6 correct-slang points). Mexico and neutral Spanish, where David ties or where Goliath with the glossary beats him, stay documented here and are not shown in the demo.
 
 ## Quick start
 
+To use the demo you need nothing: open the page. To rebuild it (Google Cloud with `gcloud` and ADC, `uv`):
+
 ```bash
-cp .env.example .env && (cd duel && uv sync) && (cd web && npm install && cp .env.example .env.local)
-gcloud auth application-default login                 # Goliath (Vertex AI) and model downloads
-ollama pull embeddinggemma && make pull-model TAG=genlingo-2026-10c-e2b-nomulti   # lexicon + David
-make up       # Ollama + warm David + service (:8787); opens the comparison page
+cp .env.example .env && (cd duel && uv sync)
+gcloud auth application-default login
+make deploy   # David on Cloud Run with a GPU (europe-west4) + the public page (us-central1)
+make check    # the live page: wakes David and translates every example with both
 make test     # tests without network (MOCK_AI=1)
 ```
 
-Rehearsal without network or GPU: `MOCK_AI=1` in `.env` and `make up`. Requirements and the full version in [docs/COMANDOS.en.md](docs/COMANDOS.en.md#quickstart).
+All commands in [docs/COMANDOS.en.md](docs/COMANDOS.en.md).
 
 ## Documentation
 
-- [docs/DEMO.en.md](docs/DEMO.en.md): the demo script (how to open the page, which examples to tap, talking points and what to do if something fails).
+- [docs/DEMO.en.md](docs/DEMO.en.md): the demo script (what to open, which examples to tap, talking points and what to do if something fails).
 - [docs/BITACORA.md](docs/BITACORA.md) (Spanish): David's story, iteration by iteration.
 - [docs/DECISIONES.en.md](docs/DECISIONES.en.md): every technical decision, full results and training cost.
-- [docs/ONBOARDING.md](docs/ONBOARDING.md) (Spanish): setup, cloud, data and training pipeline, code walkthrough and common problems.
+- [docs/ONBOARDING.md](docs/ONBOARDING.md) (Spanish): the cloud, the data and training pipeline, code walkthrough and common problems.
 - [docs/COMANDOS.en.md](docs/COMANDOS.en.md): every `make` command.
 - [docs/ESTRUCTURA.en.md](docs/ESTRUCTURA.en.md): architecture, monthly cycle, repository map and versions.
 - [docs/CREDITOS.en.md](docs/CREDITOS.en.md): data provenance and licenses.

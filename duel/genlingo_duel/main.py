@@ -28,9 +28,12 @@ log = logging.getLogger("genlingo.page")
 
 # Cloud Run stops an idle instance after about 15 minutes; past this we assume David is cold again.
 IDLE_COLD_S = 10 * 60
-# Right after a model load the first few generations on the GPU are slow (seconds, not half a second):
-# one throwaway translation per direction during the wake-up absorbs that before anyone is watching.
-WARM_PHRASES = {"genz_to_parent": "qué onda, ese plan estuvo bien chilero", "parent_to_genz": "qué pena con los vecinos"}
+# For the first minutes after a Cloud Run GPU instance starts, David is slow (seconds, not half a second):
+# the image is still streaming in and each new code path pays for it once. The wake-up keeps translating
+# throwaway phrases (the page's examples, both directions) until FAST_IN_A_ROW in a row answer under
+# FAST_MS, so "David listo" means fast. WARM_BUDGET_S caps it.
+WARM_PHRASES = [("qué onda, ese plan estuvo bien chilero", "genz_to_parent"), ("qué pena con los vecinos", "parent_to_genz")]
+FAST_MS, FAST_IN_A_ROW, WARM_BUDGET_S = 1000, 3, 300
 
 
 class TranslateRequest(BaseModel):
@@ -83,14 +86,22 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None) -> 
             if s.embedding_model and s.embedding_model not in loaded:
                 await client.warm_up_embedding(s.embedding_model)  # type: ignore[attr-defined]
             await arena.get_glossary()
-            if s.david_tag not in loaded:  # a fresh load: run the throwaway translations
-                for direction, phrase in WARM_PHRASES.items():
-                    await arena.translate_one("david", phrase, direction, s.country)
+            await warm_until_fast()
             david.seen()
             david.set("ready")
         except Exception as exc:
             log.warning("David did not wake: %s", exc)
             david.set("error", f"{type(exc).__name__}: {str(exc)[:160]}")
+
+    async def warm_until_fast() -> None:
+        phrases = [(e["text"], e["direction"]) for e in load_examples(s.data_dir)] + WARM_PHRASES
+        t0, fast, i = time.time(), 0, 0
+        while fast < FAST_IN_A_ROW and time.time() - t0 < WARM_BUDGET_S:
+            text, direction = phrases[i % len(phrases)]
+            i += 1
+            res = await arena.translate_one("david", text, direction, s.country)
+            fast = fast + 1 if res.status == "ok" and (res.latency_ms or 1e9) < FAST_MS else 0
+        log.info("David warm after %d translations, %.0f s", i, time.time() - t0)
 
     async def keep_warm() -> None:
         try:
