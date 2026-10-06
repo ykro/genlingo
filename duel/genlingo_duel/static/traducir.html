@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genlingo · Traductor</title>
+<style>
+  :root {
+    --paper: #f6f3ec; --card: #fffdf8; --ink: #16181d; --muted: #5a5e66; --line: #ddd8cc;
+    --david: #c23d19; --david-wash: #f3e3da;
+    --body: ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); }
+  main { max-width: 1180px; margin: 0 auto; padding: 48px 32px 64px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  h1 { margin: 0; font-size: 56px; letter-spacing: -0.02em; }
+  h1 span { color: var(--david); }
+  .tagline { margin: 8px 0 0; font-size: 24px; color: var(--muted); }
+  .status { font-size: 18px; color: var(--muted); }
+  .status b { color: var(--ink); }
+  .switch { display: inline-flex; margin: 40px 0 16px; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .switch button { font: 600 24px var(--body); padding: 12px 28px; border: 0; background: var(--card); color: var(--ink); cursor: pointer; }
+  .switch button[aria-pressed="true"] { background: var(--ink); color: var(--card); }
+  .box { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; min-height: 230px; display: flex; flex-direction: column; }
+  .label { font-size: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  textarea { flex: 1; width: 100%; border: 0; resize: none; background: transparent; font: 34px/1.3 var(--body); color: var(--ink); outline: none; }
+  .out { flex: 1; font-size: 40px; line-height: 1.25; font-weight: 600; margin: 0; }
+  .out.wait { color: var(--muted); font-weight: 400; }
+  .david { background: var(--david-wash); border-color: transparent; }
+  .david .label { color: var(--david); }
+  .meta { margin: 12px 0 0; font-size: 18px; color: var(--muted); min-height: 1.4em; }
+  .actions { margin: 20px 0 0; }
+  .go { font: 700 28px var(--body); padding: 16px 40px; border: 0; border-radius: 14px; background: var(--david); color: #fff; cursor: pointer; }
+  .go:disabled { opacity: 0.5; cursor: default; }
+  h2 { font-size: 22px; margin: 48px 0 12px; }
+  .examples { display: flex; flex-wrap: wrap; gap: 12px; }
+  .examples button { font: 22px var(--body); text-align: left; padding: 12px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); cursor: pointer; }
+  .examples button:hover { border-color: var(--ink); }
+  .examples small { display: block; font-size: 15px; color: var(--muted); margin-bottom: 2px; }
+  @media (max-width: 800px) { .box { grid-template-columns: 1fr; } h1 { font-size: 40px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Gen<span>lingo</span></h1>
+      <p class="tagline">Traductor entre la jerga de Gen Z y el español de los papás, con slang chapín.</p>
+    </div>
+    <p class="status" id="status">David corre en esta laptop, sin internet.</p>
+  </header>
+
+  <div class="switch" role="group" aria-label="Dirección">
+    <button type="button" data-dir="genz_to_parent" aria-pressed="true">Gen Z → papás</button>
+    <button type="button" data-dir="parent_to_genz" aria-pressed="false">Papás → Gen Z</button>
+  </div>
+
+  <div class="box">
+    <section class="panel">
+      <p class="label" id="in-label">Lo que dice Gen Z</p>
+      <textarea id="phrase" maxlength="400" aria-labelledby="in-label" placeholder="Escribe una frase"></textarea>
+    </section>
+    <section class="panel david" aria-live="polite">
+      <p class="label" id="out-label">Así lo dirían los papás</p>
+      <p class="out wait" id="out">Aquí aparece la traducción de David.</p>
+      <p class="meta" id="meta"></p>
+    </section>
+  </div>
+  <div class="actions"><button class="go" id="go" type="button">Traducir</button></div>
+
+  <h2>Ejemplos</h2>
+  <div class="examples" id="examples"></div>
+</main>
+<script>
+  const LABELS = {
+    genz_to_parent: ["Gen Z → papás", "Lo que dice Gen Z", "Así lo dirían los papás"],
+    parent_to_genz: ["Papás → Gen Z", "Lo que dicen los papás", "Así lo diría Gen Z"],
+  };
+  let direction = "genz_to_parent";
+  const $ = (id) => document.getElementById(id);
+
+  function setDirection(dir) {
+    direction = dir;
+    document.querySelectorAll(".switch button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.dir === dir)));
+    $("in-label").textContent = LABELS[dir][1];
+    $("out-label").textContent = LABELS[dir][2];
+  }
+
+  async function translate() {
+    const phrase = $("phrase").value.trim();
+    if (!phrase) return $("phrase").focus();
+    $("go").disabled = true;
+    $("out").className = "out wait";
+    $("out").textContent = "Traduciendo…";
+    $("meta").textContent = "";
+    try {
+      const res = await fetch("/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phrase, direction }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "No se pudo traducir.");
+      $("out").className = "out";
+      $("out").textContent = data.text;
+      $("meta").textContent = `Tardó ${(data.latency_ms / 1000).toFixed(1)} s · en esta laptop · costo $0`;
+    } catch (e) {
+      $("out").textContent = e.message || "No se pudo traducir.";
+    } finally {
+      $("go").disabled = false;
+    }
+  }
+
+  document.querySelectorAll(".switch button").forEach((b) => b.addEventListener("click", () => setDirection(b.dataset.dir)));
+  $("go").addEventListener("click", translate);
+  $("phrase").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); translate(); }
+  });
+
+  fetch("/translate/examples").then((r) => r.json()).then((list) => {
+    for (const ex of list) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.innerHTML = `<small>${LABELS[ex.direction][0]}</small>`;
+      b.append(ex.text);
+      b.addEventListener("click", () => { setDirection(ex.direction); $("phrase").value = ex.text; translate(); });
+      $("examples").append(b);
+    }
+  });
+</script>
+</body>
+</html>

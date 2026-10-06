@@ -4,7 +4,8 @@
 
 One Spanish line per check, `[ok]` or `[FALLA]` with the fix. Exit code = number of failures.
   Laptop: Ollama with David, the previous David and the embedding model; the duel service; the
-          presenter view; the term bank, lexicon and test set; David's run file; free disk.
+          presenter view; the term bank, lexicon and test set; David's run file; free disk; the
+          translation page (/traducir) and each of its examples translated live as verified.
   Cloud:  the audience app answers, is kept warm (min-instances >= 1) and runs this event;
           Gemini answers (one tiny call); Firestore answers for this event.
 """
@@ -12,6 +13,7 @@ One Spanish line per check, `[ok]` or `[FALLA]` with the fix. Exit code = number
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import shutil
 import sys
@@ -20,7 +22,9 @@ import time
 import httpx
 
 from _common import DATA, ROOT, audience_service
+from genlingo_duel.dataset import test_pairs
 from genlingo_duel.runs import load_run
+from genlingo_duel.translate_page import examples_path
 from genlingo_duel.settings import get_settings
 
 MIN_FREE_GB = 10
@@ -117,6 +121,49 @@ def check_data(r: Report, s) -> None:
         r.fail(f"Disco libre: {free_gb:.1f} GB (mínimo {MIN_FREE_GB} GB)", "borra GGUF viejos (ollama rm <tag>) o data/.cache")
 
 
+def same_text(a: str, b: str) -> bool:
+    return " ".join(a.lower().split()) == " ".join(b.lower().split())
+
+
+def check_translate_page(r: Report, s) -> None:
+    """The translation page and its example buttons: each example, translated live by David, must
+    give the answer that was verified (data/translate_examples.json)."""
+    print("Página para traducir (/traducir)", flush=True)
+    path = examples_path(DATA)
+    try:
+        examples = json.loads(path.read_text(encoding="utf-8"))["examples"]
+    except (OSError, ValueError, KeyError) as exc:
+        r.fail(f"No se pudieron leer los ejemplos {path.relative_to(ROOT)} ({type(exc).__name__})", "git checkout data/translate_examples.json")
+        return
+    pairs = {p.id: p for p in test_pairs(DATA)}
+    bad = [e["pair_id"] for e in examples if e.get("pair_id") not in pairs or pairs[e["pair_id"]].country != "GT"]
+    if bad or {e["direction"] for e in examples} != {"genz_to_parent", "parent_to_genz"}:
+        r.fail(f"Ejemplos fuera de la jerga chapina del set de prueba o sin las dos direcciones ({', '.join(bad[:3])})",
+               "revisa data/translate_examples.json")
+    port = os.environ.get("DUEL_PORT", "8787")
+    base = f"http://127.0.0.1:{port}"
+    try:
+        page = httpx.get(f"{base}/traducir", timeout=5)
+        if page.status_code != 200 or "Traducir" not in page.text:
+            r.fail(f"La página responde {page.status_code}", "reinicia make up")
+            return
+        r.ok(f"Página abierta en {base}/traducir")
+    except httpx.HTTPError as exc:
+        r.fail(f"La página no responde en :{port} ({type(exc).__name__})", "make up en otra terminal")
+        return
+    for e in examples:
+        try:
+            res = httpx.post(f"{base}/translate", json={"phrase": e["text"], "direction": e["direction"]}, timeout=30)
+            got = res.json().get("text", "") if res.status_code == 200 else ""
+        except (httpx.HTTPError, ValueError) as exc:
+            got = f"({type(exc).__name__})"
+        if same_text(got, e["david"]):
+            r.ok(f"Ejemplo «{e['text']}» → «{got}»")
+        else:
+            r.fail(f"Ejemplo «{e['text']}»: David dijo «{got}», se esperaba «{e['david']}»",
+                   "revisa que LOCAL_MODEL_TAG sea el David de escena y que embeddinggemma esté en Ollama")
+
+
 def check_audience_app(r: Report, s, region: str) -> None:
     print("App del público (Cloud Run)", flush=True)
     try:
@@ -189,6 +236,7 @@ def main() -> int:
     check_ollama(r, s)
     check_local_services(r, s)
     check_data(r, s)
+    check_translate_page(r, s)
     check_audience_app(r, s, region)
     check_gemini(r, s)
     check_firestore(r, s)

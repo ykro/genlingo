@@ -1,0 +1,61 @@
+{
+  "about": "Ejemplos de la página /traducir: jerga chapina (Guatemala), donde David le gana a Goliath (evals/report.md). Son frases del set de prueba; David nunca las vio al entrenar. Cada una se tradujo 4 veces en vivo con el David de escena y las 4 salieron bien.",
+  "model": "genlingo-2026-10c-e2b-nomulti",
+  "verified": "2026-10-06",
+  "examples": [
+    {
+      "pair_id": "test-w-0191",
+      "direction": "genz_to_parent",
+      "text": "Agarrá tus chivas y nos vamos al partido de fut.",
+      "david": "Agarrá tus cosas y nos vamos al partido de fútbol.",
+      "reference": "Agarrá tus cosas y nos vamos al partido de fútbol.",
+      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/chivas.md",
+      "license": "MIT License"
+    },
+    {
+      "pair_id": "test-w-0198",
+      "direction": "genz_to_parent",
+      "text": "Hacé eso al chilazo antes de que llegue tu mamá.",
+      "david": "Hacé eso rapidito antes de que llegue tu mamá.",
+      "reference": "Hacé eso rapidito antes de que llegue tu mamá.",
+      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/chilazo.md",
+      "license": "MIT License"
+    },
+    {
+      "pair_id": "test-w2-0013",
+      "direction": "genz_to_parent",
+      "text": "El chonte nos ayudó a encontrar la dirección.",
+      "david": "El policía nos ayudó a encontrar la dirección.",
+      "reference": "El policía nos ayudó a encontrar la dirección.",
+      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/chonte.md",
+      "license": "MIT License"
+    },
+    {
+      "pair_id": "test-w-0234",
+      "direction": "parent_to_genz",
+      "text": "¡Épale, cuidado con el carro!",
+      "david": "¡Trucha, maje, cuidado con el carro!",
+      "reference": "¡Trucha, maje, el carro!",
+      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/epale.md",
+      "license": "MIT License"
+    },
+    {
+      "pair_id": "test-w2-0066",
+      "direction": "parent_to_genz",
+      "text": "Voy a comprar algo de refacción para media mañana.",
+      "david": "Voy a comprar algo de refa para media mañana.",
+      "reference": "Voy a comprar algo de refa para media mañana.",
+      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/refaccion.md",
+      "license": "MIT License"
+    },
+    {
+      "pair_id": "test-w-0225",
+      "direction": "parent_to_genz",
+      "text": "No seas tan mashcuil, ya aceptá la verdad.",
+      "david": "No seas tan necio, maje, ya aceptá la verdad.",
+      "reference": "No seás tan necio, maje, ya aceptá que es así.",
+      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/mashcuil.md",
+      "license": "MIT License"
+    }
+  ]
+}

@@ -57,6 +57,8 @@ class Settings:
     firestore_database: str = field(default_factory=lambda: _env("FIRESTORE_DATABASE", "genlingo"))
     audience_feed: bool = field(default_factory=lambda: _flag("AUDIENCE_FEED"))
     event_id: str = field(default_factory=lambda: _env("EVENT_ID", "ensayo"))
+    # Where the talk happens: the translation page (/traducir) translates with this country's slang.
+    country: str = field(default_factory=lambda: _env("EVENT_COUNTRY", "GT"))
     # Evaluation rounds may also use test pairs not validated yet (pending_review, e.g. right
     # after build_test_set); on stage keep it 0: only auto-validated pairs (or ones a person
     # approved in the optional human pass) are shown.

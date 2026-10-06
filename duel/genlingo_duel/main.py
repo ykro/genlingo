@@ -17,7 +17,7 @@ from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from .arena import Arena
@@ -27,6 +27,7 @@ from .prompts import COUNTRIES, Direction
 from .runs import load_run
 from .scoreboard import Scoreboard
 from .settings import Settings, get_settings
+from .translate_page import PAGE, load_examples
 
 log = logging.getLogger("genlingo.duel")
 
@@ -59,6 +60,11 @@ class EvaluationRequest(BaseModel):
     country: str | None = None
     specialty: bool = False
     david_tag: str | None = Field(default=None, pattern=TAG_PATTERN)
+
+
+class TranslateRequest(BaseModel):
+    phrase: str = Field(min_length=1, max_length=400)
+    direction: Direction
 
 
 class VotesRequest(BaseModel):
@@ -180,6 +186,23 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
             name: {"status": r.status, "model": r.model, "latency_ms": r.latency_ms, "text": r.text, "error": r.error}
             for name, r in results.items()
         }
+
+    @app.get("/traducir", response_class=HTMLResponse)
+    async def translate_page() -> str:
+        """The translation page: David alone, Gen Z ↔ papás (translate_page.py)."""
+        return PAGE.read_text(encoding="utf-8")
+
+    @app.get("/translate/examples")
+    async def translate_examples() -> list[dict]:
+        return load_examples(s.data_dir)
+
+    @app.post("/translate")
+    async def translate(req: TranslateRequest) -> dict:
+        """David's translation only: no Goliath, no round, nothing recorded."""
+        res = await arena.translate(req.phrase.strip(), req.direction, s.country)
+        if res.status != "ok":
+            raise HTTPException(503, "David no respondió. Revisa que Ollama esté corriendo (make up).")
+        return {"text": res.text, "latency_ms": res.latency_ms, "model": res.model, "glossary": res.extra.get("glossary", [])}
 
     @app.post("/duel")
     async def duel(req: DuelRequest) -> dict:

@@ -162,6 +162,26 @@ class Arena:
                 res.extra["nbest"] = [{"text": t, "score": sc} for t, sc in david_client.last]
         return results
 
+    async def translate(self, phrase: str, direction: Direction, country: str) -> ContenderResult:
+        """David alone, for the translation page: his prompt and term-bank glossary, exactly as in a
+        duel, but no Goliath and nothing recorded. Needs no internet."""
+        s = self.settings
+        style = prompt_style_for(s, s.david_tag)
+        entries, retrieval_ms = [], 0.0
+        if style in GLOSSARY_STYLES:
+            entries, retrieval_ms, _ = await self.glossary_entries(style, phrase, direction, country)
+        glossary = render_glossary(entries, COUNTRIES[country]) if style in GLOSSARY_STYLES else ""
+        messages = translation_messages(phrase, direction, country, style, glossary)
+        david_client = None
+        if s.david_nbest > 1 and style in GLOSSARY_STYLES:
+            g = await self.get_glossary()
+            david_client = NBestClient(self.david_client, s.david_nbest, term_bank_scorer(g.bank, phrase, direction, country, entries))
+        res = (await run_duel(self.contenders(s.david_tag, david_client)[:1], messages, online=True))["david"]
+        if res.latency_ms is not None:
+            res.latency_ms = round(res.latency_ms + retrieval_ms, 1)
+        res.extra = {"glossary": [e["term"] for e in entries if e.get("role") != "foreign"]}
+        return res
+
     async def glossary_entries(self, style: str, phrase: str, direction: Direction, country: str) -> tuple[list[dict], float, str | None]:
         """(entries, retrieval ms, error) for a glossary prompt style. A failure means no glossary, never a 500."""
         t0 = time.perf_counter()
