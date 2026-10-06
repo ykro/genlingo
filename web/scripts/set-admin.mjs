@@ -1,7 +1,7 @@
 // Make an email account a presenter (custom claim admin=true). Creates the account if missing
 // with a random password nobody sees: the presenter then uses "Olvidé mi contraseña" on /admin
 // to set their own. Pass --password-out=FILE to write the generated password (rehearsal/e2e only).
-//   GOOGLE_CLOUD_PROJECT=ai-experiments-487722 node scripts/set-admin.mjs presenter@example.com
+//   GOOGLE_CLOUD_PROJECT=ai-experiments-487722 node scripts/set-admin.mjs "${ADMIN_EMAILS%%,*}"   # first address of ADMIN_EMAILS (web/.env.local)
 import { randomBytes } from "node:crypto";
 import { appendFileSync } from "node:fs";
 
