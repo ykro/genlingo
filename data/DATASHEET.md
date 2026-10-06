@@ -130,8 +130,8 @@ count ambiguous terms, not a source of terms or sentences).
    `scripts/flag_ambiguous_terms.py` counts their matches in ~39k sentences of general speech
    (transcripts; only counts are kept, no text) and marks the ones with ≥ 15 matches
    `ambiguous: true`; metrics and test validation ignore them, the glossary still explains them.
-8. **Audience pairs** (`origin=human`). Submitted at each event from the audience app, approved
-   by the presenter in `/admin`, pulled with `make export`. 20% go to the test split (stable
+8. **Audience pairs** (`origin=human`). Submitted from the audience app (an earlier version of the
+   demo; the current talk doesn't use it), approved in `/admin`, pulled with `make export`. 20% go to the test split (stable
    hash of the id).
 
 ## Uses

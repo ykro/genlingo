@@ -2,7 +2,7 @@
 
 Talk: **David vs. Goliath: cómo un modelo pequeño le gana a un modelo frontier.**
 
-A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, translates between Gen Z speech and their parents' speech ("no manches, está bien mid, me dio cringe" ↔ "estuvo regular y me dio pena ajena"). It runs on the presenter's laptop with no internet and competes live against Gemini (Goliath). The audience submits phrases from their phones and votes; an objective score (chrF++) measures both models against reference translations.
+A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, translates between Gen Z speech and their parents' speech ("no manches, está bien mid, me dio cringe" ↔ "estuvo regular y me dio pena ajena"). It runs on the presenter's laptop with no internet. The demo is one comparison page (`/traducir`, served by the duel service): David and Goliath (Gemini) translate the same phrase side by side, each column with its translation, time and cost; verified example buttons also show the human reference and a ✓/✗ per slang term. No rounds, scoreboard or votes in the talk.
 
 ## What the talk teaches (make each one visible in code and reports)
 
@@ -12,18 +12,20 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
 | Efficient fine-tuning in the cloud | `train/` (commented LoRA), two Cloud Run Jobs (L4 trains, CPU merges + GGUF), cost and duration per stage in `train/runs/<tag>.json` and `evals/report.md` |
 | Compress to run on a laptop | quantization sweep (Q4_K_M, Q5_K_M, Q6_K, Q8_0, imatrix) vs f16: size, latency and slang lost |
 | Term-level evals | chrF++ plus a copy-the-phrase baseline, correct slang (meaning-validated), slang handled and reference-change recall, a separate dev set for data decisions, Goliath with and without David's glossary, David's losses shown |
-| Big models age | model tags by data date (on stage: `genlingo-2026-10c-e2b-nomulti`), `david_tag` duel: previous David (`DAVID_PREVIOUS_TAG`) vs on-stage David |
+| Retraining on new data | model tags by data date (on stage: `genlingo-2026-10c-e2b-nomulti`); the README's experiments section shows every round's numbers |
+| Show only what David wins | comparison page examples from the niche David wins (Guatemalan slang), each verified live 3× with both models (`data/translate_examples.json`); losses stay documented in the README, BITACORA and evals, never on the page |
 
 ## Components
 
 | Component | Stack | Runs on | Why |
 | --- | --- | --- | --- |
-| Audience web app (`web/`) | Next.js, Firebase Auth (anonymous), Firestore db `genlingo`, App Check (reCAPTCHA Enterprise) | Cloud Run | Phones must reach it |
+| Comparison page (`duel/genlingo_duel/static/traducir.html`, route `/traducir`) | Plain HTML/JS served by the duel service, brand fonts served locally | Laptop | The talk demo; works offline |
+| Audience web app (`web/`, earlier version of the demo, not used in the talk) | Next.js, Firebase Auth (anonymous), Firestore db `genlingo`, App Check (reCAPTCHA Enterprise) | Cloud Run | Phones must reach it |
 | Admin (`web/` route `/admin`) | Same app, email auth for the presenter | Cloud Run | Optional: moderate phrases when auto-approve is off, approve contributed pairs |
 | Training (`train/`) | TRL + PEFT LoRA (`train_lora.py`), merge + llama.cpp GGUF `QUANT` (Q5_K_M) + f16 + Modelfile (`finish.py`) | Cloud Run Jobs in europe-west4: `genlingo-train` (1× L4) then `genlingo-finish` (CPU); notebook for Colab; `make train-finish` on the laptop as fallback | Serverless GPU billed per second; the split keeps each job within 32 GiB |
 | David | Ollama with custom Modelfile, EmbeddingGemma lexicon (term bank + meaning-validated counterparts) | Laptop | The thesis: runs offline on your laptop |
 | Duel service (`duel/`) | Python, FastAPI, Ollama client, `google-genai`, `sacrebleu`, SQLite scoreboard | Laptop | Must work with Wi-Fi off; latency measured on stage hardware |
-| Presenter view (`web/` route `/presenter`, served locally) | Next.js calling the duel service | Laptop | Offline mode |
+| Presenter view (`web/` route `/presenter`, earlier version of the demo, not used in the talk) | Next.js calling the duel service | Laptop | Offline mode |
 
 ## Data
 
@@ -48,18 +50,20 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
 
 ## Duel service
 
+- Comparison page: `GET /traducir`; `POST /translate/david` and `POST /translate/goliath` (one side each, so each column fills as it answers; nothing recorded); `GET /translate/examples`. With an example's `example_id`, the answer carries a per-term check (`term_check.py`, the eval's correct-slang rules).
+
 - `POST /duel` with `phrase`, `direction`, `country`, optional `david_tag`: calls David and Goliath (`GEMINI_MODEL`) in parallel, each with the prompt it was trained or configured for; returns translation, latency ms, tokens and cost for each.
 - Cost from a dated price schedule (`GEMINI_PRICE_SCHEDULE`). David's inference cost is zero; the presenter view shows his training cost amortized over the rounds he played.
 - Round types: **evaluation rounds** use auto-validated test-set phrases and show chrF++ live; **audience rounds** use submitted phrases, no reference, decided by vote when the audience is connected.
 - Offline: with no internet, Goliath shows as offline, Firestore is skipped and David keeps working.
 - `david_tag` lets two versions of David compete; the scoreboard is per David.
 
-## Audience flow
+## Audience flow (earlier version of the demo, not used in the talk)
 
 - Join by QR code, no sign-up (anonymous auth). Submit a phrase (one every 20 s per person, enforced server side) and vote each round.
 - Phrases that pass the blocklist go straight to the screen queue (`AUTO_APPROVE_PHRASES=1`, the default); with `0` the presenter approves them in `/admin`. The talk also works with no audience at all.
 
-## Presenter view
+## Presenter view (earlier version of the demo, not used in the talk)
 
 - Phrase and direction; David and Goliath side by side with translation, latency and cost.
 - Persistent scoreboard per David: rounds won, average chrF++, p50 latency, cumulative cost, live vote results.
@@ -67,10 +71,10 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
 
 ## Acceptance criteria
 
-- `make up` starts Ollama, the duel service and the presenter view; the duel works with Wi-Fi off.
+- `make up` starts Ollama, the duel service (with the comparison page) and the presenter view, and opens the comparison page; David works with Wi-Fi off.
+- `make preflight` translates every comparison-page example live with both models: David gets the slang right and Goliath doesn't.
 - David's p50 latency < 1 s for phrases up to 30 words on the M1 Max 64 GB laptop.
 - `make eval` runs the test pairs against both models and writes `evals/report.md` (chrF++, term metrics, per-origin, latency p50/p95, cost, compression).
-- An approved audience phrase reaches the screen in < 3 s.
 - `make reset` clears rounds, votes and scoreboard.
 - `make test` passes.
 
@@ -116,7 +120,7 @@ Everything runs in the cloud unless the talk requires the laptop (offline model,
 
 ### Docs (written at the end, from the finished code)
 
-- `README.md` (Spanish) and `README.en.md`: one screen — what it is, what you'll learn, the result, diagrams, quickstart and links. Everything else lives in `docs/` (es + en): `DECISIONES` (**technical decisions**: what, why, discarded alternatives, where each component runs and why; preview API versions), `COMANDOS` (`make` commands), `ESTRUCTURA` (repo map), `CREDITOS` (data and licenses).
+- `README.md` (Spanish) and `README.en.md`: what it is, what you'll learn, the result, diagrams, quickstart and links. Genlingo's README also carries every experiment with its statistics and why the demo uses only the final model. Everything else lives in `docs/` (es + en): `DECISIONES` (**technical decisions**: what, why, discarded alternatives, where each component runs and why; preview API versions), `COMANDOS` (`make` commands), `ESTRUCTURA` (repo map), `CREDITOS` (data and licenses).
 - `docs/ONBOARDING.md`: prerequisites with versions, local setup, credentials/ADC, GCP setup with `infra/NN-*.sh`, run/test/rehearse, code walkthrough, troubleshooting, talk-day checklist.
 - `docs/diagrams/`: made with the `diagram-design` skill, exported to SVG and PNG.
 - Never describe the project as a deviation from a spec; the docs describe what the project is.

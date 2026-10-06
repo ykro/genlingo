@@ -65,8 +65,8 @@ for _ in $(seq 1 120); do curl -sf "http://127.0.0.1:${PORT}/health" >/dev/null 
 curl -sf "http://127.0.0.1:${PORT}/health" >/dev/null || fail "el servicio del duelo no respondió en :${PORT} en 60 s (¿puerto ocupado? mira el log de uvicorn arriba)"
 echo
 echo "  Duelo:      http://127.0.0.1:${PORT}/health"
-echo "  Traducir:   http://127.0.0.1:${PORT}/traducir   (la demo de la charla, docs/DEMO.md)"
-echo "  Pantalla:   http://127.0.0.1:3000/presenter   (F pantalla completa, E set de prueba, / escribir, M David anterior)"
+echo "  Demo:       http://127.0.0.1:${PORT}/traducir   (David y Goliath lado a lado, docs/DEMO.md)"
+echo "  Anterior:   http://127.0.0.1:3000/presenter   (vista del presentador de la versión anterior; la charla no la usa)"
 echo
 [ "${NO_OPEN:-0}" = 1 ] || { command -v open >/dev/null && open "http://127.0.0.1:${PORT}/traducir" || true; }
 wait

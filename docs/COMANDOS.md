@@ -5,12 +5,12 @@ Todos los comandos del `Makefile`. `make help` los lista con su descripción. Vo
 | Comando | Qué hace |
 | --- | --- |
 | `make help` | Lista los comandos con su descripción. |
-| `make up` | Arranca Ollama (con `OLLAMA_MAX_LOADED_MODELS=4`), precarga los tres modelos de escena (David, el David anterior y EmbeddingGemma), levanta el duelo y la vista del presentador (la recompila si cambió su código). Funciona sin Wi-Fi y sin público. |
-| `make reset` | Pone en cero rondas, votos, cola y marcador locales; con `AUDIENCE_FEED=1`, también borra las rondas del evento en Firestore (hasta 3 intentos). Si Firestore falla (por ejemplo, sin red), lo dice con la causa y termina con error; el marcador local queda en cero igual. |
-| `make stage-on` | Día de charla: `min-instances=1` en la app del público (`infra/60-stage.sh on`), para que el QR no espere un arranque en frío. Muestra el valor que quedó en Cloud Run. |
+| `make up` | Arranca Ollama (con `OLLAMA_MAX_LOADED_MODELS=4`), precarga David, el David anterior (`DAVID_PREVIOUS_TAG`) y EmbeddingGemma, levanta el servicio del duelo (`:8787`, que sirve la página de comparación `/traducir`) y la vista del presentador (`:3000`, la recompila si cambió su código), y abre la página de comparación. Funciona sin Wi-Fi. |
+| `make reset` | Pone en cero el historial del servicio del duelo (rondas, votos, cola y marcador; la página de comparación no los usa); con `AUDIENCE_FEED=1`, también borra las rondas del evento en Firestore (hasta 3 intentos). Si Firestore falla (por ejemplo, sin red), lo dice con la causa y termina con error; el marcador local queda en cero igual. |
+| `make stage-on` | `min-instances=1` en la app del público de Cloud Run (`infra/60-stage.sh on`). La demo no la usa, pero `make preflight` revisa que esté tibia. Muestra el valor que quedó en Cloud Run. |
 | `make stage-off` | Después de la charla: `min-instances=0` (escala a cero, nada cobra en reposo). |
-| `make warmup` | Despierta la app del público (200 en `/` y `/api/config`), carga en Ollama los dos Davids y EmbeddingGemma, y hace una llamada a David y otra a Goliath: por el duelo si está corriendo (`POST /warmup`, no se registra como ronda) o directo si no. |
-| `make preflight` | Revisión antes de subir: Ollama con los dos Davids y EmbeddingGemma, `/health` del duelo, `/api/config` de la vista del presentador, banco de términos, léxico, set de prueba y ficha de entrenamiento de David, 10 GB libres en disco, app del público con 200, `min-instances` ≥ 1 y el mismo `EVENT_ID`, Gemini (una llamada mínima) y Firestore del evento. Una línea `[ok]` o `[FALLA]` por revisión, con el arreglo; el código de salida es el número de fallas. |
+| `make warmup` | Despierta la app del público (200 en `/` y `/api/config`), carga en Ollama los dos Davids y EmbeddingGemma, y hace una llamada a David y otra a Goliath: por el servicio si está corriendo (`POST /warmup`, no se registra) o directo si no. |
+| `make preflight` | Revisión antes de subir: Ollama con los dos Davids y EmbeddingGemma, `/health` del duelo, `/api/config` de la vista del presentador, banco de términos, léxico, set de prueba y ficha de entrenamiento de David, 10 GB libres en disco, la página de comparación y cada ejemplo traducido en vivo por los dos (David acierta la jerga y Goliath no), app del público con 200, `min-instances` ≥ 1 y el mismo `EVENT_ID`, Gemini (una llamada mínima) y Firestore del evento. Una línea `[ok]` o `[FALLA]` por revisión, con el arreglo; el código de salida es el número de fallas. |
 | `make test` | Pruebas de Python (`MOCK_AI=1`), Vitest, `tsc`, ESLint y, con JDK 21, las reglas de Firestore en el emulador. |
 | `make eval` | Pasa el set de prueba por los modelos base, cada David y Goliath (con y sin glosario) y escribe `evals/report.md`. Acepta `EVAL_ARGS="--limit 50 --no-goliath"`. |
 | `make eval-dev` | Pasa el set de desarrollo (decisiones de datos, ablaciones) y escribe `evals/report_dev.md`: `make eval-dev [EVAL_ARGS="--nbest 4"]`. |
@@ -38,14 +38,14 @@ Requisitos (versiones en [ONBOARDING.md](ONBOARDING.md)): macOS con Apple Silico
 ```bash
 cp .env.example .env                                  # modelos, precios y rutas
 (cd duel && uv sync)                                  # servicio del duelo (Python 3.12)
-(cd web && npm install && cp .env.example .env.local) # vista del presentador y app del público
+(cd web && npm install && cp .env.example .env.local) # vista del presentador, app del público y capturas
 gcloud auth application-default login                 # Goliath (Vertex AI) y descarga de modelos
 
 ollama pull embeddinggemma                            # recuperación del léxico
 make pull-model TAG=genlingo-2026-10c-e2b-nomulti     # David de escena (Q5_K_M, 3.62 GB)
-make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # David anterior (tecla M)
+make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # David anterior (make up y make preflight lo esperan)
 
-make up       # Ollama + David precalentado + duelo (:8787) + vista del presentador (:3000/presenter)
+make up       # Ollama + David precalentado + servicio (:8787); abre la página de comparación
 ```
 
 Ensayo sin red ni GPU: pon `MOCK_AI=1` en `.env` y corre `make up` (modelos simulados y deterministas).
@@ -54,10 +54,9 @@ Ensayo sin red ni GPU: pon `MOCK_AI=1` en `.env` y corre `make up` (modelos simu
 
 ```bash
 make up                                          # terminal 1: se queda corriendo
-make stage-on && make warmup && make preflight   # terminal 2: app tibia, modelos cargados, todo en [ok]
-make reset                                       # marcador en cero
+make stage-on && make warmup && make preflight   # terminal 2: modelos cargados, ejemplos verificados, todo en [ok]
 # … la charla …
 make stage-off                                   # después: la app del público vuelve a escalar a cero
 ```
 
-El guion de la demo en escena (la página para traducir: cómo abrirla, qué ejemplos tocar, qué decir y qué hacer si algo falla) está en [DEMO.md](DEMO.md).
+El guion de la demo (la página de comparación: cómo abrirla, qué ejemplos tocar, qué decir y qué hacer si algo falla) está en [DEMO.md](DEMO.md).

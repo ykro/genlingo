@@ -108,8 +108,8 @@ sola vez. Contra Goliath sin glosario, como en escena, con IC 95 % por bootstrap
 
 **Decisión:** `genlingo-2026-10c-e2b-nomulti` pasa a escena (`LOCAL_MODEL_TAG`). Es el mejor de la ronda 3 en
 dev dentro del presupuesto de p50 < 1 s, y la prueba lo confirma contra 10b en chrF++ y jerga correcta, con el
-mismo tamaño (3.62 GB). `genlingo-2026-10b-e2b` queda en `DAVID_TAGS` para comparar rondas; el David anterior
-de la tecla `M` (`DAVID_PREVIOUS_TAG`) sigue siendo `genlingo-2026-10-e2b-q5_k_m`.
+mismo tamaño (3.62 GB). `genlingo-2026-10b-e2b` quedó en `DAVID_TAGS` para comparar rondas, y el David anterior
+(`DAVID_PREVIOUS_TAG`) siguió siendo `genlingo-2026-10-e2b-q5_k_m`.
 
 ## Dónde gana David hoy, y dónde no
 
@@ -152,3 +152,14 @@ inferencia de David cuesta $0; Goliath, $1.13 por 1,000 frases con la tarifa de 
   el p50 llegó a 4.40 s.
 - Ya hecho en la ronda 3: el set de desarrollo propio (las decisiones de datos ya no miran el set de prueba)
   y los pares con varios términos a la vez (no ayudaron: quedaron fuera).
+
+## 6 · La demo pasa a ser la página de comparación (2026-10-06)
+
+La demo de la charla dejó las rondas, el marcador, los votos del público y la tecla `M`. Ahora es una sola
+página, `/traducir`, donde David y Goliath traducen la misma frase lado a lado con su tiempo y su costo. Los
+ejemplos son jerga chapina del set de prueba: se probaron en vivo las 51 frases chapinas cortas que la revisión
+término por término puede juzgar, 3 veces con cada modelo, y quedaron 4, las que David tradujo bien y Goliath
+mal las 3 veces. Se descartaron las frases donde Goliath acertó alguna vez o dijo algo razonable con otras
+palabras («échale un ojo» por «chotea», «qué tufo» por «chish», «emocionado» por «engasado»): la revisión las
+marcaba mal y la página habría dicho algo falso. La vista del presentador y la app del público siguen en el
+repositorio, pero la charla no las usa.

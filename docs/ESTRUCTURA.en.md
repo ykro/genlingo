@@ -14,11 +14,11 @@ The monthly cycle, from data to stage and back:
 
 ## Screens
 
-![Presenter view: evaluation round, David and Goliath translate the same phrase](demo/02-ronda-evaluacion.png)
+![The comparison page: David and Goliath translate the same phrase from Gen Z to parents](demo/10-comparar-genz-a-papas.png)
 
-![Audience app on a phone: phrase sent and vote cast](demo/06-publico-telefono.png)
+![No internet: Goliath says «Sin conexión» and David keeps translating](demo/12-sin-internet.png)
 
-The talk demo, the page where David translates, in [DEMO.en.md](DEMO.en.md).
+The talk demo is that page (`/traducir`); the script is in [DEMO.en.md](DEMO.en.md). The repo also has a presenter view (`/presenter`) and an audience app with votes, from an earlier version of the demo; they still work, but the talk doesn't use them.
 
 ## Repo map
 
@@ -26,17 +26,17 @@ The talk demo, the page where David translates, in [DEMO.en.md](DEMO.en.md).
 duel/                 Duel service (FastAPI) — runs on the laptop
   duel_core/          Reusable core: parallel duel, Ollama/Gemini/mock clients,
                       connectivity, cost with dated prices, chrF++, percentiles
-  genlingo_duel/      The app: prompts, glossary, term bank, arena, scoreboard (SQLite),
-                      Firestore bridge (audience_feed.py), API (main.py), the translation page
-                      (translate_page.py, static/traducir.html)
+  genlingo_duel/      The app: prompts, glossary, term bank, arena, API (main.py), the comparison
+                      page (translate_page.py, term_check.py, static/traducir.html), scoreboard
+                      (SQLite) and Firestore bridge (audience_feed.py) of the earlier view
   tests/              Service tests (MOCK_AI=1)
 web/                  Next.js: audience app (/), moderation (/admin), presenter view (/presenter)
   app/api/            Audience routes (phrases, pairs, votes, config) and admin routes
   lib/server/         Auth + App Check, 20 s limit, blocklist, validation, Firestore
-  e2e/                Rehearsals with Playwright and with the Android emulator
+  e2e/                Playwright rehearsals, script screenshots (demo-shots.mjs) and Android emulator
   firestore.rules     No client writes directly; everything goes through the API
 data/                 terms.jsonl, raw/web_usage.jsonl, pairs/, review/, SOURCES.md, DATASHEET.md,
-                      translate_examples.json (the /traducir examples, verified)
+                      translate_examples.json (the /traducir examples, verified live)
 scripts/              Data building, review, export, reset, make up, warmup, preflight
 train/                train_lora.py, finish.py, submit_job.py, finish_local.py, train_local.py, notebook, runs/
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/

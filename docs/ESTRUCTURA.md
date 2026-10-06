@@ -14,11 +14,11 @@ El ciclo de cada mes, de los datos al escenario y de vuelta:
 
 ## Pantallas
 
-![Vista del presentador: ronda de evaluación, David y Goliath traducen la misma frase](demo/02-ronda-evaluacion.png)
+![La página de comparación: David y Goliath traducen la misma frase de Gen Z a papás](demo/10-comparar-genz-a-papas.png)
 
-![App del público en un teléfono: frase enviada y voto](demo/06-publico-telefono.png)
+![Sin internet: Goliath dice «Sin conexión» y David sigue traduciendo](demo/12-sin-internet.png)
 
-La demo de la charla, la página para traducir con David, en [DEMO.md](DEMO.md).
+La demo de la charla es esa página (`/traducir`); el guion está en [DEMO.md](DEMO.md). El repositorio también tiene una vista del presentador (`/presenter`) y una app del público con votos, de una versión anterior de la demo; siguen funcionando, pero la charla no las usa.
 
 ## Mapa del repositorio
 
@@ -26,17 +26,17 @@ La demo de la charla, la página para traducir con David, en [DEMO.md](DEMO.md).
 duel/                 Servicio del duelo (FastAPI) — corre en la laptop
   duel_core/          Núcleo reutilizable: duelo en paralelo, clientes Ollama/Gemini/mock,
                       conectividad, costo con tarifas fechadas, chrF++, percentiles
-  genlingo_duel/      La app: prompts, glosario, banco de términos, arena, marcador (SQLite),
-                      puente con Firestore (audience_feed.py), API (main.py), la página para
-                      traducir (translate_page.py, static/traducir.html)
+  genlingo_duel/      La app: prompts, glosario, banco de términos, arena, API (main.py), la página
+                      de comparación (translate_page.py, term_check.py, static/traducir.html),
+                      marcador (SQLite) y puente con Firestore (audience_feed.py) de la vista anterior
   tests/              Pruebas del servicio (MOCK_AI=1)
 web/                  Next.js: app del público (/), moderación (/admin), vista del presentador (/presenter)
   app/api/            Rutas del público (frases, pares, votos, config) y de admin
   lib/server/         Auth + App Check, límite de 20 s, blocklist, validación, Firestore
-  e2e/                Ensayos con Playwright y con el emulador de Android
+  e2e/                Ensayos con Playwright, capturas del guion (demo-shots.mjs) y emulador de Android
   firestore.rules     Ningún cliente escribe directo; todo pasa por la API
 data/                 terms.jsonl, raw/web_usage.jsonl, pairs/, review/, SOURCES.md, DATASHEET.md,
-                      translate_examples.json (los ejemplos de /traducir, verificados)
+                      translate_examples.json (los ejemplos de /traducir, verificados en vivo)
 scripts/              Construcción de datos, revisión, export, reset, make up, warmup, preflight
 train/                train_lora.py, finish.py, submit_job.py, finish_local.py, train_local.py, notebook, runs/
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/

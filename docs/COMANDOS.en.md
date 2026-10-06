@@ -5,12 +5,12 @@ Every `Makefile` command. `make help` lists them with their description. Back to
 | Command | What it does |
 | --- | --- |
 | `make help` | Lists the commands with their description. |
-| `make up` | Starts Ollama (with `OLLAMA_MAX_LOADED_MODELS=4`), preloads the three stage models (David, the previous David, EmbeddingGemma), brings up the duel service and the presenter view (rebuilt if its code changed). Works with Wi-Fi off and without an audience. |
-| `make reset` | Zeroes local rounds, votes, queue and scoreboard; with `AUDIENCE_FEED=1`, also deletes the event's rounds in Firestore (up to 3 attempts). If Firestore fails (e.g. offline), it says so with the cause and exits with an error; the local scoreboard is zeroed anyway. |
-| `make stage-on` | Talk day: `min-instances=1` on the audience app (`infra/60-stage.sh on`), so the QR code doesn't wait for a cold start. Prints the value Cloud Run now shows. |
+| `make up` | Starts Ollama (with `OLLAMA_MAX_LOADED_MODELS=4`), preloads David, the previous David (`DAVID_PREVIOUS_TAG`) and EmbeddingGemma, brings up the duel service (`:8787`, which serves the comparison page `/traducir`) and the presenter view (`:3000`, rebuilt if its code changed), and opens the comparison page. Works with Wi-Fi off. |
+| `make reset` | Zeroes the duel service's history (rounds, votes, queue and scoreboard; the comparison page doesn't use them); with `AUDIENCE_FEED=1`, also deletes the event's rounds in Firestore (up to 3 attempts). If Firestore fails (e.g. offline), it says so with the cause and exits with an error; the local scoreboard is zeroed anyway. |
+| `make stage-on` | `min-instances=1` on the audience app on Cloud Run (`infra/60-stage.sh on`). The demo doesn't use it, but `make preflight` checks it is warm. Prints the value Cloud Run now shows. |
 | `make stage-off` | After the talk: `min-instances=0` (scales to zero, nothing bills at rest). |
-| `make warmup` | Wakes the audience app (200 on `/` and `/api/config`), loads both Davids and EmbeddingGemma in Ollama, and makes one David call and one Goliath call: through the duel service if it is running (`POST /warmup`, not recorded as a round), otherwise directly. |
-| `make preflight` | Pre-stage check: Ollama with both Davids and EmbeddingGemma, the duel's `/health`, the presenter view's `/api/config`, term bank, lexicon, test set and David's run file, 10 GB free disk, audience app answering 200 with `min-instances` ≥ 1 and the same `EVENT_ID`, Gemini (one tiny call) and the event's Firestore. One `[ok]` or `[FALLA]` line per check, with the fix; the exit code is the number of failures. |
+| `make warmup` | Wakes the audience app (200 on `/` and `/api/config`), loads both Davids and EmbeddingGemma in Ollama, and makes one David call and one Goliath call: through the service if it is running (`POST /warmup`, not recorded), otherwise directly. |
+| `make preflight` | Pre-stage check: Ollama with both Davids and EmbeddingGemma, the duel's `/health`, the presenter view's `/api/config`, term bank, lexicon, test set and David's run file, 10 GB free disk, the comparison page and every example translated live by both (David gets the slang right and Goliath doesn't), audience app answering 200 with `min-instances` ≥ 1 and the same `EVENT_ID`, Gemini (one tiny call) and the event's Firestore. One `[ok]` or `[FALLA]` line per check, with the fix; the exit code is the number of failures. |
 | `make test` | Python tests (`MOCK_AI=1`), Vitest, `tsc`, ESLint and, with JDK 21, the Firestore rules on the emulator. |
 | `make eval` | Runs the test set through the base models, every David and Goliath (with and without glossary) and writes `evals/report.md`. Accepts `EVAL_ARGS="--limit 50 --no-goliath"`. |
 | `make eval-dev` | Runs the dev set (data decisions, ablations) and writes `evals/report_dev.md`: `make eval-dev [EVAL_ARGS="--nbest 4"]`. |
@@ -38,14 +38,14 @@ Requirements (versions in [ONBOARDING.md](ONBOARDING.md), Spanish): macOS on App
 ```bash
 cp .env.example .env                                  # models, prices and paths
 (cd duel && uv sync)                                  # duel service (Python 3.12)
-(cd web && npm install && cp .env.example .env.local) # presenter view and audience app
+(cd web && npm install && cp .env.example .env.local) # presenter view, audience app and screenshots
 gcloud auth application-default login                 # Goliath (Vertex AI) and model downloads
 
 ollama pull embeddinggemma                            # lexicon retrieval
 make pull-model TAG=genlingo-2026-10c-e2b-nomulti     # on-stage David (Q5_K_M, 3.62 GB)
-make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # previous David (M key)
+make pull-model TAG=genlingo-2026-10-e2b-q5_k_m      # previous David (make up and make preflight expect it)
 
-make up       # Ollama + warmed-up David + duel (:8787) + presenter view (:3000/presenter)
+make up       # Ollama + warmed-up David + service (:8787); opens the comparison page
 ```
 
 Rehearsal with no network or GPU: set `MOCK_AI=1` in `.env` and run `make up` (simulated, deterministic models).
@@ -54,10 +54,9 @@ Rehearsal with no network or GPU: set `MOCK_AI=1` in `.env` and run `make up` (s
 
 ```bash
 make up                                          # terminal 1: keeps running
-make stage-on && make warmup && make preflight   # terminal 2: warm app, models loaded, everything [ok]
-make reset                                       # scoreboard to zero
+make stage-on && make warmup && make preflight   # terminal 2: models loaded, examples verified, everything [ok]
 # … the talk …
 make stage-off                                   # afterwards: the audience app scales to zero again
 ```
 
-The on-stage demo script (the translation page: how to open it, which examples to tap, talking points and what to do if something fails) is in [DEMO.en.md](DEMO.en.md).
+The demo script (the comparison page: how to open it, which examples to tap, talking points and what to do if something fails) is in [DEMO.en.md](DEMO.en.md).

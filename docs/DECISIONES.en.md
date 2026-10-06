@@ -12,7 +12,7 @@ The result is mixed, and the talk tells it that way:
 - **Compression doesn't cost slang:** the on-stage David is the Q5_K_M (3.62 GB); with the round-2 David, the Q5_K_M landed one point from the f16 (9.27 GB) at the same latency.
 - **chrF++ barely tells anyone apart:** returning the phrase untranslated already scores **53.2**; David 59.7, Goliath 53.5, Goliath with glossary 57.0. That is why the term-level metrics exist.
 - **Retraining every month costs under $1, all in the cloud:** $0.97 end to end (L4 to train + CPU to merge and quantize).
-- **Big models age:** with the `M` key, the previous David (`genlingo-2026-10-e2b-q5_k_m`, from two rounds ago, 27% correct slang) faces the on-stage one (42%) live.
+- **Retraining on new data buys slang:** the David from two data rounds ago (`genlingo-2026-10-e2b-q5_k_m`) got 27% of the slang right; today's, 42%.
 
 The full story, iteration by iteration (dead ends included), is in [BITACORA.md](BITACORA.md) (Spanish); the niches where David is measured against Goliath, defined before looking at results, in [evals/niche.md](../evals/niche.md).
 
@@ -29,7 +29,8 @@ The full story, iteration by iteration (dead ends included), is in [BITACORA.md]
 | **LoRA on Cloud Run Jobs.** One image trains on an L4 (TRL + PEFT, r=32, alpha=16 with rsLoRA, lr 2e-4, 3 epochs) and, on a CPU job, merges, exports GGUF with llama.cpp and publishes an Ollama Modelfile. Every run records its duration and cost per stage in a file. | `train/train_lora.py`, `train/finish.py`, `train/submit_job.py`, `infra/03-train-job.sh`, `train/runs/` |
 | **The compression trade-off.** f16 vs Q4_K_M, Q5_K_M, Q6_K, Q8_0 and imatrix: size, latency and how much slang is lost. | `train/quant_sweep.py`, `train_lora.to_gguf`, [Quantization: why Q5_K_M](#quantization-why-q5_k_m) |
 | **Evals with term metrics.** chrF++ plus a "copy the phrase" baseline, *correct slang*, *slang handled* and *reference-change recall* against the bank; data decisions are made on a separate dev set and David's losses are published. No model judges another. | `evals/run_eval.py`, `evals/term_accuracy.py`, `evals/report.py` |
-| **Monthly retrain and `david_tag`.** Models carry the date of their data (`genlingo-YYYY-MM`, with a letter when a month has two data versions: `genlingo-2026-10b-e2b` is October's second research round and `genlingo-2026-10c-e2b-nomulti` the third, without the multi-term pairs); the duel accepts `david_tag` to pit the previous David (`DAVID_PREVIOUS_TAG`) against the on-stage one. | `Makefile` (`TAG`), `DuelRequest.david_tag` in `duel/genlingo_duel/main.py`, `M` key in `web/components/presenter/PresenterApp.tsx` |
+| **Monthly retrain.** Models carry the date of their data (`genlingo-YYYY-MM`, with a letter when a month has two data versions: `genlingo-2026-10b-e2b` is October's second research round and `genlingo-2026-10c-e2b-nomulti` the third, without the multi-term pairs); the demo uses the one in `LOCAL_MODEL_TAG`. | `Makefile` (`TAG`), `.env.example` (`LOCAL_MODEL_TAG`), `train/runs/` |
+| **Side-by-side comparison.** A local page where David and Goliath translate the same phrase with their time and cost, and a ✓/✗ check per term on the verified examples. | `duel/genlingo_duel/static/traducir.html`, `duel/genlingo_duel/translate_page.py`, `duel/genlingo_duel/term_check.py`, `data/translate_examples.json` |
 | **Offline by design.** The network check is a 0.8 s TCP connect; with no network, Goliath shows as "sin conexión" (offline) and David keeps going. The glossary is retrieved with a local EmbeddingGemma and cached embeddings. | `duel/duel_core/connectivity.py`, `duel/duel_core/duel.py`, `duel/genlingo_duel/glossary.py` |
 
 ## Decisions
@@ -40,15 +41,15 @@ The full story, iteration by iteration (dead ends included), is in [BITACORA.md]
 | --- | --- |
 | **David** (fine-tuned Gemma, Ollama) | It is the thesis: a small model runs on your laptop, without internet and with no per-phrase cost. The latency that matters is the stage hardware's (M1 Max 64 GB), not a server's. |
 | **EmbeddingGemma** (Ollama) | Retrieves the term-bank glossary with no network. The bank's embeddings are computed once and kept in `data/.cache/term_embeddings.json`. |
-| **Duel service** (FastAPI + SQLite) | It must work with Wi-Fi off and measure latency on the stage machine. The local SQLite scoreboard makes `make reset` take under a second. |
-| **Presenter view** (Next.js, local production build) | Offline mode: self-hosted fonts and a QR code generated in the browser, nothing is downloaded during the talk. |
+| **Duel service** (FastAPI) | It serves the comparison page and calls David and, with network, Goliath. It must work with Wi-Fi off and measure latency on the stage machine. |
+| **Comparison page** (HTML served by the duel service) | Self-hosted fonts served by the same service: nothing is downloaded during the talk. |
 
-When there is network, the duel also calls Goliath and, with `AUDIENCE_FEED=1`, receives approved phrases and publishes rounds to Firestore. With no network, all of that goes quiet and David keeps going.
+When there is network, the service also calls Goliath. With no network, Goliath says «Sin conexión» and David keeps going. The repo keeps the presenter view (Next.js, `/presenter`), with rounds and a SQLite scoreboard, from an earlier version of the demo; the talk doesn't use it.
 
 ### What runs in the cloud
 
-- **Audience app** on Cloud Run (`us-central1`, `min-instances=0` outside talks; on talk day `make stage-on` raises it to 1 so the QR code doesn't greet the room with a cold start, and `make stage-off` lowers it afterwards). Firebase anonymous Auth (no sign-up), App Check with reCAPTCHA Enterprise, one phrase every 20 s enforced in a server-side transaction, a blocklist and presenter moderation in `/admin`.
-- **Firestore**, database `genlingo`: phrases, rounds, votes (one per person) and audience pairs. The rules deny every client write; the `genlingo-web` service account can only touch that database (IAM condition).
+- **Audience app** on Cloud Run, from an earlier version of the demo (phrases and votes from phones); the talk doesn't use it, it stays deployed and `make preflight` checks it (`us-central1`, `min-instances=0` outside talks; `make stage-on` raises it to 1 and `make stage-off` lowers it). Firebase anonymous Auth (no sign-up), App Check with reCAPTCHA Enterprise, one phrase every 20 s enforced in a server-side transaction, a blocklist and moderation in `/admin`.
+- **Firestore**, database `genlingo`, for that same app: phrases, rounds, votes (one per person) and audience pairs. The rules deny every client write; the `genlingo-web` service account can only touch that database (IAM condition).
 - **Goliath**: Gemini on Vertex AI with ADC, `GOOGLE_CLOUD_LOCATION=global`, thinking level `low`.
 - **Training**: two Cloud Run Jobs in `europe-west4` (L4 to train, CPU to merge and convert to GGUF); image built with Cloud Build into Artifact Registry `charlas2027`.
 
@@ -105,19 +106,18 @@ A reference written by Gemini would reward Goliath for sounding like itself. The
 
 ### Dated Gemini price schedule
 
-Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` is a list of prices by date: every round and every eval uses the price in force that day and records which one it used. The report also shows what the same eval would cost at the 2027 price ($2.26 per 1,000 phrases instead of $1.13). Thinking tokens are billed as output. David's inference costs $0; the presenter view shows his training cost amortized per round. Exports of one training run (`-f16`, `-q5_k_m`) share its `train/runs/<tag>.json`.
+Prices change, and that is part of the story. `GEMINI_PRICE_SCHEDULE=2026-09-30:0.75/3.75,2027-01-01:1.50/7.50` is a list of prices by date: every translation and every eval uses the price in force that day and records which one it used. The report also shows what the same eval would cost at the 2027 price ($2.26 per 1,000 phrases instead of $1.13). Thinking tokens are billed as output. The comparison page shows the real cost of each Goliath translation; David's costs $0. Exports of one training run (`-f16`, `-q5_k_m`) share its `train/runs/<tag>.json`.
 
 ### App Check enforcement is project-wide
 
 `infra/06-app-check.sh` registers reCAPTCHA Enterprise as the App Check provider and, with `ENFORCE_FIRESTORE=1`, enforces App Check on Cloud Firestore. That enforcement is **per project**: App Check has no per-database policy, so any web or mobile client of any database in `ai-experiments-487722` will have to send App Check tokens. Server code (Admin SDK, IAM) is not affected. The API routes enforce it on their own with `APP_CHECK_ENFORCE=1`, which `infra/05-deploy-web.sh` turns on when `RECAPTCHA_SITE_KEY` is set. Automated tests and the emulator use a registered debug token.
 
-### Who wins a round
+### How the page compares
 
-- **Evaluation round** (test-set phrase, `E` key): the higher chrF++ wins; gaps under 0.5 are a draw. It uses `auto_validated` pairs (or ones a person approved), ready with no human review.
-- **Specialty round: chapín slang** (`G` key): the same, but with the next Guatemalan test phrase in a fixed seeded order (`SPECIALTY_SEED`), the «slang chapín» niche of [evals/niche.md](../evals/niche.md). Nobody picks the phrase. The stage's default country is `GT`.
-- **Live phrase** (typed with `/`) or **audience phrase** (from a phone): with the audience app connected (`AUDIENCE_FEED=1`) the vote decides (`V` closes voting); without an audience the round shows both translations with no winner. The whole talk works without an audience: `E` rounds and typed phrases.
-- Audience phrases that pass the blocklist go straight to the screen queue (`AUTO_APPROVE_PHRASES=1`, the default); with `0` the presenter approves them in `/admin`.
-- If Goliath has no network or fails, David wins by showing up.
+- **Side by side, no winner.** Both get the same phrase at the same time (`POST /translate/david` and `/translate/goliath`); each column fills when it answers and shows its time and real cost. No rounds, scoreboard or votes. Goliath gets the country prompt, without David's glossary, as anyone would use it.
+- **The term-by-term check** (`duel/genlingo_duel/term_check.py`) uses the eval's *correct slang* rules, one term at a time. Gen Z → parents: the Gen Z term is gone and its meaning (or its counterpart, or the word the human reference used) is in the translation. Parents → Gen Z: the parents' term was replaced by its validated Gen Z counterpart or an equivalent. It only shows for examples, which carry their reference.
+- **The examples** (`data/translate_examples.json`) are Guatemalan phrases from the test set. The 51 the check can judge were run live, 3 times with each model; the ones kept are those David got right and Goliath wrong all 3 times, where a person sees the same as the check. `make preflight` translates them again with both before each talk.
+- With no network, Goliath's column says «Sin conexión» and David translates anyway.
 
 ## Results
 
@@ -131,7 +131,7 @@ Eval of 2026-10-04 on 399 `auto_validated` web test pairs (out of 522 candidates
 | `gemma4:e4b` (base) | 19% | 68% | 97% | 31% | 17% | 48.2 | 802 ms | $0 | 6.58 GB |
 | `genlingo-2026-09` (Q4, plain prompt) | 18% | 62% | 94% | 20% | 14% | 55.0 | 391 ms | $0 | 3.42 GB |
 | `genlingo-2026-10-e2b` + glossary (Q4) | 25% | 67% | 95% | 31% | 16% | 55.7 | 512 ms | $0 | 3.42 GB |
-| `genlingo-2026-10-e2b-q5_k_m` + glossary (`M` key) | 27% | 74% | 97% | 43% | 18% | 55.4 | 564 ms | $0 | 3.62 GB |
+| `genlingo-2026-10-e2b-q5_k_m` + glossary (previous David) | 27% | 74% | 97% | 43% | 18% | 55.4 | 564 ms | $0 | 3.62 GB |
 | `genlingo-2026-10-e2b-f16` + glossary | 28% | 74% | 99% | 42% | 19% | 56.3 | 566 ms | $0 | 9.27 GB |
 | `genlingo-2026-10b-e2b` + glossary (Q5_K_M, round 2) | 34% | 82% | 99% | 59% | 22% | 56.6 | 557 ms | $0 | 3.62 GB |
 | `genlingo-2026-10b-e2b-f16` + glossary | 34% | 81% | 98% | 59% | 22% | 56.7 | 543 ms | $0 | 9.27 GB |
@@ -143,10 +143,10 @@ Eval of 2026-10-04 on 399 `auto_validated` web test pairs (out of 522 candidates
 
 David's ten worst losses and the per-country and per-direction breakdowns are in [evals/report.md](../evals/report.md). The first version of the data (free paraphrase) left David *below* the base model (chrF++ 39.1): it is documented in [evals/experiments/2026-09-parafrasis-libres.md](../evals/experiments/2026-09-parafrasis-libres.md).
 
-| `M` key: the previous David | Wi-Fi off |
+| Parents → Gen Z | Wi-Fi off |
 | --- | --- |
-| ![The previous David (M key)](demo/08-david-anterior.png) | ![No internet: Goliath offline, David keeps going](demo/09-sin-internet.png) |
-| `M` key: the previous David (`genlingo-2026-10-e2b-q5_k_m`) against Goliath on the same phrase ("no manches, la peli estuvo bien mid y me dio cringe"); the scoreboard counts only his rounds. | No network: Goliath shows as "sin conexión" (offline) and the on-stage David answers in 0.85 s ("ese bolo anda chupando desde la tarde…" → "Ese muchacho anda borrachísimo desde la tarde…", that guy has been very drunk since the afternoon). |
+| ![The comparison page with «Voy a comprar algo de refacción para media mañana»](demo/11-comparar-papas-a-genz.png) | ![No internet: Goliath offline, David keeps going](demo/12-sin-internet.png) |
+| David says «refa», as Gen Z says it in Guatemala, and gets the term right; Goliath writes «munchies para el bajón» and doesn't. | No network: Goliath says «Sin conexión» and David translates «pajas» as «mentís» (you lie). |
 
 ## Training cost per run
 

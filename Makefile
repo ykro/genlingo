@@ -15,15 +15,15 @@ JAVA21    := $(shell brew --prefix openjdk@21 2>/dev/null)/libexec/openjdk.jdk/C
 help:
 	@grep -hE '^[a-z-]+:.*## ' Makefile | awk -F':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
 
-up: ## Start Ollama + warm David + duel service + presenter view (works with Wi-Fi off)
+up: ## Start Ollama + warm David + duel service (comparison page /traducir) + presenter view; opens the page (works with Wi-Fi off)
 	@scripts/up.sh
 
-reset: ## Clear rounds, votes and scoreboard (local + this event's Firestore rounds; says so if Firestore fails)
+reset: ## Clear the duel service's rounds, votes and scoreboard (the comparison page doesn't use them; also this event's Firestore rounds)
 	@$(UV) python scripts/reset.py
 
 # Talk day, in a second terminal while `make up` runs: make stage-on && make warmup && make preflight.
 # After the talk: make stage-off (nothing bills 24/7).
-stage-on: ## Talk day: min-instances=1 on the audience app (no cold start when the room scans the QR)
+stage-on: ## Talk day: min-instances=1 on the audience app (not used by the demo; make preflight checks it is warm)
 	@./infra/60-stage.sh on
 
 stage-off: ## After the talk: min-instances=0 on the audience app (scales to zero, nothing bills at rest)
@@ -32,7 +32,7 @@ stage-off: ## After the talk: min-instances=0 on the audience app (scales to zer
 warmup: ## Wake the audience app, preload the stage models, one David + one Goliath call (not recorded)
 	@$(UV) python scripts/warmup.py
 
-preflight: ## Talk-day gate: Ollama + models, duel, presenter, data, disk, audience app warm, Gemini, Firestore
+preflight: ## Talk-day gate: Ollama + models, duel, presenter, data, disk, comparison page + each example live on both sides, audience app warm, Gemini, Firestore
 	@$(UV) python scripts/preflight.py
 
 test: ## Run all tests (no network: MOCK_AI in tests). SKIP_WEB=1 / SKIP_RULES=1 skip a suite on purpose
