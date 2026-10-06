@@ -1,0 +1,5 @@
+# Cloud Build recipe for the comparison page (infra/05-page.sh): built from the repo root with duel/Dockerfile.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: [build, -t, "${_IMAGE}", -f, duel/Dockerfile, .]
+images: ["${_IMAGE}"]

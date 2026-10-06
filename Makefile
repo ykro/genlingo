@@ -1,55 +1,34 @@
-# Genlingo — David (small local Gemma) vs. Goliath (Gemini). See README.md.
+# Genlingo — David (fine-tuned Gemma on a Cloud Run GPU) vs. Goliath (Gemini). See README.md.
 -include .env
 export
 
 UV      := uv run --project duel
 TAG     ?= genlingo-$(shell date +%Y-%m)
-DUEL_PORT ?= 8787
-DUEL_URL  := http://127.0.0.1:$(DUEL_PORT)
-# JDK 21 for the Firestore emulator (rules tests), only inside make: brew install openjdk@21
-JAVA21    := $(shell brew --prefix openjdk@21 2>/dev/null)/libexec/openjdk.jdk/Contents/Home
 
-.PHONY: help up reset test eval eval-dev niches counterparts train train-local train-finish train-data quant-sweep pull-model export \
-        test-set real-pairs ambiguous-terms pairs datasheet data deploy stage-on stage-off warmup preflight
+.PHONY: help deploy check screenshots test eval eval-dev niches counterparts train train-data \
+        test-set real-pairs ambiguous-terms pairs datasheet data
 
 help:
-	@grep -hE '^[a-z-]+:.*## ' Makefile | awk -F':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
+	@grep -hE '^[a-z-]+:.*## ' Makefile | awk -F':.*## ' '{printf "  make %-16s %s\n", $$1, $$2}'
 
-up: ## Start Ollama + warm David + duel service (comparison page /traducir) + presenter view; opens the page (works with Wi-Fi off)
-	@scripts/up.sh
+deploy: ## Deploy David (Cloud Run GPU, europe-west4) and the comparison page (public Cloud Run URL)
+	bash infra/04-david.sh
+	bash infra/05-page.sh
 
-reset: ## Clear the duel service's rounds, votes and scoreboard (the comparison page doesn't use them; also this event's Firestore rounds)
-	@$(UV) python scripts/reset.py
+check: ## Check the live page end to end: wakes David, translates every example on both sides
+	$(UV) python scripts/check_page.py
 
-# Talk day, in a second terminal while `make up` runs: make stage-on && make warmup && make preflight.
-# After the talk: make stage-off (nothing bills 24/7).
-stage-on: ## Talk day: min-instances=1 on the audience app (not used by the demo; make preflight checks it is warm)
-	@./infra/60-stage.sh on
+screenshots: ## Screenshots of the live page for docs/demo/ (real browser, light theme)
+	uv run --project duel --with playwright python scripts/screenshots.py
 
-stage-off: ## After the talk: min-instances=0 on the audience app (scales to zero, nothing bills at rest)
-	@./infra/60-stage.sh off
-
-warmup: ## Wake the audience app, preload the stage models, one David + one Goliath call (not recorded)
-	@$(UV) python scripts/warmup.py
-
-preflight: ## Talk-day gate: Ollama + models, duel, presenter, data, disk, comparison page + each example live on both sides, audience app warm, Gemini, Firestore
-	@$(UV) python scripts/preflight.py
-
-test: ## Run all tests (no network: MOCK_AI in tests). SKIP_WEB=1 / SKIP_RULES=1 skip a suite on purpose
+test: ## Run all tests (no network: MOCK_AI in tests)
 	cd duel && MOCK_AI=1 uv run pytest -q
-	@if [ -d web/node_modules ]; then cd web && npm test --silent && npx tsc --noEmit && npx eslint . ; \
-	elif [ "$(SKIP_WEB)" = 1 ]; then echo "!! SKIP_WEB=1: web tests NOT run"; \
-	else echo "!! web tests can't run: (cd web && npm install), or SKIP_WEB=1 to skip them on purpose" >&2; exit 1; fi
-	@if [ -x "$(JAVA21)/bin/java" ] && [ -d web/node_modules ]; then \
-	  cd web && JAVA_HOME="$(JAVA21)" PATH="$(JAVA21)/bin:$$PATH" npm run --silent test:rules; \
-	elif [ "$(SKIP_RULES)" = 1 ] || [ "$(SKIP_WEB)" = 1 ]; then echo "!! Firestore rules tests NOT run"; \
-	else echo "!! Firestore rules tests can't run: brew install openjdk@21, or SKIP_RULES=1 to skip them on purpose" >&2; exit 1; fi
 
-eval: ## Test set through base models, David and Goliath -> evals/report.md (once per data round)
-	$(UV) python evals/run_eval.py $(EVAL_ARGS)
+eval: ## Test set through base models, every David and Goliath, in a Cloud Run GPU job -> evals/report.md (once per data round)
+	bash infra/06-eval-job.sh $(EVAL_ARGS)
 
-eval-dev: ## Dev set (data decisions, ablations) -> evals/report_dev.md: make eval-dev [EVAL_ARGS="--nbest 4"]
-	$(UV) python evals/run_eval.py --split dev $(EVAL_ARGS)
+eval-dev: ## Dev set (data decisions, ablations), same job -> evals/report_dev.md: make eval-dev [EVAL_ARGS="--nbest 4"]
+	bash infra/06-eval-job.sh --split dev $(EVAL_ARGS)
 
 niches: ## Pre-registered niches (evals/niche.md) from the latest test eval -> evals/niche_report.md
 	$(UV) python evals/niche_report.py
@@ -77,10 +56,6 @@ datasheet: ## Recount data/DATASHEET.md
 
 data: test-set real-pairs pairs datasheet ## Rebuild all data (test set, real-anchored pairs, synthetic pairs, datasheet)
 
-export: ## Pull presenter-approved audience pairs from Firestore into data/pairs/human.jsonl
-	$(UV) python scripts/export_human.py
-	$(UV) python scripts/datasheet.py
-
 # Stage recipe (genlingo-2026-10c-e2b-nomulti): no multi-term pairs, no ORPO stage. Both were tried
 # and left out (no gain on the dev set); MULTI=1 / ORPO=1 bring them back for an ablation.
 TRAIN_EXCLUDE := $(if $(filter 1,$(MULTI)),,--exclude synthetic_multi)
@@ -92,21 +67,3 @@ train-data: ## Render training pairs into chat JSONL with the lexicon glossary (
 train: train-data ## Fine-tune in the cloud (L4 job trains, CPU job merges + GGUF): make train [TAG=genlingo-YYYY-MM, default today] [QUANT=Q5_K_M] [TRAIN_ARGS=…]
 	$(UV) python train/submit_job.py --app genlingo --tag $(TAG) --data data/train/chat.jsonl \
 	  $(if $(filter 1,$(ORPO)),--pref data/train/pref.jsonl) -- $(TRAIN_ARGS)
-
-train-local: train-data ## Same training on this Mac (MPS), for experiments
-	uv run --python 3.12 --with-requirements train/requirements.txt --with torch==2.14.0 \
-	  python train/train_local.py $(TAG) data/train/chat.jsonl
-
-train-finish: ## Fallback: merge + GGUF a cloud-trained adapter on this Mac: same TAG as make train [QUANT=Q5_K_M] [KEEP_F16=1]
-	uv run --python 3.12 --with-requirements train/requirements.txt --with torch==2.14.0 \
-	  python train/finish_local.py $(TAG)
-
-quant-sweep: ## Q5/Q6/Q8 + imatrix-calibrated Q4/Q5 from a David's f16 GGUF, registered in Ollama
-	train/setup_llama_cpp.sh >/dev/null && uv run --project duel python train/quant_sweep.py $(TAG)
-
-pull-model: ## Download a trained David into Ollama: make pull-model TAG=genlingo-2026-10c-e2b-nomulti [FP16=1]
-	MODELS_BUCKET=$(MODELS_BUCKET) train/pull_model.sh $(TAG)
-
-deploy: ## Deploy the audience web app to Cloud Run (min-instances=0; make stage-on warms it on talk days)
-	bash infra/04-web-service-account.sh
-	bash infra/05-deploy-web.sh

@@ -1,4 +1,4 @@
-"""Pre-registered niches (evals/niche.md): the stage David against Goliath, with bootstrap CIs.
+"""Pre-registered niches (evals/niche.md): the page's David against Goliath, with bootstrap CIs.
 
     uv run --project duel python evals/niche_report.py [evals/results/<run>.json]
 
@@ -140,7 +140,7 @@ def main() -> None:
         f"pareado de la diferencia ({RESAMPLES:,} remuestreos, semilla {SEED}). «Victorias de David»: frases donde solo "
         "David resuelve la jerga, sobre las frases donde la resuelve exactamente uno (entre paréntesis, solo David – solo el rival).",
         "",
-        f"David: `{david}`. Rival del nicho: `{goliath}` (como en escena, sin glosario).",
+        f"David: `{david}`. Rival del nicho: `{goliath}` (como en la página, sin glosario).",
         "",
     ]
     summary = {}

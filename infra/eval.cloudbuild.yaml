@@ -1,0 +1,7 @@
+# Cloud Build recipe for the eval job image (infra/06-eval-job.sh), built from the repo root.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: [build, -t, "${_IMAGE}", -f, evals/Dockerfile, .]
+images: ["${_IMAGE}"]
+options:
+  machineType: E2_HIGHCPU_8

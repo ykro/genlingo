@@ -73,7 +73,7 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 (`pending_review` | `auto_validated` | `approved` | `rejected`), `origin` (`web` | `synthetic` | `human`) and
 `provenance`.
 
-- `age_range` is the age range of the Gen Z side (16-24 by default; audience pairs carry the
+- `age_range` is the age range of the Gen Z side (16-24 by default; human pairs would carry the
   contributor's self-reported range). Web pairs also record `speaker_age_range` of the source
   sentence in their provenance.
 
@@ -158,13 +158,13 @@ count ambiguous terms, not a source of terms or sentences).
    `scripts/flag_ambiguous_terms.py` counts their matches in ~39k sentences of general speech
    (transcripts; only counts are kept, no text) and marks the ones with ≥ 15 matches
    `ambiguous: true`; metrics and test validation ignore them, the glossary still explains them.
-8. **Audience pairs** (`origin=human`). Submitted from the audience app (an earlier version of the
-   demo; the current talk doesn't use it), approved in `/admin`, pulled with `make export`. 20% go to the test split (stable
-   hash of the id).
+8. **Human pairs** (`origin=human`). The schema accepts them (an earlier version of the demo had an
+   audience app that sent them); there are none in the data today. They would go 20% to the test split
+   (stable hash of the id).
 
 ## Uses
 
-Training David (`split=train`, status `auto_validated` or `approved`), duel evaluation rounds and
+Training David (`split=train`, status `auto_validated` or `approved`), the page's examples and
 `make eval` (`split=test`, status `auto_validated`: validated automatically, no human needed).
 `pending_review` pairs are used only in rehearsal reports, labelled as such.
 

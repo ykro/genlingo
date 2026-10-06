@@ -1,8 +1,0 @@
-node_modules
-.next
-e2e/shots
-.env*
-!.env.example
-design
-tests
-*.tsbuildinfo

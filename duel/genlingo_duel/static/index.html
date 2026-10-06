@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Genlingo · David contra Goliath</title>
+<style>
+  @font-face { font-family: "Big Shoulders"; src: url("/fonts/BigShoulders-latin.woff2") format("woff2"); font-weight: 500 800; font-display: swap; }
+  @font-face { font-family: "Figtree"; src: url("/fonts/Figtree-latin.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+
+  :root {
+    color-scheme: light;
+    --paper: oklch(96.6% 0.012 85);
+    --card: oklch(99% 0.006 85);
+    --ink: oklch(21% 0.012 260);
+    --ink-2: oklch(42% 0.012 260);
+    --rule: oklch(88% 0.014 85);
+    --david: oklch(52% 0.17 38);
+    --david-ink: oklch(42% 0.15 38);
+    --david-wash: oklch(94.5% 0.03 45);
+    --goliath: oklch(47% 0.19 265);
+    --goliath-ink: oklch(40% 0.17 265);
+    --goliath-wash: oklch(95% 0.022 265);
+    --ok: oklch(46% 0.13 150);
+    --ok-wash: oklch(94% 0.045 150);
+    --bad: oklch(49% 0.17 25);
+    --bad-wash: oklch(94.5% 0.035 25);
+    --wait: oklch(70% 0.15 75);
+    --display: "Big Shoulders", "Arial Narrow", sans-serif;
+    --body: "Figtree", ui-sans-serif, system-ui, sans-serif;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --step-0: clamp(1rem, 0.55rem + 0.9vw, 1.375rem);
+    --step-1: clamp(1.15rem, 0.6rem + 1.1vw, 1.65rem);
+    --step-2: clamp(1.5rem, 0.7rem + 1.7vw, 2.4rem);
+    --step-3: clamp(1.7rem, 0.4rem + 1.6vw + 1.6vh, 3.4rem);
+    --gutter: clamp(1rem, 0.4rem + 2vw, 3rem);
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--paper); }
+  body { margin: 0; min-height: 100vh; background: var(--paper); color: var(--ink); font: 400 var(--step-0)/1.45 var(--body); -webkit-font-smoothing: antialiased; }
+  button, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; border-radius: 6px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  main { max-width: 1680px; min-height: 100vh; margin: 0 auto; padding: clamp(0.9rem, 2vh, 2.25rem) var(--gutter) clamp(1rem, 2.5vh, 2.5rem); display: grid; grid-template-rows: auto auto auto auto 1fr; gap: clamp(0.75rem, 1.9vh, 1.6rem); }
+
+  /* ---- top line ---- */
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .brand { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; }
+  .brand h1 { margin: 0; font: 800 var(--step-3)/0.9 var(--display); letter-spacing: 0.01em; text-transform: uppercase; }
+  .brand h1 .d { color: var(--david); }
+  .brand h1 .g { color: var(--goliath); }
+  .brand h1 .vs { font-weight: 500; color: var(--ink-2); margin: 0 0.18em; }
+  .brand p { margin: 0; color: var(--ink-2); font-size: var(--step-0); }
+  .net { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.85rem; border-radius: 999px; background: var(--card); border: 1px solid var(--rule); font-size: 0.85em; font-weight: 600; }
+  .net i { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--ok); }
+  .net.wait i { background: var(--wait); animation: pulse 1.4s var(--ease) infinite; }
+  .net.off i { background: var(--bad); }
+  .net time { font-variant-numeric: tabular-nums; color: var(--ink-2); font-weight: 500; }
+  @keyframes pulse { 50% { opacity: 0.35; } }
+
+  /* ---- composer ---- */
+  .composer { display: grid; grid-template-columns: auto 1fr auto; gap: 0.75rem; align-items: stretch; }
+  .dir { display: inline-grid; grid-auto-flow: column; padding: 0.3rem; border-radius: 14px; background: var(--card); border: 1px solid var(--rule); }
+  .dir button { border: 0; background: transparent; padding: 0 1.1rem; border-radius: 10px; font-weight: 600; cursor: pointer; white-space: nowrap; color: var(--ink-2); transition: background 200ms var(--ease), color 200ms var(--ease); }
+  .dir button[aria-pressed="true"] { background: var(--ink); color: var(--card); }
+  .field { display: flex; align-items: center; background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 0 1.1rem; transition: border-color 200ms var(--ease); }
+  .field:focus-within { border-color: var(--ink); }
+  textarea { width: 100%; border: 0; outline: none; resize: none; background: transparent; font-size: var(--step-1); line-height: 1.3; padding: 0.75rem 0; height: calc(1.3em + 1.5rem); max-height: calc(3.9em + 1.5rem); overflow-y: auto; }
+  textarea::placeholder { color: var(--ink-2); opacity: 1; }
+  .go { border: 0; border-radius: 14px; padding: 0 1.8rem; background: var(--ink); color: var(--card); font: 700 var(--step-1)/1 var(--body); cursor: pointer; transition: transform 160ms var(--ease), opacity 160ms var(--ease); }
+  .go:hover { transform: translateY(-1px); }
+  .go:active { transform: translateY(1px); }
+  .go:disabled { opacity: 0.45; cursor: progress; transform: none; }
+
+  /* ---- examples ---- */
+  .examples { display: grid; gap: 0.55rem; }
+  .group { display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; }
+  .group > span { font-weight: 700; color: var(--ink-2); min-width: 9.5em; }
+  .ex { display: inline-flex; align-items: baseline; text-align: left; min-height: 2.75rem; border: 1px solid var(--rule); background: var(--card); border-radius: 999px; padding: 0.4rem 0.95rem; cursor: pointer; transition: border-color 160ms var(--ease), background 160ms var(--ease); }
+  .ex:hover { border-color: var(--ink); }
+  .ex:disabled { opacity: 0.5; cursor: progress; border-color: var(--rule); }
+  .ex[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--card); }
+  .ex .phrase { font-weight: 500; }
+  .ex .phrase b { font-weight: 800; color: var(--david-ink); }
+  .ex[aria-pressed="true"] .phrase b { color: inherit; text-decoration: underline; text-underline-offset: 0.2em; }
+
+  /* ---- meaning band (examples only) ---- */
+  .meaning { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 320ms var(--ease); }
+  .meaning.show { grid-template-rows: 1fr; }
+  .meaning > div { overflow: hidden; }
+  .meaning p { margin: 0; padding: 0.15rem 0 0; display: flex; gap: 0.9rem; align-items: baseline; flex-wrap: wrap; }
+  .meaning .k { font: 700 0.8em/1 var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); }
+  .meaning q { font-size: var(--step-1); font-weight: 600; quotes: "«" "»"; }
+  .meaning a { display: inline-block; padding: 0.55rem 0; color: var(--ink-2); font-size: 0.85em; text-underline-offset: 0.2em; }
+  .meaning a:hover { color: var(--ink); }
+
+  /* ---- the two sides ---- */
+  .sides { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.75rem, 1.4vw, 1.5rem); }
+  .side { border-radius: 22px; padding: clamp(1rem, 1.8vw, 2rem); display: grid; grid-template-rows: auto 1fr auto; gap: clamp(0.6rem, 1.6vh, 1.3rem); min-height: 16rem; }
+  .body { display: grid; align-content: start; gap: clamp(0.7rem, 1.6vh, 1.2rem); }
+  .side.david { background: var(--david-wash); --side-2: color-mix(in oklch, var(--david-ink) 62%, var(--ink)); }
+  .side.goliath { background: var(--goliath-wash); --side-2: color-mix(in oklch, var(--goliath-ink) 62%, var(--ink)); }
+  .who { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .who h2 { margin: 0; font: 800 var(--step-3)/0.9 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
+  .david .who h2 { color: var(--david-ink); }
+  .goliath .who h2 { color: var(--goliath-ink); }
+  .who span { font-weight: 600; color: var(--side-2); }
+  .answer { margin: 0; font: 600 clamp(1.7rem, 0.3rem + 1.9vw + 1.8vh, 4rem)/1.15 var(--body); letter-spacing: -0.01em; text-wrap: balance; align-self: start; }
+  .answer.hint, .answer.wait, .answer.off, .answer.boot { font-weight: 500; color: var(--side-2); font-size: var(--step-2); }
+  .answer.boot strong { display: block; color: var(--ink); font: 800 var(--step-3)/1 var(--display); text-transform: uppercase; margin-bottom: 0.4rem; }
+  .answer.boot small { display: block; margin-top: 0.6rem; font-size: var(--step-0); }
+  .answer.off strong { display: block; color: var(--ink); font: 800 var(--step-3)/1 var(--display); text-transform: uppercase; margin-bottom: 0.4rem; }
+  .answer.in { animation: rise 420ms var(--ease) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .dots::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: dots 1.2s steps(4) infinite; }
+  @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+
+  .terms { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+  .terms li { display: grid; grid-template-columns: auto 1fr; gap: 0.7rem; align-items: center; }
+  .mark { display: inline-grid; place-items: center; min-width: 6.2rem; padding: 0.3rem 0.7rem; border-radius: 999px; font-weight: 700; font-size: 0.85em; }
+  .mark.ok { background: var(--ok-wash); color: var(--ok); }
+  .mark.no { background: var(--bad-wash); color: var(--bad); }
+  .terms b { font-weight: 700; }
+  .terms em { font-style: normal; color: var(--side-2); }
+
+  .stats:empty { border-top-color: transparent; }
+  .stats { display: flex; gap: clamp(1.2rem, 3vw, 3rem); margin: 0; padding-top: clamp(0.7rem, 1.2vw, 1.1rem); border-top: 1px solid color-mix(in oklch, var(--ink) 12%, transparent); }
+  .stats div { display: grid; gap: 0.1rem; }
+  .stats dt { font: 700 0.75em/1 var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--side-2); }
+  .stats dd { margin: 0; font: 700 var(--step-2)/1.1 var(--display); font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 900px) {
+    .composer { grid-template-columns: 1fr; }
+    .dir { justify-self: start; }
+    .go { padding: 0.9rem; }
+    .sides { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <div class="brand">
+      <h1><span class="d">David</span><span class="vs">vs.</span><span class="g">Goliath</span></h1>
+      <p>Traductor entre Gen Z y los papás, con jerga chapina.</p>
+    </div>
+    <span class="net wait" id="net" role="status"><i aria-hidden="true"></i><span>Preparando a David…</span> <time id="clock"></time></span>
+  </header>
+
+  <form class="composer" id="form">
+    <div class="dir" role="group" aria-label="Dirección de la traducción">
+      <button type="button" data-dir="genz_to_parent" aria-pressed="true">Gen Z → papás</button>
+      <button type="button" data-dir="parent_to_genz" aria-pressed="false">Papás → Gen Z</button>
+    </div>
+    <label class="field">
+      <span class="sr-only">Frase para traducir</span>
+      <textarea id="phrase" rows="1" maxlength="400" placeholder="Escribe una frase con jerga…" autocomplete="off" spellcheck="false"></textarea>
+    </label>
+    <button class="go" id="go" type="submit">Traducir</button>
+  </form>
+
+  <nav class="examples" id="examples" aria-label="Ejemplos de jerga chapina">
+    <div class="group" id="ex-genz_to_parent"><span>Gen Z → papás</span></div>
+    <div class="group" id="ex-parent_to_genz"><span>Papás → Gen Z</span></div>
+  </nav>
+
+  <div class="meaning" id="meaning" aria-live="polite"><div><p>
+    <span class="k">Traducción de referencia</span>
+    <q id="reference"></q>
+    <a id="source" target="_blank" rel="noopener"></a>
+  </p></div></div>
+
+  <div class="sides">
+    <section class="side david" aria-labelledby="h-david">
+      <div class="who"><h2 id="h-david">David</h2><span>Gemma pequeño, ajustado con nuestros datos</span></div>
+      <div class="body" aria-live="polite" id="david-body"></div>
+      <dl class="stats" id="david-stats"></dl>
+    </section>
+    <section class="side goliath" aria-labelledby="h-goliath">
+      <div class="who"><h2 id="h-goliath">Goliath</h2><span>Gemini, el modelo grande de Google</span></div>
+      <div class="body" aria-live="polite" id="goliath-body"></div>
+      <dl class="stats" id="goliath-stats"></dl>
+    </section>
+  </div>
+</main>
+<script>
+  const DIR = { genz_to_parent: "Gen Z → papás", parent_to_genz: "Papás → Gen Z" };
+  const PLACEHOLDER = { genz_to_parent: "Escribe una frase con jerga…", parent_to_genz: "Escribe una frase como la diría un papá…" };
+  const SOURCE_NAME = (url) => url.includes("diccionario-chapin") ? "Diccionario chapín" : url.includes("wikilengua") ? "Wikilengua" : new URL(url).hostname;
+  const $ = (id) => document.getElementById(id);
+  let direction = "genz_to_parent";
+  let examples = [];
+  let current = null; // the example on screen, if any
+  let ticket = 0;     // ignore answers from an earlier request
+
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+  const seconds = (ms) => ms == null ? "—" : `${(ms / 1000).toFixed(1)} s`;
+
+  /** The phrase with its slang terms in bold (accents and case ignored), so each button says what it tests. */
+  function highlight(text, terms) {
+    const span = el("span", "phrase");
+    const foldChar = (c) => c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const folded = [...text].map(foldChar).join("");
+    const marks = new Array(folded.length).fill(false);
+    for (const t of terms) {
+      const w = [...t.replace(/[¡!¿?]/g, "").trim()].map(foldChar).join("");
+      if (!w) continue;
+      const re = new RegExp(`(^|[^\\p{L}])(${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\p{L}*)`, "gu");
+      for (const m of folded.matchAll(re)) {
+        const start = m.index + m[1].length;
+        for (let i = start; i < start + m[2].length; i++) marks[i] = true;
+      }
+    }
+    const chars = [...text];
+    let i = 0;
+    while (i < chars.length) {
+      let j = i;
+      while (j < chars.length && marks[j] === marks[i]) j++;
+      const chunk = chars.slice(i, j).join("");
+      span.append(marks[i] ? el("b", null, chunk) : chunk);
+      i = j;
+    }
+    return span;
+  }
+
+  function setDirection(dir) {
+    direction = dir;
+    document.querySelectorAll(".dir button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.dir === dir)));
+    $("phrase").placeholder = PLACEHOLDER[dir];
+  }
+
+  function stats(side, rows) {
+    const dl = $(`${side}-stats`);
+    dl.replaceChildren();
+    for (const [k, v] of rows) {
+      const d = el("div"); d.append(el("dt", null, k), el("dd", null, v)); dl.append(d);
+    }
+  }
+
+  const clocks = {};
+  function stopClock(side) { cancelAnimationFrame(clocks[side]); delete clocks[side]; }
+  function startClock(side) {
+    const t0 = performance.now();
+    const dd = $(`${side}-stats`).querySelector("dd");
+    const tick = () => { dd.textContent = seconds(performance.now() - t0); clocks[side] = requestAnimationFrame(tick); };
+    tick();
+  }
+
+  function paint(side, state, data) {
+    stopClock(side);
+    const body = $(`${side}-body`);
+    body.replaceChildren();
+    const p = el("p", "answer");
+    if (state === "hint") {
+      p.classList.add("hint");
+      p.textContent = side === "david" ? "Escribe una frase o toca un ejemplo." : "Los dos traducen la misma frase al mismo tiempo.";
+      stats(side, []);
+    } else if (state === "wait") {
+      p.classList.add("wait");
+      p.append(el("span", "dots", "Traduciendo"));
+      stats(side, [["Tiempo", "0.0 s"]]);
+      body.append(p);
+      startClock(side);
+      return;
+    } else if (state === "boot") {
+      p.classList.add("boot");
+      p.append(el("strong", null, "Preparando a David"), "Se está encendiendo su servidor con GPU y cargando el modelo.",
+               el("small", null, "Pasa solo la primera vez después de un rato sin uso: tarda de uno a dos minutos."));
+      stats(side, []);
+    } else if (state === "error") {
+      p.classList.add("off");
+      p.append(el("strong", null, "No respondió"), side === "david" ? "David tardó demasiado. Vuelve a intentar en unos segundos." : "Gemini tardó demasiado o falló. Vuelve a intentar.");
+      stats(side, []);
+    } else {
+      p.classList.add("in");
+      p.textContent = data.text;
+      body.append(p);
+      if (data.terms && data.terms.length) {
+        const ul = el("ul", "terms");
+        ul.setAttribute("aria-label", "Revisión de la jerga");
+        for (const t of data.terms) {
+          const li = el("li");
+          const mark = el("span", `mark ${t.ok ? "ok" : "no"}`, t.ok ? "✓ Bien" : "✗ Mal");
+          const what = el("span");
+          what.append(el("b", null, t.term), " → ", el("em", null, t.expected.split(";")[0].trim()));
+          li.append(mark, what);
+          ul.append(li);
+        }
+        body.append(ul);
+      }
+      stats(side, [["Tiempo", seconds(data.latency_ms)]]);
+      return;
+    }
+    body.append(p);
+  }
+
+  async function translateSide(side, phrase, dir, exampleId, mine) {
+    try {
+      const res = await fetch(`/api/translate/${side}`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phrase, direction: dir, example_id: exampleId }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      if (mine !== ticket) return;
+      const ok = data.status === "ok" && data.text && data.text.trim();
+      paint(side, ok ? "ok" : "error", data);
+    } catch {
+      if (mine === ticket) paint(side, "error");
+    }
+  }
+
+  async function translate() {
+    if (!davidReady) return;
+    const phrase = $("phrase").value.trim();
+    if (!phrase) { $("phrase").focus(); return; }
+    if (current && (current.text !== phrase || current.direction !== direction)) showExample(null);
+    const mine = ++ticket;
+    $("go").disabled = true;
+    paint("david", "wait"); paint("goliath", "wait");
+    await Promise.all(["david", "goliath"].map((s) => translateSide(s, phrase, direction, current?.id ?? null, mine)));
+    if (mine === ticket) $("go").disabled = !davidReady;
+  }
+
+  function showExample(ex) {
+    current = ex;
+    document.querySelectorAll(".ex").forEach((b) => b.setAttribute("aria-pressed", String(!!ex && b.dataset.id === ex.id)));
+    $("meaning").classList.toggle("show", !!ex);
+    if (ex) {
+      $("reference").textContent = ex.reference;
+      $("source").href = ex.source;
+      $("source").textContent = `Fuente: ${SOURCE_NAME(ex.source)} (${ex.license})`;
+    }
+  }
+
+  document.querySelectorAll(".dir button").forEach((b) => b.addEventListener("click", () => { setDirection(b.dataset.dir); if (current) showExample(null); }));
+  $("form").addEventListener("submit", (e) => { e.preventDefault(); translate(); });
+  $("phrase").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); translate(); } });
+  function fit() { const t = $("phrase"); t.style.height = "auto"; t.style.height = `${t.scrollHeight}px`; }
+  $("phrase").addEventListener("input", () => { fit(); if (current && $("phrase").value.trim() !== current.text) showExample(null); });
+
+  // David runs on a GPU server that turns off when nobody uses it. Opening the page turns it on
+  // (POST /api/david/wake answers when he is ready) and a ping every minute keeps it on while the
+  // page is open and visible, for at most three hours.
+  let davidReady = false;
+  const opened = Date.now();
+  const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+  function setReady(ready, label) {
+    const changed = ready !== davidReady;
+    davidReady = ready;
+    const net = $("net");
+    net.classList.toggle("wait", !ready && !label);
+    net.classList.toggle("off", !!label);
+    net.querySelector("span").textContent = ready ? "David listo" : label || "Preparando a David…";
+    $("go").disabled = !ready;
+    document.querySelectorAll(".ex").forEach((b) => { b.disabled = !ready; });
+    if (changed) paint("david", ready ? "hint" : "boot");
+    if (ready) $("clock").textContent = "";
+  }
+  async function poll() {
+    if (davidReady) return;
+    try {
+      const st = await (await fetch("/api/status", { cache: "no-store" })).json();
+      if (st.david.phase === "ready") setReady(true);
+      else $("clock").textContent = mmss(st.david.seconds);
+    } catch { /* the next poll tries again */ }
+  }
+  async function wake() {
+    try {
+      const st = await (await fetch("/api/david/wake", { method: "POST" })).json();
+      if (st.phase === "ready") setReady(true);
+      else if (st.phase === "error") { setReady(false, "David no respondió · reintentando"); setTimeout(wake, 5000); }
+      else setTimeout(wake, 2000);
+    } catch { setReady(false, "Sin respuesta del servidor · reintentando"); setTimeout(wake, 5000); }
+  }
+  setInterval(poll, 1000);
+  setInterval(() => {
+    if (document.visibilityState === "visible" && Date.now() - opened < 3 * 3600 * 1000) {
+      fetch("/api/david/wake", { method: "POST" }).then((r) => r.json()).then((st) => { if (st.phase !== "ready") { setReady(false); wake(); } }).catch(() => {});
+    }
+  }, 60 * 1000);
+
+  paint("david", "boot"); paint("goliath", "hint");
+  $("go").disabled = true;
+  wake();
+  fetch("/api/examples").then((r) => r.json()).then((list) => {
+    examples = list;
+    for (const ex of list) {
+      const b = el("button", "ex");
+      b.type = "button"; b.dataset.id = ex.id; b.setAttribute("aria-pressed", "false"); b.disabled = !davidReady;
+      b.title = ex.text;
+      b.append(highlight(ex.text, ex.slang));
+      b.setAttribute("aria-label", `Ejemplo, ${DIR[ex.direction]}: ${ex.text}`);
+      b.addEventListener("click", () => { setDirection(ex.direction); $("phrase").value = ex.text; fit(); showExample(ex); translate(); });
+      $(`ex-${ex.direction}`).append(b);
+    }
+    for (const dir of Object.keys(DIR)) if ($(`ex-${dir}`).children.length < 2) $(`ex-${dir}`).hidden = true;
+  }).catch(() => { $("examples").replaceChildren(el("span", null, "No se pudieron cargar los ejemplos. Igual puedes escribir una frase.")); });
+</script>
+</body>
+</html>

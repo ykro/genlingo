@@ -1,0 +1,21 @@
+# Only what duel/Dockerfile copies goes to Cloud Build.
+*
+!duel/
+duel/.venv/
+duel/**/__pycache__/
+duel/.pytest_cache/
+duel/state/
+!data/
+data/*
+!data/terms.jsonl
+!data/counterparts.jsonl
+!data/translate_examples.json
+!data/eval/
+data/eval/*
+!data/eval/terms_test.jsonl
+!data/.cache/
+data/.cache/*
+!data/.cache/term_embeddings.json
+!train/
+train/*
+!train/runs/

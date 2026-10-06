@@ -1,7 +1,7 @@
 [project]
 name = "genlingo-duel"
 version = "0.1.0"
-description = "Genlingo duel service: David (local Gemma via Ollama) vs. Goliath (Gemini on Vertex AI)"
+description = "Genlingo comparison page: David (fine-tuned Gemma on a Cloud Run GPU) vs. Goliath (Gemini on Vertex AI)"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.140",
@@ -10,7 +10,7 @@ dependencies = [
     "google-genai>=2.20",
     "sacrebleu>=2.5",
     "python-dotenv>=1.1",
-    "google-cloud-firestore>=2.30",
+    "requests>=2.32",
 ]
 
 [dependency-groups]

@@ -39,32 +39,23 @@ class Settings:
     # Single-price fallback when no schedule is configured.
     gemini_input_usd_per_m: float = field(default_factory=lambda: _float("GEMINI_INPUT_USD_PER_M", 0.0))
     gemini_output_usd_per_m: float = field(default_factory=lambda: _float("GEMINI_OUTPUT_USD_PER_M", 0.0))
-    david_tag: str = field(default_factory=lambda: _env("LOCAL_MODEL_TAG"))
-    # The previous David (an earlier data round), for the "previous vs on-stage David" duel (key M).
-    david_previous_tag: str = field(default_factory=lambda: _env("DAVID_PREVIOUS_TAG"))
+    # The Ollama tag of David (the fine-tuned Gemma the page uses), served by the David service.
+    david_tag: str = field(default_factory=lambda: _env("DAVID_MODEL_TAG"))
     # Prompt styles (plain | country | glossary | lexicon; see prompts.py). David's comes from his run file when it has one;
     # Goliath gets no glossary by default (the term bank is David's data), set it to compare.
     david_prompt_style: str = field(default_factory=lambda: _env("DAVID_PROMPT_STYLE", "plain"))
     goliath_prompt_style: str = field(default_factory=lambda: _env("GOLIATH_PROMPT_STYLE", "country"))
+    # David's Ollama: the private Cloud Run GPU service (infra/04-david.sh), called with an ID token
+    # when it is https. The eval job runs its own Ollama inside the job (OLLAMA_URL).
+    david_url: str = field(default_factory=lambda: _env("DAVID_URL", _env("OLLAMA_URL", "http://127.0.0.1:11434")))
     ollama_url: str = field(default_factory=lambda: _env("OLLAMA_URL", "http://127.0.0.1:11434"))
-    # Local sentence-embedding model (Ollama) for the term-bank glossary retrieval.
+    # Sentence-embedding model (served by the same Ollama) for the term-bank glossary retrieval.
     embedding_model: str = field(default_factory=lambda: _env("EMBEDDING_MODEL"))
     mock_ai: bool = field(default_factory=lambda: _flag("MOCK_AI"))
-    force_offline: bool = field(default_factory=lambda: _flag("FORCE_OFFLINE"))
-    db_path: Path = field(default_factory=lambda: REPO_ROOT / _env("DUEL_DB_PATH", "duel/state/genlingo.sqlite"))
     data_dir: Path = field(default_factory=lambda: REPO_ROOT / "data")
     runs_dir: Path = field(default_factory=lambda: REPO_ROOT / "train" / "runs")
-    firestore_database: str = field(default_factory=lambda: _env("FIRESTORE_DATABASE", "genlingo"))
-    audience_feed: bool = field(default_factory=lambda: _flag("AUDIENCE_FEED"))
-    event_id: str = field(default_factory=lambda: _env("EVENT_ID", "ensayo"))
-    # Where the talk happens: the translation page (/traducir) translates with this country's slang.
+    # The page translates with this country's slang (the examples are Guatemalan).
     country: str = field(default_factory=lambda: _env("EVENT_COUNTRY", "GT"))
-    # Evaluation rounds may also use test pairs not validated yet (pending_review, e.g. right
-    # after build_test_set); on stage keep it 0: only auto-validated pairs (or ones a person
-    # approved in the optional human pass) are shown.
-    allow_unreviewed_test: bool = field(default_factory=lambda: _flag("ALLOW_UNREVIEWED_TEST"))
-    # Specialty rounds (key G): the «slang chapín» niche of evals/niche.md (GT test pairs), in a fixed seeded order.
-    specialty_seed: int = field(default_factory=lambda: int(_env("SPECIALTY_SEED", "2027")))
     # David's N-best: candidates generated in parallel and reranked with the term bank (1 = off).
     david_nbest: int = field(default_factory=lambda: int(_env("DAVID_NBEST", "1")))
 

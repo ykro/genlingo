@@ -24,7 +24,7 @@ import json
 import random
 
 from _common import DATA
-from duel_core import OllamaClient
+from genlingo_duel.arena import david_client_for
 from genlingo_duel.dataset import read_jsonl, train_pairs
 from genlingo_duel.glossary import Glossary, hashing_embedder, load_counterparts, render
 from genlingo_duel.prompts import COUNTRIES, translation_messages
@@ -81,7 +81,7 @@ async def main_async(n: int, n_rejects: int, seed: int) -> None:
     if s.mock_ai or not s.embedding_model:
         glossary = await Glossary(bank, hashing_embedder(), counterparts=cps).load()
     else:
-        ollama = OllamaClient(s.ollama_url)
+        ollama = david_client_for(s.david_url)  # the embedding model lives on David's service
         glossary = await Glossary(bank, lambda t: ollama.embed(t, model=s.embedding_model),
                                   cache=DATA / ".cache" / "term_embeddings.json", model=s.embedding_model, counterparts=cps).load()
     archived = list(read_jsonl(DATA / "pairs" / "archive" / "wrong_meaning_pairs.jsonl"))

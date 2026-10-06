@@ -1,13 +1,17 @@
 """`make eval`: run the test set through every model and write evals/report.md.
 
+Runs in the cloud: `make eval` starts the Cloud Run GPU job ${APP}-eval (infra/06-eval-job.sh,
+evals/cloud_eval.sh), which runs Ollama inside the job, loads each model from the models bucket
+one at a time (EVAL_MODELS_DIR) and copies the report back. Directly:
+
     uv run --project duel python evals/run_eval.py [--limit N] [--models a,b] [--no-goliath]
 
 Models compared (all from env vars):
   - base candidates  BASE_MODEL_TAGS      (e.g. Gemma 4 E2B vs E4B, not fine-tuned)
-  - David            LOCAL_MODEL_TAG      (fine-tuned, Q4) and LOCAL_MODEL_TAG-f16 if pulled
+  - David            DAVID_MODEL_TAG      (fine-tuned, Q5_K_M) and DAVID_MODEL_TAG-f16 if published
   - Goliath          GEMINI_MODEL
 
-Eval rules baked in: same prompt for everyone, test pairs are never synthetic, local
+Eval rules baked in: same prompt for everyone, test pairs are never synthetic, Ollama
 models are warmed up first (a cold load is not "latency"), and every per-sentence result is
 saved so David's losses can be shown, not just his wins.
 """
@@ -39,8 +43,8 @@ def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str
 
     - base models (BASE_MODEL_TAGS) with the plain v2 prompt; the first one also with the glossary,
       to separate "the glossary helps" from "fine-tuning helps";
-    - Davids (DAVID_TAGS, default LOCAL_MODEL_TAG), each with the prompt style he was trained on,
-      plus <tag>-f16 when it was pulled;
+    - Davids (DAVID_TAGS, default DAVID_MODEL_TAG), each with the prompt style he was trained on,
+      plus <tag>-f16 when it is published;
     - Goliath plain and Goliath with the same glossary David gets: the fair comparison.
     """
     import os
@@ -68,7 +72,7 @@ def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str
         if nbest > 1 and prompt_style_for(s, tag) in GLOSSARY_STYLES:  # same David, N candidates reranked
             add(tag, role + "_nbest", "ollama", prompt_style_for(s, tag), quant=quant_of(s, tag), nbest=nbest,
                 suffix=f" · N-best {nbest}")
-        if available is None or {f"{tag}-f16", f"{tag}-f16:latest"} & available:  # only if it was pulled
+        if available is None or {f"{tag}-f16", f"{tag}-f16:latest"} & available:  # only if it is published
             add(f"{tag}-f16", "david_f16" if role == "david" else "david_alt_f16", "ollama", prompt_style_for(s, tag), quant="F16")
     if with_goliath and s.gemini_model:
         add(s.gemini_model, "goliath", "gemini", "country")
@@ -77,7 +81,7 @@ def model_plan(s, only: list[str] | None, with_goliath: bool, available: set[str
         plan = [m for m in plan if m["name"] in only or m["role"] in only or m["label"] in only]
     for m in plan:
         if m["kind"] == "ollama" and available is not None and not ({m["name"], f"{m['name']}:latest"} & available):
-            m["skip"] = "no está en Ollama (make pull-model)"
+            m["skip"] = "no está publicado en el bucket de modelos"
     return plan
 
 
@@ -92,6 +96,45 @@ def quant_of(s, tag: str) -> str:
         return m.group(1).upper()
     run = load_run(s.runs_dir, tag) or {}
     return run.get("quant") or (run.get("finish") or {}).get("quant") or (run.get("metrics") or {}).get("quant") or "Q4_K_M"
+
+
+WARMUP_PHRASES = 5  # throwaway generations per Ollama model before timing (not recorded)
+
+
+def models_dir() -> Path | None:
+    """The models bucket mounted in the eval job: <tag>/Modelfile (+ Modelfile.f16). None = use what Ollama has."""
+    import os
+
+    d = os.environ.get("EVAL_MODELS_DIR", "")
+    return Path(d) if d else None
+
+
+def fetchable(root: Path, bases: list[str]) -> set[str]:
+    """Models the eval job can load: every published David (and its -f16) plus the base tags (Ollama library)."""
+    out = set(bases)
+    for d in root.iterdir() if root.exists() else []:
+        if (d / "Modelfile").exists():
+            out.add(d.name)
+        if (d / "Modelfile.f16").exists():
+            out.add(f"{d.name}-f16")
+    return out
+
+
+def fetch_model(root: Path, name: str) -> None:
+    """Load one model into the job's Ollama: a David from his Modelfile in the bucket, a base model from the library."""
+    import subprocess
+
+    tag, f16 = (name[:-4], True) if name.endswith("-f16") else (name, False)
+    modelfile = root / tag / ("Modelfile.f16" if f16 else "Modelfile")
+    cmd = ["ollama", "create", name, "-f", str(modelfile)] if modelfile.exists() else ["ollama", "pull", name]
+    subprocess.run(cmd, check=True)
+
+
+def drop_model(name: str) -> None:
+    """Free the job's memory (its filesystem) before the next model."""
+    import subprocess
+
+    subprocess.run(["ollama", "rm", name], check=False, capture_output=True)
 
 
 async def run_model(m: dict, client, pairs, price: Price, concurrency: int, context: dict, bank=None) -> list[dict]:
@@ -159,18 +202,25 @@ async def main_async(args) -> None:
     if not pairs:
         sys.exit("no test pairs: run scripts/build_test_set.py first")
 
+    import os
+
     ollama = MockClient(lambda msgs: msgs[-1]["content"]) if s.mock_ai else OllamaClient(s.ollama_url, temperature=0.0)
     available, sizes = None, {}
+    root = models_dir()
     if not s.mock_ai:
         models = await ollama.list_models()
         available = {x["name"] for x in models} | {x["model"] for x in models}
         sizes = {x["name"]: x.get("size") for x in models}
+        if root is not None:
+            bases = [t.strip() for t in os.environ.get("BASE_MODEL_TAGS", "").split(",") if t.strip()]
+            available |= fetchable(root, bases)
     only = [x.strip() for x in args.models.split(",")] if args.models else None
     plan = model_plan(s, only, not args.no_goliath, available, nbest=args.nbest)
     gstyles = {m["style"] for m in plan if m["style"] in GLOSSARY_STYLES and not m.get("skip")}
     context, bank = await glossary_context(s, pairs, gstyles) if gstyles else ({}, None)
 
     results, meta = [], []
+    fetched: set[str] = set()  # models this run loaded from the bucket (dropped after their last variant)
     for m in plan:
         if m.get("skip"):
             print(f"-- {m['label']}: {m['skip']}")
@@ -186,15 +236,24 @@ async def main_async(args) -> None:
                 m["next_price"] = {"input_per_million": nxt.input_per_million, "output_per_million": nxt.output_per_million,
                                    "effective_from": nxt.effective_from}
         else:
-            client, price, conc = ollama, Price.free(), 1  # one at a time: latency as on stage
+            client, price, conc = ollama, Price.free(), 1  # one at a time: latency as on the page
             if not s.mock_ai:
+                if root is not None and not await ollama.has_model(m["name"]):
+                    fetch_model(root, m["name"])
+                    fetched.add(m["name"])
+                    sizes = {x["name"]: x.get("size") for x in await ollama.list_models()}
                 await ollama.warm_up(m["name"])
+                # The first generations after a load are slow on the GPU (seconds, not hundreds of ms):
+                # a few throwaway ones first, so the latency is the model's, not the warm-up's.
+                await run_model(m, client, pairs[:WARMUP_PHRASES], price, 1, context, bank)
             m["size_bytes"] = sizes.get(m["name"]) or sizes.get(f"{m['name']}:latest")
         t0 = time.time()
         rows = await run_model(m, client, pairs, price, conc, context, bank)
         m["wall_s"] = round(time.time() - t0, 1)
         errors = sum(1 for r in rows if "error" in r)
         print(f"-- {m['label']}: {len(rows) - errors} ok, {errors} errors, {m['wall_s']} s")
+        if m["name"] in fetched and not any(x["name"] == m["name"] for x in plan[plan.index(m) + 1:]):
+            drop_model(m["name"])
         results += rows
         meta.append(m)
 
@@ -216,7 +275,7 @@ async def main_async(args) -> None:
         assert [p["id"] for p in prev["pairs"]] == [p["id"] for p in raw["pairs"]], "different test set"
         new_labels = {m.get("label", m["name"]) for m in raw["models"]}
         kept = [m for m in prev["models"] if m.get("label", m["name"]) not in new_labels]
-        if any(m.get("role") == "david" for m in raw["models"]):  # one on-stage David: the current LOCAL_MODEL_TAG
+        if any(m.get("role") == "david" for m in raw["models"]):  # one on-stage David: the current DAVID_MODEL_TAG
             for m in kept:
                 if m.get("role") in ("david", "david_f16"):
                     m["role"] = m["role"].replace("david", "david_alt", 1)

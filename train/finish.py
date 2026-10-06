@@ -1,8 +1,7 @@
 """Second half of a fine-tune: LoRA adapter -> merge -> GGUF (f16 + quantized) -> Modelfile -> bucket.
 
 Runs as its own Cloud Run Job (CPU only, `${APP}-finish`), right after the GPU job that trains the
-adapter (`${APP}-train`, `ADAPTER_ONLY=1`). `make train` chains both; `make train-finish` runs this
-same code on a laptop as a fallback (finish_local.py).
+adapter (`${APP}-train`, `ADAPTER_ONLY=1`). `make train` chains both.
 
     python finish.py --tag genlingo-2026-10c-e2b-nomulti --adapter-uri /mnt/work/genlingo/runs/genlingo-2026-10c-e2b-nomulti/adapter \
         --base-model $GEMMA_BASE_MODEL --weights-uri $GEMMA_WEIGHTS_URI --ollama-renderer $OLLAMA_RENDERER \

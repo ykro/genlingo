@@ -25,7 +25,7 @@ from pathlib import Path
 GOLD_SHARE = 0.85
 
 from _common import DATA
-from duel_core import OllamaClient
+from genlingo_duel.arena import david_client_for
 from genlingo_duel.dataset import read_jsonl, train_pairs
 from genlingo_duel.glossary import LEX_K, Glossary, hashing_embedder, load_counterparts
 from genlingo_duel.glossary import render as render_glossary
@@ -83,7 +83,7 @@ async def build(style: str, out: Path, exclude: tuple[str, ...] = ()) -> dict:
         if s.mock_ai or not s.embedding_model:
             glossary = await Glossary(bank, hashing_embedder(), counterparts=cps).load()
         else:
-            ollama = OllamaClient(s.ollama_url)
+            ollama = david_client_for(s.david_url)  # the embedding model lives on David's service
             glossary = await Glossary(bank, lambda t: ollama.embed(t, model=s.embedding_model),
                                       cache=DATA / ".cache" / "term_embeddings.json", model=s.embedding_model,
                                       counterparts=cps).load()

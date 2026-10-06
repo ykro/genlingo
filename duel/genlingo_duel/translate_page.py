@@ -1,7 +1,7 @@
-"""The comparison page (/traducir): David and Goliath translate Gen Z ↔ papás side by side.
+"""The comparison page: David and Goliath translate Gen Z ↔ papás side by side.
 
-A text box, a direction switch and example buttons; each column shows its translation, how long it
-took and what it cost. No scores, rounds or votes. The examples (data/translate_examples.json) are
+A text box, a direction switch and example buttons; each column shows its translation and how long
+it took. No scores, rounds or votes. The examples (data/translate_examples.json) are
 Guatemalan slang from the test set, the use case David wins; each one was checked live with both
 models. For an example the page also shows the human reference and a ✓/✗ per slang term
 (term_check.py, the same rules as the eval's *jerga correcta*).
@@ -18,10 +18,9 @@ from .glossary import load_counterparts
 from .term_check import term_checks
 from .terms import TermBank
 
-PAGE = Path(__file__).with_name("static") / "traducir.html"
-# The brand fonts (OFL) live in the web app; the page serves them itself so it keeps its type offline.
-FONTS = {name: Path(__file__).resolve().parents[2] / "web" / "app" / "fonts" / name
-         for name in ("BigShoulders-latin.woff2", "Figtree-latin.woff2")}
+PAGE = Path(__file__).with_name("static") / "index.html"
+# The brand fonts (OFL, static/fonts/README.txt), served by the page itself.
+FONTS = {name: Path(__file__).with_name("static") / "fonts" / name for name in ("BigShoulders-latin.woff2", "Figtree-latin.woff2")}
 
 
 def examples_path(data_dir: Path) -> Path:

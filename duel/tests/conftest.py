@@ -30,9 +30,9 @@ def settings(tmp_path: Path) -> Settings:
     runs.mkdir()
     (runs / "genlingo-test.json").write_text(json.dumps({"tag": "genlingo-test", "estimated_cost_usd": 0.42, "duration_s": 900}))
     return Settings(
-        mock_ai=True, force_offline=False, db_path=tmp_path / "state.sqlite", data_dir=tmp_path / "data",
+        mock_ai=True, data_dir=tmp_path / "data",
         runs_dir=runs, david_tag="genlingo-test", gemini_model="goliath-model",
-        gemini_input_usd_per_m=1.0, gemini_output_usd_per_m=10.0, audience_feed=False, event_id="ensayo",
+        gemini_input_usd_per_m=1.0, gemini_output_usd_per_m=10.0,
     )
 
 

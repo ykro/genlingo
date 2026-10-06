@@ -7,7 +7,6 @@ import httpx
 import pytest
 
 from duel_core import (
-    Connectivity,
     Contender,
     MockClient,
     OllamaClient,
@@ -142,12 +141,6 @@ def test_ollama_client_parses_response_and_retries_without_think():
     assert len(seen) == 2 and "think" not in seen[1]
 
 
-def test_connectivity_forced_offline_and_unreachable_host():
-    assert asyncio.run(Connectivity(force_offline=True).is_online()) is False
-    # Port 9 on localhost (discard) is closed on dev machines: must answer False fast, not hang.
-    assert asyncio.run(Connectivity(host="127.0.0.1", port=9, timeout_s=0.3).is_online()) is False
-
-
 def test_price_schedule_picks_the_price_in_force():
     from datetime import date
 
@@ -180,3 +173,36 @@ def test_duel_with_a_prompt_per_contender():
     res = asyncio.run(run_duel(cs, {"david": [{"role": "user", "content": "a"}], "goliath": [{"role": "user", "content": "b"}]}))
     assert cs[0].client.calls[0][1][0]["content"] == "a" and cs[1].client.calls[0][1][0]["content"] == "b"
     assert res["david"].status == "ok"
+
+
+def test_gemini_client_retries_a_429_and_gives_up_on_other_errors():
+    from types import SimpleNamespace
+
+    from duel_core.gemini_client import GeminiClient
+
+    class Busy(Exception):
+        code = 429
+
+    calls = []
+
+    async def generate_content(model, contents, config):
+        calls.append(model)
+        if len(calls) < 3:
+            raise Busy("RESOURCE_EXHAUSTED")
+        return SimpleNamespace(text="hola", usage_metadata=SimpleNamespace(prompt_token_count=5, candidates_token_count=1, thoughts_token_count=2))
+
+    client = GeminiClient.__new__(GeminiClient)
+    client.temperature, client.max_output_tokens, client.thinking_level, client.timeout_s = 0.0, None, None, 20.0
+    client._client = SimpleNamespace(aio=SimpleNamespace(models=SimpleNamespace(generate_content=generate_content)))
+    comp = asyncio.run(client.complete([{"role": "user", "content": "x"}], model="m"))
+    assert comp.text == "hola" and comp.output_tokens == 3 and len(calls) == 3
+
+    async def broken(model, contents, config):
+        calls.append("broken")
+        raise ValueError("bad request")
+
+    client._client.aio.models.generate_content = broken
+    calls.clear()
+    with pytest.raises(ValueError):
+        asyncio.run(client.complete([{"role": "user", "content": "x"}], model="m"))
+    assert calls == ["broken"]

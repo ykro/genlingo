@@ -1,0 +1,18 @@
+# Cloud Build recipe for David's image (infra/04-david.sh): copy the stage GGUF + Modelfile from the
+# models bucket into the build context, then build and push.
+steps:
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -e
+        mkdir -p model
+        gcloud storage cp "${_MODELS_BUCKET}/${_DAVID_TAG}/Modelfile" "${_MODELS_BUCKET}/${_DAVID_TAG}/${_GGUF}" model/
+  - name: gcr.io/cloud-builders/docker
+    args: [build, -t, "${_IMAGE}", --build-arg, "DAVID_TAG=${_DAVID_TAG}", --build-arg, "EMBEDDING_MODEL=${_EMBEDDING_MODEL}", .]
+images: ["${_IMAGE}"]
+options:
+  machineType: E2_HIGHCPU_8
+  diskSizeGb: 100
+timeout: 3600s

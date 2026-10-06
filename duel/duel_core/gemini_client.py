@@ -31,6 +31,8 @@ def _is_network_error(exc: BaseException) -> bool:
 
 
 class GeminiClient:
+    RETRIES_429 = 3
+
     def __init__(
         self,
         project: str,
@@ -58,6 +60,18 @@ class GeminiClient:
             automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),  # no tools here
         )
 
+    async def _generate(self, model: str, contents, system: str | None):
+        """One call, retried on 429: Vertex AI's shared capacity sometimes answers "resource exhausted"
+        for a moment. Up to RETRIES_429 retries with a short backoff, inside the overall timeout; the
+        latency the caller measures includes the wait."""
+        for attempt in range(self.RETRIES_429 + 1):
+            try:
+                return await self._client.aio.models.generate_content(model=model, contents=contents, config=self._config(system))
+            except Exception as exc:
+                if attempt == self.RETRIES_429 or getattr(exc, "code", None) != 429:
+                    raise
+                await asyncio.sleep(0.5 * 2**attempt)
+
     async def complete(self, messages: list[Message], *, model: str) -> Completion:
         from google.genai import types
 
@@ -69,10 +83,7 @@ class GeminiClient:
         ]
         t0 = time.perf_counter()
         try:
-            res = await asyncio.wait_for(
-                self._client.aio.models.generate_content(model=model, contents=contents, config=self._config(system)),
-                self.timeout_s,
-            )
+            res = await asyncio.wait_for(self._generate(model, contents, system), self.timeout_s)
         except asyncio.TimeoutError as exc:
             # Slow is not offline: the round shows an error for Goliath, not "sin conexión".
             raise TimeoutError(f"Gemini did not answer in {self.timeout_s}s") from exc

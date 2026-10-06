@@ -2,7 +2,8 @@
 
 Before translating, we look up the few term-bank entries that matter for this phrase and this
 country: exact matches of slang in the phrase, plus the closest entries by meaning (EmbeddingGemma,
-running locally in Ollama, so it works with Wi-Fi off). The glossary goes into the prompt.
+served by the same Ollama as David; the bank's vectors are cached in data/.cache). The glossary goes
+into the prompt.
 
 It's legitimate because the term bank is our data (researched, sourced, dated) and Goliath doesn't
 have it. It's visible because the eval also runs Goliath *with* the same glossary, so the room can

@@ -26,7 +26,7 @@ dirección que los datos reales vinieron a reforzar.
 
 ## Quién compite
 
-- **David:** el David de escena (`LOCAL_MODEL_TAG`), con el prompt con que se entrenó (`país + glosario`).
+- **David:** el David de la página (`DAVID_MODEL_TAG`; se llamaba `LOCAL_MODEL_TAG` cuando se registró este nicho), con el prompt con que se entrenó (`país + glosario`).
 - **Goliath:** `GEMINI_MODEL` como en escena (`GOLIATH_PROMPT_STYLE = country`, sin glosario). Es el rival del nicho.
 - **Goliath + el mismo glosario:** se reporta siempre al lado, para separar modelo de datos, pero no
   decide el nicho.

@@ -20,7 +20,7 @@ class Price:
 
     @classmethod
     def free(cls) -> "Price":
-        """Local inference: the laptop is already paid for."""
+        """No per-token price (a self-hosted model: its cost is the machine it runs on, not the tokens)."""
         return cls(0.0, 0.0)
 
 

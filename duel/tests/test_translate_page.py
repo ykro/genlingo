@@ -1,8 +1,11 @@
+import dataclasses
 import json
 
+import httpx
 from fastapi.testclient import TestClient
 
 from genlingo_duel import dataset
+from genlingo_duel.arena import Arena
 from genlingo_duel.main import create_app
 from genlingo_duel.settings import REPO_ROOT
 from genlingo_duel.term_check import term_checks
@@ -17,47 +20,123 @@ def _example_file(settings):
     ]}))
 
 
-def test_page_is_served_with_its_fonts_and_nothing_from_the_internet(settings):
+def test_page_is_served_with_its_fonts_and_nothing_from_another_site(settings):
     with TestClient(create_app(settings)) as c:
-        page = c.get("/traducir")
+        page = c.get("/")
         assert page.status_code == 200 and "Traducir" in page.text and "Goliath" in page.text
-        assert "https://" not in page.text  # no CDN: it must work offline
+        assert "https://" not in page.text  # no CDN: fonts and code come from the page itself
         assert "prefers-color-scheme: dark" not in page.text  # light only
-        assert c.get("/traducir/fonts/Figtree-latin.woff2").status_code == 200
-        assert c.get("/traducir/fonts/../../.env").status_code == 404
+        assert "laptop" not in page.text and "Sin conexión" not in page.text  # David runs in the cloud now
+        assert c.get("/fonts/Figtree-latin.woff2").status_code == 200
+        assert c.get("/fonts/../../.env").status_code == 404
 
 
 def test_each_side_translates_on_its_own_and_nothing_is_recorded(settings):
     with TestClient(create_app(settings)) as c:
-        d = c.post("/translate/david", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent"}).json()
-        g = c.post("/translate/goliath", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent"}).json()
+        d = c.post("/api/translate/david", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent"}).json()
+        g = c.post("/api/translate/goliath", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent"}).json()
         assert d["status"] == g["status"] == "ok"
         assert d["model"] == "genlingo-test" and g["model"] == "goliath-model"
-        assert d["cost_usd"] == 0 and g["cost_usd"] > 0 and d["latency_ms"] > 0
-        assert "terms" not in d  # typed text: just the translations, time and cost
-        assert c.get("/rounds").json() == []
-        assert c.post("/translate/judge", json={"phrase": "x", "direction": "genz_to_parent"}).status_code == 422
-
-
-def test_offline_goliath_says_so_and_david_still_translates(settings):
-    settings.force_offline = True
-    with TestClient(create_app(settings)) as c:
-        g = c.post("/translate/goliath", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent"}).json()
-        d = c.post("/translate/david", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent"}).json()
-    assert g["status"] == "offline" and d["status"] == "ok" and d["text"]
+        assert d["latency_ms"] > 0 and g["cost_usd"] > 0
+        assert "terms" not in d  # typed text: just the two translations
+        assert c.post("/api/translate/judge", json={"phrase": "x", "direction": "genz_to_parent"}).status_code == 422
+        # nothing else is exposed: no rounds, votes or scoreboard
+        for path in ("/rounds", "/scoreboard", "/queue", "/duel", "/reset"):
+            assert c.get(path).status_code in (404, 405)
 
 
 def test_an_example_comes_back_with_the_term_check(settings):
     _example_file(settings)
     with TestClient(create_app(settings)) as c:
-        ex = c.get("/translate/examples").json()
+        ex = c.get("/api/examples").json()
         assert ex == [{"id": "e1", "text": "estuvo bien mid", "direction": "genz_to_parent", "reference": "estuvo regular",
                        "source": "https://x", "license": "MIT", "slang": ["mid"]}]
-        d = c.post("/translate/david", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent", "example_id": "e1"}).json()
+        d = c.post("/api/translate/david", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent", "example_id": "e1"}).json()
         assert d["terms"] == [{"term": "mid", "expected": "regular, mediocre", "ok": True}]
         # the check belongs to the example's phrase: edited text gets no check
-        edited = c.post("/translate/david", json={"phrase": "estuvo bien mid hoy", "direction": "genz_to_parent", "example_id": "e1"}).json()
+        edited = c.post("/api/translate/david", json={"phrase": "estuvo bien mid hoy", "direction": "genz_to_parent", "example_id": "e1"}).json()
         assert "terms" not in edited
+
+
+class FakeDavid:
+    """Stands in for David's Ollama: cold until warmed, counts the calls."""
+
+    def __init__(self, fail=False):
+        self.models: list[str] = []
+        self.calls: list[str] = []
+        self.fail = fail
+
+    async def loaded_models(self, timeout_s=10.0):
+        self.calls.append("ps")
+        if self.fail:
+            raise RuntimeError("instance did not start")
+        return list(self.models)
+
+    async def warm_up(self, model, timeout_s=600.0):
+        self.calls.append(f"load {model}")
+        self.models.append(model)
+
+    async def warm_up_embedding(self, model, timeout_s=600.0):
+        self.calls.append(f"load {model}")
+        self.models.append(model)
+
+    async def complete(self, messages, *, model):
+        from duel_core import Completion
+
+        self.calls.append(f"translate {model}")
+        return Completion(text="estuvo regular", model=model, latency_ms=400)
+
+
+def _cloud_app(settings, fake):
+    settings.mock_ai = False
+    settings.embedding_model = "emb"
+    arena = Arena.from_settings(dataclasses.replace(settings, mock_ai=True))
+    arena.settings = settings
+    arena.david_client = fake
+    arena.glossary = object()  # already loaded
+    return create_app(settings, arena)
+
+
+def test_opening_the_page_wakes_david_once_and_reports_when_he_is_ready(settings):
+    fake = FakeDavid()
+    with TestClient(_cloud_app(settings, fake)) as c:
+        assert c.get("/api/status").json()["david"]["phase"] == "idle"
+        assert c.post("/api/david/wake").json()["phase"] == "ready"
+        # load both models, then one throwaway translation per direction (the first ones after a load are slow)
+        assert fake.calls == ["ps", "load genlingo-test", "load emb", "translate genlingo-test", "translate genlingo-test"]
+        # while the page stays open, its pings only check that he is still loaded
+        assert c.post("/api/david/wake").json()["phase"] == "ready"
+        assert fake.calls[-1] == "ps" and fake.calls.count("load genlingo-test") == 1
+
+
+def test_a_failed_wake_up_says_so_and_the_next_call_retries(settings):
+    fake = FakeDavid(fail=True)
+    with TestClient(_cloud_app(settings, fake)) as c:
+        st = c.post("/api/david/wake").json()
+        assert st["phase"] == "error" and "did not start" in st["error"]
+        fake.fail = False
+        assert c.post("/api/david/wake").json()["phase"] == "ready"
+
+
+def test_david_is_assumed_cold_after_cloud_run_would_have_stopped_him(settings, monkeypatch):
+    from genlingo_duel import main
+
+    fake = FakeDavid()
+    with TestClient(_cloud_app(settings, fake)) as c:
+        c.post("/api/david/wake")
+        c.app.state.david.last_seen -= main.IDLE_COLD_S + 1
+        assert c.get("/api/status").json()["david"]["phase"] == "idle"
+
+
+def test_https_david_url_gets_an_id_token(monkeypatch):
+    from genlingo_duel import arena as arena_mod, cloud_auth
+
+    monkeypatch.setattr(cloud_auth, "_fetch", lambda audience: f"token-for-{audience}")
+    client = arena_mod.david_client_for("https://genlingo-david-x.run.app/")
+    req = httpx.Request("GET", "https://genlingo-david-x.run.app/api/ps")
+    flow = client._http.auth.auth_flow(req)
+    assert next(flow).headers["Authorization"] == "Bearer token-for-https://genlingo-david-x.run.app"
+    assert arena_mod.david_client_for("http://127.0.0.1:11434")._http.auth is None
 
 
 def test_term_check_rules():
@@ -75,13 +154,21 @@ def test_term_check_rules():
     assert check("algo de refacción", "parent_to_genz", "unos munchies") == [False]
 
 
-def test_stage_examples_are_guatemalan_test_pairs_with_source_and_live_record():
+def test_page_examples_are_guatemalan_test_pairs_that_david_gets_right_and_goliath_does_not():
     data = REPO_ROOT / "data"
     examples = json.loads(examples_path(data).read_text(encoding="utf-8"))["examples"]
     pairs = {p.id: p for p in dataset.test_pairs(data)}
+    bank = TermBank(dataset.read_jsonl(data / "eval" / "terms_test.jsonl"), ignore_ambiguous=True)
+    from genlingo_duel.glossary import load_counterparts
+
+    cps = load_counterparts(data / "counterparts.jsonl")
     assert {e["direction"] for e in examples} == {"genz_to_parent", "parent_to_genz"}
     for e in examples:
         p = pairs[e["pair_id"]]  # still in the test set: David never trained on it
         assert p.country == "GT" and p.direction == e["direction"] and p.source == e["text"] and p.target == e["reference"]
         assert e["source"].startswith("https://") and e["license"] and e["why"]
-        assert len(e["live_runs"]) >= 3 and all(r["david"] == e["david"] for r in e["live_runs"])
+        assert len(e["live_runs"]) >= 3
+        for run in e["live_runs"]:
+            check = lambda hyp: [t["ok"] for t in term_checks(bank, cps, e["text"], e["direction"], "GT", hyp, e["reference"])]  # noqa: E731
+            assert check(run["david"]) and all(check(run["david"])), run
+            assert run["goliath"] is None or not all(check(run["goliath"])), run

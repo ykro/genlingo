@@ -1,11 +1,10 @@
-"""duel_core — small, app-agnostic toolkit for "small local model vs. big cloud model" duels.
+"""duel_core — small, app-agnostic toolkit for "small own model vs. big cloud model" comparisons.
 
 Everything here is independent of the language pair or the task: the app injects its own
 prompt templates, prices and model names (from env vars). Used by Genlingo (Gen Z <-> parents)
 and Tzij (Spanish <-> K'iche'). Vendored with `_base/sync.sh`, never imported from `_base`.
 """
 
-from .connectivity import Connectivity
 from .cost import Price, PriceSchedule, cost_usd
 from .duel import Contender, ContenderResult, run_duel
 from .gemini_client import GeminiClient
@@ -18,7 +17,6 @@ from .types import Completion, Message, ModelClient, OfflineError
 
 __all__ = [
     "Completion",
-    "Connectivity",
     "Contender",
     "ContenderResult",
     "GeminiClient",

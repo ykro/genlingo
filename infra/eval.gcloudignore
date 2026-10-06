@@ -1,0 +1,14 @@
+# What evals/Dockerfile copies (the eval job image).
+*
+!duel/
+duel/.venv/
+duel/**/__pycache__/
+duel/.pytest_cache/
+!evals/
+evals/results/
+evals/**/__pycache__/
+!data/
+data/.cache/stt_*
+!train/
+train/*
+!train/runs/

@@ -1,7 +1,7 @@
 """Genlingo's translation prompt: the only prompt both David and Goliath ever see.
 
 The same template renders the fine-tuning data (`scripts/build_train_set.py`), so David is
-trained on exactly the format he is asked in on stage. `country` goes into the prompt because
+trained on exactly the format he is asked in on the page. `country` goes into the prompt because
 "está bien chido" (MX) and "está bien chilero" (GT) are the same sentence in different places.
 """
 

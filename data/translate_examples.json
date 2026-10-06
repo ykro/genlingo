@@ -1,5 +1,5 @@
 {
- "about": "Ejemplos de la página /traducir. Son frases de jerga chapina (Guatemala) del set de prueba: David nunca las vio al entrenar. Se probaron en vivo las 51 frases chapinas cortas que la revisión término por término puede juzgar, 3 veces con cada modelo (2026-10-06). Solo quedaron las que David tradujo bien y Goliath mal las 3 veces, y donde una persona ve lo mismo que la revisión: Goliath deja jerga o cambia el significado. Se descartaron las frases donde Goliath acertó alguna vez o dijo algo razonable con otras palabras (por ejemplo «échale un ojo» por «chotea», «qué tufo» por «chish»).",
+ "about": "Ejemplos de la página de comparación. Son frases de jerga chapina (Guatemala) del set de prueba: David nunca las vio al entrenar. Se probaron en vivo las 51 frases chapinas cortas que la revisión término por término puede juzgar, 3 veces con cada modelo (2026-10-06). Solo quedaron las que David tradujo bien y Goliath mal las 3 veces, y donde una persona ve lo mismo que la revisión: Goliath deja jerga o cambia el significado. Se descartaron las frases donde Goliath acertó alguna vez o dijo algo razonable con otras palabras (por ejemplo «échale un ojo» por «chotea», «qué tufo» por «chish»). Después de pasar a David a la nube se volvieron a probar los 4 contra el David de Cloud Run (GPU L4), 3 veces cada uno con los dos modelos (2026-10-06): David acertó la jerga las 12 veces y Goliath ninguna. Esas son las respuestas guardadas en live_runs.",
  "david_model": "genlingo-2026-10c-e2b-nomulti",
  "goliath_model": "gemini-3.8-flash",
  "verified": "2026-10-06",
@@ -15,15 +15,15 @@
    "live_runs": [
     {
      "david": "Esa tarea tuya te quedó muy mala",
-     "goliath": "esa tu tarea te quedó bien pura lata"
+     "goliath": "Esa tu tarea te quedó bien garra."
     },
     {
      "david": "Esa tarea tuya te quedó muy mala",
+     "goliath": "Esa tu tarea te quedó pura lata"
+    },
+    {
+     "david": "Esa tarea tuya te quedó muy mal hecha",
      "goliath": "Esa tu tarea te quedó bien pura lata"
-    },
-    {
-     "david": "Esa tarea tuya te quedó muy mala",
-     "goliath": "esa tu tarea te quedó pura lata"
     }
    ],
    "david": "Esa tarea tuya te quedó muy mala"
@@ -39,15 +39,15 @@
    "live_runs": [
     {
      "david": "No te creo vos, ¡ya sé que vos solo mentís!",
-     "goliath": "No te creo vos, ¡si ya sé que sos puro casaquero!"
+     "goliath": "No te creo mano, ¡si ya sé que vos pura casaca sos!"
     },
     {
      "david": "No te creo vos, ¡ya sé que vos solo mentís!",
-     "goliath": "No te creo nada vos, ¡si ya sé que pura casaca sos!"
+     "goliath": "No te creo vos, ¡si ya sé que pura casaca sos!"
     },
     {
      "david": "No te creo vos, ¡ya sé que vos solo mentís!",
-     "goliath": "No te creo vos, ¡si ya sé que sos bien casaquero!"
+     "goliath": "No te creo vos, ¡si ya sé que pura casaca sos!"
     }
    ],
    "david": "No te creo vos, ¡ya sé que vos solo mentís!"
@@ -63,7 +63,7 @@
    "live_runs": [
     {
      "david": "Sí, seguro llego al partido.",
-     "goliath": "Cabal, fijo llego al partido."
+     "goliath": "Cabal, sin falta llego al partido."
     },
     {
      "david": "Sí, seguro llego al partido.",
@@ -87,15 +87,15 @@
    "live_runs": [
     {
      "david": "Voy a comprar algo de refa para media mañana.",
+     "goliath": null
+    },
+    {
+     "david": "Voy a comprar algo de refa para media mañana.",
      "goliath": "Voy a conseguir un munchies para el bajón de media mañana."
     },
     {
      "david": "Voy a comprar algo de refa para media mañana.",
-     "goliath": "Voy a conseguir un munchies para media mañana."
-    },
-    {
-     "david": "Voy a comprar algo de refa para media mañana.",
-     "goliath": "Voy a comprar algo para monchear a media mañana."
+     "goliath": "Voy a conseguir un munchies para el bajón de media mañana."
     }
    ],
    "david": "Voy a comprar algo de refa para media mañana."

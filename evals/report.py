@@ -104,7 +104,7 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
         xs = c["genz_to_parent"] + c["parent_to_genz"]
         return sum(xs) / len(xs) if xs else 0.0
 
-    # On-stage David. Rule: the best slang handling among Davids within the latency budget; if a
+    # The page's David. Rule: the best slang handling among Davids within the latency budget; if a
     # quantization sweep exists, the SMALLEST file within 2 points of that best (compression wins
     # unless it costs slang).
     candidates = [n for n, sm in summary.items() if sm["role"] in ("david", "david_alt", "david_f16", "david_alt_f16")
@@ -119,7 +119,7 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
                 and summary[n].get("size_bytes")]
         # Ties on size (same quantization) go to the higher chrF++.
         david = min(near, key=lambda n: (summary[n]["size_bytes"], -(summary[n]["chrf"] or 0)), default=best)
-        label = "Mejor David en desarrollo" if raw.get("split") == "dev" else "David en escena"
+        label = "Mejor David en desarrollo" if raw.get("split") == "dev" else "David de la página"
         lines += [
             f"**{label}:** `{david}` ({_gb(summary[david].get('size_bytes'))}, p50 {_ms(summary[david]['p50'])}): "
             f"el archivo más pequeño a ≤ 2 puntos de `{ref}` ({100 * handled_total(computed[ref]):.0f} % de jerga resuelta), "
@@ -184,7 +184,7 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
             ]
     return lines
 
-P50_BUDGET_MS = 1000  # David must answer in under a second on the stage laptop
+P50_BUDGET_MS = 1000  # David must answer in under a second
 ROLE_LABEL = {
     "base": "base (sin ajuste)",
     "david": "David (LoRA, {quant})",
@@ -421,7 +421,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
         "## Resumen",
         "",
         "chrF++ de corpus (0–100, más es mejor) contra la referencia humana. Latencia de extremo a extremo "
-        "con el modelo ya cargado; los modelos locales corren uno a la vez en la laptop del escenario.",
+        "con el modelo ya cargado; los modelos de Ollama corren uno a la vez en la GPU del job del eval.",
         "",
         table(
             ["modelo", "rol", "prompt", "chrF++", "p50", "p95", "costo total", "costo / 1,000 frases", "tamaño", "errores"],
@@ -484,11 +484,11 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
             "",
         ]
     elif pairs_f16:
-        # The stage David's f16 wasn't in this eval: show the f16-vs-quantized pairs that were.
+        # The page David's f16 wasn't in this eval: show the f16-vs-quantized pairs that were.
         lines += [
             "## Compresión: f16 vs cuantizado",
             "",
-            "El David de escena no se evaluó en f16 en esta ejecución; estas son las comparaciones que sí tiene, "
+            "El David de la página no se evaluó en f16 en esta ejecución; estas son las comparaciones que sí tiene, "
             "cada David con su propio f16 y el mismo prompt.",
             "",
             table(
@@ -500,7 +500,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
         ]
     else:
         lines += [f"## Compresión: f16 vs {quant}", "",
-                  "Esta ejecución no incluyó ningún David en f16; para compararlo, `make pull-model TAG=<tag> FP16=1` antes de `make eval`.", ""]
+                  "Esta ejecución no incluyó ningún David en f16; para compararlo, publica su f16 (`KEEP_F16=1` en `make train`) antes de `make eval`.", ""]
 
     lines += ["## Entrenamiento", ""]
     run = None
@@ -525,7 +525,7 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
                 if run.get("rates_usd_per_s")
                 else f"Costo = duración × tarifa por hora estimada (${run.get('hourly_usd', 0)}/h)."
             )
-            + " Un reentrenamiento mensual cuesta eso; la inferencia de David cuesta $0 porque corre en la laptop.",
+            + " Un reentrenamiento mensual cuesta eso.",
             "",
         ]
     else:

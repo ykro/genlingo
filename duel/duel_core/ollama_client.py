@@ -1,4 +1,4 @@
-"""Minimal async client for Ollama's REST API (David's side of the duel).
+"""Minimal async client for Ollama's REST API (David's side of the comparison).
 
 Uses /api/chat with `stream: false`: for short translations the full answer arrives in a few
 hundred ms, so streaming adds complexity without changing what the audience sees.
@@ -26,17 +26,18 @@ class OllamaClient:
         temperature: float = 0.2,
         num_predict: int = 128,
         seed: int | None = None,
-        keep_alive: str = "2h",  # keep David loaded through a talk: a cold load costs seconds on stage
+        keep_alive: str | int = -1,  # keep David loaded while his instance lives: a model load costs seconds
         think: bool = False,  # hybrid-reasoning models think by default; a translation doesn't need it
         timeout_s: float = 60.0,
         transport: httpx.AsyncBaseTransport | None = None,
+        auth: httpx.Auth | None = None,  # e.g. an ID token for a private Cloud Run service
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.options: dict[str, Any] = {"temperature": temperature, "num_predict": num_predict}
         if seed is not None:
             self.options["seed"] = seed
         self.keep_alive, self.think = keep_alive, think
-        self._http = httpx.AsyncClient(base_url=self.base_url, timeout=timeout_s, transport=transport)
+        self._http = httpx.AsyncClient(base_url=self.base_url, timeout=timeout_s, transport=transport, auth=auth)
 
     async def complete(self, messages: list[Message], *, model: str, options: dict[str, Any] | None = None) -> Completion:
         """`options` overrides the client's defaults for this call (e.g. temperature and seed for N-best)."""
@@ -67,17 +68,23 @@ class OllamaClient:
         )
 
     async def embed(self, texts: list[str], *, model: str) -> list[list[float]]:
-        """Sentence embeddings (e.g. EmbeddingGemma) for local retrieval: works offline too."""
+        """Sentence embeddings (e.g. EmbeddingGemma) for retrieval, served by the same Ollama."""
         res = await self._http.post("/api/embed", json={"model": model, "input": texts, "keep_alive": self.keep_alive})
         if res.status_code != 200:
             raise OllamaError(f"Ollama embed {res.status_code}: {res.text[:200]}")
         return res.json()["embeddings"]
 
-    async def is_up(self) -> bool:
+    async def is_up(self, timeout_s: float = 1.5) -> bool:
         try:
-            return (await self._http.get("/api/version", timeout=1.5)).status_code == 200
+            return (await self._http.get("/api/version", timeout=timeout_s)).status_code == 200
         except httpx.HTTPError:
             return False
+
+    async def loaded_models(self, timeout_s: float = 10.0) -> list[str]:
+        """Models currently in memory (/api/ps): a loaded model answers without a load delay."""
+        res = await self._http.get("/api/ps", timeout=timeout_s)
+        res.raise_for_status()
+        return [(m.get("name") or "").removesuffix(":latest") for m in res.json().get("models", [])]
 
     async def list_models(self) -> list[dict[str, Any]]:
         res = await self._http.get("/api/tags")
@@ -89,9 +96,18 @@ class OllamaClient:
         names = {m.get("name") for m in models} | {m.get("model") for m in models}
         return model in names or f"{model}:latest" in names
 
-    async def warm_up(self, model: str) -> None:
-        """Load the model into memory before the first round (an empty chat just loads it)."""
-        await self._http.post("/api/chat", json={"model": model, "messages": [], "keep_alive": self.keep_alive})
+    async def warm_up(self, model: str, timeout_s: float = 600.0) -> None:
+        """Load the model into memory before the first request (an empty chat just loads it)."""
+        res = await self._http.post("/api/chat", json={"model": model, "messages": [], "keep_alive": self.keep_alive},
+                                    timeout=timeout_s)
+        if res.status_code != 200:
+            raise OllamaError(f"Ollama {res.status_code}: {res.text[:200]}")
+
+    async def warm_up_embedding(self, model: str, timeout_s: float = 600.0) -> None:
+        res = await self._http.post("/api/embed", json={"model": model, "input": ["hola"], "keep_alive": self.keep_alive},
+                                    timeout=timeout_s)
+        if res.status_code != 200:
+            raise OllamaError(f"Ollama embed {res.status_code}: {res.text[:200]}")
 
     async def aclose(self) -> None:
         await self._http.aclose()

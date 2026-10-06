@@ -9,7 +9,7 @@ retrains. Alternative: `TRAIN_RUNTIME=vertex` runs everything as one Vertex AI C
 
 Steps: upload the chat JSONL to the staging bucket (same region as the GPU), build/reuse the
 training image (Cloud Build, cached by content hash), run the jobs, poll until they finish, then
-write train/runs/<tag>.json with duration, machine and cost per stage and in total. That file is what the talk shows:
+write train/runs/<tag>.json with duration, machine and cost per stage and in total. That file is what the README and the talk quote:
 "retraining David this month took N minutes and cost $X".
 
 Only needs the gcloud CLI (no SDK), so it runs anywhere gcloud is authenticated.
