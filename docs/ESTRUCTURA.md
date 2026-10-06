@@ -18,7 +18,7 @@ El ciclo de cada mes, de los datos al escenario y de vuelta:
 
 ![App del público en un teléfono: frase enviada y voto](demo/06-publico-telefono.png)
 
-Todas las pantallas, paso a paso, en [DEMO.md](DEMO.md).
+La demo de la charla, la página para traducir con David, en [DEMO.md](DEMO.md).
 
 ## Mapa del repositorio
 
@@ -27,14 +27,16 @@ duel/                 Servicio del duelo (FastAPI) — corre en la laptop
   duel_core/          Núcleo reutilizable: duelo en paralelo, clientes Ollama/Gemini/mock,
                       conectividad, costo con tarifas fechadas, chrF++, percentiles
   genlingo_duel/      La app: prompts, glosario, banco de términos, arena, marcador (SQLite),
-                      puente con Firestore (audience_feed.py), API (main.py)
+                      puente con Firestore (audience_feed.py), API (main.py), la página para
+                      traducir (translate_page.py, static/traducir.html)
   tests/              Pruebas del servicio (MOCK_AI=1)
 web/                  Next.js: app del público (/), moderación (/admin), vista del presentador (/presenter)
   app/api/            Rutas del público (frases, pares, votos, config) y de admin
   lib/server/         Auth + App Check, límite de 20 s, blocklist, validación, Firestore
   e2e/                Ensayos con Playwright y con el emulador de Android
   firestore.rules     Ningún cliente escribe directo; todo pasa por la API
-data/                 terms.jsonl, raw/web_usage.jsonl, pairs/, review/, SOURCES.md, DATASHEET.md
+data/                 terms.jsonl, raw/web_usage.jsonl, pairs/, review/, SOURCES.md, DATASHEET.md,
+                      translate_examples.json (los ejemplos de /traducir, verificados)
 scripts/              Construcción de datos, revisión, export, reset, make up, warmup, preflight
 train/                train_lora.py, finish.py, submit_job.py, finish_local.py, train_local.py, notebook, runs/
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/

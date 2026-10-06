@@ -62,7 +62,7 @@ Ensayo sin red ni GPU: `MOCK_AI=1` en `.env` y `make up`. Requisitos, el David a
 
 ## Documentación
 
-- [docs/DEMO.md](docs/DEMO.md): guion de la demo, pantalla por pantalla (teclas, frases, qué decir, tiempos y qué hacer si algo falla).
+- [docs/DEMO.md](docs/DEMO.md): guion de la demo, la página para traducir con David (cómo abrirla, qué ejemplos tocar, qué decir y qué hacer si algo falla).
 - [docs/ONBOARDING.md](docs/ONBOARDING.md): instalación, nube, cadena de datos y entrenamiento, recorrido del código, problemas frecuentes y lista del día.
 - [docs/BITACORA.md](docs/BITACORA.md): la historia de David iteración por iteración, con los callejones sin salida y los nichos.
 - [docs/DECISIONES.md](docs/DECISIONES.md): lo que enseña la demo en detalle, cada decisión técnica, resultados completos y costo de entrenamiento.

@@ -64,7 +64,7 @@ Rehearsal with no network or GPU: `MOCK_AI=1` in `.env` and `make up`. Requireme
 
 ## Documentation
 
-- [docs/DEMO.md](docs/DEMO.md) (Spanish): the demo script, screen by screen (keys, phrases, talking points, timings and what to do if something fails).
+- [docs/DEMO.en.md](docs/DEMO.en.md): the demo script, the page where David translates (how to open it, which examples to tap, talking points and what to do if something fails).
 - [docs/ONBOARDING.md](docs/ONBOARDING.md) (Spanish): setup, cloud, data and training chain, code walkthrough, common problems and talk-day checklist.
 - [docs/BITACORA.md](docs/BITACORA.md) (Spanish): David's story iteration by iteration, with the dead ends and the niches.
 - [docs/DECISIONES.en.md](docs/DECISIONES.en.md): what the demo teaches in detail, every technical decision, full results and training cost.

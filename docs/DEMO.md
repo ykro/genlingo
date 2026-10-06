@@ -1,178 +1,88 @@
 # Guion de la demo
 
-El plan paso a paso de la demo en escena: qué hay que tener listo antes, qué teclear en cada pantalla, qué
-decir y cuánto dura. Unos 11 minutos en total. La demo funciona sin público (pasos 2, 3, 4, 7 y 8) y sin
-internet para David (paso 8).
+La demo es una sola página: David traduce entre la jerga de Gen Z y el español de los papás, en la
+laptop y sin internet. Se elige la dirección, se escribe una frase o se toca un ejemplo, y se pulsa
+**Traducir**. Unos 3 minutos.
 
-Teclas de la vista del presentador: `E` set de prueba · `G` especialidad chapín · `/` escribir (`Tab`
-cambia la dirección, `Esc` cancela) · `Enter` siguiente frase del público · `V` cerrar votos · `M` David
-anterior / de escena · `F` pantalla completa.
+## Antes de la charla
 
-## Antes de la demo
+Una hora antes, en la laptop del escenario (cargada):
 
-Una hora antes, en la laptop del escenario (M1 Max, cargada):
-
-- [ ] Con público: `AUDIENCE_FEED=1` en `.env`. Con `AUTO_APPROVE_PHRASES=1` (por defecto en Cloud Run)
-      las frases que pasan el filtro llegan solas a la fila. Sin público, déjalo en `0`.
-- [ ] `make up` en una terminal. Arranca Ollama, precarga los dos Davids y EmbeddingGemma, levanta el
-      duelo (`:8787`) y la vista del presentador (`:3000/presenter`). Si algo falla, dice qué y en qué línea.
+- [ ] `make up` en una terminal. Arranca Ollama, carga a David y el modelo del glosario, y levanta la
+      página.
 - [ ] En otra terminal:
 
       ```bash
       make stage-on && make warmup && make preflight
       ```
 
-      `stage-on` deja una instancia tibia de la app del público. `warmup` la despierta, carga los modelos
-      y hace una llamada a David y otra a Goliath por el duelo (no cuenta como ronda). `preflight` revisa
-      Ollama y los modelos, el duelo, la vista del presentador, los datos, el disco, la app del público
-      (200, `min-instances` ≥ 1, mismo evento), Gemini y Firestore. Tiene que terminar en
-      «preflight ok»; cada `[FALLA]` dice cómo arreglarlo.
-- [ ] Proyector: pantalla duplicada o extendida a 1920×1080, Chrome en `http://127.0.0.1:3000/presenter`,
-      zoom 100 %, `F` para pantalla completa. Mira desde el fondo de la sala que el QR se lea.
-- [ ] App del público: abre la URL de Cloud Run en el Chrome del emulador `Pixel_9_API_36_1`. Tiene
-      que cargar «El duelo está por empezar.».
-- [ ] Prueba de Wi-Fi apagado: apaga el Wi-Fi, escribe una frase, comprueba «Sin conexión» y que David
-      responde; vuelve a encender el Wi-Fi y espera a que el indicador diga «En línea».
-- [ ] `make reset`: marcador en cero (tarda menos de un segundo; si Firestore falla, lo dice). Deja la
-      pantalla de bienvenida proyectada.
+      `preflight` revisa los modelos, la página y traduce en vivo cada ejemplo: los seis tienen que
+      salir igual que cuando se verificaron. Tiene que terminar en «preflight ok»; cada `[FALLA]` dice
+      cómo arreglarlo.
+- [ ] Abre `http://127.0.0.1:8787/traducir` en Chrome, en pantalla completa, y comprueba que se lea
+      desde el fondo de la sala.
+- [ ] Toca un ejemplo una vez para que la primera traducción en escena no sea la más lenta.
 
-Después de la charla:
+Después de la charla: `make stage-off`.
 
-- [ ] `make stage-off`: la app del público vuelve a `min-instances=0` y deja de cobrar en reposo.
+## En escena
 
-## Paso a paso
+### 1 · La página (30 s)
 
-### 1 · Bienvenida y QR (1 min)
+![La página para traducir](demo/10-traducir-genz-a-papas.png)
 
-![Bienvenida con el QR](demo/01-bienvenida.png)
+> Esto es David: un modelo pequeño que corre en esta laptop, sin internet. Lo entrenamos con jerga
+> real de Guatemala.
 
-Pantalla inicial, sin tocar nada.
+### 2 · De Gen Z a papás (1 min)
 
-> Un modelo pequeño en esta laptop contra un gigante en la nube. Escaneen el código: van a mandar frases y votar.
+Toca dos ejemplos de «Gen Z → papás»:
 
-### 2 · Ronda de evaluación (1.5 min)
+| Ejemplo | Lo que responde David |
+| --- | --- |
+| Agarrá tus chivas y nos vamos al partido de fut. | Agarrá tus cosas y nos vamos al partido de fútbol. |
+| Hacé eso al chilazo antes de que llegue tu mamá. | Hacé eso rapidito antes de que llegue tu mamá. |
+| El chonte nos ayudó a encontrar la dirección. | El policía nos ayudó a encontrar la dirección. |
 
-![Ronda de evaluación](demo/02-ronda-evaluacion.png)
+> «Chivas», «al chilazo», «chonte»: David sabe qué significan y lo dice como lo diría tu mamá, en
+> menos de un segundo y sin costo.
 
-```
-E
-```
+### 3 · De papás a Gen Z (1 min)
 
-Una frase del set de prueba con su referencia humana y el chrF++ de cada uno.
+![De papás a Gen Z](demo/11-traducir-papas-a-genz.png)
 
-> Las frases de prueba son reales, de la web, y David nunca las vio al entrenar; el chrF++ mide cuánto se parece cada traducción a la referencia.
+Toca dos ejemplos de «Papás → Gen Z»:
 
-### 3 · Ronda de especialidad: slang chapín (1.5 min)
+| Ejemplo | Lo que responde David |
+| --- | --- |
+| ¡Épale, cuidado con el carro! | ¡Trucha, maje, cuidado con el carro! |
+| Voy a comprar algo de refacción para media mañana. | Voy a comprar algo de refa para media mañana. |
+| No seas tan mashcuil, ya aceptá la verdad. | No seas tan necio, maje, ya aceptá la verdad. |
 
-![Ronda de especialidad](demo/03-especialidad-chapin.png)
+> La dirección difícil: no basta con quitar la jerga, hay que poner la jerga correcta de aquí.
 
-```
-G
-```
+### 4 · Una frase escrita (30 s, opcional)
 
-La siguiente frase guatemalteca del set de prueba, en un orden fijo con semilla: nadie la elige.
+Escribe en el cuadro una frase con jerga chapina y pulsa **Traducir**.
 
-> Este es el terreno de David: jerga chapina, donde Gemini tiene pocos datos y nosotros investigamos 115 frases reales.
+> Cualquier frase, en vivo, en la laptop.
 
-### 4 · Frase escrita, Gen Z → papás (1 min)
+## De dónde salen los ejemplos
 
-![Frase escrita Gen Z → papás](demo/04-genz-a-papas.png)
+Los seis ejemplos están en `data/translate_examples.json`, con su fuente y su licencia. Son frases
+de jerga chapina del set de prueba: David nunca las vio al entrenar. Cada una se tradujo cuatro
+veces en vivo con el David de escena (`genlingo-2026-10c-e2b-nomulti`) y las cuatro salieron bien.
+Se eligieron de Guatemala porque ahí es donde David acierta más jerga que Gemini (52 % contra 23 %,
+[evals/report.md](../evals/report.md)).
 
-```
-/
-Qué onda, maje, no traigo pisto para el chinique, estoy bien pisado
-Enter
-```
-
-> David responde en menos de un segundo y gratis; Goliath depende de la red y cobra por cada frase.
-
-### 5 · Frase escrita, papás → Gen Z (1 min)
-
-![Frase escrita papás → Gen Z](demo/05-papas-a-genz.png)
-
-```
-/
-Tab
-Mijo, ese patojo es muy shute y anda armando bochinche
-Enter
-```
-
-`Tab` cambia la dirección a «Papás → Gen Z» antes de escribir.
-
-> La dirección difícil: hay que producir jerga real del país, no solo quitarla. Aquí es donde más mejoró David con datos reales.
-
-### 6 · Frase del público (2 min)
-
-![La frase en el teléfono](demo/06-publico-telefono.png)
-![La frase del público en la pantalla](demo/07-publico-pantalla.png)
-
-En el Chrome del emulador (o un teléfono de la sala), en la URL de Cloud Run, escribe y envía:
-
-```
-nel, maje, ese chance está bien clavado
-```
-
-La fila de la pantalla muestra «1 frase del público en fila». En la laptop:
-
-```
-Enter
-V
-```
-
-`Enter` lanza la ronda con la frase del público, el público vota desde el teléfono y `V` cierra la votación.
-
-> La frase llegó del teléfono a la pantalla en segundos; el voto decide quién ganó.
-
-### 7 · El David anterior (1 min)
-
-![El David anterior](demo/08-david-anterior.png)
-
-```
-M
-/
-no manches, la peli estuvo bien mid y me dio cringe
-Enter
-M
-```
-
-`M` cambia al David anterior (`genlingo-2026-10-e2b-q5_k_m`); el marcador cuenta solo sus rondas. `M` otra vez vuelve al de escena.
-
-> Reentrenar a David con los datos del mes cuesta 97 centavos de dólar; los modelos grandes envejecen al ritmo de su próxima versión.
-
-### 8 · Wi-Fi apagado (1 min)
-
-![Sin internet](demo/09-sin-internet.png)
-
-Apaga el Wi-Fi de la laptop y escribe:
-
-```
-/
-ese bolo anda chupando desde la tarde, qué pena con los vecinos
-Enter
-```
-
-Goliath aparece «Sin conexión» y David responde igual. Vuelve a encender el Wi-Fi.
-
-> Goliath vive en la nube. David vive aquí: sin internet, sin costo por frase y sin mandar datos a nadie.
-
-### 9 · Cierre con el marcador (30 s)
-
-Sin teclas: el marcador queda en pantalla con victorias, chrF++ medio, latencia p50 y costo acumulado de
-cada uno.
-
-> Con los mismos datos, Gemini se acerca a David, pero en jerga chapina David sigue ganando; la ventaja de David son sus datos, y esos son nuestros.
+Una frase escrita en vivo no está verificada de antemano: David puede equivocarse con jerga que no
+conoce.
 
 ## Si algo falla
 
 | Síntoma | Qué hacer |
 | --- | --- |
-| La pantalla dice «Duelo sin respuesta» | El servicio del duelo se cayó: en la terminal de `make up`, `Ctrl+C` y `make up` otra vez (30 s). El marcador está en SQLite y se conserva. |
-| David tarda más de 2 s en la primera ronda | Se descargó el modelo de memoria: haz una ronda de calentamiento (`/`, una frase corta) antes de seguir. |
-| «David no está cargado en Ollama» | `ollama ps`; si no aparece, `make up` lo vuelve a precargar. Mientras tanto, sigue con rondas de Goliath. |
-| Goliath tarda más de 10 s o falla | La red del lugar está lenta: sigue con David; el paso 8 ya cuenta esa historia. |
-| El indicador dice «Sin conexión» con Wi-Fi encendido | El chequeo se refresca cada 3 s; espera o comprueba la red con `curl -sI https://aiplatform.googleapis.com`. |
-| No llegan frases del público | Revisa `AUDIENCE_FEED=1` en `.env` y `"audience_feed": true` en `/health`. Plan B: escribe tú la frase con `/`. |
-| El QR no se lee desde el fondo | Dicta la URL corta o compártela en el chat del evento; la app funciona igual. |
-| Una frase del público tiene groserías | El filtro la bloquea antes de la fila; si pasa algo raro, `AUTO_APPROVE_PHRASES=0` y apruebas en `/admin`. |
-| `E` o `G` dicen que no quedan frases | Ya se usaron todas: `make reset` (pierdes el marcador) o sigue con frases escritas. |
-| El proyector corta la pantalla | Chrome a 1920×1080 y zoom 100 % (`Cmd+0`), `F` para pantalla completa. |
+| La página no abre | `make up` en una terminal; la página está en `http://127.0.0.1:8787/traducir`. |
+| «David no respondió» | Ollama no está corriendo o no tiene a David: `ollama ps` y `make up` otra vez. |
+| La primera traducción tarda más de 2 s | El modelo se había descargado de memoria: toca un ejemplo y sigue. |
+| Un ejemplo responde distinto a la tabla | `make preflight` lo marca; revisa que `LOCAL_MODEL_TAG` en `.env` sea `genlingo-2026-10c-e2b-nomulti`. |

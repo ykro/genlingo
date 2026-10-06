@@ -60,4 +60,4 @@ make reset                                       # scoreboard to zero
 make stage-off                                   # afterwards: the audience app scales to zero again
 ```
 
-The on-stage demo script, screen by screen (keys, phrases, talking points, timings and what to do if something fails), is in [DEMO.md](DEMO.md) (Spanish).
+The on-stage demo script (the translation page: how to open it, which examples to tap, talking points and what to do if something fails) is in [DEMO.en.md](DEMO.en.md).

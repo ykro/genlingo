@@ -60,4 +60,4 @@ make reset                                       # marcador en cero
 make stage-off                                   # después: la app del público vuelve a escalar a cero
 ```
 
-El guion de la demo en escena, pantalla por pantalla (teclas, frases, qué decir, tiempos y qué hacer si algo falla), está en [DEMO.md](DEMO.md).
+El guion de la demo en escena (la página para traducir: cómo abrirla, qué ejemplos tocar, qué decir y qué hacer si algo falla) está en [DEMO.md](DEMO.md).
