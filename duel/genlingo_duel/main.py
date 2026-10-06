@@ -17,7 +17,7 @@ from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from .arena import Arena
@@ -27,7 +27,7 @@ from .prompts import COUNTRIES, Direction
 from .runs import load_run
 from .scoreboard import Scoreboard
 from .settings import Settings, get_settings
-from .translate_page import PAGE, load_examples
+from .translate_page import FONTS, PAGE, check_terms, find_example, load_examples
 
 log = logging.getLogger("genlingo.duel")
 
@@ -65,6 +65,8 @@ class EvaluationRequest(BaseModel):
 class TranslateRequest(BaseModel):
     phrase: str = Field(min_length=1, max_length=400)
     direction: Direction
+    # An example button: the answer also carries the ✓/✗ per slang term (translate_page.py).
+    example_id: str | None = Field(default=None, max_length=40)
 
 
 class VotesRequest(BaseModel):
@@ -189,20 +191,29 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None, fee
 
     @app.get("/traducir", response_class=HTMLResponse)
     async def translate_page() -> str:
-        """The translation page: David alone, Gen Z ↔ papás (translate_page.py)."""
+        """The comparison page: David and Goliath side by side (translate_page.py)."""
         return PAGE.read_text(encoding="utf-8")
+
+    @app.get("/traducir/fonts/{name}")
+    async def translate_font(name: str) -> FileResponse:
+        if name not in FONTS or not FONTS[name].exists():
+            raise HTTPException(404, "No existe.")
+        return FileResponse(FONTS[name], media_type="font/woff2", headers={"Cache-Control": "max-age=86400"})
 
     @app.get("/translate/examples")
     async def translate_examples() -> list[dict]:
         return load_examples(s.data_dir)
 
-    @app.post("/translate")
-    async def translate(req: TranslateRequest) -> dict:
-        """David's translation only: no Goliath, no round, nothing recorded."""
-        res = await arena.translate(req.phrase.strip(), req.direction, s.country)
-        if res.status != "ok":
-            raise HTTPException(503, "David no respondió. Revisa que Ollama esté corriendo (make up).")
-        return {"text": res.text, "latency_ms": res.latency_ms, "model": res.model, "glossary": res.extra.get("glossary", [])}
+    @app.post("/translate/{side}")
+    async def translate(req: TranslateRequest, side: Literal["david", "goliath"]) -> dict:
+        """One side's translation (the page asks both at once): no round, no score, nothing recorded.
+        Without internet Goliath answers "offline" and David still translates."""
+        res = await arena.translate_one(side, req.phrase.strip(), req.direction, s.country)
+        out = {"status": res.status, "text": res.text, "latency_ms": res.latency_ms, "cost_usd": res.cost_usd, "model": res.model}
+        example = find_example(s.data_dir, req.example_id)
+        if example and example["text"] == req.phrase.strip() and res.status == "ok":
+            out["terms"] = check_terms(s.data_dir, example, s.country, res.text)
+        return out
 
     @app.post("/duel")
     async def duel(req: DuelRequest) -> dict:

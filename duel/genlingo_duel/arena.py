@@ -162,24 +162,25 @@ class Arena:
                 res.extra["nbest"] = [{"text": t, "score": sc} for t, sc in david_client.last]
         return results
 
-    async def translate(self, phrase: str, direction: Direction, country: str) -> ContenderResult:
-        """David alone, for the translation page: his prompt and term-bank glossary, exactly as in a
-        duel, but no Goliath and nothing recorded. Needs no internet."""
+    async def translate_one(self, side: str, phrase: str, direction: Direction, country: str) -> ContenderResult:
+        """One side of the comparison page, with the same prompt (and, for David, the same glossary)
+        as in a duel, so each column can show its answer as soon as it arrives. Nothing is recorded."""
         s = self.settings
-        style = prompt_style_for(s, s.david_tag)
+        style = prompt_style_for(s, s.david_tag) if side == "david" else canonical_style(s.goliath_prompt_style)
         entries, retrieval_ms = [], 0.0
         if style in GLOSSARY_STYLES:
             entries, retrieval_ms, _ = await self.glossary_entries(style, phrase, direction, country)
         glossary = render_glossary(entries, COUNTRIES[country]) if style in GLOSSARY_STYLES else ""
         messages = translation_messages(phrase, direction, country, style, glossary)
         david_client = None
-        if s.david_nbest > 1 and style in GLOSSARY_STYLES:
+        if side == "david" and s.david_nbest > 1 and style in GLOSSARY_STYLES:
             g = await self.get_glossary()
             david_client = NBestClient(self.david_client, s.david_nbest, term_bank_scorer(g.bank, phrase, direction, country, entries))
-        res = (await run_duel(self.contenders(s.david_tag, david_client)[:1], messages, online=True))["david"]
+        contender = [c for c in self.contenders(s.david_tag, david_client) if c.name == side]
+        online = True if side == "david" else await self.is_online()
+        res = (await run_duel(contender, messages, online=online))[side]
         if res.latency_ms is not None:
             res.latency_ms = round(res.latency_ms + retrieval_ms, 1)
-        res.extra = {"glossary": [e["term"] for e in entries if e.get("role") != "foreign"]}
         return res
 
     async def glossary_entries(self, style: str, phrase: str, direction: Direction, country: str) -> tuple[list[dict], float, str | None]:

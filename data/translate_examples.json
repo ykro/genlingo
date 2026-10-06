@@ -1,61 +1,104 @@
 {
-  "about": "Ejemplos de la página /traducir: jerga chapina (Guatemala), donde David le gana a Goliath (evals/report.md). Son frases del set de prueba; David nunca las vio al entrenar. Cada una se tradujo 4 veces en vivo con el David de escena y las 4 salieron bien.",
-  "model": "genlingo-2026-10c-e2b-nomulti",
-  "verified": "2026-10-06",
-  "examples": [
+ "about": "Ejemplos de la página /traducir. Son frases de jerga chapina (Guatemala) del set de prueba: David nunca las vio al entrenar. Se probaron en vivo las 51 frases chapinas cortas que la revisión término por término puede juzgar, 3 veces con cada modelo (2026-10-06). Solo quedaron las que David tradujo bien y Goliath mal las 3 veces, y donde una persona ve lo mismo que la revisión: Goliath deja jerga o cambia el significado. Se descartaron las frases donde Goliath acertó alguna vez o dijo algo razonable con otras palabras (por ejemplo «échale un ojo» por «chotea», «qué tufo» por «chish»).",
+ "david_model": "genlingo-2026-10c-e2b-nomulti",
+ "goliath_model": "gemini-3.8-flash",
+ "verified": "2026-10-06",
+ "examples": [
+  {
+   "pair_id": "test-w-0179",
+   "direction": "genz_to_parent",
+   "text": "esa tu tarea te quedó bien chafa",
+   "reference": "esa tarea te quedó muy mal hecha",
+   "source": "https://www.wikilengua.org/index.php/Jerga_juvenil/Guatemala",
+   "license": "CC BY-SA 3.0",
+   "why": "David dice que la tarea quedó mala, como lo diría un papá; Goliath cambia «chafa» por otra jerga («pura lata»).",
+   "live_runs": [
     {
-      "pair_id": "test-w-0191",
-      "direction": "genz_to_parent",
-      "text": "Agarrá tus chivas y nos vamos al partido de fut.",
-      "david": "Agarrá tus cosas y nos vamos al partido de fútbol.",
-      "reference": "Agarrá tus cosas y nos vamos al partido de fútbol.",
-      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/chivas.md",
-      "license": "MIT License"
+     "david": "Esa tarea tuya te quedó muy mala",
+     "goliath": "esa tu tarea te quedó bien pura lata"
     },
     {
-      "pair_id": "test-w-0198",
-      "direction": "genz_to_parent",
-      "text": "Hacé eso al chilazo antes de que llegue tu mamá.",
-      "david": "Hacé eso rapidito antes de que llegue tu mamá.",
-      "reference": "Hacé eso rapidito antes de que llegue tu mamá.",
-      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/chilazo.md",
-      "license": "MIT License"
+     "david": "Esa tarea tuya te quedó muy mala",
+     "goliath": "Esa tu tarea te quedó bien pura lata"
     },
     {
-      "pair_id": "test-w2-0013",
-      "direction": "genz_to_parent",
-      "text": "El chonte nos ayudó a encontrar la dirección.",
-      "david": "El policía nos ayudó a encontrar la dirección.",
-      "reference": "El policía nos ayudó a encontrar la dirección.",
-      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/chonte.md",
-      "license": "MIT License"
-    },
-    {
-      "pair_id": "test-w-0234",
-      "direction": "parent_to_genz",
-      "text": "¡Épale, cuidado con el carro!",
-      "david": "¡Trucha, maje, cuidado con el carro!",
-      "reference": "¡Trucha, maje, el carro!",
-      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/epale.md",
-      "license": "MIT License"
-    },
-    {
-      "pair_id": "test-w2-0066",
-      "direction": "parent_to_genz",
-      "text": "Voy a comprar algo de refacción para media mañana.",
-      "david": "Voy a comprar algo de refa para media mañana.",
-      "reference": "Voy a comprar algo de refa para media mañana.",
-      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/refaccion.md",
-      "license": "MIT License"
-    },
-    {
-      "pair_id": "test-w-0225",
-      "direction": "parent_to_genz",
-      "text": "No seas tan mashcuil, ya aceptá la verdad.",
-      "david": "No seas tan necio, maje, ya aceptá la verdad.",
-      "reference": "No seás tan necio, maje, ya aceptá que es así.",
-      "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/mashcuil.md",
-      "license": "MIT License"
+     "david": "Esa tarea tuya te quedó muy mala",
+     "goliath": "esa tu tarea te quedó pura lata"
     }
-  ]
+   ],
+   "david": "Esa tarea tuya te quedó muy mala"
+  },
+  {
+   "pair_id": "test-w-0202",
+   "direction": "genz_to_parent",
+   "text": "No te creo vos, ¡ya sé que vos solo pajas sos!",
+   "reference": "No te creo, ¡ya sé que vos solo mentiras decís!",
+   "source": "https://www.wikilengua.org/index.php/Jerga_juvenil/Guatemala",
+   "license": "CC BY-SA 3.0",
+   "why": "David traduce «pajas» como mentir; Goliath la cambia por otra jerga («casaca», «casaquero»).",
+   "live_runs": [
+    {
+     "david": "No te creo vos, ¡ya sé que vos solo mentís!",
+     "goliath": "No te creo vos, ¡si ya sé que sos puro casaquero!"
+    },
+    {
+     "david": "No te creo vos, ¡ya sé que vos solo mentís!",
+     "goliath": "No te creo nada vos, ¡si ya sé que pura casaca sos!"
+    },
+    {
+     "david": "No te creo vos, ¡ya sé que vos solo mentís!",
+     "goliath": "No te creo vos, ¡si ya sé que sos bien casaquero!"
+    }
+   ],
+   "david": "No te creo vos, ¡ya sé que vos solo mentís!"
+  },
+  {
+   "pair_id": "test-w-0206",
+   "direction": "genz_to_parent",
+   "text": "Simón, de ley llego al partido.",
+   "reference": "Sí, seguro que llego al partido.",
+   "source": "https://www.wikilengua.org/index.php/Jerga_juvenil/Guatemala",
+   "license": "CC BY-SA 3.0",
+   "why": "David dice «Sí, seguro»; Goliath cambia «simón, de ley» por más jerga («cabal», «fijo»).",
+   "live_runs": [
+    {
+     "david": "Sí, seguro llego al partido.",
+     "goliath": "Cabal, fijo llego al partido."
+    },
+    {
+     "david": "Sí, seguro llego al partido.",
+     "goliath": "Cabal, sin falta llego al partido."
+    },
+    {
+     "david": "Sí, seguro llego al partido.",
+     "goliath": "Cabal, sin falta llego al partido."
+    }
+   ],
+   "david": "Sí, seguro llego al partido."
+  },
+  {
+   "pair_id": "test-w2-0066",
+   "direction": "parent_to_genz",
+   "text": "Voy a comprar algo de refacción para media mañana.",
+   "reference": "Voy a comprar algo de refa para media mañana.",
+   "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/refaccion.md",
+   "license": "MIT License",
+   "why": "David dice «refa», como lo dice Gen Z en Guatemala; Goliath inventa «munchies» y «monchear», que no son chapines.",
+   "live_runs": [
+    {
+     "david": "Voy a comprar algo de refa para media mañana.",
+     "goliath": "Voy a conseguir un munchies para el bajón de media mañana."
+    },
+    {
+     "david": "Voy a comprar algo de refa para media mañana.",
+     "goliath": "Voy a conseguir un munchies para media mañana."
+    },
+    {
+     "david": "Voy a comprar algo de refa para media mañana.",
+     "goliath": "Voy a comprar algo para monchear a media mañana."
+    }
+   ],
+   "david": "Voy a comprar algo de refa para media mañana."
+  }
+ ]
 }
