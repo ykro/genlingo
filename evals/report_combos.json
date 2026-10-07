@@ -1,0 +1,4322 @@
+{
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | Todo": {
+  "n": 174,
+  "n_phrases": 174,
+  "david": 0.6206896551724138,
+  "rival": 0.4540229885057471,
+  "diff": 0.16666666666666666,
+  "ci": [
+   0.07471264367816093,
+   0.25862068965517243
+  ],
+  "win_rate": 0.704225352112676,
+  "only_david": 50,
+  "only_rival": 21,
+  "chrf_david": 61.431428563203816,
+  "chrf_rival": 50.803253106624226,
+  "p50_david": 288.8,
+  "p50_rival": 2846.2
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | País MX": {
+  "n": 67,
+  "n_phrases": 67,
+  "david": 0.6567164179104478,
+  "rival": 0.5223880597014925,
+  "diff": 0.13432835820895522,
+  "ci": [
+   -0.014925373134328358,
+   0.26865671641791045
+  ],
+  "win_rate": 0.68,
+  "only_david": 17,
+  "only_rival": 8,
+  "chrf_david": 62.94640541189989,
+  "chrf_rival": 47.99266888368339,
+  "p50_david": 280.1,
+  "p50_rival": 2063.8
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | País CO": {
+  "n": 46,
+  "n_phrases": 46,
+  "david": 0.5217391304347826,
+  "rival": 0.32608695652173914,
+  "diff": 0.1956521739130435,
+  "ci": [
+   0.0,
+   0.391304347826087
+  ],
+  "win_rate": 0.7142857142857143,
+  "only_david": 15,
+  "only_rival": 6,
+  "chrf_david": 58.084372325159194,
+  "chrf_rival": 51.269791378956974,
+  "p50_david": 299.05,
+  "p50_rival": 3986.75
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | País LATAM": {
+  "n": 39,
+  "n_phrases": 39,
+  "david": 0.717948717948718,
+  "rival": 0.6410256410256411,
+  "diff": 0.07692307692307693,
+  "ci": [
+   -0.10256410256410256,
+   0.2564102564102564
+  ],
+  "win_rate": 0.6153846153846154,
+  "only_david": 8,
+  "only_rival": 5,
+  "chrf_david": 63.40017315657921,
+  "chrf_rival": 54.34188089619495,
+  "p50_david": 320.1,
+  "p50_rival": 1573.5
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | País GT": {
+  "n": 22,
+  "n_phrases": 22,
+  "david": 0.5454545454545454,
+  "rival": 0.18181818181818182,
+  "diff": 0.36363636363636365,
+  "ci": [
+   0.09090909090909091,
+   0.6363636363636364
+  ],
+  "win_rate": 0.8333333333333334,
+  "only_david": 10,
+  "only_rival": 2,
+  "chrf_david": 60.01986133279706,
+  "chrf_rival": 49.25280173634268,
+  "p50_david": 255.60000000000002,
+  "p50_rival": 4532.85
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | Gen Z → papás": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 0.6282051282051282,
+  "rival": 0.3333333333333333,
+  "diff": 0.2948717948717949,
+  "ci": [
+   0.15384615384615385,
+   0.4358974358974359
+  ],
+  "win_rate": 0.7948717948717948,
+  "only_david": 31,
+  "only_rival": 8,
+  "chrf_david": 69.28014512832131,
+  "chrf_rival": 57.052245735243275,
+  "p50_david": 287.25,
+  "p50_rival": 2523.0
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | papás → Gen Z": {
+  "n": 96,
+  "n_phrases": 96,
+  "david": 0.6145833333333334,
+  "rival": 0.5520833333333334,
+  "diff": 0.0625,
+  "ci": [
+   -0.052083333333333336,
+   0.17708333333333334
+  ],
+  "win_rate": 0.59375,
+  "only_david": 19,
+  "only_rival": 13,
+  "chrf_david": 53.70112178171219,
+  "chrf_rival": 44.6795012039023,
+  "p50_david": 289.6,
+  "p50_rival": 3168.2
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | MX · Gen Z → papás": {
+  "n": 30,
+  "n_phrases": 30,
+  "david": 0.5,
+  "rival": 0.2,
+  "diff": 0.3,
+  "ci": [
+   0.1,
+   0.5
+  ],
+  "win_rate": 0.8461538461538461,
+  "only_david": 11,
+  "only_rival": 2,
+  "chrf_david": 67.61798734040664,
+  "chrf_rival": 49.50592934712625,
+  "p50_david": 270.6,
+  "p50_rival": 2685.25
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | MX · papás → Gen Z": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.7837837837837838,
+  "rival": 0.7837837837837838,
+  "diff": 0.0,
+  "ci": [
+   -0.1891891891891892,
+   0.1891891891891892
+  ],
+  "win_rate": 0.5,
+  "only_david": 6,
+  "only_rival": 6,
+  "chrf_david": 58.45390041502877,
+  "chrf_rival": 46.54202369894189,
+  "p50_david": 283.2,
+  "p50_rival": 2063.8
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | CO · Gen Z → papás": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.631578947368421,
+  "rival": 0.3157894736842105,
+  "diff": 0.3157894736842105,
+  "ci": [
+   0.0,
+   0.5789473684210527
+  ],
+  "win_rate": 0.8,
+  "only_david": 8,
+  "only_rival": 2,
+  "chrf_david": 71.72278730762432,
+  "chrf_rival": 64.26906948291395,
+  "p50_david": 337.7,
+  "p50_rival": 2927.2
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | CO · papás → Gen Z": {
+  "n": 27,
+  "n_phrases": 27,
+  "david": 0.4444444444444444,
+  "rival": 0.3333333333333333,
+  "diff": 0.1111111111111111,
+  "ci": [
+   -0.1111111111111111,
+   0.37037037037037035
+  ],
+  "win_rate": 0.6363636363636364,
+  "only_david": 7,
+  "only_rival": 4,
+  "chrf_david": 45.184674191804994,
+  "chrf_rival": 38.88424708268671,
+  "p50_david": 291.6,
+  "p50_rival": 4542.5
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | LATAM · Gen Z → papás": {
+  "n": 20,
+  "n_phrases": 20,
+  "david": 0.75,
+  "rival": 0.6,
+  "diff": 0.15,
+  "ci": [
+   -0.15,
+   0.45
+  ],
+  "win_rate": 0.6666666666666666,
+  "only_david": 6,
+  "only_rival": 3,
+  "chrf_david": 68.05944767135898,
+  "chrf_rival": 59.78346376058097,
+  "p50_david": 308.1,
+  "p50_rival": 1608.0
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | LATAM · papás → Gen Z": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.6842105263157895,
+  "rival": 0.6842105263157895,
+  "diff": 0.0,
+  "ci": [
+   -0.21052631578947367,
+   0.21052631578947367
+  ],
+  "win_rate": 0.5,
+  "only_david": 2,
+  "only_rival": 2,
+  "chrf_david": 57.376620792724296,
+  "chrf_rival": 47.49067579537813,
+  "p50_david": 320.1,
+  "p50_rival": 1489.9
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | GT · Gen Z → papás": {
+  "n": 9,
+  "n_phrases": 9,
+  "david": 0.7777777777777778,
+  "rival": 0.2222222222222222,
+  "diff": 0.5555555555555556,
+  "ci": [
+   0.1111111111111111,
+   1.0
+  ],
+  "win_rate": 0.8571428571428571,
+  "only_david": 6,
+  "only_rival": 1,
+  "chrf_david": 73.71933538100257,
+  "chrf_rival": 53.16219337629953,
+  "p50_david": 225.9,
+  "p50_rival": 1281.4
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga correcta | GT · papás → Gen Z": {
+  "n": 13,
+  "n_phrases": 13,
+  "david": 0.38461538461538464,
+  "rival": 0.15384615384615385,
+  "diff": 0.23076923076923078,
+  "ci": [
+   -0.07692307692307693,
+   0.5384615384615384
+  ],
+  "win_rate": 0.8,
+  "only_david": 4,
+  "only_rival": 1,
+  "chrf_david": 52.806247940498885,
+  "chrf_rival": 47.188101369118996,
+  "p50_david": 285.2,
+  "p50_rival": 5443.7
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | Todo": {
+  "n": 174,
+  "n_phrases": 174,
+  "david": 0.8850574712643678,
+  "rival": 0.8735632183908046,
+  "diff": 0.011494252873563218,
+  "ci": [
+   -0.04597701149425287,
+   0.06896551724137931
+  ],
+  "win_rate": 0.5357142857142857,
+  "only_david": 15,
+  "only_rival": 13,
+  "chrf_david": 61.431428563203816,
+  "chrf_rival": 50.803253106624226,
+  "p50_david": 288.8,
+  "p50_rival": 2846.2
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | País MX": {
+  "n": 67,
+  "n_phrases": 67,
+  "david": 0.9402985074626866,
+  "rival": 0.9253731343283582,
+  "diff": 0.014925373134328358,
+  "ci": [
+   -0.07462686567164178,
+   0.1044776119402985
+  ],
+  "win_rate": 0.5555555555555556,
+  "only_david": 5,
+  "only_rival": 4,
+  "chrf_david": 62.94640541189989,
+  "chrf_rival": 47.99266888368339,
+  "p50_david": 280.1,
+  "p50_rival": 2063.8
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | País CO": {
+  "n": 46,
+  "n_phrases": 46,
+  "david": 0.8695652173913043,
+  "rival": 0.8478260869565217,
+  "diff": 0.021739130434782608,
+  "ci": [
+   -0.10869565217391304,
+   0.17391304347826086
+  ],
+  "win_rate": 0.5454545454545454,
+  "only_david": 6,
+  "only_rival": 5,
+  "chrf_david": 58.084372325159194,
+  "chrf_rival": 51.269791378956974,
+  "p50_david": 299.05,
+  "p50_rival": 3986.75
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | País LATAM": {
+  "n": 39,
+  "n_phrases": 39,
+  "david": 0.8717948717948718,
+  "rival": 0.9487179487179487,
+  "diff": -0.07692307692307693,
+  "ci": [
+   -0.1794871794871795,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 3,
+  "chrf_david": 63.40017315657921,
+  "chrf_rival": 54.34188089619495,
+  "p50_david": 320.1,
+  "p50_rival": 1573.5
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | País GT": {
+  "n": 22,
+  "n_phrases": 22,
+  "david": 0.7727272727272727,
+  "rival": 0.6363636363636364,
+  "diff": 0.13636363636363635,
+  "ci": [
+   -0.045454545454545456,
+   0.3181818181818182
+  ],
+  "win_rate": 0.8,
+  "only_david": 4,
+  "only_rival": 1,
+  "chrf_david": 60.01986133279706,
+  "chrf_rival": 49.25280173634268,
+  "p50_david": 255.60000000000002,
+  "p50_rival": 4532.85
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | Gen Z → papás": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 1.0,
+  "rival": 0.9743589743589743,
+  "diff": 0.02564102564102564,
+  "ci": [
+   0.0,
+   0.0641025641025641
+  ],
+  "win_rate": 1.0,
+  "only_david": 2,
+  "only_rival": 0,
+  "chrf_david": 69.28014512832131,
+  "chrf_rival": 57.052245735243275,
+  "p50_david": 287.25,
+  "p50_rival": 2523.0
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | papás → Gen Z": {
+  "n": 96,
+  "n_phrases": 96,
+  "david": 0.7916666666666666,
+  "rival": 0.7916666666666666,
+  "diff": 0.0,
+  "ci": [
+   -0.10416666666666667,
+   0.10416666666666667
+  ],
+  "win_rate": 0.5,
+  "only_david": 13,
+  "only_rival": 13,
+  "chrf_david": 53.70112178171219,
+  "chrf_rival": 44.6795012039023,
+  "p50_david": 289.6,
+  "p50_rival": 3168.2
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | MX · Gen Z → papás": {
+  "n": 30,
+  "n_phrases": 30,
+  "david": 1.0,
+  "rival": 0.9666666666666667,
+  "diff": 0.03333333333333333,
+  "ci": [
+   0.0,
+   0.1
+  ],
+  "win_rate": 1.0,
+  "only_david": 1,
+  "only_rival": 0,
+  "chrf_david": 67.61798734040664,
+  "chrf_rival": 49.50592934712625,
+  "p50_david": 270.6,
+  "p50_rival": 2685.25
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | MX · papás → Gen Z": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.8918918918918919,
+  "rival": 0.8918918918918919,
+  "diff": 0.0,
+  "ci": [
+   -0.16216216216216217,
+   0.16216216216216217
+  ],
+  "win_rate": 0.5,
+  "only_david": 4,
+  "only_rival": 4,
+  "chrf_david": 58.45390041502877,
+  "chrf_rival": 46.54202369894189,
+  "p50_david": 283.2,
+  "p50_rival": 2063.8
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | CO · Gen Z → papás": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 71.72278730762432,
+  "chrf_rival": 64.26906948291395,
+  "p50_david": 337.7,
+  "p50_rival": 2927.2
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | CO · papás → Gen Z": {
+  "n": 27,
+  "n_phrases": 27,
+  "david": 0.7777777777777778,
+  "rival": 0.7407407407407407,
+  "diff": 0.037037037037037035,
+  "ci": [
+   -0.18518518518518517,
+   0.25925925925925924
+  ],
+  "win_rate": 0.5454545454545454,
+  "only_david": 6,
+  "only_rival": 5,
+  "chrf_david": 45.184674191804994,
+  "chrf_rival": 38.88424708268671,
+  "p50_david": 291.6,
+  "p50_rival": 4542.5
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | LATAM · Gen Z → papás": {
+  "n": 20,
+  "n_phrases": 20,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 68.05944767135898,
+  "chrf_rival": 59.78346376058097,
+  "p50_david": 308.1,
+  "p50_rival": 1608.0
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | LATAM · papás → Gen Z": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.7368421052631579,
+  "rival": 0.8947368421052632,
+  "diff": -0.15789473684210525,
+  "ci": [
+   -0.3157894736842105,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 3,
+  "chrf_david": 57.376620792724296,
+  "chrf_rival": 47.49067579537813,
+  "p50_david": 320.1,
+  "p50_rival": 1489.9
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | GT · Gen Z → papás": {
+  "n": 9,
+  "n_phrases": 9,
+  "david": 1.0,
+  "rival": 0.8888888888888888,
+  "diff": 0.1111111111111111,
+  "ci": [
+   0.0,
+   0.3333333333333333
+  ],
+  "win_rate": 1.0,
+  "only_david": 1,
+  "only_rival": 0,
+  "chrf_david": 73.71933538100257,
+  "chrf_rival": 53.16219337629953,
+  "p50_david": 225.9,
+  "p50_rival": 1281.4
+ },
+ "combos | genlingo-2026-10e-e2b | goliath | Jerga resuelta | GT · papás → Gen Z": {
+  "n": 13,
+  "n_phrases": 13,
+  "david": 0.6153846153846154,
+  "rival": 0.46153846153846156,
+  "diff": 0.15384615384615385,
+  "ci": [
+   -0.15384615384615385,
+   0.46153846153846156
+  ],
+  "win_rate": 0.75,
+  "only_david": 3,
+  "only_rival": 1,
+  "chrf_david": 52.806247940498885,
+  "chrf_rival": 47.188101369118996,
+  "p50_david": 285.2,
+  "p50_rival": 5443.7
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | Todo": {
+  "n": 174,
+  "n_phrases": 174,
+  "david": 0.6206896551724138,
+  "rival": 0.6149425287356322,
+  "diff": 0.005747126436781609,
+  "ci": [
+   -0.08045977011494253,
+   0.09195402298850575
+  ],
+  "win_rate": 0.5079365079365079,
+  "only_david": 32,
+  "only_rival": 31,
+  "chrf_david": 61.431428563203816,
+  "chrf_rival": 56.50789289600975,
+  "p50_david": 288.8,
+  "p50_rival": 3600.4
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | País MX": {
+  "n": 67,
+  "n_phrases": 67,
+  "david": 0.6567164179104478,
+  "rival": 0.7014925373134329,
+  "diff": -0.04477611940298507,
+  "ci": [
+   -0.1791044776119403,
+   0.08955223880597014
+  ],
+  "win_rate": 0.42857142857142855,
+  "only_david": 9,
+  "only_rival": 12,
+  "chrf_david": 62.94640541189989,
+  "chrf_rival": 52.977877707356235,
+  "p50_david": 280.1,
+  "p50_rival": 3568.3
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | País CO": {
+  "n": 46,
+  "n_phrases": 46,
+  "david": 0.5217391304347826,
+  "rival": 0.41304347826086957,
+  "diff": 0.10869565217391304,
+  "ci": [
+   -0.08695652173913043,
+   0.30434782608695654
+  ],
+  "win_rate": 0.6190476190476191,
+  "only_david": 13,
+  "only_rival": 8,
+  "chrf_david": 58.084372325159194,
+  "chrf_rival": 54.85936968282677,
+  "p50_david": 299.05,
+  "p50_rival": 4107.05
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | País LATAM": {
+  "n": 39,
+  "n_phrases": 39,
+  "david": 0.717948717948718,
+  "rival": 0.7692307692307693,
+  "diff": -0.05128205128205128,
+  "ci": [
+   -0.20512820512820512,
+   0.10256410256410256
+  ],
+  "win_rate": 0.4,
+  "only_david": 4,
+  "only_rival": 6,
+  "chrf_david": 63.40017315657921,
+  "chrf_rival": 63.90289226896473,
+  "p50_david": 320.1,
+  "p50_rival": 3098.1
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | País GT": {
+  "n": 22,
+  "n_phrases": 22,
+  "david": 0.5454545454545454,
+  "rival": 0.5,
+  "diff": 0.045454545454545456,
+  "ci": [
+   -0.22727272727272727,
+   0.3181818181818182
+  ],
+  "win_rate": 0.5454545454545454,
+  "only_david": 6,
+  "only_rival": 5,
+  "chrf_david": 60.01986133279706,
+  "chrf_rival": 52.5403676163954,
+  "p50_david": 255.60000000000002,
+  "p50_rival": 3708.1000000000004
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | Gen Z → papás": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 0.6282051282051282,
+  "rival": 0.5512820512820513,
+  "diff": 0.07692307692307693,
+  "ci": [
+   -0.07692307692307693,
+   0.23076923076923078
+  ],
+  "win_rate": 0.5789473684210527,
+  "only_david": 22,
+  "only_rival": 16,
+  "chrf_david": 69.28014512832131,
+  "chrf_rival": 61.57186480508802,
+  "p50_david": 287.25,
+  "p50_rival": 3574.95
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | papás → Gen Z": {
+  "n": 96,
+  "n_phrases": 96,
+  "david": 0.6145833333333334,
+  "rival": 0.6666666666666666,
+  "diff": -0.052083333333333336,
+  "ci": [
+   -0.15625,
+   0.052083333333333336
+  ],
+  "win_rate": 0.4,
+  "only_david": 10,
+  "only_rival": 15,
+  "chrf_david": 53.70112178171219,
+  "chrf_rival": 51.51486757295888,
+  "p50_david": 289.6,
+  "p50_rival": 3651.75
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | MX · Gen Z → papás": {
+  "n": 30,
+  "n_phrases": 30,
+  "david": 0.5,
+  "rival": 0.6333333333333333,
+  "diff": -0.13333333333333333,
+  "ci": [
+   -0.36666666666666664,
+   0.1
+  ],
+  "win_rate": 0.3333333333333333,
+  "only_david": 4,
+  "only_rival": 8,
+  "chrf_david": 67.61798734040664,
+  "chrf_rival": 53.404590209806855,
+  "p50_david": 270.6,
+  "p50_rival": 3530.25
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | MX · papás → Gen Z": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.7837837837837838,
+  "rival": 0.7567567567567568,
+  "diff": 0.02702702702702703,
+  "ci": [
+   -0.13513513513513514,
+   0.1891891891891892
+  ],
+  "win_rate": 0.5555555555555556,
+  "only_david": 5,
+  "only_rival": 4,
+  "chrf_david": 58.45390041502877,
+  "chrf_rival": 52.57572768691369,
+  "p50_david": 283.2,
+  "p50_rival": 3588.8
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | CO · Gen Z → papás": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.631578947368421,
+  "rival": 0.3684210526315789,
+  "diff": 0.2631578947368421,
+  "ci": [
+   -0.05263157894736842,
+   0.5789473684210527
+  ],
+  "win_rate": 0.7272727272727273,
+  "only_david": 8,
+  "only_rival": 3,
+  "chrf_david": 71.72278730762432,
+  "chrf_rival": 66.35489999616497,
+  "p50_david": 337.7,
+  "p50_rival": 3855.6
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | CO · papás → Gen Z": {
+  "n": 27,
+  "n_phrases": 27,
+  "david": 0.4444444444444444,
+  "rival": 0.4444444444444444,
+  "diff": 0.0,
+  "ci": [
+   -0.2222222222222222,
+   0.2222222222222222
+  ],
+  "win_rate": 0.5,
+  "only_david": 5,
+  "only_rival": 5,
+  "chrf_david": 45.184674191804994,
+  "chrf_rival": 43.80666843825871,
+  "p50_david": 291.6,
+  "p50_rival": 4128.1
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | LATAM · Gen Z → papás": {
+  "n": 20,
+  "n_phrases": 20,
+  "david": 0.75,
+  "rival": 0.7,
+  "diff": 0.05,
+  "ci": [
+   -0.2,
+   0.3
+  ],
+  "win_rate": 0.5714285714285714,
+  "only_david": 4,
+  "only_rival": 3,
+  "chrf_david": 68.05944767135898,
+  "chrf_rival": 67.61534204738757,
+  "p50_david": 308.1,
+  "p50_rival": 3084.3
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | LATAM · papás → Gen Z": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.6842105263157895,
+  "rival": 0.8421052631578947,
+  "diff": -0.15789473684210525,
+  "ci": [
+   -0.3157894736842105,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 3,
+  "chrf_david": 57.376620792724296,
+  "chrf_rival": 59.16854781114937,
+  "p50_david": 320.1,
+  "p50_rival": 3400.3
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | GT · Gen Z → papás": {
+  "n": 9,
+  "n_phrases": 9,
+  "david": 0.7777777777777778,
+  "rival": 0.3333333333333333,
+  "diff": 0.4444444444444444,
+  "ci": [
+   -0.1111111111111111,
+   1.0
+  ],
+  "win_rate": 0.75,
+  "only_david": 6,
+  "only_rival": 2,
+  "chrf_david": 73.71933538100257,
+  "chrf_rival": 55.43069395715754,
+  "p50_david": 225.9,
+  "p50_rival": 3772.8
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | GT · papás → Gen Z": {
+  "n": 13,
+  "n_phrases": 13,
+  "david": 0.38461538461538464,
+  "rival": 0.6153846153846154,
+  "diff": -0.23076923076923078,
+  "ci": [
+   -0.46153846153846156,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 3,
+  "chrf_david": 52.806247940498885,
+  "chrf_rival": 51.05491628697568,
+  "p50_david": 285.2,
+  "p50_rival": 2942.2
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | Todo": {
+  "n": 174,
+  "n_phrases": 174,
+  "david": 0.8850574712643678,
+  "rival": 0.9022988505747126,
+  "diff": -0.017241379310344827,
+  "ci": [
+   -0.06896551724137931,
+   0.034482758620689655
+  ],
+  "win_rate": 0.43478260869565216,
+  "only_david": 10,
+  "only_rival": 13,
+  "chrf_david": 61.431428563203816,
+  "chrf_rival": 56.50789289600975,
+  "p50_david": 288.8,
+  "p50_rival": 3600.4
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | País MX": {
+  "n": 67,
+  "n_phrases": 67,
+  "david": 0.9402985074626866,
+  "rival": 0.9552238805970149,
+  "diff": -0.014925373134328358,
+  "ci": [
+   -0.08955223880597014,
+   0.05970149253731343
+  ],
+  "win_rate": 0.42857142857142855,
+  "only_david": 3,
+  "only_rival": 4,
+  "chrf_david": 62.94640541189989,
+  "chrf_rival": 52.977877707356235,
+  "p50_david": 280.1,
+  "p50_rival": 3568.3
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | País CO": {
+  "n": 46,
+  "n_phrases": 46,
+  "david": 0.8695652173913043,
+  "rival": 0.8260869565217391,
+  "diff": 0.043478260869565216,
+  "ci": [
+   -0.08695652173913043,
+   0.17391304347826086
+  ],
+  "win_rate": 0.6,
+  "only_david": 6,
+  "only_rival": 4,
+  "chrf_david": 58.084372325159194,
+  "chrf_rival": 54.85936968282677,
+  "p50_david": 299.05,
+  "p50_rival": 4107.05
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | País LATAM": {
+  "n": 39,
+  "n_phrases": 39,
+  "david": 0.8717948717948718,
+  "rival": 0.9230769230769231,
+  "diff": -0.05128205128205128,
+  "ci": [
+   -0.1282051282051282,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 2,
+  "chrf_david": 63.40017315657921,
+  "chrf_rival": 63.90289226896473,
+  "p50_david": 320.1,
+  "p50_rival": 3098.1
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | País GT": {
+  "n": 22,
+  "n_phrases": 22,
+  "david": 0.7727272727272727,
+  "rival": 0.8636363636363636,
+  "diff": -0.09090909090909091,
+  "ci": [
+   -0.2727272727272727,
+   0.09090909090909091
+  ],
+  "win_rate": 0.25,
+  "only_david": 1,
+  "only_rival": 3,
+  "chrf_david": 60.01986133279706,
+  "chrf_rival": 52.5403676163954,
+  "p50_david": 255.60000000000002,
+  "p50_rival": 3708.1000000000004
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | Gen Z → papás": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 69.28014512832131,
+  "chrf_rival": 61.57186480508802,
+  "p50_david": 287.25,
+  "p50_rival": 3574.95
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | papás → Gen Z": {
+  "n": 96,
+  "n_phrases": 96,
+  "david": 0.7916666666666666,
+  "rival": 0.8229166666666666,
+  "diff": -0.03125,
+  "ci": [
+   -0.125,
+   0.07291666666666667
+  ],
+  "win_rate": 0.43478260869565216,
+  "only_david": 10,
+  "only_rival": 13,
+  "chrf_david": 53.70112178171219,
+  "chrf_rival": 51.51486757295888,
+  "p50_david": 289.6,
+  "p50_rival": 3651.75
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | MX · Gen Z → papás": {
+  "n": 30,
+  "n_phrases": 30,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 67.61798734040664,
+  "chrf_rival": 53.404590209806855,
+  "p50_david": 270.6,
+  "p50_rival": 3530.25
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | MX · papás → Gen Z": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.8918918918918919,
+  "rival": 0.918918918918919,
+  "diff": -0.02702702702702703,
+  "ci": [
+   -0.16216216216216217,
+   0.10810810810810811
+  ],
+  "win_rate": 0.42857142857142855,
+  "only_david": 3,
+  "only_rival": 4,
+  "chrf_david": 58.45390041502877,
+  "chrf_rival": 52.57572768691369,
+  "p50_david": 283.2,
+  "p50_rival": 3588.8
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | CO · Gen Z → papás": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 71.72278730762432,
+  "chrf_rival": 66.35489999616497,
+  "p50_david": 337.7,
+  "p50_rival": 3855.6
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | CO · papás → Gen Z": {
+  "n": 27,
+  "n_phrases": 27,
+  "david": 0.7777777777777778,
+  "rival": 0.7037037037037037,
+  "diff": 0.07407407407407407,
+  "ci": [
+   -0.14814814814814814,
+   0.2962962962962963
+  ],
+  "win_rate": 0.6,
+  "only_david": 6,
+  "only_rival": 4,
+  "chrf_david": 45.184674191804994,
+  "chrf_rival": 43.80666843825871,
+  "p50_david": 291.6,
+  "p50_rival": 4128.1
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | LATAM · Gen Z → papás": {
+  "n": 20,
+  "n_phrases": 20,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 68.05944767135898,
+  "chrf_rival": 67.61534204738757,
+  "p50_david": 308.1,
+  "p50_rival": 3084.3
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | LATAM · papás → Gen Z": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.7368421052631579,
+  "rival": 0.8421052631578947,
+  "diff": -0.10526315789473684,
+  "ci": [
+   -0.2631578947368421,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 2,
+  "chrf_david": 57.376620792724296,
+  "chrf_rival": 59.16854781114937,
+  "p50_david": 320.1,
+  "p50_rival": 3400.3
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | GT · Gen Z → papás": {
+  "n": 9,
+  "n_phrases": 9,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 73.71933538100257,
+  "chrf_rival": 55.43069395715754,
+  "p50_david": 225.9,
+  "p50_rival": 3772.8
+ },
+ "combos | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | GT · papás → Gen Z": {
+  "n": 13,
+  "n_phrases": 13,
+  "david": 0.6153846153846154,
+  "rival": 0.7692307692307693,
+  "diff": -0.15384615384615385,
+  "ci": [
+   -0.46153846153846156,
+   0.15384615384615385
+  ],
+  "win_rate": 0.25,
+  "only_david": 1,
+  "only_rival": 3,
+  "chrf_david": 52.806247940498885,
+  "chrf_rival": 51.05491628697568,
+  "p50_david": 285.2,
+  "p50_rival": 2942.2
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | Todo": {
+  "n": 174,
+  "n_phrases": 174,
+  "david": 0.39080459770114945,
+  "rival": 0.4540229885057471,
+  "diff": -0.06321839080459771,
+  "ci": [
+   -0.16666666666666666,
+   0.034482758620689655
+  ],
+  "win_rate": 0.43037974683544306,
+  "only_david": 34,
+  "only_rival": 45,
+  "chrf_david": 57.04080236388963,
+  "chrf_rival": 50.803253106624226,
+  "p50_david": 287.29999999999995,
+  "p50_rival": 2846.2
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | País MX": {
+  "n": 67,
+  "n_phrases": 67,
+  "david": 0.34328358208955223,
+  "rival": 0.5223880597014925,
+  "diff": -0.1791044776119403,
+  "ci": [
+   -0.3283582089552239,
+   -0.029850746268656716
+  ],
+  "win_rate": 0.2692307692307692,
+  "only_david": 7,
+  "only_rival": 19,
+  "chrf_david": 54.91100683432295,
+  "chrf_rival": 47.99266888368339,
+  "p50_david": 287.9,
+  "p50_rival": 2063.8
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | País CO": {
+  "n": 46,
+  "n_phrases": 46,
+  "david": 0.41304347826086957,
+  "rival": 0.32608695652173914,
+  "diff": 0.08695652173913043,
+  "ci": [
+   -0.13043478260869565,
+   0.30434782608695654
+  ],
+  "win_rate": 0.5833333333333334,
+  "only_david": 14,
+  "only_rival": 10,
+  "chrf_david": 58.17967474091316,
+  "chrf_rival": 51.269791378956974,
+  "p50_david": 294.1,
+  "p50_rival": 3986.75
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | País LATAM": {
+  "n": 39,
+  "n_phrases": 39,
+  "david": 0.41025641025641024,
+  "rival": 0.6410256410256411,
+  "diff": -0.23076923076923078,
+  "ci": [
+   -0.4358974358974359,
+   -0.02564102564102564
+  ],
+  "win_rate": 0.2631578947368421,
+  "only_david": 5,
+  "only_rival": 14,
+  "chrf_david": 58.28488025706845,
+  "chrf_rival": 54.34188089619495,
+  "p50_david": 322.9,
+  "p50_rival": 1573.5
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | País GT": {
+  "n": 22,
+  "n_phrases": 22,
+  "david": 0.45454545454545453,
+  "rival": 0.18181818181818182,
+  "diff": 0.2727272727272727,
+  "ci": [
+   0.0,
+   0.5454545454545454
+  ],
+  "win_rate": 0.8,
+  "only_david": 8,
+  "only_rival": 2,
+  "chrf_david": 57.848375686729,
+  "chrf_rival": 49.25280173634268,
+  "p50_david": 255.9,
+  "p50_rival": 4532.85
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | Gen Z → papás": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 0.38461538461538464,
+  "rival": 0.3333333333333333,
+  "diff": 0.05128205128205128,
+  "ci": [
+   -0.10256410256410256,
+   0.20512820512820512
+  ],
+  "win_rate": 0.5555555555555556,
+  "only_david": 20,
+  "only_rival": 16,
+  "chrf_david": 60.752703431754774,
+  "chrf_rival": 57.052245735243275,
+  "p50_david": 282.85,
+  "p50_rival": 2523.0
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | papás → Gen Z": {
+  "n": 96,
+  "n_phrases": 96,
+  "david": 0.3958333333333333,
+  "rival": 0.5520833333333334,
+  "diff": -0.15625,
+  "ci": [
+   -0.2916666666666667,
+   -0.020833333333333332
+  ],
+  "win_rate": 0.32558139534883723,
+  "only_david": 14,
+  "only_rival": 29,
+  "chrf_david": 53.440966476194305,
+  "chrf_rival": 44.6795012039023,
+  "p50_david": 288.6,
+  "p50_rival": 3168.2
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | MX · Gen Z → papás": {
+  "n": 30,
+  "n_phrases": 30,
+  "david": 0.26666666666666666,
+  "rival": 0.2,
+  "diff": 0.06666666666666667,
+  "ci": [
+   -0.1,
+   0.23333333333333334
+  ],
+  "win_rate": 0.625,
+  "only_david": 5,
+  "only_rival": 3,
+  "chrf_david": 56.24615801092023,
+  "chrf_rival": 49.50592934712625,
+  "p50_david": 270.70000000000005,
+  "p50_rival": 2685.25
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | MX · papás → Gen Z": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.40540540540540543,
+  "rival": 0.7837837837837838,
+  "diff": -0.3783783783783784,
+  "ci": [
+   -0.5675675675675675,
+   -0.1891891891891892
+  ],
+  "win_rate": 0.1111111111111111,
+  "only_david": 2,
+  "only_rival": 16,
+  "chrf_david": 53.63983046837099,
+  "chrf_rival": 46.54202369894189,
+  "p50_david": 293.3,
+  "p50_rival": 2063.8
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | CO · Gen Z → papás": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.5789473684210527,
+  "rival": 0.3157894736842105,
+  "diff": 0.2631578947368421,
+  "ci": [
+   -0.05263157894736842,
+   0.5789473684210527
+  ],
+  "win_rate": 0.7272727272727273,
+  "only_david": 8,
+  "only_rival": 3,
+  "chrf_david": 68.85011923847377,
+  "chrf_rival": 64.26906948291395,
+  "p50_david": 335.4,
+  "p50_rival": 2927.2
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | CO · papás → Gen Z": {
+  "n": 27,
+  "n_phrases": 27,
+  "david": 0.2962962962962963,
+  "rival": 0.3333333333333333,
+  "diff": -0.037037037037037035,
+  "ci": [
+   -0.2962962962962963,
+   0.2222222222222222
+  ],
+  "win_rate": 0.46153846153846156,
+  "only_david": 6,
+  "only_rival": 7,
+  "chrf_david": 48.17122599934697,
+  "chrf_rival": 38.88424708268671,
+  "p50_david": 286.4,
+  "p50_rival": 4542.5
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | LATAM · Gen Z → papás": {
+  "n": 20,
+  "n_phrases": 20,
+  "david": 0.3,
+  "rival": 0.6,
+  "diff": -0.3,
+  "ci": [
+   -0.6,
+   0.0
+  ],
+  "win_rate": 0.25,
+  "only_david": 3,
+  "only_rival": 9,
+  "chrf_david": 57.248314351560914,
+  "chrf_rival": 59.78346376058097,
+  "p50_david": 314.65,
+  "p50_rival": 1608.0
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | LATAM · papás → Gen Z": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.5263157894736842,
+  "rival": 0.6842105263157895,
+  "diff": -0.15789473684210525,
+  "ci": [
+   -0.42105263157894735,
+   0.10526315789473684
+  ],
+  "win_rate": 0.2857142857142857,
+  "only_david": 2,
+  "only_rival": 5,
+  "chrf_david": 59.61663624312964,
+  "chrf_rival": 47.49067579537813,
+  "p50_david": 334.1,
+  "p50_rival": 1489.9
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | GT · Gen Z → papás": {
+  "n": 9,
+  "n_phrases": 9,
+  "david": 0.5555555555555556,
+  "rival": 0.2222222222222222,
+  "diff": 0.3333333333333333,
+  "ci": [
+   -0.1111111111111111,
+   0.7777777777777778
+  ],
+  "win_rate": 0.8,
+  "only_david": 4,
+  "only_rival": 1,
+  "chrf_david": 67.52911713740029,
+  "chrf_rival": 53.16219337629953,
+  "p50_david": 226.1,
+  "p50_rival": 1281.4
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga correcta | GT · papás → Gen Z": {
+  "n": 13,
+  "n_phrases": 13,
+  "david": 0.38461538461538464,
+  "rival": 0.15384615384615385,
+  "diff": 0.23076923076923078,
+  "ci": [
+   -0.07692307692307693,
+   0.5384615384615384
+  ],
+  "win_rate": 0.8,
+  "only_david": 4,
+  "only_rival": 1,
+  "chrf_david": 52.72832221430161,
+  "chrf_rival": 47.188101369118996,
+  "p50_david": 280.9,
+  "p50_rival": 5443.7
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | Todo": {
+  "n": 174,
+  "n_phrases": 174,
+  "david": 0.7988505747126436,
+  "rival": 0.8735632183908046,
+  "diff": -0.07471264367816093,
+  "ci": [
+   -0.14367816091954022,
+   0.0
+  ],
+  "win_rate": 0.34146341463414637,
+  "only_david": 14,
+  "only_rival": 27,
+  "chrf_david": 57.04080236388963,
+  "chrf_rival": 50.803253106624226,
+  "p50_david": 287.29999999999995,
+  "p50_rival": 2846.2
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | País MX": {
+  "n": 67,
+  "n_phrases": 67,
+  "david": 0.8208955223880597,
+  "rival": 0.9253731343283582,
+  "diff": -0.1044776119402985,
+  "ci": [
+   -0.208955223880597,
+   0.0
+  ],
+  "win_rate": 0.26666666666666666,
+  "only_david": 4,
+  "only_rival": 11,
+  "chrf_david": 54.91100683432295,
+  "chrf_rival": 47.99266888368339,
+  "p50_david": 287.9,
+  "p50_rival": 2063.8
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | País CO": {
+  "n": 46,
+  "n_phrases": 46,
+  "david": 0.7608695652173914,
+  "rival": 0.8478260869565217,
+  "diff": -0.08695652173913043,
+  "ci": [
+   -0.2391304347826087,
+   0.06521739130434782
+  ],
+  "win_rate": 0.35714285714285715,
+  "only_david": 5,
+  "only_rival": 9,
+  "chrf_david": 58.17967474091316,
+  "chrf_rival": 51.269791378956974,
+  "p50_david": 294.1,
+  "p50_rival": 3986.75
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | País LATAM": {
+  "n": 39,
+  "n_phrases": 39,
+  "david": 0.7948717948717948,
+  "rival": 0.9487179487179487,
+  "diff": -0.15384615384615385,
+  "ci": [
+   -0.28205128205128205,
+   -0.05128205128205128
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 6,
+  "chrf_david": 58.28488025706845,
+  "chrf_rival": 54.34188089619495,
+  "p50_david": 322.9,
+  "p50_rival": 1573.5
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | País GT": {
+  "n": 22,
+  "n_phrases": 22,
+  "david": 0.8181818181818182,
+  "rival": 0.6363636363636364,
+  "diff": 0.18181818181818182,
+  "ci": [
+   0.0,
+   0.4090909090909091
+  ],
+  "win_rate": 0.8333333333333334,
+  "only_david": 5,
+  "only_rival": 1,
+  "chrf_david": 57.848375686729,
+  "chrf_rival": 49.25280173634268,
+  "p50_david": 255.9,
+  "p50_rival": 4532.85
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | Gen Z → papás": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 0.9743589743589743,
+  "rival": 0.9743589743589743,
+  "diff": 0.0,
+  "ci": [
+   -0.05128205128205128,
+   0.05128205128205128
+  ],
+  "win_rate": 0.5,
+  "only_david": 2,
+  "only_rival": 2,
+  "chrf_david": 60.752703431754774,
+  "chrf_rival": 57.052245735243275,
+  "p50_david": 282.85,
+  "p50_rival": 2523.0
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | papás → Gen Z": {
+  "n": 96,
+  "n_phrases": 96,
+  "david": 0.65625,
+  "rival": 0.7916666666666666,
+  "diff": -0.13541666666666666,
+  "ci": [
+   -0.2604166666666667,
+   -0.010416666666666666
+  ],
+  "win_rate": 0.32432432432432434,
+  "only_david": 12,
+  "only_rival": 25,
+  "chrf_david": 53.440966476194305,
+  "chrf_rival": 44.6795012039023,
+  "p50_david": 288.6,
+  "p50_rival": 3168.2
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | MX · Gen Z → papás": {
+  "n": 30,
+  "n_phrases": 30,
+  "david": 1.0,
+  "rival": 0.9666666666666667,
+  "diff": 0.03333333333333333,
+  "ci": [
+   0.0,
+   0.1
+  ],
+  "win_rate": 1.0,
+  "only_david": 1,
+  "only_rival": 0,
+  "chrf_david": 56.24615801092023,
+  "chrf_rival": 49.50592934712625,
+  "p50_david": 270.70000000000005,
+  "p50_rival": 2685.25
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | MX · papás → Gen Z": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.6756756756756757,
+  "rival": 0.8918918918918919,
+  "diff": -0.21621621621621623,
+  "ci": [
+   -0.40540540540540543,
+   -0.02702702702702703
+  ],
+  "win_rate": 0.21428571428571427,
+  "only_david": 3,
+  "only_rival": 11,
+  "chrf_david": 53.63983046837099,
+  "chrf_rival": 46.54202369894189,
+  "p50_david": 293.3,
+  "p50_rival": 2063.8
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | CO · Gen Z → papás": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.9473684210526315,
+  "rival": 1.0,
+  "diff": -0.05263157894736842,
+  "ci": [
+   -0.15789473684210525,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 1,
+  "chrf_david": 68.85011923847377,
+  "chrf_rival": 64.26906948291395,
+  "p50_david": 335.4,
+  "p50_rival": 2927.2
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | CO · papás → Gen Z": {
+  "n": 27,
+  "n_phrases": 27,
+  "david": 0.6296296296296297,
+  "rival": 0.7407407407407407,
+  "diff": -0.1111111111111111,
+  "ci": [
+   -0.37037037037037035,
+   0.14814814814814814
+  ],
+  "win_rate": 0.38461538461538464,
+  "only_david": 5,
+  "only_rival": 8,
+  "chrf_david": 48.17122599934697,
+  "chrf_rival": 38.88424708268671,
+  "p50_david": 286.4,
+  "p50_rival": 4542.5
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | LATAM · Gen Z → papás": {
+  "n": 20,
+  "n_phrases": 20,
+  "david": 0.95,
+  "rival": 1.0,
+  "diff": -0.05,
+  "ci": [
+   -0.15,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 1,
+  "chrf_david": 57.248314351560914,
+  "chrf_rival": 59.78346376058097,
+  "p50_david": 314.65,
+  "p50_rival": 1608.0
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | LATAM · papás → Gen Z": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.631578947368421,
+  "rival": 0.8947368421052632,
+  "diff": -0.2631578947368421,
+  "ci": [
+   -0.47368421052631576,
+   -0.10526315789473684
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 5,
+  "chrf_david": 59.61663624312964,
+  "chrf_rival": 47.49067579537813,
+  "p50_david": 334.1,
+  "p50_rival": 1489.9
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | GT · Gen Z → papás": {
+  "n": 9,
+  "n_phrases": 9,
+  "david": 1.0,
+  "rival": 0.8888888888888888,
+  "diff": 0.1111111111111111,
+  "ci": [
+   0.0,
+   0.3333333333333333
+  ],
+  "win_rate": 1.0,
+  "only_david": 1,
+  "only_rival": 0,
+  "chrf_david": 67.52911713740029,
+  "chrf_rival": 53.16219337629953,
+  "p50_david": 226.1,
+  "p50_rival": 1281.4
+ },
+ "combos | genlingo-2026-10d-e2b | goliath | Jerga resuelta | GT · papás → Gen Z": {
+  "n": 13,
+  "n_phrases": 13,
+  "david": 0.6923076923076923,
+  "rival": 0.46153846153846156,
+  "diff": 0.23076923076923078,
+  "ci": [
+   -0.07692307692307693,
+   0.5384615384615384
+  ],
+  "win_rate": 0.8,
+  "only_david": 4,
+  "only_rival": 1,
+  "chrf_david": 52.72832221430161,
+  "chrf_rival": 47.188101369118996,
+  "p50_david": 280.9,
+  "p50_rival": 5443.7
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | Todo": {
+  "n": 174,
+  "n_phrases": 174,
+  "david": 0.39080459770114945,
+  "rival": 0.6149425287356322,
+  "diff": -0.22413793103448276,
+  "ci": [
+   -0.3160919540229885,
+   -0.13218390804597702
+  ],
+  "win_rate": 0.25316455696202533,
+  "only_david": 20,
+  "only_rival": 59,
+  "chrf_david": 57.04080236388963,
+  "chrf_rival": 56.50789289600975,
+  "p50_david": 287.29999999999995,
+  "p50_rival": 3600.4
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | País MX": {
+  "n": 67,
+  "n_phrases": 67,
+  "david": 0.34328358208955223,
+  "rival": 0.7014925373134329,
+  "diff": -0.3582089552238806,
+  "ci": [
+   -0.4925373134328358,
+   -0.22388059701492538
+  ],
+  "win_rate": 0.1,
+  "only_david": 3,
+  "only_rival": 27,
+  "chrf_david": 54.91100683432295,
+  "chrf_rival": 52.977877707356235,
+  "p50_david": 287.9,
+  "p50_rival": 3568.3
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | País CO": {
+  "n": 46,
+  "n_phrases": 46,
+  "david": 0.41304347826086957,
+  "rival": 0.41304347826086957,
+  "diff": 0.0,
+  "ci": [
+   -0.1956521739130435,
+   0.1956521739130435
+  ],
+  "win_rate": 0.5,
+  "only_david": 11,
+  "only_rival": 11,
+  "chrf_david": 58.17967474091316,
+  "chrf_rival": 54.85936968282677,
+  "p50_david": 294.1,
+  "p50_rival": 4107.05
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | País LATAM": {
+  "n": 39,
+  "n_phrases": 39,
+  "david": 0.41025641025641024,
+  "rival": 0.7692307692307693,
+  "diff": -0.358974358974359,
+  "ci": [
+   -0.5384615384615384,
+   -0.1794871794871795
+  ],
+  "win_rate": 0.1111111111111111,
+  "only_david": 2,
+  "only_rival": 16,
+  "chrf_david": 58.28488025706845,
+  "chrf_rival": 63.90289226896473,
+  "p50_david": 322.9,
+  "p50_rival": 3098.1
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | País GT": {
+  "n": 22,
+  "n_phrases": 22,
+  "david": 0.45454545454545453,
+  "rival": 0.5,
+  "diff": -0.045454545454545456,
+  "ci": [
+   -0.3181818181818182,
+   0.22727272727272727
+  ],
+  "win_rate": 0.4444444444444444,
+  "only_david": 4,
+  "only_rival": 5,
+  "chrf_david": 57.848375686729,
+  "chrf_rival": 52.5403676163954,
+  "p50_david": 255.9,
+  "p50_rival": 3708.1000000000004
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | Gen Z → papás": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 0.38461538461538464,
+  "rival": 0.5512820512820513,
+  "diff": -0.16666666666666666,
+  "ci": [
+   -0.32051282051282054,
+   -0.01282051282051282
+  ],
+  "win_rate": 0.3488372093023256,
+  "only_david": 15,
+  "only_rival": 28,
+  "chrf_david": 60.752703431754774,
+  "chrf_rival": 61.57186480508802,
+  "p50_david": 282.85,
+  "p50_rival": 3574.95
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | papás → Gen Z": {
+  "n": 96,
+  "n_phrases": 96,
+  "david": 0.3958333333333333,
+  "rival": 0.6666666666666666,
+  "diff": -0.2708333333333333,
+  "ci": [
+   -0.3854166666666667,
+   -0.15625
+  ],
+  "win_rate": 0.1388888888888889,
+  "only_david": 5,
+  "only_rival": 31,
+  "chrf_david": 53.440966476194305,
+  "chrf_rival": 51.51486757295888,
+  "p50_david": 288.6,
+  "p50_rival": 3651.75
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | MX · Gen Z → papás": {
+  "n": 30,
+  "n_phrases": 30,
+  "david": 0.26666666666666666,
+  "rival": 0.6333333333333333,
+  "diff": -0.36666666666666664,
+  "ci": [
+   -0.5666666666666667,
+   -0.13333333333333333
+  ],
+  "win_rate": 0.13333333333333333,
+  "only_david": 2,
+  "only_rival": 13,
+  "chrf_david": 56.24615801092023,
+  "chrf_rival": 53.404590209806855,
+  "p50_david": 270.70000000000005,
+  "p50_rival": 3530.25
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | MX · papás → Gen Z": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.40540540540540543,
+  "rival": 0.7567567567567568,
+  "diff": -0.35135135135135137,
+  "ci": [
+   -0.5135135135135135,
+   -0.1891891891891892
+  ],
+  "win_rate": 0.06666666666666667,
+  "only_david": 1,
+  "only_rival": 14,
+  "chrf_david": 53.63983046837099,
+  "chrf_rival": 52.57572768691369,
+  "p50_david": 293.3,
+  "p50_rival": 3588.8
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | CO · Gen Z → papás": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.5789473684210527,
+  "rival": 0.3684210526315789,
+  "diff": 0.21052631578947367,
+  "ci": [
+   -0.10526315789473684,
+   0.5263157894736842
+  ],
+  "win_rate": 0.7,
+  "only_david": 7,
+  "only_rival": 3,
+  "chrf_david": 68.85011923847377,
+  "chrf_rival": 66.35489999616497,
+  "p50_david": 335.4,
+  "p50_rival": 3855.6
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | CO · papás → Gen Z": {
+  "n": 27,
+  "n_phrases": 27,
+  "david": 0.2962962962962963,
+  "rival": 0.4444444444444444,
+  "diff": -0.14814814814814814,
+  "ci": [
+   -0.4074074074074074,
+   0.1111111111111111
+  ],
+  "win_rate": 0.3333333333333333,
+  "only_david": 4,
+  "only_rival": 8,
+  "chrf_david": 48.17122599934697,
+  "chrf_rival": 43.80666843825871,
+  "p50_david": 286.4,
+  "p50_rival": 4128.1
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | LATAM · Gen Z → papás": {
+  "n": 20,
+  "n_phrases": 20,
+  "david": 0.3,
+  "rival": 0.7,
+  "diff": -0.4,
+  "ci": [
+   -0.7,
+   -0.1
+  ],
+  "win_rate": 0.16666666666666666,
+  "only_david": 2,
+  "only_rival": 10,
+  "chrf_david": 57.248314351560914,
+  "chrf_rival": 67.61534204738757,
+  "p50_david": 314.65,
+  "p50_rival": 3084.3
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | LATAM · papás → Gen Z": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.5263157894736842,
+  "rival": 0.8421052631578947,
+  "diff": -0.3157894736842105,
+  "ci": [
+   -0.5263157894736842,
+   -0.10526315789473684
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 6,
+  "chrf_david": 59.61663624312964,
+  "chrf_rival": 59.16854781114937,
+  "p50_david": 334.1,
+  "p50_rival": 3400.3
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | GT · Gen Z → papás": {
+  "n": 9,
+  "n_phrases": 9,
+  "david": 0.5555555555555556,
+  "rival": 0.3333333333333333,
+  "diff": 0.2222222222222222,
+  "ci": [
+   -0.3333333333333333,
+   0.6666666666666666
+  ],
+  "win_rate": 0.6666666666666666,
+  "only_david": 4,
+  "only_rival": 2,
+  "chrf_david": 67.52911713740029,
+  "chrf_rival": 55.43069395715754,
+  "p50_david": 226.1,
+  "p50_rival": 3772.8
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | GT · papás → Gen Z": {
+  "n": 13,
+  "n_phrases": 13,
+  "david": 0.38461538461538464,
+  "rival": 0.6153846153846154,
+  "diff": -0.23076923076923078,
+  "ci": [
+   -0.46153846153846156,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 3,
+  "chrf_david": 52.72832221430161,
+  "chrf_rival": 51.05491628697568,
+  "p50_david": 280.9,
+  "p50_rival": 2942.2
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | Todo": {
+  "n": 174,
+  "n_phrases": 174,
+  "david": 0.7988505747126436,
+  "rival": 0.9022988505747126,
+  "diff": -0.10344827586206896,
+  "ci": [
+   -0.1724137931034483,
+   -0.034482758620689655
+  ],
+  "win_rate": 0.2631578947368421,
+  "only_david": 10,
+  "only_rival": 28,
+  "chrf_david": 57.04080236388963,
+  "chrf_rival": 56.50789289600975,
+  "p50_david": 287.29999999999995,
+  "p50_rival": 3600.4
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | País MX": {
+  "n": 67,
+  "n_phrases": 67,
+  "david": 0.8208955223880597,
+  "rival": 0.9552238805970149,
+  "diff": -0.13432835820895522,
+  "ci": [
+   -0.23880597014925373,
+   -0.029850746268656716
+  ],
+  "win_rate": 0.2,
+  "only_david": 3,
+  "only_rival": 12,
+  "chrf_david": 54.91100683432295,
+  "chrf_rival": 52.977877707356235,
+  "p50_david": 287.9,
+  "p50_rival": 3568.3
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | País CO": {
+  "n": 46,
+  "n_phrases": 46,
+  "david": 0.7608695652173914,
+  "rival": 0.8260869565217391,
+  "diff": -0.06521739130434782,
+  "ci": [
+   -0.21739130434782608,
+   0.08695652173913043
+  ],
+  "win_rate": 0.38461538461538464,
+  "only_david": 5,
+  "only_rival": 8,
+  "chrf_david": 58.17967474091316,
+  "chrf_rival": 54.85936968282677,
+  "p50_david": 294.1,
+  "p50_rival": 4107.05
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | País LATAM": {
+  "n": 39,
+  "n_phrases": 39,
+  "david": 0.7948717948717948,
+  "rival": 0.9230769230769231,
+  "diff": -0.1282051282051282,
+  "ci": [
+   -0.23076923076923078,
+   -0.02564102564102564
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 5,
+  "chrf_david": 58.28488025706845,
+  "chrf_rival": 63.90289226896473,
+  "p50_david": 322.9,
+  "p50_rival": 3098.1
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | País GT": {
+  "n": 22,
+  "n_phrases": 22,
+  "david": 0.8181818181818182,
+  "rival": 0.8636363636363636,
+  "diff": -0.045454545454545456,
+  "ci": [
+   -0.22727272727272727,
+   0.13636363636363635
+  ],
+  "win_rate": 0.4,
+  "only_david": 2,
+  "only_rival": 3,
+  "chrf_david": 57.848375686729,
+  "chrf_rival": 52.5403676163954,
+  "p50_david": 255.9,
+  "p50_rival": 3708.1000000000004
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | Gen Z → papás": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 0.9743589743589743,
+  "rival": 1.0,
+  "diff": -0.02564102564102564,
+  "ci": [
+   -0.0641025641025641,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 2,
+  "chrf_david": 60.752703431754774,
+  "chrf_rival": 61.57186480508802,
+  "p50_david": 282.85,
+  "p50_rival": 3574.95
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | papás → Gen Z": {
+  "n": 96,
+  "n_phrases": 96,
+  "david": 0.65625,
+  "rival": 0.8229166666666666,
+  "diff": -0.16666666666666666,
+  "ci": [
+   -0.28125,
+   -0.041666666666666664
+  ],
+  "win_rate": 0.2777777777777778,
+  "only_david": 10,
+  "only_rival": 26,
+  "chrf_david": 53.440966476194305,
+  "chrf_rival": 51.51486757295888,
+  "p50_david": 288.6,
+  "p50_rival": 3651.75
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | MX · Gen Z → papás": {
+  "n": 30,
+  "n_phrases": 30,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 56.24615801092023,
+  "chrf_rival": 53.404590209806855,
+  "p50_david": 270.70000000000005,
+  "p50_rival": 3530.25
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | MX · papás → Gen Z": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.6756756756756757,
+  "rival": 0.918918918918919,
+  "diff": -0.24324324324324326,
+  "ci": [
+   -0.43243243243243246,
+   -0.05405405405405406
+  ],
+  "win_rate": 0.2,
+  "only_david": 3,
+  "only_rival": 12,
+  "chrf_david": 53.63983046837099,
+  "chrf_rival": 52.57572768691369,
+  "p50_david": 293.3,
+  "p50_rival": 3588.8
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | CO · Gen Z → papás": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.9473684210526315,
+  "rival": 1.0,
+  "diff": -0.05263157894736842,
+  "ci": [
+   -0.15789473684210525,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 1,
+  "chrf_david": 68.85011923847377,
+  "chrf_rival": 66.35489999616497,
+  "p50_david": 335.4,
+  "p50_rival": 3855.6
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | CO · papás → Gen Z": {
+  "n": 27,
+  "n_phrases": 27,
+  "david": 0.6296296296296297,
+  "rival": 0.7037037037037037,
+  "diff": -0.07407407407407407,
+  "ci": [
+   -0.3333333333333333,
+   0.18518518518518517
+  ],
+  "win_rate": 0.4166666666666667,
+  "only_david": 5,
+  "only_rival": 7,
+  "chrf_david": 48.17122599934697,
+  "chrf_rival": 43.80666843825871,
+  "p50_david": 286.4,
+  "p50_rival": 4128.1
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | LATAM · Gen Z → papás": {
+  "n": 20,
+  "n_phrases": 20,
+  "david": 0.95,
+  "rival": 1.0,
+  "diff": -0.05,
+  "ci": [
+   -0.15,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 1,
+  "chrf_david": 57.248314351560914,
+  "chrf_rival": 67.61534204738757,
+  "p50_david": 314.65,
+  "p50_rival": 3084.3
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | LATAM · papás → Gen Z": {
+  "n": 19,
+  "n_phrases": 19,
+  "david": 0.631578947368421,
+  "rival": 0.8421052631578947,
+  "diff": -0.21052631578947367,
+  "ci": [
+   -0.42105263157894735,
+   -0.05263157894736842
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 4,
+  "chrf_david": 59.61663624312964,
+  "chrf_rival": 59.16854781114937,
+  "p50_david": 334.1,
+  "p50_rival": 3400.3
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | GT · Gen Z → papás": {
+  "n": 9,
+  "n_phrases": 9,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 67.52911713740029,
+  "chrf_rival": 55.43069395715754,
+  "p50_david": 226.1,
+  "p50_rival": 3772.8
+ },
+ "combos | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | GT · papás → Gen Z": {
+  "n": 13,
+  "n_phrases": 13,
+  "david": 0.6923076923076923,
+  "rival": 0.7692307692307693,
+  "diff": -0.07692307692307693,
+  "ci": [
+   -0.38461538461538464,
+   0.23076923076923078
+  ],
+  "win_rate": 0.4,
+  "only_david": 2,
+  "only_rival": 3,
+  "chrf_david": 52.72832221430161,
+  "chrf_rival": 51.05491628697568,
+  "p50_david": 280.9,
+  "p50_rival": 2942.2
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | Todo": {
+  "n": 398,
+  "n_phrases": 398,
+  "david": 0.5778894472361809,
+  "rival": 0.33668341708542715,
+  "diff": 0.24120603015075376,
+  "ci": [
+   0.18592964824120603,
+   0.2964824120603015
+  ],
+  "win_rate": 0.8076923076923077,
+  "only_david": 126,
+  "only_rival": 30,
+  "chrf_david": 60.70708468919669,
+  "chrf_rival": 53.16033231076832,
+  "p50_david": 252.75,
+  "p50_rival": 3488.45
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | País MX": {
+  "n": 77,
+  "n_phrases": 77,
+  "david": 0.6493506493506493,
+  "rival": 0.4805194805194805,
+  "diff": 0.16883116883116883,
+  "ci": [
+   0.05194805194805195,
+   0.2857142857142857
+  ],
+  "win_rate": 0.76,
+  "only_david": 19,
+  "only_rival": 6,
+  "chrf_david": 54.07731571909995,
+  "chrf_rival": 50.99649871827745,
+  "p50_david": 241.3,
+  "p50_rival": 3275.3
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | País CO": {
+  "n": 131,
+  "n_phrases": 131,
+  "david": 0.5267175572519084,
+  "rival": 0.2824427480916031,
+  "diff": 0.24427480916030533,
+  "ci": [
+   0.1450381679389313,
+   0.3435114503816794
+  ],
+  "win_rate": 0.82,
+  "only_david": 41,
+  "only_rival": 9,
+  "chrf_david": 60.95105597258586,
+  "chrf_rival": 52.36219295192023,
+  "p50_david": 262.0,
+  "p50_rival": 3976.5
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | País LATAM": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.5466666666666666,
+  "rival": 0.52,
+  "diff": 0.02666666666666667,
+  "ci": [
+   -0.09333333333333334,
+   0.14666666666666667
+  ],
+  "win_rate": 0.5454545454545454,
+  "only_david": 12,
+  "only_rival": 10,
+  "chrf_david": 57.86558659818104,
+  "chrf_rival": 57.431698116605176,
+  "p50_david": 258.2,
+  "p50_rival": 1754.8
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | País GT": {
+  "n": 115,
+  "n_phrases": 115,
+  "david": 0.6086956521739131,
+  "rival": 0.1826086956521739,
+  "diff": 0.4260869565217391,
+  "ci": [
+   0.3217391304347826,
+   0.5304347826086957
+  ],
+  "win_rate": 0.9152542372881356,
+  "only_david": 54,
+  "only_rival": 5,
+  "chrf_david": 66.70106616302529,
+  "chrf_rival": 52.46630996012903,
+  "p50_david": 250.6,
+  "p50_rival": 4361.0
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | Gen Z → papás": {
+  "n": 226,
+  "n_phrases": 226,
+  "david": 0.7743362831858407,
+  "rival": 0.41150442477876104,
+  "diff": 0.36283185840707965,
+  "ci": [
+   0.2920353982300885,
+   0.4336283185840708
+  ],
+  "win_rate": 0.9270833333333334,
+  "only_david": 89,
+  "only_rival": 7,
+  "chrf_david": 69.47836555848512,
+  "chrf_rival": 60.074618332644725,
+  "p50_david": 240.6,
+  "p50_rival": 3903.8500000000004
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | papás → Gen Z": {
+  "n": 172,
+  "n_phrases": 172,
+  "david": 0.31976744186046513,
+  "rival": 0.23837209302325582,
+  "diff": 0.08139534883720931,
+  "ci": [
+   -0.011627906976744186,
+   0.1686046511627907
+  ],
+  "win_rate": 0.6166666666666667,
+  "only_david": 37,
+  "only_rival": 23,
+  "chrf_david": 48.336161128919436,
+  "chrf_rival": 43.422108478199824,
+  "p50_david": 265.3,
+  "p50_rival": 3250.9
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | MX · Gen Z → papás": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.8378378378378378,
+  "rival": 0.5135135135135135,
+  "diff": 0.32432432432432434,
+  "ci": [
+   0.1891891891891892,
+   0.4864864864864865
+  ],
+  "win_rate": 1.0,
+  "only_david": 12,
+  "only_rival": 0,
+  "chrf_david": 60.537858214458126,
+  "chrf_rival": 56.16856478172386,
+  "p50_david": 213.9,
+  "p50_rival": 3412.9
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | MX · papás → Gen Z": {
+  "n": 40,
+  "n_phrases": 40,
+  "david": 0.475,
+  "rival": 0.45,
+  "diff": 0.025,
+  "ci": [
+   -0.15,
+   0.2
+  ],
+  "win_rate": 0.5384615384615384,
+  "only_david": 7,
+  "only_rival": 6,
+  "chrf_david": 49.217414451215674,
+  "chrf_rival": 47.16664547607835,
+  "p50_david": 257.35,
+  "p50_rival": 3250.9
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | CO · Gen Z → papás": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.7066666666666667,
+  "rival": 0.37333333333333335,
+  "diff": 0.3333333333333333,
+  "ci": [
+   0.21333333333333335,
+   0.4533333333333333
+  ],
+  "win_rate": 0.9032258064516129,
+  "only_david": 28,
+  "only_rival": 3,
+  "chrf_david": 71.5175842491371,
+  "chrf_rival": 60.564171886510756,
+  "p50_david": 260.9,
+  "p50_rival": 4201.5
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | CO · papás → Gen Z": {
+  "n": 56,
+  "n_phrases": 56,
+  "david": 0.2857142857142857,
+  "rival": 0.16071428571428573,
+  "diff": 0.125,
+  "ci": [
+   -0.017857142857142856,
+   0.26785714285714285
+  ],
+  "win_rate": 0.6842105263157895,
+  "only_david": 13,
+  "only_rival": 6,
+  "chrf_david": 42.72247988991956,
+  "chrf_rival": 37.9702426542855,
+  "p50_david": 262.55,
+  "p50_rival": 3804.0
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | LATAM · Gen Z → papás": {
+  "n": 50,
+  "n_phrases": 50,
+  "david": 0.8,
+  "rival": 0.64,
+  "diff": 0.16,
+  "ci": [
+   0.02,
+   0.3
+  ],
+  "win_rate": 0.75,
+  "only_david": 12,
+  "only_rival": 4,
+  "chrf_david": 62.566892875988366,
+  "chrf_rival": 63.51032541894316,
+  "p50_david": 241.95,
+  "p50_rival": 2272.8
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | LATAM · papás → Gen Z": {
+  "n": 25,
+  "n_phrases": 25,
+  "david": 0.04,
+  "rival": 0.28,
+  "diff": -0.24,
+  "ci": [
+   -0.4,
+   -0.08
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 6,
+  "chrf_david": 47.44395352710025,
+  "chrf_rival": 44.201597743210584,
+  "p50_david": 265.1,
+  "p50_rival": 1238.2
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | GT · Gen Z → papás": {
+  "n": 64,
+  "n_phrases": 64,
+  "david": 0.796875,
+  "rival": 0.21875,
+  "diff": 0.578125,
+  "ci": [
+   0.453125,
+   0.703125
+  ],
+  "win_rate": 1.0,
+  "only_david": 37,
+  "only_rival": 0,
+  "chrf_david": 77.22977291688778,
+  "chrf_rival": 58.040779598810055,
+  "p50_david": 230.2,
+  "p50_rival": 5030.35
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga correcta | GT · papás → Gen Z": {
+  "n": 51,
+  "n_phrases": 51,
+  "david": 0.37254901960784315,
+  "rival": 0.13725490196078433,
+  "diff": 0.23529411764705882,
+  "ci": [
+   0.058823529411764705,
+   0.4117647058823529
+  ],
+  "win_rate": 0.7727272727272727,
+  "only_david": 17,
+  "only_rival": 5,
+  "chrf_david": 54.24134244203227,
+  "chrf_rival": 45.87717000277342,
+  "p50_david": 267.3,
+  "p50_rival": 3299.3
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | Todo": {
+  "n": 398,
+  "n_phrases": 398,
+  "david": 0.8115577889447236,
+  "rival": 0.7713567839195979,
+  "diff": 0.04020100502512563,
+  "ci": [
+   -0.002512562814070352,
+   0.0829145728643216
+  ],
+  "win_rate": 0.6052631578947368,
+  "only_david": 46,
+  "only_rival": 30,
+  "chrf_david": 60.70708468919669,
+  "chrf_rival": 53.16033231076832,
+  "p50_david": 252.75,
+  "p50_rival": 3488.45
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | País MX": {
+  "n": 77,
+  "n_phrases": 77,
+  "david": 0.8571428571428571,
+  "rival": 0.8571428571428571,
+  "diff": 0.0,
+  "ci": [
+   -0.07792207792207792,
+   0.07792207792207792
+  ],
+  "win_rate": 0.5,
+  "only_david": 5,
+  "only_rival": 5,
+  "chrf_david": 54.07731571909995,
+  "chrf_rival": 50.99649871827745,
+  "p50_david": 241.3,
+  "p50_rival": 3275.3
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | País CO": {
+  "n": 131,
+  "n_phrases": 131,
+  "david": 0.8015267175572519,
+  "rival": 0.7938931297709924,
+  "diff": 0.007633587786259542,
+  "ci": [
+   -0.07633587786259542,
+   0.08396946564885496
+  ],
+  "win_rate": 0.5172413793103449,
+  "only_david": 15,
+  "only_rival": 14,
+  "chrf_david": 60.95105597258586,
+  "chrf_rival": 52.36219295192023,
+  "p50_david": 262.0,
+  "p50_rival": 3976.5
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | País LATAM": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.76,
+  "rival": 0.7866666666666666,
+  "diff": -0.02666666666666667,
+  "ci": [
+   -0.10666666666666667,
+   0.05333333333333334
+  ],
+  "win_rate": 0.4,
+  "only_david": 4,
+  "only_rival": 6,
+  "chrf_david": 57.86558659818104,
+  "chrf_rival": 57.431698116605176,
+  "p50_david": 258.2,
+  "p50_rival": 1754.8
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | País GT": {
+  "n": 115,
+  "n_phrases": 115,
+  "david": 0.8260869565217391,
+  "rival": 0.6782608695652174,
+  "diff": 0.14782608695652175,
+  "ci": [
+   0.06956521739130435,
+   0.23478260869565218
+  ],
+  "win_rate": 0.8148148148148148,
+  "only_david": 22,
+  "only_rival": 5,
+  "chrf_david": 66.70106616302529,
+  "chrf_rival": 52.46630996012903,
+  "p50_david": 250.6,
+  "p50_rival": 4361.0
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | Gen Z → papás": {
+  "n": 226,
+  "n_phrases": 226,
+  "david": 0.995575221238938,
+  "rival": 0.9690265486725663,
+  "diff": 0.02654867256637168,
+  "ci": [
+   0.004424778761061947,
+   0.05309734513274336
+  ],
+  "win_rate": 0.875,
+  "only_david": 7,
+  "only_rival": 1,
+  "chrf_david": 69.47836555848512,
+  "chrf_rival": 60.074618332644725,
+  "p50_david": 240.6,
+  "p50_rival": 3903.8500000000004
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | papás → Gen Z": {
+  "n": 172,
+  "n_phrases": 172,
+  "david": 0.5697674418604651,
+  "rival": 0.5116279069767442,
+  "diff": 0.05813953488372093,
+  "ci": [
+   -0.03488372093023256,
+   0.1511627906976744
+  ],
+  "win_rate": 0.5735294117647058,
+  "only_david": 39,
+  "only_rival": 29,
+  "chrf_david": 48.336161128919436,
+  "chrf_rival": 43.422108478199824,
+  "p50_david": 265.3,
+  "p50_rival": 3250.9
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | MX · Gen Z → papás": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 60.537858214458126,
+  "chrf_rival": 56.16856478172386,
+  "p50_david": 213.9,
+  "p50_rival": 3412.9
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | MX · papás → Gen Z": {
+  "n": 40,
+  "n_phrases": 40,
+  "david": 0.725,
+  "rival": 0.725,
+  "diff": 0.0,
+  "ci": [
+   -0.15,
+   0.15
+  ],
+  "win_rate": 0.5,
+  "only_david": 5,
+  "only_rival": 5,
+  "chrf_david": 49.217414451215674,
+  "chrf_rival": 47.16664547607835,
+  "p50_david": 257.35,
+  "p50_rival": 3250.9
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | CO · Gen Z → papás": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.9866666666666667,
+  "rival": 0.96,
+  "diff": 0.02666666666666667,
+  "ci": [
+   -0.02666666666666667,
+   0.08
+  ],
+  "win_rate": 0.75,
+  "only_david": 3,
+  "only_rival": 1,
+  "chrf_david": 71.5175842491371,
+  "chrf_rival": 60.564171886510756,
+  "p50_david": 260.9,
+  "p50_rival": 4201.5
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | CO · papás → Gen Z": {
+  "n": 56,
+  "n_phrases": 56,
+  "david": 0.5535714285714286,
+  "rival": 0.5714285714285714,
+  "diff": -0.017857142857142856,
+  "ci": [
+   -0.19642857142857142,
+   0.16071428571428573
+  ],
+  "win_rate": 0.48,
+  "only_david": 12,
+  "only_rival": 13,
+  "chrf_david": 42.72247988991956,
+  "chrf_rival": 37.9702426542855,
+  "p50_david": 262.55,
+  "p50_rival": 3804.0
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | LATAM · Gen Z → papás": {
+  "n": 50,
+  "n_phrases": 50,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 62.566892875988366,
+  "chrf_rival": 63.51032541894316,
+  "p50_david": 241.95,
+  "p50_rival": 2272.8
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | LATAM · papás → Gen Z": {
+  "n": 25,
+  "n_phrases": 25,
+  "david": 0.28,
+  "rival": 0.36,
+  "diff": -0.08,
+  "ci": [
+   -0.32,
+   0.16
+  ],
+  "win_rate": 0.4,
+  "only_david": 4,
+  "only_rival": 6,
+  "chrf_david": 47.44395352710025,
+  "chrf_rival": 44.201597743210584,
+  "p50_david": 265.1,
+  "p50_rival": 1238.2
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | GT · Gen Z → papás": {
+  "n": 64,
+  "n_phrases": 64,
+  "david": 1.0,
+  "rival": 0.9375,
+  "diff": 0.0625,
+  "ci": [
+   0.015625,
+   0.125
+  ],
+  "win_rate": 1.0,
+  "only_david": 4,
+  "only_rival": 0,
+  "chrf_david": 77.22977291688778,
+  "chrf_rival": 58.040779598810055,
+  "p50_david": 230.2,
+  "p50_rival": 5030.35
+ },
+ "test | genlingo-2026-10e-e2b | goliath | Jerga resuelta | GT · papás → Gen Z": {
+  "n": 51,
+  "n_phrases": 51,
+  "david": 0.6078431372549019,
+  "rival": 0.35294117647058826,
+  "diff": 0.2549019607843137,
+  "ci": [
+   0.0784313725490196,
+   0.43137254901960786
+  ],
+  "win_rate": 0.782608695652174,
+  "only_david": 18,
+  "only_rival": 5,
+  "chrf_david": 54.24134244203227,
+  "chrf_rival": 45.87717000277342,
+  "p50_david": 267.3,
+  "p50_rival": 3299.3
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | Todo": {
+  "n": 399,
+  "n_phrases": 399,
+  "david": 0.5764411027568922,
+  "rival": 0.47869674185463656,
+  "diff": 0.09774436090225563,
+  "ci": [
+   0.042606516290726815,
+   0.15538847117794485
+  ],
+  "win_rate": 0.6466165413533834,
+  "only_david": 86,
+  "only_rival": 47,
+  "chrf_david": 60.71327599476505,
+  "chrf_rival": 56.872015620782015,
+  "p50_david": 252.8,
+  "p50_rival": 3277.2
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | País MX": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 0.6410256410256411,
+  "rival": 0.5769230769230769,
+  "diff": 0.0641025641025641,
+  "ci": [
+   -0.05128205128205128,
+   0.1794871794871795
+  ],
+  "win_rate": 0.6190476190476191,
+  "only_david": 13,
+  "only_rival": 8,
+  "chrf_david": 54.35749094308482,
+  "chrf_rival": 53.23429408041578,
+  "p50_david": 241.4,
+  "p50_rival": 3147.5
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | País CO": {
+  "n": 131,
+  "n_phrases": 131,
+  "david": 0.5267175572519084,
+  "rival": 0.3969465648854962,
+  "diff": 0.1297709923664122,
+  "ci": [
+   0.030534351145038167,
+   0.22900763358778625
+  ],
+  "win_rate": 0.6888888888888889,
+  "only_david": 31,
+  "only_rival": 14,
+  "chrf_david": 60.95105597258586,
+  "chrf_rival": 55.03350840042381,
+  "p50_david": 262.0,
+  "p50_rival": 3811.0
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | País LATAM": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.5466666666666666,
+  "rival": 0.6,
+  "diff": -0.05333333333333334,
+  "ci": [
+   -0.16,
+   0.05333333333333334
+  ],
+  "win_rate": 0.3888888888888889,
+  "only_david": 7,
+  "only_rival": 11,
+  "chrf_david": 57.86558659818104,
+  "chrf_rival": 58.77753634374636,
+  "p50_david": 258.2,
+  "p50_rival": 2708.3
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | País GT": {
+  "n": 115,
+  "n_phrases": 115,
+  "david": 0.6086956521739131,
+  "rival": 0.4260869565217391,
+  "diff": 0.1826086956521739,
+  "ci": [
+   0.06956521739130435,
+   0.2956521739130435
+  ],
+  "win_rate": 0.7142857142857143,
+  "only_david": 35,
+  "only_rival": 14,
+  "chrf_david": 66.70106616302529,
+  "chrf_rival": 60.39257261049975,
+  "p50_david": 250.6,
+  "p50_rival": 2903.3
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | Gen Z → papás": {
+  "n": 226,
+  "n_phrases": 226,
+  "david": 0.7743362831858407,
+  "rival": 0.5796460176991151,
+  "diff": 0.19469026548672566,
+  "ci": [
+   0.12389380530973451,
+   0.26548672566371684
+  ],
+  "win_rate": 0.775,
+  "only_david": 62,
+  "only_rival": 18,
+  "chrf_david": 69.47836555848512,
+  "chrf_rival": 63.11742197315232,
+  "p50_david": 240.6,
+  "p50_rival": 2957.7
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | papás → Gen Z": {
+  "n": 173,
+  "n_phrases": 173,
+  "david": 0.3179190751445087,
+  "rival": 0.3468208092485549,
+  "diff": -0.028901734104046242,
+  "ci": [
+   -0.10982658959537572,
+   0.05202312138728324
+  ],
+  "win_rate": 0.4528301886792453,
+  "only_david": 24,
+  "only_rival": 29,
+  "chrf_david": 48.54404112974332,
+  "chrf_rival": 48.169622365815954,
+  "p50_david": 265.5,
+  "p50_rival": 3780.4
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | MX · Gen Z → papás": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.8378378378378378,
+  "rival": 0.6756756756756757,
+  "diff": 0.16216216216216217,
+  "ci": [
+   0.0,
+   0.32432432432432434
+  ],
+  "win_rate": 0.8,
+  "only_david": 8,
+  "only_rival": 2,
+  "chrf_david": 60.537858214458126,
+  "chrf_rival": 52.909338829847606,
+  "p50_david": 213.9,
+  "p50_rival": 3021.4
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | MX · papás → Gen Z": {
+  "n": 41,
+  "n_phrases": 41,
+  "david": 0.4634146341463415,
+  "rival": 0.4878048780487805,
+  "diff": -0.024390243902439025,
+  "ci": [
+   -0.17073170731707318,
+   0.14634146341463414
+  ],
+  "win_rate": 0.45454545454545453,
+  "only_david": 5,
+  "only_rival": 6,
+  "chrf_david": 50.00566918849899,
+  "chrf_rival": 53.48607506752507,
+  "p50_david": 258.4,
+  "p50_rival": 3572.0
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | CO · Gen Z → papás": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.7066666666666667,
+  "rival": 0.48,
+  "diff": 0.22666666666666666,
+  "ci": [
+   0.09333333333333334,
+   0.36
+  ],
+  "win_rate": 0.7931034482758621,
+  "only_david": 23,
+  "only_rival": 6,
+  "chrf_david": 71.5175842491371,
+  "chrf_rival": 64.0521316762103,
+  "p50_david": 260.9,
+  "p50_rival": 3372.9
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | CO · papás → Gen Z": {
+  "n": 56,
+  "n_phrases": 56,
+  "david": 0.2857142857142857,
+  "rival": 0.2857142857142857,
+  "diff": 0.0,
+  "ci": [
+   -0.14285714285714285,
+   0.14285714285714285
+  ],
+  "win_rate": 0.5,
+  "only_david": 8,
+  "only_rival": 8,
+  "chrf_david": 42.72247988991956,
+  "chrf_rival": 39.280128794088505,
+  "p50_david": 262.55,
+  "p50_rival": 4200.2
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | LATAM · Gen Z → papás": {
+  "n": 50,
+  "n_phrases": 50,
+  "david": 0.8,
+  "rival": 0.78,
+  "diff": 0.02,
+  "ci": [
+   -0.12,
+   0.16
+  ],
+  "win_rate": 0.5384615384615384,
+  "only_david": 7,
+  "only_rival": 6,
+  "chrf_david": 62.566892875988366,
+  "chrf_rival": 63.565356940451544,
+  "p50_david": 241.95,
+  "p50_rival": 2656.1000000000004
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | LATAM · papás → Gen Z": {
+  "n": 25,
+  "n_phrases": 25,
+  "david": 0.04,
+  "rival": 0.24,
+  "diff": -0.2,
+  "ci": [
+   -0.36,
+   -0.04
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 5,
+  "chrf_david": 47.44395352710025,
+  "chrf_rival": 48.13657195538199,
+  "p50_david": 265.1,
+  "p50_rival": 3887.5
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | GT · Gen Z → papás": {
+  "n": 64,
+  "n_phrases": 64,
+  "david": 0.796875,
+  "rival": 0.484375,
+  "diff": 0.3125,
+  "ci": [
+   0.171875,
+   0.453125
+  ],
+  "win_rate": 0.8571428571428571,
+  "only_david": 24,
+  "only_rival": 4,
+  "chrf_david": 77.22977291688778,
+  "chrf_rival": 66.34860358678749,
+  "p50_david": 230.2,
+  "p50_rival": 2757.2
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga correcta | GT · papás → Gen Z": {
+  "n": 51,
+  "n_phrases": 51,
+  "david": 0.37254901960784315,
+  "rival": 0.35294117647058826,
+  "diff": 0.0196078431372549,
+  "ci": [
+   -0.1568627450980392,
+   0.19607843137254902
+  ],
+  "win_rate": 0.5238095238095238,
+  "only_david": 11,
+  "only_rival": 10,
+  "chrf_david": 54.24134244203227,
+  "chrf_rival": 53.35344750879175,
+  "p50_david": 267.3,
+  "p50_rival": 3082.3
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | Todo": {
+  "n": 399,
+  "n_phrases": 399,
+  "david": 0.8095238095238095,
+  "rival": 0.8120300751879699,
+  "diff": -0.002506265664160401,
+  "ci": [
+   -0.042606516290726815,
+   0.03759398496240601
+  ],
+  "win_rate": 0.49230769230769234,
+  "only_david": 32,
+  "only_rival": 33,
+  "chrf_david": 60.71327599476505,
+  "chrf_rival": 56.872015620782015,
+  "p50_david": 252.8,
+  "p50_rival": 3277.2
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | País MX": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 0.8461538461538461,
+  "rival": 0.8461538461538461,
+  "diff": 0.0,
+  "ci": [
+   -0.08974358974358974,
+   0.08974358974358974
+  ],
+  "win_rate": 0.5,
+  "only_david": 6,
+  "only_rival": 6,
+  "chrf_david": 54.35749094308482,
+  "chrf_rival": 53.23429408041578,
+  "p50_david": 241.4,
+  "p50_rival": 3147.5
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | País CO": {
+  "n": 131,
+  "n_phrases": 131,
+  "david": 0.8015267175572519,
+  "rival": 0.8015267175572519,
+  "diff": 0.0,
+  "ci": [
+   -0.06870229007633588,
+   0.06870229007633588
+  ],
+  "win_rate": 0.5,
+  "only_david": 10,
+  "only_rival": 10,
+  "chrf_david": 60.95105597258586,
+  "chrf_rival": 55.03350840042381,
+  "p50_david": 262.0,
+  "p50_rival": 3811.0
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | País LATAM": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.76,
+  "rival": 0.7733333333333333,
+  "diff": -0.013333333333333334,
+  "ci": [
+   -0.09333333333333334,
+   0.08
+  ],
+  "win_rate": 0.45454545454545453,
+  "only_david": 5,
+  "only_rival": 6,
+  "chrf_david": 57.86558659818104,
+  "chrf_rival": 58.77753634374636,
+  "p50_david": 258.2,
+  "p50_rival": 2708.3
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | País GT": {
+  "n": 115,
+  "n_phrases": 115,
+  "david": 0.8260869565217391,
+  "rival": 0.8260869565217391,
+  "diff": 0.0,
+  "ci": [
+   -0.0782608695652174,
+   0.0782608695652174
+  ],
+  "win_rate": 0.5,
+  "only_david": 11,
+  "only_rival": 11,
+  "chrf_david": 66.70106616302529,
+  "chrf_rival": 60.39257261049975,
+  "p50_david": 250.6,
+  "p50_rival": 2903.3
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | Gen Z → papás": {
+  "n": 226,
+  "n_phrases": 226,
+  "david": 0.995575221238938,
+  "rival": 0.995575221238938,
+  "diff": 0.0,
+  "ci": [
+   -0.01327433628318584,
+   0.01327433628318584
+  ],
+  "win_rate": 0.5,
+  "only_david": 1,
+  "only_rival": 1,
+  "chrf_david": 69.47836555848512,
+  "chrf_rival": 63.11742197315232,
+  "p50_david": 240.6,
+  "p50_rival": 2957.7
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | papás → Gen Z": {
+  "n": 173,
+  "n_phrases": 173,
+  "david": 0.5664739884393064,
+  "rival": 0.5722543352601156,
+  "diff": -0.005780346820809248,
+  "ci": [
+   -0.09826589595375723,
+   0.08092485549132948
+  ],
+  "win_rate": 0.49206349206349204,
+  "only_david": 31,
+  "only_rival": 32,
+  "chrf_david": 48.54404112974332,
+  "chrf_rival": 48.169622365815954,
+  "p50_david": 265.5,
+  "p50_rival": 3780.4
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | MX · Gen Z → papás": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 60.537858214458126,
+  "chrf_rival": 52.909338829847606,
+  "p50_david": 213.9,
+  "p50_rival": 3021.4
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | MX · papás → Gen Z": {
+  "n": 41,
+  "n_phrases": 41,
+  "david": 0.7073170731707317,
+  "rival": 0.7073170731707317,
+  "diff": 0.0,
+  "ci": [
+   -0.17073170731707318,
+   0.17073170731707318
+  ],
+  "win_rate": 0.5,
+  "only_david": 6,
+  "only_rival": 6,
+  "chrf_david": 50.00566918849899,
+  "chrf_rival": 53.48607506752507,
+  "p50_david": 258.4,
+  "p50_rival": 3572.0
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | CO · Gen Z → papás": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.9866666666666667,
+  "rival": 0.9866666666666667,
+  "diff": 0.0,
+  "ci": [
+   -0.04,
+   0.04
+  ],
+  "win_rate": 0.5,
+  "only_david": 1,
+  "only_rival": 1,
+  "chrf_david": 71.5175842491371,
+  "chrf_rival": 64.0521316762103,
+  "p50_david": 260.9,
+  "p50_rival": 3372.9
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | CO · papás → Gen Z": {
+  "n": 56,
+  "n_phrases": 56,
+  "david": 0.5535714285714286,
+  "rival": 0.5535714285714286,
+  "diff": 0.0,
+  "ci": [
+   -0.14285714285714285,
+   0.14285714285714285
+  ],
+  "win_rate": 0.5,
+  "only_david": 9,
+  "only_rival": 9,
+  "chrf_david": 42.72247988991956,
+  "chrf_rival": 39.280128794088505,
+  "p50_david": 262.55,
+  "p50_rival": 4200.2
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | LATAM · Gen Z → papás": {
+  "n": 50,
+  "n_phrases": 50,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 62.566892875988366,
+  "chrf_rival": 63.565356940451544,
+  "p50_david": 241.95,
+  "p50_rival": 2656.1000000000004
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | LATAM · papás → Gen Z": {
+  "n": 25,
+  "n_phrases": 25,
+  "david": 0.28,
+  "rival": 0.32,
+  "diff": -0.04,
+  "ci": [
+   -0.28,
+   0.2
+  ],
+  "win_rate": 0.45454545454545453,
+  "only_david": 5,
+  "only_rival": 6,
+  "chrf_david": 47.44395352710025,
+  "chrf_rival": 48.13657195538199,
+  "p50_david": 265.1,
+  "p50_rival": 3887.5
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | GT · Gen Z → papás": {
+  "n": 64,
+  "n_phrases": 64,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 77.22977291688778,
+  "chrf_rival": 66.34860358678749,
+  "p50_david": 230.2,
+  "p50_rival": 2757.2
+ },
+ "test | genlingo-2026-10e-e2b | goliath_glossary | Jerga resuelta | GT · papás → Gen Z": {
+  "n": 51,
+  "n_phrases": 51,
+  "david": 0.6078431372549019,
+  "rival": 0.6078431372549019,
+  "diff": 0.0,
+  "ci": [
+   -0.17647058823529413,
+   0.17647058823529413
+  ],
+  "win_rate": 0.5,
+  "only_david": 11,
+  "only_rival": 11,
+  "chrf_david": 54.24134244203227,
+  "chrf_rival": 53.35344750879175,
+  "p50_david": 267.3,
+  "p50_rival": 3082.3
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | Todo": {
+  "n": 398,
+  "n_phrases": 398,
+  "david": 0.535175879396985,
+  "rival": 0.33668341708542715,
+  "diff": 0.1984924623115578,
+  "ci": [
+   0.1407035175879397,
+   0.2562814070351759
+  ],
+  "win_rate": 0.7581699346405228,
+  "only_david": 116,
+  "only_rival": 37,
+  "chrf_david": 59.827100405029974,
+  "chrf_rival": 53.16033231076832,
+  "p50_david": 255.6,
+  "p50_rival": 3488.45
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | País MX": {
+  "n": 77,
+  "n_phrases": 77,
+  "david": 0.5454545454545454,
+  "rival": 0.4805194805194805,
+  "diff": 0.06493506493506493,
+  "ci": [
+   -0.06493506493506493,
+   0.19480519480519481
+  ],
+  "win_rate": 0.5925925925925926,
+  "only_david": 16,
+  "only_rival": 11,
+  "chrf_david": 53.25016080356036,
+  "chrf_rival": 50.99649871827745,
+  "p50_david": 244.1,
+  "p50_rival": 3275.3
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | País CO": {
+  "n": 131,
+  "n_phrases": 131,
+  "david": 0.5190839694656488,
+  "rival": 0.2824427480916031,
+  "diff": 0.2366412213740458,
+  "ci": [
+   0.13740458015267176,
+   0.33587786259541985
+  ],
+  "win_rate": 0.803921568627451,
+  "only_david": 41,
+  "only_rival": 10,
+  "chrf_david": 61.25377679071289,
+  "chrf_rival": 52.36219295192023,
+  "p50_david": 263.1,
+  "p50_rival": 3976.5
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | País LATAM": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.5333333333333333,
+  "rival": 0.52,
+  "diff": 0.013333333333333334,
+  "ci": [
+   -0.10666666666666667,
+   0.13333333333333333
+  ],
+  "win_rate": 0.5238095238095238,
+  "only_david": 11,
+  "only_rival": 10,
+  "chrf_david": 55.33364487287358,
+  "chrf_rival": 57.431698116605176,
+  "p50_david": 256.8,
+  "p50_rival": 1754.8
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | País GT": {
+  "n": 115,
+  "n_phrases": 115,
+  "david": 0.5478260869565217,
+  "rival": 0.1826086956521739,
+  "diff": 0.3652173913043478,
+  "ci": [
+   0.2608695652173913,
+   0.46956521739130436
+  ],
+  "win_rate": 0.8888888888888888,
+  "only_david": 48,
+  "only_rival": 6,
+  "chrf_david": 65.40878036155225,
+  "chrf_rival": 52.46630996012903,
+  "p50_david": 246.9,
+  "p50_rival": 4361.0
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | Gen Z → papás": {
+  "n": 226,
+  "n_phrases": 226,
+  "david": 0.7433628318584071,
+  "rival": 0.41150442477876104,
+  "diff": 0.33185840707964603,
+  "ci": [
+   0.2610619469026549,
+   0.40707964601769914
+  ],
+  "win_rate": 0.8947368421052632,
+  "only_david": 85,
+  "only_rival": 10,
+  "chrf_david": 68.38774898210956,
+  "chrf_rival": 60.074618332644725,
+  "p50_david": 237.25,
+  "p50_rival": 3903.8500000000004
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | papás → Gen Z": {
+  "n": 172,
+  "n_phrases": 172,
+  "david": 0.2616279069767442,
+  "rival": 0.23837209302325582,
+  "diff": 0.023255813953488372,
+  "ci": [
+   -0.06395348837209303,
+   0.11046511627906977
+  ],
+  "win_rate": 0.5344827586206896,
+  "only_david": 31,
+  "only_rival": 27,
+  "chrf_david": 47.74420179873801,
+  "chrf_rival": 43.422108478199824,
+  "p50_david": 266.20000000000005,
+  "p50_rival": 3250.9
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | MX · Gen Z → papás": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.7837837837837838,
+  "rival": 0.5135135135135135,
+  "diff": 0.2702702702702703,
+  "ci": [
+   0.08108108108108109,
+   0.4594594594594595
+  ],
+  "win_rate": 0.8571428571428571,
+  "only_david": 12,
+  "only_rival": 2,
+  "chrf_david": 57.09945353027416,
+  "chrf_rival": 56.16856478172386,
+  "p50_david": 216.4,
+  "p50_rival": 3412.9
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | MX · papás → Gen Z": {
+  "n": 40,
+  "n_phrases": 40,
+  "david": 0.325,
+  "rival": 0.45,
+  "diff": -0.125,
+  "ci": [
+   -0.3,
+   0.05
+  ],
+  "win_rate": 0.3076923076923077,
+  "only_david": 4,
+  "only_rival": 9,
+  "chrf_david": 50.35785131711328,
+  "chrf_rival": 47.16664547607835,
+  "p50_david": 272.85,
+  "p50_rival": 3250.9
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | CO · Gen Z → papás": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.7066666666666667,
+  "rival": 0.37333333333333335,
+  "diff": 0.3333333333333333,
+  "ci": [
+   0.21333333333333335,
+   0.4533333333333333
+  ],
+  "win_rate": 0.9032258064516129,
+  "only_david": 28,
+  "only_rival": 3,
+  "chrf_david": 71.81487576406458,
+  "chrf_rival": 60.564171886510756,
+  "p50_david": 267.1,
+  "p50_rival": 4201.5
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | CO · papás → Gen Z": {
+  "n": 56,
+  "n_phrases": 56,
+  "david": 0.26785714285714285,
+  "rival": 0.16071428571428573,
+  "diff": 0.10714285714285714,
+  "ci": [
+   -0.03571428571428571,
+   0.26785714285714285
+  ],
+  "win_rate": 0.65,
+  "only_david": 13,
+  "only_rival": 7,
+  "chrf_david": 42.946741435165876,
+  "chrf_rival": 37.9702426542855,
+  "p50_david": 261.20000000000005,
+  "p50_rival": 3804.0
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | LATAM · Gen Z → papás": {
+  "n": 50,
+  "n_phrases": 50,
+  "david": 0.74,
+  "rival": 0.64,
+  "diff": 0.1,
+  "ci": [
+   -0.04,
+   0.24
+  ],
+  "win_rate": 0.6666666666666666,
+  "only_david": 10,
+  "only_rival": 5,
+  "chrf_david": 61.105631584701015,
+  "chrf_rival": 63.51032541894316,
+  "p50_david": 237.7,
+  "p50_rival": 2272.8
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | LATAM · papás → Gen Z": {
+  "n": 25,
+  "n_phrases": 25,
+  "david": 0.12,
+  "rival": 0.28,
+  "diff": -0.16,
+  "ci": [
+   -0.36,
+   0.0
+  ],
+  "win_rate": 0.16666666666666666,
+  "only_david": 1,
+  "only_rival": 5,
+  "chrf_david": 42.520856435464104,
+  "chrf_rival": 44.201597743210584,
+  "p50_david": 261.7,
+  "p50_rival": 1238.2
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | GT · Gen Z → papás": {
+  "n": 64,
+  "n_phrases": 64,
+  "david": 0.765625,
+  "rival": 0.21875,
+  "diff": 0.546875,
+  "ci": [
+   0.421875,
+   0.671875
+  ],
+  "win_rate": 1.0,
+  "only_david": 35,
+  "only_rival": 0,
+  "chrf_david": 75.49728456414341,
+  "chrf_rival": 58.040779598810055,
+  "p50_david": 227.3,
+  "p50_rival": 5030.35
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga correcta | GT · papás → Gen Z": {
+  "n": 51,
+  "n_phrases": 51,
+  "david": 0.27450980392156865,
+  "rival": 0.13725490196078433,
+  "diff": 0.13725490196078433,
+  "ci": [
+   -0.0392156862745098,
+   0.29411764705882354
+  ],
+  "win_rate": 0.6842105263157895,
+  "only_david": 13,
+  "only_rival": 6,
+  "chrf_david": 53.53646723066758,
+  "chrf_rival": 45.87717000277342,
+  "p50_david": 273.0,
+  "p50_rival": 3299.3
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | Todo": {
+  "n": 398,
+  "n_phrases": 398,
+  "david": 0.7839195979899497,
+  "rival": 0.7713567839195979,
+  "diff": 0.01256281407035176,
+  "ci": [
+   -0.032663316582914576,
+   0.05527638190954774
+  ],
+  "win_rate": 0.5308641975308642,
+  "only_david": 43,
+  "only_rival": 38,
+  "chrf_david": 59.827100405029974,
+  "chrf_rival": 53.16033231076832,
+  "p50_david": 255.6,
+  "p50_rival": 3488.45
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | País MX": {
+  "n": 77,
+  "n_phrases": 77,
+  "david": 0.7662337662337663,
+  "rival": 0.8571428571428571,
+  "diff": -0.09090909090909091,
+  "ci": [
+   -0.18181818181818182,
+   0.0
+  ],
+  "win_rate": 0.23076923076923078,
+  "only_david": 3,
+  "only_rival": 10,
+  "chrf_david": 53.25016080356036,
+  "chrf_rival": 50.99649871827745,
+  "p50_david": 244.1,
+  "p50_rival": 3275.3
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | País CO": {
+  "n": 131,
+  "n_phrases": 131,
+  "david": 0.8396946564885496,
+  "rival": 0.7938931297709924,
+  "diff": 0.04580152671755725,
+  "ci": [
+   -0.03816793893129771,
+   0.1297709923664122
+  ],
+  "win_rate": 0.59375,
+  "only_david": 19,
+  "only_rival": 13,
+  "chrf_david": 61.25377679071289,
+  "chrf_rival": 52.36219295192023,
+  "p50_david": 263.1,
+  "p50_rival": 3976.5
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | País LATAM": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.7733333333333333,
+  "rival": 0.7866666666666666,
+  "diff": -0.013333333333333334,
+  "ci": [
+   -0.09333333333333334,
+   0.06666666666666667
+  ],
+  "win_rate": 0.4444444444444444,
+  "only_david": 4,
+  "only_rival": 5,
+  "chrf_david": 55.33364487287358,
+  "chrf_rival": 57.431698116605176,
+  "p50_david": 256.8,
+  "p50_rival": 1754.8
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | País GT": {
+  "n": 115,
+  "n_phrases": 115,
+  "david": 0.7391304347826086,
+  "rival": 0.6782608695652174,
+  "diff": 0.06086956521739131,
+  "ci": [
+   -0.02608695652173913,
+   0.14782608695652175
+  ],
+  "win_rate": 0.6296296296296297,
+  "only_david": 17,
+  "only_rival": 10,
+  "chrf_david": 65.40878036155225,
+  "chrf_rival": 52.46630996012903,
+  "p50_david": 246.9,
+  "p50_rival": 4361.0
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | Gen Z → papás": {
+  "n": 226,
+  "n_phrases": 226,
+  "david": 1.0,
+  "rival": 0.9690265486725663,
+  "diff": 0.030973451327433628,
+  "ci": [
+   0.008849557522123894,
+   0.05752212389380531
+  ],
+  "win_rate": 1.0,
+  "only_david": 7,
+  "only_rival": 0,
+  "chrf_david": 68.38774898210956,
+  "chrf_rival": 60.074618332644725,
+  "p50_david": 237.25,
+  "p50_rival": 3903.8500000000004
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | papás → Gen Z": {
+  "n": 172,
+  "n_phrases": 172,
+  "david": 0.5,
+  "rival": 0.5116279069767442,
+  "diff": -0.011627906976744186,
+  "ci": [
+   -0.10465116279069768,
+   0.0872093023255814
+  ],
+  "win_rate": 0.4864864864864865,
+  "only_david": 36,
+  "only_rival": 38,
+  "chrf_david": 47.74420179873801,
+  "chrf_rival": 43.422108478199824,
+  "p50_david": 266.20000000000005,
+  "p50_rival": 3250.9
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | MX · Gen Z → papás": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 57.09945353027416,
+  "chrf_rival": 56.16856478172386,
+  "p50_david": 216.4,
+  "p50_rival": 3412.9
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | MX · papás → Gen Z": {
+  "n": 40,
+  "n_phrases": 40,
+  "david": 0.55,
+  "rival": 0.725,
+  "diff": -0.175,
+  "ci": [
+   -0.35,
+   0.0
+  ],
+  "win_rate": 0.23076923076923078,
+  "only_david": 3,
+  "only_rival": 10,
+  "chrf_david": 50.35785131711328,
+  "chrf_rival": 47.16664547607835,
+  "p50_david": 272.85,
+  "p50_rival": 3250.9
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | CO · Gen Z → papás": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 1.0,
+  "rival": 0.96,
+  "diff": 0.04,
+  "ci": [
+   0.0,
+   0.09333333333333334
+  ],
+  "win_rate": 1.0,
+  "only_david": 3,
+  "only_rival": 0,
+  "chrf_david": 71.81487576406458,
+  "chrf_rival": 60.564171886510756,
+  "p50_david": 267.1,
+  "p50_rival": 4201.5
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | CO · papás → Gen Z": {
+  "n": 56,
+  "n_phrases": 56,
+  "david": 0.625,
+  "rival": 0.5714285714285714,
+  "diff": 0.05357142857142857,
+  "ci": [
+   -0.125,
+   0.23214285714285715
+  ],
+  "win_rate": 0.5517241379310345,
+  "only_david": 16,
+  "only_rival": 13,
+  "chrf_david": 42.946741435165876,
+  "chrf_rival": 37.9702426542855,
+  "p50_david": 261.20000000000005,
+  "p50_rival": 3804.0
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | LATAM · Gen Z → papás": {
+  "n": 50,
+  "n_phrases": 50,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 61.105631584701015,
+  "chrf_rival": 63.51032541894316,
+  "p50_david": 237.7,
+  "p50_rival": 2272.8
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | LATAM · papás → Gen Z": {
+  "n": 25,
+  "n_phrases": 25,
+  "david": 0.32,
+  "rival": 0.36,
+  "diff": -0.04,
+  "ci": [
+   -0.28,
+   0.2
+  ],
+  "win_rate": 0.4444444444444444,
+  "only_david": 4,
+  "only_rival": 5,
+  "chrf_david": 42.520856435464104,
+  "chrf_rival": 44.201597743210584,
+  "p50_david": 261.7,
+  "p50_rival": 1238.2
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | GT · Gen Z → papás": {
+  "n": 64,
+  "n_phrases": 64,
+  "david": 1.0,
+  "rival": 0.9375,
+  "diff": 0.0625,
+  "ci": [
+   0.015625,
+   0.125
+  ],
+  "win_rate": 1.0,
+  "only_david": 4,
+  "only_rival": 0,
+  "chrf_david": 75.49728456414341,
+  "chrf_rival": 58.040779598810055,
+  "p50_david": 227.3,
+  "p50_rival": 5030.35
+ },
+ "test | genlingo-2026-10d-e2b | goliath | Jerga resuelta | GT · papás → Gen Z": {
+  "n": 51,
+  "n_phrases": 51,
+  "david": 0.4117647058823529,
+  "rival": 0.35294117647058826,
+  "diff": 0.058823529411764705,
+  "ci": [
+   -0.13725490196078433,
+   0.23529411764705882
+  ],
+  "win_rate": 0.5652173913043478,
+  "only_david": 13,
+  "only_rival": 10,
+  "chrf_david": 53.53646723066758,
+  "chrf_rival": 45.87717000277342,
+  "p50_david": 273.0,
+  "p50_rival": 3299.3
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | Todo": {
+  "n": 399,
+  "n_phrases": 399,
+  "david": 0.5363408521303258,
+  "rival": 0.47869674185463656,
+  "diff": 0.05764411027568922,
+  "ci": [
+   0.005012531328320802,
+   0.11027568922305764
+  ],
+  "win_rate": 0.5966386554621849,
+  "only_david": 71,
+  "only_rival": 48,
+  "chrf_david": 59.832848960519925,
+  "chrf_rival": 56.872015620782015,
+  "p50_david": 255.7,
+  "p50_rival": 3277.2
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | País MX": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 0.5512820512820513,
+  "rival": 0.5769230769230769,
+  "diff": -0.02564102564102564,
+  "ci": [
+   -0.14102564102564102,
+   0.08974358974358974
+  ],
+  "win_rate": 0.45,
+  "only_david": 9,
+  "only_rival": 11,
+  "chrf_david": 53.5264751031472,
+  "chrf_rival": 53.23429408041578,
+  "p50_david": 244.5,
+  "p50_rival": 3147.5
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | País CO": {
+  "n": 131,
+  "n_phrases": 131,
+  "david": 0.5190839694656488,
+  "rival": 0.3969465648854962,
+  "diff": 0.12213740458015267,
+  "ci": [
+   0.022900763358778626,
+   0.22137404580152673
+  ],
+  "win_rate": 0.6818181818181818,
+  "only_david": 30,
+  "only_rival": 14,
+  "chrf_david": 61.25377679071289,
+  "chrf_rival": 55.03350840042381,
+  "p50_david": 263.1,
+  "p50_rival": 3811.0
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | País LATAM": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.5333333333333333,
+  "rival": 0.6,
+  "diff": -0.06666666666666667,
+  "ci": [
+   -0.17333333333333334,
+   0.02666666666666667
+  ],
+  "win_rate": 0.3333333333333333,
+  "only_david": 5,
+  "only_rival": 10,
+  "chrf_david": 55.33364487287358,
+  "chrf_rival": 58.77753634374636,
+  "p50_david": 256.8,
+  "p50_rival": 2708.3
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | País GT": {
+  "n": 115,
+  "n_phrases": 115,
+  "david": 0.5478260869565217,
+  "rival": 0.4260869565217391,
+  "diff": 0.12173913043478261,
+  "ci": [
+   0.017391304347826087,
+   0.22608695652173913
+  ],
+  "win_rate": 0.675,
+  "only_david": 27,
+  "only_rival": 13,
+  "chrf_david": 65.40878036155225,
+  "chrf_rival": 60.39257261049975,
+  "p50_david": 246.9,
+  "p50_rival": 2903.3
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | Gen Z → papás": {
+  "n": 226,
+  "n_phrases": 226,
+  "david": 0.7433628318584071,
+  "rival": 0.5796460176991151,
+  "diff": 0.16371681415929204,
+  "ci": [
+   0.08849557522123894,
+   0.23893805309734514
+  ],
+  "win_rate": 0.7402597402597403,
+  "only_david": 57,
+  "only_rival": 20,
+  "chrf_david": 68.38774898210956,
+  "chrf_rival": 63.11742197315232,
+  "p50_david": 237.25,
+  "p50_rival": 2957.7
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | papás → Gen Z": {
+  "n": 173,
+  "n_phrases": 173,
+  "david": 0.2658959537572254,
+  "rival": 0.3468208092485549,
+  "diff": -0.08092485549132948,
+  "ci": [
+   -0.15606936416184972,
+   -0.005780346820809248
+  ],
+  "win_rate": 0.3333333333333333,
+  "only_david": 14,
+  "only_rival": 28,
+  "chrf_david": 47.94754278359586,
+  "chrf_rival": 48.169622365815954,
+  "p50_david": 266.3,
+  "p50_rival": 3780.4
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | MX · Gen Z → papás": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 0.7837837837837838,
+  "rival": 0.6756756756756757,
+  "diff": 0.10810810810810811,
+  "ci": [
+   -0.05405405405405406,
+   0.2702702702702703
+  ],
+  "win_rate": 0.7,
+  "only_david": 7,
+  "only_rival": 3,
+  "chrf_david": 57.09945353027416,
+  "chrf_rival": 52.909338829847606,
+  "p50_david": 216.4,
+  "p50_rival": 3021.4
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | MX · papás → Gen Z": {
+  "n": 41,
+  "n_phrases": 41,
+  "david": 0.34146341463414637,
+  "rival": 0.4878048780487805,
+  "diff": -0.14634146341463414,
+  "ci": [
+   -0.2926829268292683,
+   0.0
+  ],
+  "win_rate": 0.2,
+  "only_david": 2,
+  "only_rival": 8,
+  "chrf_david": 51.01599644017782,
+  "chrf_rival": 53.48607506752507,
+  "p50_david": 273.4,
+  "p50_rival": 3572.0
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | CO · Gen Z → papás": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.7066666666666667,
+  "rival": 0.48,
+  "diff": 0.22666666666666666,
+  "ci": [
+   0.10666666666666667,
+   0.3466666666666667
+  ],
+  "win_rate": 0.8148148148148148,
+  "only_david": 22,
+  "only_rival": 5,
+  "chrf_david": 71.81487576406458,
+  "chrf_rival": 64.0521316762103,
+  "p50_david": 267.1,
+  "p50_rival": 3372.9
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | CO · papás → Gen Z": {
+  "n": 56,
+  "n_phrases": 56,
+  "david": 0.26785714285714285,
+  "rival": 0.2857142857142857,
+  "diff": -0.017857142857142856,
+  "ci": [
+   -0.16071428571428573,
+   0.125
+  ],
+  "win_rate": 0.47058823529411764,
+  "only_david": 8,
+  "only_rival": 9,
+  "chrf_david": 42.946741435165876,
+  "chrf_rival": 39.280128794088505,
+  "p50_david": 261.20000000000005,
+  "p50_rival": 4200.2
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | LATAM · Gen Z → papás": {
+  "n": 50,
+  "n_phrases": 50,
+  "david": 0.74,
+  "rival": 0.78,
+  "diff": -0.04,
+  "ci": [
+   -0.18,
+   0.1
+  ],
+  "win_rate": 0.4166666666666667,
+  "only_david": 5,
+  "only_rival": 7,
+  "chrf_david": 61.105631584701015,
+  "chrf_rival": 63.565356940451544,
+  "p50_david": 237.7,
+  "p50_rival": 2656.1000000000004
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | LATAM · papás → Gen Z": {
+  "n": 25,
+  "n_phrases": 25,
+  "david": 0.12,
+  "rival": 0.24,
+  "diff": -0.12,
+  "ci": [
+   -0.24,
+   0.0
+  ],
+  "win_rate": 0.0,
+  "only_david": 0,
+  "only_rival": 3,
+  "chrf_david": 42.520856435464104,
+  "chrf_rival": 48.13657195538199,
+  "p50_david": 261.7,
+  "p50_rival": 3887.5
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | GT · Gen Z → papás": {
+  "n": 64,
+  "n_phrases": 64,
+  "david": 0.765625,
+  "rival": 0.484375,
+  "diff": 0.28125,
+  "ci": [
+   0.140625,
+   0.421875
+  ],
+  "win_rate": 0.8214285714285714,
+  "only_david": 23,
+  "only_rival": 5,
+  "chrf_david": 75.49728456414341,
+  "chrf_rival": 66.34860358678749,
+  "p50_david": 227.3,
+  "p50_rival": 2757.2
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga correcta | GT · papás → Gen Z": {
+  "n": 51,
+  "n_phrases": 51,
+  "david": 0.27450980392156865,
+  "rival": 0.35294117647058826,
+  "diff": -0.0784313725490196,
+  "ci": [
+   -0.21568627450980393,
+   0.058823529411764705
+  ],
+  "win_rate": 0.3333333333333333,
+  "only_david": 4,
+  "only_rival": 8,
+  "chrf_david": 53.53646723066758,
+  "chrf_rival": 53.35344750879175,
+  "p50_david": 273.0,
+  "p50_rival": 3082.3
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | Todo": {
+  "n": 399,
+  "n_phrases": 399,
+  "david": 0.7844611528822055,
+  "rival": 0.8120300751879699,
+  "diff": -0.02756892230576441,
+  "ci": [
+   -0.06766917293233082,
+   0.012531328320802004
+  ],
+  "win_rate": 0.4126984126984127,
+  "only_david": 26,
+  "only_rival": 37,
+  "chrf_david": 59.832848960519925,
+  "chrf_rival": 56.872015620782015,
+  "p50_david": 255.7,
+  "p50_rival": 3277.2
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | País MX": {
+  "n": 78,
+  "n_phrases": 78,
+  "david": 0.7692307692307693,
+  "rival": 0.8461538461538461,
+  "diff": -0.07692307692307693,
+  "ci": [
+   -0.1794871794871795,
+   0.02564102564102564
+  ],
+  "win_rate": 0.3125,
+  "only_david": 5,
+  "only_rival": 11,
+  "chrf_david": 53.5264751031472,
+  "chrf_rival": 53.23429408041578,
+  "p50_david": 244.5,
+  "p50_rival": 3147.5
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | País CO": {
+  "n": 131,
+  "n_phrases": 131,
+  "david": 0.8396946564885496,
+  "rival": 0.8015267175572519,
+  "diff": 0.03816793893129771,
+  "ci": [
+   -0.030534351145038167,
+   0.11450381679389313
+  ],
+  "win_rate": 0.6086956521739131,
+  "only_david": 14,
+  "only_rival": 9,
+  "chrf_david": 61.25377679071289,
+  "chrf_rival": 55.03350840042381,
+  "p50_david": 263.1,
+  "p50_rival": 3811.0
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | País LATAM": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 0.7733333333333333,
+  "rival": 0.7733333333333333,
+  "diff": 0.0,
+  "ci": [
+   -0.08,
+   0.08
+  ],
+  "win_rate": 0.5,
+  "only_david": 4,
+  "only_rival": 4,
+  "chrf_david": 55.33364487287358,
+  "chrf_rival": 58.77753634374636,
+  "p50_david": 256.8,
+  "p50_rival": 2708.3
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | País GT": {
+  "n": 115,
+  "n_phrases": 115,
+  "david": 0.7391304347826086,
+  "rival": 0.8260869565217391,
+  "diff": -0.08695652173913043,
+  "ci": [
+   -0.1565217391304348,
+   -0.02608695652173913
+  ],
+  "win_rate": 0.1875,
+  "only_david": 3,
+  "only_rival": 13,
+  "chrf_david": 65.40878036155225,
+  "chrf_rival": 60.39257261049975,
+  "p50_david": 246.9,
+  "p50_rival": 2903.3
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | Gen Z → papás": {
+  "n": 226,
+  "n_phrases": 226,
+  "david": 1.0,
+  "rival": 0.995575221238938,
+  "diff": 0.004424778761061947,
+  "ci": [
+   0.0,
+   0.01327433628318584
+  ],
+  "win_rate": 1.0,
+  "only_david": 1,
+  "only_rival": 0,
+  "chrf_david": 68.38774898210956,
+  "chrf_rival": 63.11742197315232,
+  "p50_david": 237.25,
+  "p50_rival": 2957.7
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | papás → Gen Z": {
+  "n": 173,
+  "n_phrases": 173,
+  "david": 0.5028901734104047,
+  "rival": 0.5722543352601156,
+  "diff": -0.06936416184971098,
+  "ci": [
+   -0.15606936416184972,
+   0.017341040462427744
+  ],
+  "win_rate": 0.4032258064516129,
+  "only_david": 25,
+  "only_rival": 37,
+  "chrf_david": 47.94754278359586,
+  "chrf_rival": 48.169622365815954,
+  "p50_david": 266.3,
+  "p50_rival": 3780.4
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | MX · Gen Z → papás": {
+  "n": 37,
+  "n_phrases": 37,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 57.09945353027416,
+  "chrf_rival": 52.909338829847606,
+  "p50_david": 216.4,
+  "p50_rival": 3021.4
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | MX · papás → Gen Z": {
+  "n": 41,
+  "n_phrases": 41,
+  "david": 0.5609756097560976,
+  "rival": 0.7073170731707317,
+  "diff": -0.14634146341463414,
+  "ci": [
+   -0.34146341463414637,
+   0.04878048780487805
+  ],
+  "win_rate": 0.3125,
+  "only_david": 5,
+  "only_rival": 11,
+  "chrf_david": 51.01599644017782,
+  "chrf_rival": 53.48607506752507,
+  "p50_david": 273.4,
+  "p50_rival": 3572.0
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | CO · Gen Z → papás": {
+  "n": 75,
+  "n_phrases": 75,
+  "david": 1.0,
+  "rival": 0.9866666666666667,
+  "diff": 0.013333333333333334,
+  "ci": [
+   0.0,
+   0.04
+  ],
+  "win_rate": 1.0,
+  "only_david": 1,
+  "only_rival": 0,
+  "chrf_david": 71.81487576406458,
+  "chrf_rival": 64.0521316762103,
+  "p50_david": 267.1,
+  "p50_rival": 3372.9
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | CO · papás → Gen Z": {
+  "n": 56,
+  "n_phrases": 56,
+  "david": 0.625,
+  "rival": 0.5535714285714286,
+  "diff": 0.07142857142857142,
+  "ci": [
+   -0.08928571428571429,
+   0.23214285714285715
+  ],
+  "win_rate": 0.5909090909090909,
+  "only_david": 13,
+  "only_rival": 9,
+  "chrf_david": 42.946741435165876,
+  "chrf_rival": 39.280128794088505,
+  "p50_david": 261.20000000000005,
+  "p50_rival": 4200.2
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | LATAM · Gen Z → papás": {
+  "n": 50,
+  "n_phrases": 50,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 61.105631584701015,
+  "chrf_rival": 63.565356940451544,
+  "p50_david": 237.7,
+  "p50_rival": 2656.1000000000004
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | LATAM · papás → Gen Z": {
+  "n": 25,
+  "n_phrases": 25,
+  "david": 0.32,
+  "rival": 0.32,
+  "diff": 0.0,
+  "ci": [
+   -0.24,
+   0.24
+  ],
+  "win_rate": 0.5,
+  "only_david": 4,
+  "only_rival": 4,
+  "chrf_david": 42.520856435464104,
+  "chrf_rival": 48.13657195538199,
+  "p50_david": 261.7,
+  "p50_rival": 3887.5
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | GT · Gen Z → papás": {
+  "n": 64,
+  "n_phrases": 64,
+  "david": 1.0,
+  "rival": 1.0,
+  "diff": 0.0,
+  "ci": [
+   0.0,
+   0.0
+  ],
+  "win_rate": null,
+  "only_david": 0,
+  "only_rival": 0,
+  "chrf_david": 75.49728456414341,
+  "chrf_rival": 66.34860358678749,
+  "p50_david": 227.3,
+  "p50_rival": 2757.2
+ },
+ "test | genlingo-2026-10d-e2b | goliath_glossary | Jerga resuelta | GT · papás → Gen Z": {
+  "n": 51,
+  "n_phrases": 51,
+  "david": 0.4117647058823529,
+  "rival": 0.6078431372549019,
+  "diff": -0.19607843137254902,
+  "ci": [
+   -0.3333333333333333,
+   -0.058823529411764705
+  ],
+  "win_rate": 0.1875,
+  "only_david": 3,
+  "only_rival": 13,
+  "chrf_david": 53.53646723066758,
+  "chrf_rival": 53.35344750879175,
+  "p50_david": 273.0,
+  "p50_rival": 3082.3
+ }
+}

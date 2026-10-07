@@ -10,17 +10,16 @@
 <text x="420" y="322" text-anchor="middle" fill="#5A5E66">6</text>
 <text x="542" y="322" text-anchor="middle" fill="#5A5E66">8</text>
 <text x="663" y="322" text-anchor="middle" fill="#5A5E66">10</text>
-<text x="48" y="280" text-anchor="end" fill="#5A5E66">60</text>
-<text x="48" y="225" text-anchor="end" fill="#5A5E66">65</text>
-<text x="48" y="171" text-anchor="end" fill="#5A5E66">70</text>
-<text x="48" y="116" text-anchor="end" fill="#5A5E66">75</text>
-<text x="48" y="62" text-anchor="end" fill="#5A5E66">80</text>
-<polyline points="263.4,195.1 275.6,124.1 619.0,121.4" fill="none" stroke="#D9D4C7" stroke-width="2"/>
-<circle cx="263.4" cy="195.1" r="6" fill="#C23D19"/>
-<text x="272.4" y="187.1" fill="#16181D">Q4_K_M · 67 %</text>
-<circle cx="275.6" cy="124.1" r="6" fill="#C23D19"/>
-<text x="284.6" y="116.1" fill="#16181D">Q5_K_M · 74 %</text>
-<circle cx="619.0" cy="121.4" r="6" fill="#C23D19"/>
-<text x="628.0" y="113.4" fill="#16181D">F16 · 74 %</text>
+<text x="48" y="269" text-anchor="end" fill="#5A5E66">60</text>
+<text x="48" y="207" text-anchor="end" fill="#5A5E66">65</text>
+<text x="48" y="144" text-anchor="end" fill="#5A5E66">70</text>
+<text x="48" y="81" text-anchor="end" fill="#5A5E66">75</text>
+<polyline points="263.4,178.5 275.6,131.3 619.0,140.7" fill="none" stroke="#D9D4C7" stroke-width="2"/>
+<circle cx="263.4" cy="178.5" r="6" fill="#C23D19"/>
+<text x="272.4" y="170.5" fill="#16181D">Q4_K_M · 67 %</text>
+<circle cx="275.6" cy="131.3" r="6" fill="#C23D19"/>
+<text x="284.6" y="123.3" fill="#16181D">Q5_K_M · 71 %</text>
+<circle cx="619.0" cy="140.7" r="6" fill="#C23D19"/>
+<text x="628.0" y="132.7" fill="#16181D">F16 · 70 %</text>
 <text x="664" y="32.0" text-anchor="end" fill="#5A5E66"><tspan fill="#C23D19">●</tspan> cuantización normal  <tspan fill="#2B4ACB">●</tspan> con imatrix</text>
 </svg>
