@@ -10,6 +10,9 @@ set -a; [ -f "$ROOT/.env" ] && source "$ROOT/.env" || source "$ROOT/.env.example
 # EVAL_DAVID_TAGS (optional) evaluates other Davids than .env's DAVID_TAGS (e.g. a new round's variants before
 # anyone decides to put one on the page; DAVID_MODEL_TAG, the page's David, stays as it is).
 DAVID_TAGS="${EVAL_DAVID_TAGS:-$DAVID_TAGS}"
+# EVAL_DAVID_MODEL_TAG (optional): the David the reports treat as the page's (role "david"), e.g. a round's
+# winner evaluated before the page switches to it.
+DAVID_MODEL_TAG="${EVAL_DAVID_MODEL_TAG:-$DAVID_MODEL_TAG}"
 JOB="${APP}-eval"
 SA="${APP}-eval"
 SA_EMAIL="${SA}@${PROJECT_ID}.iam.gserviceaccount.com"

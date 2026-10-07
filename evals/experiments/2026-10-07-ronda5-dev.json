@@ -1,0 +1,155 @@
+{
+ "genlingo-2026-10d-e2b + léxico": {
+  "dev": {
+   "n": 241,
+   "correcta": 49.0,
+   "resuelta": 84.5,
+   "chrf": 66.1,
+   "p50_ms": 277.6
+  },
+  "dev_combos": {
+   "n": 69,
+   "correcta": 34.8,
+   "resuelta": 84.1,
+   "chrf": 59.7,
+   "p50_ms": 289.8
+  },
+  "file": "dev-20261007-204650.json"
+ },
+ "genlingo-2026-10e-e2b + léxico": {
+  "dev": {
+   "n": 241,
+   "correcta": 58.1,
+   "resuelta": 82.9,
+   "chrf": 69.8,
+   "p50_ms": 274.75
+  },
+  "dev_combos": {
+   "n": 69,
+   "correcta": 56.5,
+   "resuelta": 84.1,
+   "chrf": 63.7,
+   "p50_ms": 284.8
+  },
+  "file": "dev-20261007-204650.json"
+ },
+ "genlingo-2026-10e-e2b-nocombo + léxico": {
+  "dev": {
+   "n": 241,
+   "correcta": 53.1,
+   "resuelta": 82.9,
+   "chrf": 69.4,
+   "p50_ms": 272.75
+  },
+  "dev_combos": {
+   "n": 69,
+   "correcta": 46.4,
+   "resuelta": 87.0,
+   "chrf": 63.0,
+   "p50_ms": 285.9
+  },
+  "file": "dev-20261007-204650.json"
+ },
+ "genlingo-2026-10e-e2b-webonly + léxico": {
+  "dev": {
+   "n": 241,
+   "correcta": 56.4,
+   "resuelta": 84.1,
+   "chrf": 69.5,
+   "p50_ms": 271.35
+  },
+  "dev_combos": {
+   "n": 69,
+   "correcta": 47.8,
+   "resuelta": 89.9,
+   "chrf": 64.5,
+   "p50_ms": 279.3
+  },
+  "file": "dev-20261007-204650.json"
+ },
+ "genlingo-2026-10e-e2b-all + léxico": {
+  "dev": {
+   "n": 241,
+   "correcta": 57.3,
+   "resuelta": 82.2,
+   "chrf": 69.9,
+   "p50_ms": 271.7
+  },
+  "dev_combos": {
+   "n": 69,
+   "correcta": 49.3,
+   "resuelta": 81.2,
+   "chrf": 63.3,
+   "p50_ms": 279.2
+  },
+  "file": "dev-20261007-204650.json"
+ },
+ "gemini-3.8-flash": {
+  "dev": {
+   "n": 240,
+   "correcta": 39.6,
+   "resuelta": 79.4,
+   "chrf": 53.0,
+   "p50_ms": 3381.7
+  },
+  "dev_combos": {
+   "n": 68,
+   "correcta": 35.3,
+   "resuelta": 77.9,
+   "chrf": 51.7,
+   "p50_ms": 3520.1499999999996
+  },
+  "file": "dev-20261007-204650.json"
+ },
+ "gemini-3.8-flash + léxico": {
+  "dev": {
+   "n": 241,
+   "correcta": 58.9,
+   "resuelta": 84.9,
+   "chrf": 60.6,
+   "p50_ms": 3403.0
+  },
+  "dev_combos": {
+   "n": 69,
+   "correcta": 59.4,
+   "resuelta": 88.4,
+   "chrf": 60.6,
+   "p50_ms": 3552.6
+  },
+  "file": "dev-20261007-204650.json"
+ },
+ "genlingo-2026-10e-e2b-v2 + léxico": {
+  "dev": {
+   "n": 241,
+   "correcta": 59.3,
+   "resuelta": 85.3,
+   "chrf": 68.3,
+   "p50_ms": 270.5
+  },
+  "dev_combos": {
+   "n": 69,
+   "correcta": 52.2,
+   "resuelta": 87.0,
+   "chrf": 61.2,
+   "p50_ms": 286.1
+  },
+  "file": "dev-20261007-212927.json"
+ },
+ "genlingo-2026-10e-e2b-v2-nocombo + léxico": {
+  "dev": {
+   "n": 241,
+   "correcta": 54.4,
+   "resuelta": 81.8,
+   "chrf": 69.6,
+   "p50_ms": 270.2
+  },
+  "dev_combos": {
+   "n": 69,
+   "correcta": 40.6,
+   "resuelta": 84.1,
+   "chrf": 62.2,
+   "p50_ms": 288.4
+  },
+  "file": "dev-20261007-212927.json"
+ }
+}
