@@ -1,5 +1,5 @@
 {
- "about": "Ejemplos de la página de comparación: frases reales del set de prueba (David nunca las vio al entrenar), solo de fuentes con licencia abierta o escritas por el curador sobre una fuente abierta (diccionario-chapin MIT, WikiLengua CC BY-SA 3.0, Wikcionario CC BY-SA 4.0). Cada ejemplo se traduce con la jerga de su país. El 2026-10-07 se probaron en vivo con el David de la ronda 5 (genlingo-2026-10e-e2b, GPU L4 en la nube) y Gemini, los dos a temperatura 0, 3 veces cada uno, las 96 frases de prueba que se pueden mostrar: todas las de México (24), Colombia (24) y español neutro (26), más las chapinas con 2 o más términos y los ejemplos anteriores (22; make check-candidates, evals/experiments/2026-10-07-ejemplos-ronda5.md). Pasaron la revisión automática 18 (MX 6, CO 3, neutro 1, GT 8). Al leerlas quedaron 6: las que David tradujo bien las 3 veces, donde la respuesta de Goliath está mal las 3 veces al leerla y la referencia es correcta. Cuatro son combinaciones de 2 términos. Fuera: Colombia y español neutro, porque Goliath dijo algo correcto que el banco no reconoce («qué vaina», «acuerpado», «arranco», «se le van a ir encima»); en México, «qué oso» y «un chingo de chamba», donde Goliath acertó alguna vez («híjole, mano», «un montón de trabajo»), y «pipiris nice», donde las dos respuestas son jerga válida. «esa tu tarea te quedó bien chafa» salió: el David nuevo dice «rascuache» (otra jerga). live_runs guarda las respuestas.",
+ "about": "Ejemplos de la página de comparación: frases reales del set de prueba (David nunca las vio al entrenar), solo de fuentes con licencia abierta o escritas por el curador sobre una fuente abierta (diccionario-chapin MIT, WikiLengua CC BY-SA 3.0, Wikcionario CC BY-SA 4.0). Cada ejemplo se traduce con la jerga de su país. El 2026-10-07 se probaron en vivo con el David de la ronda 5 (genlingo-2026-10e-e2b, GPU L4 en la nube) y Gemini, los dos a temperatura 0, 3 veces cada uno, las 96 frases de prueba que se pueden mostrar: todas las de México (24), Colombia (24) y español neutro (26), más las chapinas con 2 o más términos y los ejemplos anteriores (22; make check-candidates, evals/experiments/2026-10-07-ejemplos-ronda5.md). Pasaron la revisión automática 18 (MX 6, CO 3, neutro 1, GT 8). Al leerlas quedaron 6 y en la prueba de la página publicada, 5: las que David tradujo bien las 3 veces, donde la respuesta de Goliath está mal las 3 veces al leerla y la referencia es correcta. Tres son combinaciones de 2 términos. «Chotealo, que ese maje se quiere colar» salió después de publicarla: en la prueba en vivo de la página Goliath dijo «Ponele ojo, que ese cuate se quiere colar», que también es correcto. Fuera: Colombia y español neutro, porque Goliath dijo algo correcto que el banco no reconoce («qué vaina», «acuerpado», «arranco», «se le van a ir encima»); en México, «qué oso» y «un chingo de chamba», donde Goliath acertó alguna vez («híjole, mano», «un montón de trabajo»), y «pipiris nice», donde las dos respuestas son jerga válida. «esa tu tarea te quedó bien chafa» salió: el David nuevo dice «rascuache» (otra jerga). live_runs guarda las respuestas.",
  "david_model": "genlingo-2026-10e-e2b",
  "goliath_model": "gemini-3.8-flash",
  "verified": "2026-10-07",
@@ -52,31 +52,6 @@
     }
    ],
    "david": "Ese muchacho está muy enamorado de ella.",
-   "country": "GT"
-  },
-  {
-   "pair_id": "test-w2-0145",
-   "direction": "genz_to_parent",
-   "text": "Chotealo, que ese maje se quiere colar.",
-   "reference": "Vigilalo, que ese muchacho se quiere colar.",
-   "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/chotear.md",
-   "license": "MIT License",
-   "why": "Dos términos: David dice «vigílalo» y «muchacho»; Goliath cambia «maje» por «pisado» o «patojo», que siguen siendo jerga.",
-   "live_runs": [
-    {
-     "david": "Vigílalo, que ese muchacho se quiere meter.",
-     "goliath": "Miralo, que ese pisado se quiere meter a la brava."
-    },
-    {
-     "david": "Vigílalo, que ese muchacho se quiere meter.",
-     "goliath": "Miralo, que ese pisado se quiere meter a la brava."
-    },
-    {
-     "david": "Vigílalo, que ese muchacho se quiere meter.",
-     "goliath": "Miralo bien, que ese patojo se quiere meter a la brava."
-    }
-   ],
-   "david": "Vigílalo, que ese muchacho se quiere meter.",
    "country": "GT"
   },
   {
