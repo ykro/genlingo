@@ -11,3 +11,5 @@ evals/results/
 train/.ipynb_checkpoints/
 CLAUDE.md
 data/.cache/stt_*
+data/.private/
+data/.cache/term_embeddings.json

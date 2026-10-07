@@ -2,6 +2,8 @@
 # Models are not baked in: the job loads each one from the models bucket (mounted) while it runs.
 ARG OLLAMA_VERSION=0.35.0
 FROM ollama/ollama:${OLLAMA_VERSION}
+ARG OLLAMA_VERSION
+ENV OLLAMA_VERSION=${OLLAMA_VERSION}
 COPY --from=ghcr.io/astral-sh/uv:0.8 /uv /bin/uv
 ENV UV_PYTHON_INSTALL_DIR=/opt/python UV_LINK_MODE=copy PYTHONUNBUFFERED=1
 WORKDIR /app

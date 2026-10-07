@@ -210,6 +210,8 @@ async def main_async(args) -> None:
     s = get_settings()
     if args.split == "dev":  # data decisions are made here; the test set is touched once per round
         pairs = [p for p in load_pairs(s.data_dir, ["pairs/dev_real.jsonl"]) if p.status in ("auto_validated", "approved")]
+    elif args.split == "probe":  # held-out pan-Hispanic Gen Z probe (data/eval/probe_genz.jsonl, evals/probe_report.py)
+        pairs = load_pairs(s.data_dir, ["eval/probe_genz.jsonl"])
     else:
         pairs = test_pairs(s.data_dir)
     reviewed = True
@@ -308,8 +310,14 @@ async def main_async(args) -> None:
             if "error" not in r and r.get("latency_ms") is not None:
                 by.setdefault(r["model"], []).append(r["latency_ms"])
         raw["latency"] = {"file": Path(args.latency_from).name, "n": len(lr["pairs"]), "by_model": by}
-    name = f"{stamp}.json" if args.split == "test" else f"dev-{stamp}.json"
+    name = f"{stamp}.json" if args.split == "test" else f"{args.split}-{stamp}.json"
     (out_dir / name).write_text(json.dumps(raw, ensure_ascii=False, indent=1))
+    if args.split == "probe":
+        from probe_report import write_probe_report  # same folder (evals/)
+
+        write_probe_report(raw, ROOT / "evals" / "report_probe.md")
+        print(f"report -> evals/report_probe.md, raw -> evals/results/{name}")
+        return
     report_path = ROOT / "evals" / ("report.md" if args.split == "test" else "report_dev.md")
     report = write_report(raw, report_path, runs_dir=s.runs_dir)
     print(f"report -> {report_path.relative_to(ROOT)} ({len(report)} chars), raw -> evals/results/{name}")
@@ -321,7 +329,8 @@ def main() -> None:
     ap.add_argument("--models", default="")
     ap.add_argument("--no-goliath", action="store_true")
     ap.add_argument("--merge-with", default="", help="earlier raw results to merge these variants into")
-    ap.add_argument("--split", choices=["test", "dev"], default="test", help="dev: data decisions; test: once per round")
+    ap.add_argument("--split", choices=["test", "dev", "probe"], default="test",
+                    help="dev: data decisions; test: once per round; probe: held-out pan-Hispanic Gen Z probe")
     ap.add_argument("--latency-from", default="", help="raw results of an exclusive latency run (p50/p95 come from there)")
     ap.add_argument("--nbest", type=int, default=int(__import__("os").environ.get("EVAL_NBEST", "1")),
                     help="also run each glossary-trained David with N candidates reranked by the term bank")

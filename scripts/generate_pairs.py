@@ -96,15 +96,17 @@ def load_counterparts(data_dir: Path) -> dict[str, str | None]:
 
 
 def plan_calls(bank: TermBank, vectors: dict[str, list[float]], target: int, seed: int,
-               counterparts: dict[str, str | None] | None = None, anchor_prefix: str = "") -> list[dict]:
-    """Round-robin over countries and terms; each call = one kind, one anchor term, its validated counterpart."""
+               counterparts: dict[str, str | None] | None = None, anchor_prefix: str = "",
+               countries: list[str] | None = None, mix: dict[str, float] | None = None) -> list[dict]:
+    """Round-robin over countries and terms; each call = one kind, one anchor term, its validated counterpart.
+    `countries` / `mix` narrow a top-up round (e.g. the pan-Hispanic Gen Z round: LATAM + MX, Gen Z anchors)."""
     counterparts = counterparts or {}
     rng = random.Random(seed)
     n_calls = -(-target // PAIRS_PER_CALL)
-    kinds = [k for k, share in MIX.items() for _ in range(round(share * 20))]
+    kinds = [k for k, share in (mix or MIX).items() for _ in range(round(share * 20))]
     rng.shuffle(kinds)  # interleave kinds, so any prefix of the plan keeps the mix
     calls = []
-    countries = list(COUNTRIES)
+    countries = countries or list(COUNTRIES)
     cursors = {}
     for i in range(n_calls):
         kind = kinds[i % len(kinds)]
@@ -285,8 +287,9 @@ def test_sentences(data_dir: Path) -> TextIndex:
     texts: list[str] = []
     for row in read_jsonl(data_dir / "raw" / "web_usage.jsonl"):
         texts += [row["example"], row.get("rewrite", "")]
-    for row in read_jsonl(data_dir / "pairs" / "test_web.jsonl"):
-        texts += [row["source"], row["target"]]
+    for rel in ("pairs/test_web.jsonl", "eval/probe_genz.jsonl", "pairs/dev_real.jsonl"):
+        for row in read_jsonl(data_dir / rel):
+            texts += [row["source"], row["target"]]
     return TextIndex(texts)
 
 
@@ -299,7 +302,10 @@ async def main_async(args: argparse.Namespace) -> None:
     else:  # cached EmbeddingGemma vectors, used only to pick traps (no model call)
         vectors = json.loads((data / ".cache" / "term_embeddings.json").read_text())["vectors"]
     # Over-generate: validation against the term bank is strict and rejects a good share.
-    calls = plan_calls(bank, vectors, int(args.target * 2.2), args.seed, load_counterparts(data), args.anchor_prefix)
+    countries = [c.strip() for c in args.countries.split(",") if c.strip()] or None
+    mix = {k: MIX[k] for k in args.kinds.split(",") if k.strip()} if args.kinds else None
+    calls = plan_calls(bank, vectors, int(args.target * 2.2), args.seed, load_counterparts(data), args.anchor_prefix,
+                       countries=countries, mix=mix)
     model = "mock" if s.mock_ai else s.gemini_model
     usage = {"input": 0, "output": 0}
     t0 = time.time()
@@ -327,7 +333,7 @@ async def main_async(args: argparse.Namespace) -> None:
     pairs = [p for c, raw in zip(calls, raws) for p in to_pairs(c, raw, model)]
     kept, dropped = filter_pairs(bank, {c["seed"]: c for c in calls}, pairs, test_sentences(data))
     # Rebalance: 60 % papás -> Gen Z, 40 % Gen Z -> papás, up to the target.
-    p2g = [p for p in kept if p["direction"] == "parent_to_genz"][: round(args.target * 0.6)]
+    p2g = [p for p in kept if p["direction"] == "parent_to_genz"][: round(args.target * args.p2g_share)]
     g2p = [p for p in kept if p["direction"] == "genz_to_parent"][: args.target - len(p2g)]
     final = p2g + g2p
     out = Path(args.out) if args.out else data / "pairs" / "synthetic.jsonl"
@@ -378,6 +384,9 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=2027)
     ap.add_argument("--concurrency", type=int, default=8)
     ap.add_argument("--out", default=None)
+    ap.add_argument("--countries", default="", help="comma-separated countries to plan for (default: all)")
+    ap.add_argument("--kinds", default="", help="comma-separated MIX kinds to use (default: all, with their shares)")
+    ap.add_argument("--p2g-share", type=float, default=0.6, help="share of papás -> Gen Z pairs in the output")
     ap.add_argument("--anchor-prefix", default="", help="only anchor on term ids with this prefix (top-up for a new round)")
     asyncio.run(main_async(ap.parse_args()))
 

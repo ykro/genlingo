@@ -13,6 +13,19 @@ sources by `source_id` (exact per-entry URL in the record). Accessed 2026-09-30.
   CC BY-SA examples inherit share-alike for that text.
 - **All-rights-reserved sources** (news, magazines, blogs): only facts and short attributed
   quotations for research and education. Nothing is republished beyond that.
+- **What is in this repo and what isn't** (2026-10-07). The repo keeps every record: the term, the
+  meaning in our words, the URL and the curator's rewrite, plus the full text of the open sources
+  (S01–S05, S62, S70: WikiLengua and Wikcionario under CC BY-SA, so pairs that quote them inherit
+  share-alike; diccionario-chapin under MIT; Guate Inmortal under CC BY 4.0). The sentences quoted
+  from every other source (some, like S83 and S85, forbid any reproduction) are **not** in the repo:
+  their field is `null` and listed in `"redacted"`, and the full files live in a private bucket
+  (`PRIVATE_DATA_URI`), which `make data-pull` downloads to `data/.private/` (git-ignored) with the
+  project's credentials. The scripts read the private copy when it is there
+  (`genlingo_duel.dataset.read_jsonl`) and write both versions (`write_jsonl`). The eval job image
+  carries the private copy and stays in the project's private Artifact Registry. Files affected:
+  `pairs/test_web.jsonl`, `pairs/real_train.jsonl`, `pairs/dev_real.jsonl`, `raw/web_usage*.jsonl`,
+  `terms.jsonl`, `raw/terms_*.jsonl`, `eval/terms_test.jsonl`, `eval/probe_genz.jsonl`. The page's
+  example phrases come only from open sources.
 - **Curator-written sentences:** where a source gives a term but no usable example, the curator
   wrote a minimal example and marked it `example_origin=curator` (under 30% of test candidates).
 - **Test references** (`rewrite`) are written by the dataset curator from the meaning the source
@@ -158,3 +171,44 @@ Notes:
 - **S04** (abisai7 / diccionario-chapin (MIT)): 4 new terms, 46 new usage examples.
 - **S20** (Alcaldía de Medellín — Medellín Joven): 20 new terms, 27 new usage examples.
 - **S62** (Wikcionario (Wikimedia Foundation), CC BY-SA 4.0): 20 new terms, 25 new usage examples.
+
+## Round 4 (2026-10-06): pan-Hispanic Gen Z and Mexico
+
+Why: on the test set David tied Goliath in Mexico and in neutral Latin American Spanish (LATAM), and the people
+who tried the page with ordinary Gen Z slang (cringe, random, crush, stalkear…) saw it fail. Only 24 LATAM and 9
+MX training pairs were anchored in real sentences (GT: 268, CO: 255). Same policy as before: facts paraphrased,
+short attributed quotations, exact URL per record. Accessed 2026-10-06.
+
+**Training sources** (`raw/web_usage_2026-10-06.jsonl`, all `example_origin: "source"`, rewrites by the curator):
+
+| id | url | owner | license | country | taken |
+| --- | --- | --- | --- | --- | --- |
+| S90 | https://es.lingopie.com/blog/el-colorido-lenguaje-mexicano/ | Lingopie (blog en español) | © Lingopie, all rights reserved; facts + short attributed quotation (research/education) | MX | 15 usage examples (real) |
+| S91 | https://www.elcorreogallego.es/sociedad/2026/07/31/cringe-shippear-diccionario-expresiones-juveniles-132965245.html | El Correo Gallego | © El Correo Gallego, all rights reserved; short attributed quotation (research/education) | LATAM | 1 usage example (real) |
+| S92 | https://www.planeta.pe/noticias/actualidad/que-significa-estar-en-tu-prime-la-expresion-viral-que-todos-usan-en-redes/ | Radio Planeta (Perú) | © Radio Planeta, all rights reserved; short attributed quotation (research/education) | LATAM | 1 usage example (real) |
+
+Real Gen Z sentences are scarce on the web pages that explain slang (most give a definition, few a sentence), so
+this round's training data is mostly synthetic: `pairs/synthetic_genz.jsonl` (Gemini, LATAM + MX Gen Z terms,
+validated against the term bank like every synthetic pair, never in dev, test or the probe).
+
+**Probe sources** (`eval/probe_genz.jsonl`, held out: no page below is used for training; every sentence is
+verbatim from its page, the parents' version is the curator's):
+
+| page | owner | country of the outlet |
+| --- | --- | --- |
+| https://www.elespectador.com/zona-z/que-significa-aesthetic-funar-cringe-y-glow-up-este-es-el-glosario-de-la-gen-z/ | El Espectador (Zona Z) | CO |
+| https://www.acis.org.co/blog/noticias-2/que-significa-dar-cringe-las-expresiones-en-ingles-que-se-estan-tomando-las-nuevas-generaciones-en-colombia-8772 | ACIS | CO |
+| https://gullon.es/blog/bienestar-y-ocio/que-dice-la-gen-z/ | Gullón (blog) | ES |
+| https://fad.es/planetajoven/glosario-para-entender-como-hablan-los-y-las-jovenes-de-la-generacion-z/ | Fad Juventud | ES |
+| https://educayaprende.com/diccionario-generacion-z-para-padres/ | Educa y Aprende | ES |
+| https://www.telediario.mx/tendencias/guia-amor-redes-sociales-que-es-shippear-ghostear-love-bombing | Telediario México | MX |
+| https://androidphoria.com/curiosidades/que-significar-estar-en-su-prime | Androidphoria | ES |
+| https://www.elmostrador.cl/agenda-pais/agenda-digital/2025/07/01/me-dio-cringe-el-modismo-que-define-la-incomodidad-en-la-era-digital/ | El Mostrador | CL |
+| https://www.tiktok.com/@burbujadelespanol/video/7602259913288584481 | @burbujadelespanol (TikTok, video description) | — |
+| https://www.elnacional.com/2024/02/delulu-es-la-solulu-lo-que-revela-sobre-la-generacion-z-esta-extrana-frase-que-utilizan-algunos-jovenes/ | El Nacional (BBC Mundo) | VE |
+| https://sonilec.mx/que-significa-mid-y-como-se-usa-en-el-lenguaje-actual/ | Sonilec | MX |
+| https://literalbro.com/que-significa/mood/ | LiteralBro | — |
+| https://www.smythsys.es/21468/significado-de-basado-en-internet-%F0%9F%A4%94-de-donde-viene/ | SmythSys | ES |
+| https://bloygo.yoigo.com/glosario/definicion-rizz/ | Bloygo (Yoigo) | ES |
+
+All are all-rights-reserved pages: only the short example sentence is quoted, with its URL, for evaluation.

@@ -13,13 +13,13 @@ def test_exact_and_normalized_match():
 
 def test_test_sentence_quoted_inside_a_longer_training_sentence():
     # real-w2-0169-f quoted test-w-0099 inside a dialogue
-    idx = TextIndex(["[…]"])
+    idx = TextIndex(["-Dale, vamos. Mi primo dijo que tampoco iba al partido. -¿En serio? Qué churreta, parce."])
     assert idx.overlaps("¿En serio? Qué churreta, parce.")
 
 
 def test_training_sentence_inside_the_test_sentence_and_normalized_substring():
     # syn-0612d72dba contained the test source with different punctuation
-    idx = TextIndex(["Llega a las tres de la mañana sin avisar, ¿usted qué cree, que esto es un hotel?"])
+    idx = TextIndex(["Vuelve a las cuatro sin llamar, ¿usted qué cree, que esto es un hotel?"])
     assert idx.overlaps("Usted qué cree ¿que esto es un hotel?")
     assert TextIndex(["usted qué cree que esto es un hotel"]).overlaps("Oiga, ¿usted qué cree que esto es un hotel o qué?")
 

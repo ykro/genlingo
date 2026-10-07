@@ -15,6 +15,9 @@ USAGE_FIELDS = {"id", "term_ids", "generation", "example", "rewrite", "country",
 
 needs = lambda rel: pytest.mark.skipif(not (DATA / rel).exists(), reason=f"{rel} not built yet")  # noqa: E731
 
+# These checks read the quoted sentences: without the private copy (make data-pull) they are skipped.
+pytestmark = pytest.mark.skipif(not (DATA / ".private").exists(), reason="no data/.private (make data-pull)")
+
 
 def source_ids() -> set[str]:
     return set(re.findall(r"^\|\s*(S\d+)\s*\|", (DATA / "SOURCES.md").read_text(), flags=re.M))

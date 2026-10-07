@@ -73,20 +73,7 @@ Costo = duración × tarifa por hora estimada ($0.0/h). La inferencia de David c
 
 ## Dónde pierde David
 
-David gana 104 de 318 frases por chrF++ de oración. Las 10 peores derrotas:
-
-| frase | referencia | David | Goliath | Δ chrF++ |
-| --- | --- | --- | --- | --- |
-| […] | Eres un as en ese juego | Eres muy bueno jugando ese videojuego. | Eres un as en ese juego | -72.7 |
-| […] | Me gusta el ambiente de ese lugar, es muy tranquilo. | Me parece muy agradable ese sitio, tiene un ambiente muy relajado. | Me gusta el ambiente de ese lugar, es muy tranquilo. | -71.3 |
-| […] | Se me antojan unas cervecitas. | Tengo muchas ganas de tomar una cerveza. | Se me antojan unas cervecitas bien frías. | -68.4 |
-| […] | Hermano, no puedo ir con ustedes a cine. Estoy sin un peso. | Mijo, no me apetece ir al cine hoy, prefiero quedarme a descansar. | Hombre, no puedo ir con ustedes a cine. Estoy sin un peso. | -67.0 |
-| Subieron fotos del cumple y yo ni sabía, GPI. | Subieron fotos del cumpleaños y yo ni enterada, gracias por invitar, ¿eh? | No me enteré de la fiesta de cumpleaños hasta después, qué sorpresa tan grande. | Publicaron fotos del cumpleaños y yo ni enterado, gracias por invitarme, ¿eh? | -57.3 |
-| […] | ¿Usted cree que yo soy boba o qué? | ¿En serio crees que soy de ayer? | ¿Usted cree que yo soy huevón o qué? | -55.7 |
-| Anoche nos fuimos de reven y estuvo de pelos. | Anoche nos fuimos de peda y estuvo buenísima. | Ayer nos pusimos a andar de fiesta y nos la pasamos un chorro. | Anoche nos fuimos de peda y estuvo épico. | -54.9 |
-| Yo me foquié y cuando desperté tenía casi cien llamadas perdidas | Me quedé profundo y cuando me desperté tenía casi cien llamadas perdidas | Me desperté con el teléfono lleno de llamadas perdidas, qué situación tan rara. | Me quedé profundamente dormido y cuando me desperté tenía casi cien llamadas perdidas | -53.7 |
-| […] | Sí, yo le aviso. | Sí, es verdad. | Sale y vale, yo le aviso. | -53.0 |
-| Qué cuerudo sos, no te da vergüenza nada. | Qué descarado sos, maje, cero pena. | Qué molleja, no te da pena nada. | Qué descarado sos, cero pena te da todo. | -51.9 |
+David gana 104 de 318 frases por chrF++ de oración. La tabla de las 10 peores derrotas citaba frases de fuentes que no se pueden redistribuir; queda en los resultados por frase (`evals/results/20261001-152529.json`, local) y no se reproduce aquí.
 
 ## Metodología
 

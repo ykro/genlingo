@@ -22,6 +22,7 @@ gcloud run services add-iam-policy-binding "${APP}-david" --region "$DAVID_REGIO
   --member="serviceAccount:${SA_EMAIL}" --role=roles/run.invoker --quiet >/dev/null
 
 IMAGE="${AR}/${SERVICE}:$(date +%Y%m%d-%H%M%S)"
+[ -f "$ROOT/data/.cache/term_embeddings.json" ] || { echo "data/.cache/term_embeddings.json is missing: run make data-pull" >&2; exit 1; }
 say "Building ${IMAGE}"
 gcloud builds submit "$ROOT" --config "$INFRA_DIR/page.cloudbuild.yaml" --region "$REGION" --quiet \
   --substitutions "_IMAGE=${IMAGE}"

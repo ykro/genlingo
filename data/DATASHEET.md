@@ -25,31 +25,31 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 
 |  | genz_to_parent | parent_to_genz | total |
 | --- | --- | --- | --- |
-| dev · web | 76 | 70 | 146 |
+| dev · web | 79 | 72 | 151 |
 | test · web | 294 | 228 | 522 |
-| train · synthetic | 881 | 1535 | 2416 |
-| train · web | 281 | 275 | 556 |
-| **total** | 1532 | 2108 | 3640 |
+| train · synthetic | 1681 | 2335 | 4016 |
+| train · web | 287 | 278 | 565 |
+| **total** | 2341 | 2913 | 5254 |
 
 ### Pairs by split and origin × country
 
 |  | MX | GT | CO | LATAM | total |
 | --- | --- | --- | --- | --- | --- |
-| dev · web | 8 | 69 | 67 | 2 | 146 |
+| dev · web | 13 | 69 | 67 | 2 | 151 |
 | test · web | 101 | 150 | 185 | 86 | 522 |
-| train · synthetic | 442 | 844 | 660 | 470 | 2416 |
-| train · web | 9 | 268 | 255 | 24 | 556 |
-| **total** | 560 | 1331 | 1167 | 582 | 3640 |
+| train · synthetic | 834 | 844 | 660 | 1678 | 4016 |
+| train · web | 18 | 268 | 255 | 24 | 565 |
+| **total** | 966 | 1331 | 1167 | 1790 | 5254 |
 
 ### Pairs by split and origin × status
 
 |  | auto_validated | approved | pending_review | rejected | total |
 | --- | --- | --- | --- | --- | --- |
-| dev · web | 146 | 0 | 0 | 0 | 146 |
+| dev · web | 151 | 0 | 0 | 0 | 151 |
 | test · web | 399 | 0 | 0 | 123 | 522 |
-| train · synthetic | 0 | 2416 | 0 | 0 | 2416 |
-| train · web | 556 | 0 | 0 | 0 | 556 |
-| **total** | 1101 | 2416 | 0 | 123 | 3640 |
+| train · synthetic | 0 | 4016 | 0 | 0 | 4016 |
+| train · web | 565 | 0 | 0 | 0 | 565 |
+| **total** | 1115 | 4016 | 0 | 123 | 5254 |
 
 ### Term bank (`data/terms.jsonl`)
 
@@ -71,6 +71,13 @@ count ambiguous terms, not a source of terms or sentences).
 | GT | 67 | 6 | 73 |
 | CO | 84 | 4 | 88 |
 | LATAM | 52 | 18 | 70 |
+
+## What is in the repo
+
+Every record is here (term, meaning in our words, URL, the curator's rewrite) with the full text of the open
+sources (WikiLengua and Wikcionario, CC BY-SA; diccionario-chapin, MIT; Guate Inmortal, CC BY 4.0). Sentences
+quoted from all-rights-reserved sources are `null` here and listed in `"redacted"`; the full files are in a
+private bucket (`make data-pull` -> `data/.private/`). Details in `SOURCES.md` (Policy).
 
 ## Collection process
 
@@ -115,7 +122,7 @@ count ambiguous terms, not a source of terms or sentences).
    term of their country and the reference must replace it; papás → Gen Z references must contain
    Gen Z slang of the country; no other-country terms; sane length; no overlap with training.
    Passing pairs are `auto_validated`, failing ones `rejected` with the reason.
-5. **Dev pairs** (`origin=web`, `split=dev`, `data/pairs/dev_real.jsonl`, 146 pairs). One real sentence in five
+5. **Dev pairs** (`origin=web`, `split=dev`, `data/pairs/dev_real.jsonl`, 151 pairs). One real sentence in five
    from the training side (stable hash of the sentence id, both directions together) is held out to
    decide data rounds and ablations, so the test set is touched once per round. Dev never overlaps a
    test, niche or training sentence (also checked as substrings). Davids trained before 2026-10-02 saw

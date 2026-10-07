@@ -1,0 +1,32 @@
+{
+  "model": "gemini-3.8-flash",
+  "prompt_version": "synthetic-2026-10b",
+  "base_seed": 4061,
+  "calls": 880,
+  "generated": 3520,
+  "valid": 2448,
+  "kept": 1600,
+  "dropped": {
+    "genz_slang_in_source": 168,
+    "foreign_term": 260,
+    "parent_term_left_in_target": 9,
+    "source_missing_term": 144,
+    "target_missing_term": 246,
+    "slang_left_in_target": 73,
+    "duplicate": 165,
+    "test_leak": 7
+  },
+  "kinds": {
+    "p2g_genz": 536,
+    "p2g_trap": 264,
+    "g2p_genz": 800
+  },
+  "counterparts": "data/counterparts.jsonl",
+  "tokens": {
+    "input": 428539,
+    "output": 185413
+  },
+  "cost_usd": 1.0167,
+  "duration_s": 444.6,
+  "generated_at": "2026-10-06T20:01:24-0600"
+}

@@ -83,7 +83,7 @@ async def build(style: str, out: Path, exclude: tuple[str, ...] = ()) -> dict:
         if s.mock_ai or not s.embedding_model:
             glossary = await Glossary(bank, hashing_embedder(), counterparts=cps).load()
         else:
-            ollama = david_client_for(s.david_url)  # the embedding model lives on David's service
+            ollama = david_client_for(s.david_url, timeout_s=600.0)  # the embedding model lives on David's service (a cold GPU takes minutes)
             glossary = await Glossary(bank, lambda t: ollama.embed(t, model=s.embedding_model),
                                       cache=DATA / ".cache" / "term_embeddings.json", model=s.embedding_model,
                                       counterparts=cps).load()

@@ -24,7 +24,11 @@ gcloud storage buckets add-iam-policy-binding "$STAGING_BUCKET" --member="servic
 gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:${SA_EMAIL}" \
   --role=roles/aiplatform.user --condition=None --quiet >/dev/null
 
-HASH="$( (cd "$ROOT" && git ls-files -s duel evals data train/runs; git -C "$ROOT" diff HEAD -- duel evals data train/runs) | shasum -a 256 | cut -c1-12)"
+# data/.private/ (make data-pull) goes into the image too: the eval needs the quoted sentences, and the
+# image stays in the project's private Artifact Registry.
+[ -d "$ROOT/data/.private" ] || { echo "data/.private is missing: run make data-pull first" >&2; exit 1; }
+HASH="$( (cd "$ROOT" && git ls-files -s duel evals data train/runs; git -C "$ROOT" diff HEAD -- duel evals data train/runs
+          find data/.private -type f -exec shasum {} + | sort) | shasum -a 256 | cut -c1-12)"
 IMAGE="${EU_AR}/${JOB}:${HASH}"
 if ! exists gcloud artifacts docker images describe "$IMAGE"; then
   say "Building ${IMAGE}"
@@ -50,8 +54,8 @@ gcloud run jobs "${verb[@]}" "$JOB" --region "$TRAIN_REGION" --image "$IMAGE" --
   --set-env-vars "$ENV"
 
 say "Running the eval (${RUN_ID})"
-ARGS="$(IFS=,; echo "$*")"
-gcloud run jobs execute "$JOB" --region "$TRAIN_REGION" --wait ${ARGS:+--args="$ARGS"}
+ARGS="$(IFS=@; echo "$*")"   # "@" as gcloud's list delimiter: values like --models a,b keep their commas
+gcloud run jobs execute "$JOB" --region "$TRAIN_REGION" --wait ${ARGS:+--args="^@^$ARGS"}
 
 say "Copying the report back to evals/"
 OUT="${STAGING_BUCKET}/${APP}/evals/${RUN_ID}"

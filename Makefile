@@ -36,8 +36,18 @@ eval: ## Test set through base models, every David and Goliath, in a Cloud Run G
 eval-dev: ## Dev set (data decisions, ablations), same job -> evals/report_dev.md: make eval-dev [EVAL_ARGS="--nbest 4"]
 	bash infra/06-eval-job.sh --split dev $(EVAL_ARGS)
 
+eval-probe: ## Held-out pan-Hispanic Gen Z probe (real web sentences, LATAM and GT) -> evals/report_probe.md: make eval-probe [EVAL_ARGS="--models <tag>"]
+	bash infra/06-eval-job.sh --split probe $(EVAL_ARGS)
+	$(UV) python evals/probe_report.py $$(ls -t evals/results/probe-*.json | head -1)
+
 niches: ## Pre-registered niches (evals/niche.md) from the latest test eval -> evals/niche_report.md
 	$(UV) python evals/niche_report.py
+
+data-pull: ## Download the quoted text of sources that can't be redistributed (private bucket -> data/.private/); needs project access
+	$(UV) python scripts/private_data.py pull
+
+data-push: ## Upload data/.private/ to the private bucket (after a data round)
+	$(UV) python scripts/private_data.py push
 
 test-set: ## Build test pairs from real web usage examples and validate them against the term bank
 	$(UV) python scripts/build_test_set.py

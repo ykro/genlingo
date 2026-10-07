@@ -21,6 +21,7 @@ from term_accuracy import (  # noqa: E402
     foreign_slang,
     slang_handled,
 )
+from genlingo_duel.dataset import OPEN_SOURCES  # noqa: E402
 from genlingo_duel.glossary import load_counterparts  # noqa: E402
 
 DATA = ROOT / "data"
@@ -535,11 +536,14 @@ def write_report(raw: dict, path: Path, runs_dir: Path | None = None, data_dir: 
     if david and goliath:
         common = set(david["sentence"]) & set(goliath["sentence"])
         wins = sum(1 for pid in common if david["sentence"][pid][0] > goliath["sentence"][pid][0] + 0.5)
-        losses = sorted(common, key=lambda pid: david["sentence"][pid][0] - goliath["sentence"][pid][0])[:10]
+        # Only sentences from open sources are printed (the others can't be redistributed: data/SOURCES.md).
+        shown = [pid for pid in common if (pairs[pid].get("provenance") or {}).get("source_id") in OPEN_SOURCES]
+        losses = sorted(shown, key=lambda pid: david["sentence"][pid][0] - goliath["sentence"][pid][0])[:10]
         lines += [
             "## Dónde pierde David",
             "",
-            f"David gana {wins} de {len(common)} frases por chrF++ de oración. Las 10 peores derrotas:",
+            f"David gana {wins} de {len(common)} frases por chrF++ de oración. Las 10 peores derrotas entre las frases de "
+            "fuentes abiertas (las demás no se pueden reproducir aquí):",
             "",
             table(
                 ["frase", "referencia", "David", "Goliath", "Δ chrF++"],

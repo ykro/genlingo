@@ -100,6 +100,13 @@ count ambiguous terms, not a source of terms or sentences).
 
 {table(["country", "verbatim from source", "curator-written", "total"], [[c, usage_tab[(c, "source")], usage_tab[(c, "curator")], usage_tab[(c, "source")] + usage_tab[(c, "curator")]] for c in COUNTRY_ORDER])}
 
+## What is in the repo
+
+Every record is here (term, meaning in our words, URL, the curator's rewrite) with the full text of the open
+sources (WikiLengua and Wikcionario, CC BY-SA; diccionario-chapin, MIT; Guate Inmortal, CC BY 4.0). Sentences
+quoted from all-rights-reserved sources are `null` here and listed in `"redacted"`; the full files are in a
+private bucket (`make data-pull` -> `data/.private/`). Details in `SOURCES.md` (Policy).
+
 ## Collection process
 
 1. **Web research** (`origin=web`). Glossaries, dictionaries (Wiktionary, Diccionario de
