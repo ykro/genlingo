@@ -21,8 +21,12 @@ de `evals/report.md`.
 | 2026-10-01 | Barrido de cuantización | Q5_K_M en vez de Q4_K_M | 74 % | 27 % | $0 (en la Mac) |
 | 2026-10-02 | `genlingo-2026-10b-e2b` | Oraciones reales + banco de 406 términos | 82 % | 34 % | $0.71 |
 | 2026-10-04 | `genlingo-2026-10c-e2b-nomulti` | Contrapartes por significado + prompt de léxico + ronda 3 de oraciones reales | **82 %** | **42 %** | $0.97 |
+| 2026-10-07 | `genlingo-2026-10e-e2b` | Frases con varios términos (reales y sintéticas validadas) | 81 %¹ | 58 %¹ | $1.44 |
 | | Goliath (referencia) | `gemini-3.8-flash`, sin glosario | 77 % | 26 % | $1.13 / 1,000 frases |
 | | Goliath + el mismo glosario | El banco de David en el prompt de Gemini | 82 % | 38 % | $1.27 / 1,000 frases |
+
+¹ Con la revisión término por término del 2026-10-07 y el banco de la ronda 5, en el eval de ese día; las demás
+filas son del eval del 2026-10-04 con la regla anterior, así que no se comparan con esta.
 
 ## Callejones sin salida, en una línea
 
@@ -224,3 +228,26 @@ Guatemala», así que David convierte cualquier frase a jerga chapina.
 - **El eval en la nube** usa ahora los kernels de CUDA ya compilados de David: cada modelo responde las 399
   frases en ~80 s, con p50 de 237 ms para el David de la página (antes algunas frases tardaban de 3 a 13 s). Como un job con GPU dura como máximo 1 hora,
   `make eval` corre los modelos en cuatro jobs seguidos y los junta.
+
+## 9 · Frases con varios términos de jerga: ronda 5 (2026-10-07)
+
+La hipótesis: Goliath conoce muchos términos sueltos, pero cuando una frase junta varios del mismo país
+(«no manches güey, el profe está bien mamón y la tarea está cañona») el David entrenado con ese país puede ganar.
+El nicho «Combinaciones» se registró antes de buscar datos ([evals/niche.md](../evals/niche.md), enmienda 2):
+oraciones reales de la web con 2 o más términos del banco congelado, en las dos direcciones.
+
+- **Datos:** 422 oraciones reales nuevas comprobadas palabra por palabra (México 89, español neutro 130, Colombia 150,
+  Guatemala 53; 120 de ellas son ejemplos escritos por editores y solo sirven para entrenar), 202 términos nuevos,
+  324 frases sintéticas naturales con 2–3 términos validados uno por uno por significado y 600 pares sintéticos
+  papás → Gen Z fuera de Guatemala. A diferencia de la ronda 3, frases cortas y naturales y una parte menor del
+  entrenamiento.
+- **Variantes:** seis, decididas en desarrollo ([detalle](../evals/experiments/2026-10-07-ronda5-combinaciones.md)).
+  Las combinaciones sintéticas fueron lo que más sumó (56.5 % contra 46.4 % de jerga correcta en las combinaciones
+  de desarrollo). Ganó `genlingo-2026-10e-e2b` ($1.44, 66 min).
+- **Resultado** (jerga correcta, contra Goliath sin glosario, eval del 2026-10-07):
+  - Combinaciones: 62 % contra 45 % (+16.7 [+7.5, +25.9]): **gana David**. El David anterior perdía ahí (39 %).
+  - Todo el set: 58 % contra 34 % (+24.1). México pasa de empate a **gana David** (65 % contra 48 %).
+  - Siguen en empate: el español neutro, papás → Gen Z y la jerga Gen Z general de la sonda (88 % contra 94 %);
+    papás → Gen Z en español neutro lo pierde David (4 % contra 28 %, 25 frases).
+- **Estado:** `genlingo-2026-10e-e2b` está publicado en el bucket de modelos; la página sigue con
+  `genlingo-2026-10d-e2b` hasta que se despliegue (`DAVID_MODEL_TAG=genlingo-2026-10e-e2b`, `make deploy`).

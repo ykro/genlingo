@@ -37,8 +37,8 @@ test: ## Run all tests (no network: MOCK_AI in tests)
 
 # A Cloud Run GPU job runs at most 1 h and loading each model from the bucket takes minutes, so `make eval` runs
 # these groups as separate jobs, one after another (one L4 of quota), and merges them.
-EVAL_GROUPS ?= genlingo-2026-10d-e2b,genlingo-2026-10d-e2b-f16,genlingo-2026-10c-e2b-nomulti,genlingo-2026-10c-e2b-nomulti-f16 \
-               genlingo-2026-10b-e2b,genlingo-2026-10b-e2b-f16,genlingo-2026-10-e2b-q5_k_m \
+EVAL_GROUPS ?= genlingo-2026-10e-e2b,genlingo-2026-10e-e2b-f16,genlingo-2026-10d-e2b,genlingo-2026-10d-e2b-f16 \
+               genlingo-2026-10c-e2b-nomulti,genlingo-2026-10c-e2b-nomulti-f16,genlingo-2026-10b-e2b,genlingo-2026-10b-e2b-f16,genlingo-2026-10-e2b-q5_k_m \
                genlingo-2026-10-e2b,genlingo-2026-10-e2b-f16,genlingo-2026-09,genlingo-2026-09-f16 \
                base,goliath,goliath_glossary
 eval: ## Test set through base models, every David and Goliath -> evals/report.md (once per data round): one Cloud Run GPU job per group in EVAL_GROUPS, merged
