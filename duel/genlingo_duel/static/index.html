@@ -81,6 +81,8 @@
   .group > span { font-weight: 700; color: var(--ink-2); min-width: 9.5em; }
   .ex { display: inline-flex; align-items: baseline; text-align: left; min-height: 2.75rem; border: 1px solid var(--rule); background: var(--card); border-radius: 999px; padding: 0.4rem 0.95rem; cursor: pointer; transition: border-color 160ms var(--ease), background 160ms var(--ease); }
   .ex:hover { border-color: var(--ink); }
+  .ex-where { margin-left: 0.55em; font-size: 0.78em; color: var(--ink-2); font-weight: 600; white-space: nowrap; }
+  .ex[aria-pressed="true"] .ex-where { color: inherit; opacity: 0.8; }
   .ex:disabled { opacity: 0.5; cursor: progress; border-color: var(--rule); }
   .ex[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--card); }
   .ex .phrase { font-weight: 500; }
@@ -200,7 +202,7 @@
     <button class="go" id="go" type="submit">Traducir</button>
   </form>
 
-  <nav class="examples" id="examples" aria-label="Ejemplos de jerga chapina">
+  <nav class="examples" id="examples" aria-label="Ejemplos de jerga">
     <div class="group" id="ex-genz_to_parent"><span>Gen Z → papás</span></div>
     <div class="group" id="ex-parent_to_genz"><span>Papás → Gen Z</span></div>
   </nav>
@@ -507,11 +509,12 @@
       b.type = "button"; b.dataset.id = ex.id; b.setAttribute("aria-pressed", "false"); b.disabled = !davidReady;
       b.title = ex.text;
       b.append(highlight(ex.text, ex.slang));
-      b.setAttribute("aria-label", `Ejemplo, ${DIR[ex.direction]}: ${ex.text}`);
+      if (ex.country && ex.country !== "GT") b.append(el("span", "ex-where", ex.country_name));
+      b.setAttribute("aria-label", `Ejemplo${ex.country !== "GT" ? " de " + ex.country_name : ""}, ${DIR[ex.direction]}: ${ex.text}`);
       b.addEventListener("click", () => { setDirection(ex.direction); $("phrase").value = ex.text; fit(); showExample(ex); translate(); });
       $(`ex-${ex.direction}`).append(b);
     }
-    for (const dir of Object.keys(DIR)) if ($(`ex-${dir}`).children.length < 2) $(`ex-${dir}`).hidden = true;
+    for (const dir of Object.keys(DIR)) if ($(`ex-${dir}`).children.length < 1) $(`ex-${dir}`).hidden = true;
   }).catch(() => { $("examples").replaceChildren(el("span", null, "No se pudieron cargar los ejemplos. Igual puedes escribir una frase.")); });
 </script>
 </body>

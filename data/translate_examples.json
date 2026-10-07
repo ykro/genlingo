@@ -1,8 +1,8 @@
 {
- "about": "Ejemplos de la página de comparación. Son frases de jerga chapina (Guatemala) del set de prueba: David nunca las vio al entrenar. Se probaron en vivo las 51 frases chapinas cortas que la revisión término por término puede juzgar, 3 veces con cada modelo (2026-10-06). Solo quedaron las que David tradujo bien y Goliath mal las 3 veces, y donde una persona ve lo mismo que la revisión: Goliath deja jerga o cambia el significado. Se descartaron las frases donde Goliath acertó alguna vez o dijo algo razonable con otras palabras (por ejemplo «échale un ojo» por «chotea», «qué tufo» por «chish»). Después de pasar a David a la nube se volvieron a probar los 4 en la página, contra el David de Cloud Run (GPU L4), 3 veces cada uno con los dos modelos a temperatura 0, como en el eval (2026-10-06): David acertó la jerga las 12 veces, siempre con la misma respuesta, y Goliath ninguna de las 10 que respondió (2 veces tardó más de 20 s). Esas son las respuestas guardadas en live_runs (goliath: null cuando no respondió).",
- "david_model": "genlingo-2026-10c-e2b-nomulti",
+ "about": "Ejemplos de la página de comparación: frases reales del set de prueba (David nunca las vio al entrenar), solo de fuentes con licencia abierta (WikiLengua CC BY-SA 3.0, diccionario-chapin MIT, Wikcionario CC BY-SA 4.0), porque las demás no se pueden redistribuir. Cada ejemplo se traduce con la jerga de su país. El 2026-10-07 se probaron en vivo las 38 frases de prueba de fuentes abiertas de México, Colombia y español neutro, más los 4 ejemplos chapines anteriores, 3 veces con cada modelo, contra el David de la nube (genlingo-2026-10d-e2b, GPU L4) y Gemini, los dos a temperatura 0. Quedaron las que David tradujo bien las 3 veces, donde Goliath dejó jerga o cambió el significado las 3 veces y donde la revisión término por término de la página lo muestra igual (✓ David, ✗ Goliath). Pasaron 3 frases chapinas. Fuera de Guatemala no pasó ninguna: en Colombia y en español neutro Goliath tradujo igual o mejor; en México David ganó a ojo en 3 frases de Gen Z a papás («de partir la madre» → «a todo dar», «un chingo de chamba» → «un montón de trabajo», «madrear… carrilla» → «golpear… haciendo burla»), pero la revisión de la página no lo distingue (marca ✗ a «a todo dar» y da por buenas las respuestas de Goliath con otra jerga, «un friego», «toreando»). Para la jerga Gen Z general (cringe, random, crush…) la sonda da empate (evals/report_probe.md). «No te creo vos, ¡ya sé que vos solo pajas sos!» salió: una vez Goliath dijo «mentiroso», que también es correcto. live_runs guarda las respuestas.",
+ "david_model": "genlingo-2026-10d-e2b",
  "goliath_model": "gemini-3.8-flash",
- "verified": "2026-10-06",
+ "verified": "2026-10-07",
  "examples": [
   {
    "pair_id": "test-w-0179",
@@ -14,43 +14,20 @@
    "why": "David dice que la tarea quedó mala, como lo diría un papá; Goliath cambia «chafa» por otra jerga («pura lata»).",
    "live_runs": [
     {
-     "david": "Esa tarea tuya te quedó muy mala",
-     "goliath": "Esa tu tarea te quedó bien pura lata"
+     "david": "esa tu tarea te quedó bien mal hecha",
+     "goliath": "Esa tu tarea te quedó bien pura lata."
     },
     {
-     "david": "Esa tarea tuya te quedó muy mala",
-     "goliath": "Esa tu tarea te quedó pura lata"
+     "david": "esa tu tarea te quedó bien mal hecha",
+     "goliath": "Esa tu tarea te quedó pura lata."
     },
     {
-     "david": "Esa tarea tuya te quedó muy mala",
+     "david": "esa tu tarea te quedó bien mal hecha",
      "goliath": "Esa tu tarea te quedó bien pura lata."
     }
    ],
-   "david": "Esa tarea tuya te quedó muy mala"
-  },
-  {
-   "pair_id": "test-w-0202",
-   "direction": "genz_to_parent",
-   "text": "No te creo vos, ¡ya sé que vos solo pajas sos!",
-   "reference": "No te creo, ¡ya sé que vos solo mentiras decís!",
-   "source": "https://www.wikilengua.org/index.php/Jerga_juvenil/Guatemala",
-   "license": "CC BY-SA 3.0",
-   "why": "David traduce «pajas» como mentir; Goliath la cambia por otra jerga («casaca», «casaquero»).",
-   "live_runs": [
-    {
-     "david": "No te creo vos, ¡ya sé que vos solo mentís!",
-     "goliath": "No te creo mano, ¡si ya sé que vos pura casaca sos!"
-    },
-    {
-     "david": "No te creo vos, ¡ya sé que vos solo mentís!",
-     "goliath": "No te creo mano, ¡ya sé que vos pura casaca sos!"
-    },
-    {
-     "david": "No te creo vos, ¡ya sé que vos solo mentís!",
-     "goliath": "No te creo, mano, ¡si ya sé que vos pura casaca sos!"
-    }
-   ],
-   "david": "No te creo vos, ¡ya sé que vos solo mentís!"
+   "david": "esa tu tarea te quedó bien mal hecha",
+   "country": "GT"
   },
   {
    "pair_id": "test-w-0206",
@@ -63,7 +40,7 @@
    "live_runs": [
     {
      "david": "Sí, seguro llego al partido.",
-     "goliath": null
+     "goliath": "Va pues, fijo llego al partido."
     },
     {
      "david": "Sí, seguro llego al partido.",
@@ -71,10 +48,11 @@
     },
     {
      "david": "Sí, seguro llego al partido.",
-     "goliath": null
+     "goliath": "Cabal, fijo llego al partido."
     }
    ],
-   "david": "Sí, seguro llego al partido."
+   "david": "Sí, seguro llego al partido.",
+   "country": "GT"
   },
   {
    "pair_id": "test-w2-0066",
@@ -87,18 +65,19 @@
    "live_runs": [
     {
      "david": "Voy a comprar algo de refa para media mañana.",
-     "goliath": "Voy a conseguir un munchies para el bajón de media mañana."
+     "goliath": "Voy a conseguir un moncheo para el bajón de media mañana."
     },
     {
      "david": "Voy a comprar algo de refa para media mañana.",
-     "goliath": "Voy a conseguir un munchies para el bajón de media mañana."
+     "goliath": "Voy a conseguirme un moncheo para el bajón de media mañana."
     },
     {
      "david": "Voy a comprar algo de refa para media mañana.",
-     "goliath": "Voy a conseguirme un monchies para el bajón de media mañana."
+     "goliath": "Voy a conseguir algo de moncha para el bajón de media mañana."
     }
    ],
-   "david": "Voy a comprar algo de refa para media mañana."
+   "david": "Voy a comprar algo de refa para media mañana.",
+   "country": "GT"
   }
  ]
 }

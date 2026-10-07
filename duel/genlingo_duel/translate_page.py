@@ -41,9 +41,15 @@ def load_examples(data_dir: Path) -> list[dict]:
     out = []
     for n, e in enumerate(_examples(data_dir)):
         item = {"id": e.get("pair_id") or str(n), **{k: e.get(k) for k in keys}}
-        item["slang"] = [t["term"] for t in check_terms(data_dir, item, "GT", "")]
+        # Each example is translated with its own country's slang (Guatemala unless it says otherwise).
+        item["country"] = e.get("country", "GT")
+        item["country_name"] = COUNTRY_NAMES.get(item["country"], item["country"])
+        item["slang"] = [t["term"] for t in check_terms(data_dir, item, item["country"], "")]
         out.append(item)
     return out
+
+
+COUNTRY_NAMES = {"GT": "Guatemala", "MX": "México", "CO": "Colombia", "LATAM": "español neutro"}
 
 
 def find_example(data_dir: Path, example_id: str | None) -> dict | None:

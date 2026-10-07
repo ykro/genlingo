@@ -164,7 +164,11 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None) -> 
         limits.check_ip(request, "translate")
         if side == "goliath":
             limits.count_daily("gemini")
-        res = await arena.translate_one(side, req.phrase.strip(), req.direction, s.country)
+        example = find_example(s.data_dir, req.example_id)
+        if example and example["text"] != req.phrase.strip():
+            example = None
+        country = example["country"] if example else s.country  # an example carries its country's slang
+        res = await arena.translate_one(side, req.phrase.strip(), req.direction, country)
         if side == "david" and res.status == "ok":
             david.seen()
             if david.phase != "ready":
@@ -180,12 +184,11 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None) -> 
         if res.status == "ok":
             # ✓/✗ per slang term: an example is checked against its human reference too; typed text against the
             # term bank alone. [] means the phrase has no slang the bank knows (nothing to check automatically).
-            example = find_example(s.data_dir, req.example_id)
-            if example and example["text"] == req.phrase.strip():
-                out["terms"], out["checked"] = check_terms(s.data_dir, example, s.country, res.text), "example"
+            if example:
+                out["terms"], out["checked"] = check_terms(s.data_dir, example, country, res.text), "example"
             else:
                 typed = {"text": req.phrase.strip(), "direction": req.direction, "reference": None}
-                out["terms"], out["checked"] = check_terms(s.data_dir, typed, s.country, res.text), "typed"
+                out["terms"], out["checked"] = check_terms(s.data_dir, typed, country, res.text), "typed"
         return out
 
     @app.get("/api/health")

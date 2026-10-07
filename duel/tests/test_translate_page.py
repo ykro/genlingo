@@ -2,6 +2,7 @@ import dataclasses
 import json
 
 import httpx
+import pytest
 from fastapi.testclient import TestClient
 
 from genlingo_duel import dataset
@@ -53,7 +54,8 @@ def test_an_example_comes_back_with_the_term_check(settings):
     with TestClient(create_app(settings)) as c:
         ex = c.get("/api/examples").json()
         assert ex == [{"id": "e1", "text": "estuvo bien mid", "direction": "genz_to_parent", "reference": "estuvo regular",
-                       "source": "https://x", "license": "MIT", "slang": ["mid"]}]
+                       "source": "https://x", "license": "MIT", "country": "GT", "country_name": "Guatemala",
+                       "slang": ["mid"]}]
         d = c.post("/api/translate/david", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent", "example_id": "e1"}).json()
         assert d["terms"] == [{"term": "mid", "expected": "regular, mediocre", "ok": True}]
         assert d["checked"] == "example"
@@ -185,7 +187,8 @@ def test_term_check_rules():
     assert check("algo de refacción", "parent_to_genz", "unos munchies") == [False]
 
 
-def test_page_examples_are_guatemalan_test_pairs_that_david_gets_right_and_goliath_does_not():
+@pytest.mark.skipif(not (REPO_ROOT / "data" / ".private").exists(), reason="test sentences are in the private bucket (make data-pull)")
+def test_page_examples_are_open_licensed_test_pairs_that_david_gets_right_and_goliath_does_not():
     data = REPO_ROOT / "data"
     examples = json.loads(examples_path(data).read_text(encoding="utf-8"))["examples"]
     pairs = {p.id: p for p in dataset.test_pairs(data)}
@@ -196,11 +199,13 @@ def test_page_examples_are_guatemalan_test_pairs_that_david_gets_right_and_golia
     assert {e["direction"] for e in examples} == {"genz_to_parent", "parent_to_genz"}
     for e in examples:
         p = pairs[e["pair_id"]]  # still in the test set: David never trained on it
-        assert p.country == "GT" and p.direction == e["direction"] and p.source == e["text"] and p.target == e["reference"]
+        country = e.get("country", "GT")
+        assert p.country == country and p.direction == e["direction"] and p.source == e["text"] and p.target == e["reference"]
         assert e["source"].startswith("https://") and e["license"] and e["why"]
+        assert p.provenance["source_id"] in dataset.OPEN_SOURCES  # only text we may redistribute is shown
         assert len(e["live_runs"]) >= 3
         for run in e["live_runs"]:
-            check = lambda hyp: [t["ok"] for t in term_checks(bank, cps, e["text"], e["direction"], "GT", hyp, e["reference"])]  # noqa: E731
+            check = lambda hyp: [t["ok"] for t in term_checks(bank, cps, e["text"], e["direction"], country, hyp, e["reference"])]  # noqa: E731
             assert check(run["david"]) and all(check(run["david"])), run
             assert run["goliath"] is None or not all(check(run["goliath"])), run
 
