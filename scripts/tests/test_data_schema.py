@@ -45,8 +45,8 @@ def test_web_usage_schema_and_no_overlap_with_generator_examples():
         assert USAGE_FIELDS <= u.keys(), u
         assert set(u["term_ids"]) <= term_ids, u["id"]
         assert u["source_id"] in ids
-    term_examples = {normalize(t["example"]) for t in read_jsonl(DATA / "terms.jsonl")}
-    assert not term_examples & {normalize(u["example"]) for u in usage}
+    term_examples = {normalize(t["example"]) for t in read_jsonl(DATA / "terms.jsonl") if t.get("example")}
+    assert not term_examples & {normalize(u["example"]) for u in usage if u.get("example")}
 
 
 @needs("pairs/test_web.jsonl")

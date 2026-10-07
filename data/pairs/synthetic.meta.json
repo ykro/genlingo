@@ -32,16 +32,14 @@
   "duration_s": 585.1,
   "generated_at": "2026-10-02T10:59:00-0600",
   "refiltered": {
-    "terms": 532,
+    "terms": 734,
     "dropped": {
-      "foreign_term": 45,
-      "parent_term_left_in_target": 8,
-      "genz_slang_in_source": 1,
-      "slang_left_in_target": 1
+      "genz_slang_in_source": 20,
+      "foreign_term": 11,
+      "slang_left_in_target": 27
     },
-    "kept": 1431,
-    "at": "2026-10-02T11:40:07-0600",
-    "dropped_unvalidated_links": 14
+    "kept": 1657,
+    "at": "2026-10-07T13:07:08-0600"
   },
   "top_up": {
     "for": "terms added on 2026-10-02 (t3-)",

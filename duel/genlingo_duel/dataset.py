@@ -26,6 +26,10 @@ PAIR_FILES = {
     "dev_real": "pairs/dev_real.jsonl",
     "synthetic_multi": "pairs/synthetic_multi.jsonl",
     "synthetic_genz": "pairs/synthetic_genz.jsonl",  # pan-Hispanic Gen Z round (2026-10-06): LATAM + MX
+    # round 5 (2026-10-07): natural 2–3-term combinations per country, each term checked by meaning, both directions
+    "synthetic_combo": "pairs/synthetic_combo.jsonl",
+    # round 5: papás -> Gen Z outside Guatemala (MX, CO, LATAM), single-term
+    "synthetic_p2g": "pairs/synthetic_p2g.jsonl",
 }
 
 
@@ -97,7 +101,8 @@ def _quoted_fields(rel: str, row: dict) -> list[str]:
         return ["example"] if row.get("example_origin", "source") == "source" else []
     if rel in ("terms.jsonl", "eval/terms_test.jsonl") or rel.startswith("raw/terms_"):
         return ["example"] if row.get("example") and row.get("example_origin", "source") == "source" else []
-    if rel in ("pairs/test_web.jsonl", "pairs/real_train.jsonl", "pairs/dev_real.jsonl", "eval/probe_genz.jsonl"):
+    if rel in ("pairs/test_web.jsonl", "pairs/real_train.jsonl", "pairs/dev_real.jsonl", "eval/probe_genz.jsonl",
+               "eval/combos.jsonl"):
         prov = row.get("provenance") or {}
         if prov.get("example_origin", "source") != "source":
             return []
@@ -106,7 +111,7 @@ def _quoted_fields(rel: str, row: dict) -> list[str]:
 
 
 PRIVATE_FILES = ("raw/web_usage", "raw/terms_", "terms.jsonl", "eval/terms_test.jsonl", "pairs/test_web.jsonl",
-                 "pairs/real_train.jsonl", "pairs/dev_real.jsonl", "eval/probe_genz.jsonl")
+                 "pairs/real_train.jsonl", "pairs/dev_real.jsonl", "eval/probe_genz.jsonl", "eval/combos.jsonl")
 
 
 def is_private_file(rel: str) -> bool:

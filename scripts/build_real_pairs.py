@@ -31,8 +31,12 @@ def main() -> None:
     bank = TermBank(read_jsonl(DATA / "terms.jsonl"), ignore_ambiguous=True)
     licenses = source_licenses((DATA / "SOURCES.md").read_text(encoding="utf-8"))
     # Test sentences in use (rejected ones don't count), raw and normalized substrings included.
-    test_text = TextIndex(x for r in read_jsonl(DATA / "pairs" / "test_web.jsonl") if r["status"] != "rejected"
-                          for x in (r["source"], r["target"]))
+    # ... plus the held-out evaluation sets: the probe, the combinations niche and the round-5 sentences held for it.
+    held = [x for rel in ("eval/probe_genz.jsonl", "eval/combos.jsonl") for r in read_jsonl(DATA / rel)
+            for x in (r["source"], r["target"])]
+    held += [x for r in usage_rows("combos") for x in (r["example"], r["rewrite"])]
+    test_text = TextIndex([x for r in read_jsonl(DATA / "pairs" / "test_web.jsonl") if r["status"] != "rejected"
+                           for x in (r["source"], r["target"])] + held)
     seen: set[str] = set()
     pairs, reasons = [], Counter()
     for row in usage_rows("train"):
@@ -57,7 +61,8 @@ def main() -> None:
                 Pair.model_validate(pair)
                 pairs.append(pair)
     # Dev must not appear in any training file either (synthetic pairs quote real sentences sometimes).
-    synthetic = TextIndex(x for f in ("synthetic.jsonl", "synthetic_multi.jsonl", "human.jsonl")
+    synthetic = TextIndex(x for f in ("synthetic.jsonl", "synthetic_multi.jsonl", "synthetic_genz.jsonl",
+                                      "synthetic_combo.jsonl", "synthetic_p2g.jsonl", "human.jsonl")
                           for r in read_jsonl(DATA / "pairs" / f) for x in (r["source"], r["target"]))
     train = [p for p in pairs if p["split"] == "train"]
     real = TextIndex(x for p in train for x in (p["source"], p["target"]))  # two rewrites can be near-identical

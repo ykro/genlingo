@@ -1,6 +1,9 @@
 """Term -> counterpart table, validated by MEANING (data/counterparts.jsonl).
 
-    uv run --project duel python scripts/build_counterparts.py [--no-judge]
+    uv run --project duel python scripts/build_counterparts.py [--no-judge] [--only-new]
+
+`--only-new` (a research round that adds terms) keeps every existing row as it is and links only the terms the
+table doesn't have yet: the eval's «jerga correcta» reads this table, so existing links never move between rounds.
 
 Why: the earlier synthetic pairs picked each term's counterpart in the other generation as its nearest neighbour by
 embedding, and the embedding of "term: meaning" is dominated by the term's surface. 175 of the 217
@@ -92,11 +95,18 @@ async def judge(client, model, terms, a, cands) -> str | None:
     return None
 
 
-async def main_async(no_judge: bool) -> None:
+async def main_async(no_judge: bool, only_new: bool = False) -> None:
     s = get_settings()
     terms = {t["id"]: t for t in read_jsonl(DATA / "terms.jsonl")}
     V = json.loads((DATA / ".cache" / "term_embeddings.json").read_text())["vectors"]
     ids = [k for k, t in terms.items() if k in V and not t.get("ambiguous")]
+    existing = list(read_jsonl(OUT)) if only_new else []
+    if only_new:
+        known = {r["term_id"] for r in existing}
+        missing = [k for k, t in terms.items() if k not in V and k not in known and not t.get("ambiguous")]
+        if missing:
+            sys.exit(f"{len(missing)} new terms have no embedding yet (e.g. {missing[:3]}): refresh data/.cache/term_embeddings.json first")
+        ids = [k for k in ids if k not in known]
     top: dict[str, list[str]] = {}
     for a in ids:
         other = "parent" if terms[a]["generation"] == "genz" else "genz"
@@ -141,6 +151,7 @@ async def main_async(no_judge: bool) -> None:
         out.append({"term_id": a, "term": terms[a]["term"], "generation": terms[a]["generation"], "country": terms[a]["country"],
                     "counterpart_id": c, "counterpart": terms[c]["term"] if c else None,
                     "cos": round(cs, 3) if cs is not None else None, "method": method, "candidates": top[a]})
+    out = existing + out
     write_jsonl(OUT, out)
     by = {}
     for r in out:
@@ -151,7 +162,9 @@ async def main_async(no_judge: bool) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-judge", action="store_true", help="mutual nearest neighbours only (no Gemini)")
-    asyncio.run(main_async(ap.parse_args().no_judge))
+    ap.add_argument("--only-new", action="store_true", help="keep existing links; link only terms the table lacks")
+    a = ap.parse_args()
+    asyncio.run(main_async(a.no_judge, a.only_new))
 
 
 if __name__ == "__main__":

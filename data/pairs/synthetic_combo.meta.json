@@ -1,0 +1,48 @@
+{
+  "model": "gemini-3.8-flash",
+  "prompt_version": "synthetic-combo-2026-10e",
+  "base_seed": 6067,
+  "calls": 313,
+  "generated": 1252,
+  "valid": 324,
+  "kept_sentences": 324,
+  "kept_pairs": 648,
+  "dropped": {
+    "term_meaning_missing": 337,
+    "slang_left_in_parents": 106,
+    "foreign_term": 435,
+    "test_leak": 5,
+    "fewer_than_2_terms": 38,
+    "parent_term_left_in_genz": 4,
+    "length": 2,
+    "empty_or_identical": 1
+  },
+  "countries": {
+    "LATAM": 164,
+    "CO": 54,
+    "MX": 69,
+    "GT": 37
+  },
+  "terms_per_sentence": {
+    "2": 171,
+    "3": 141,
+    "4": 12
+  },
+  "words_genz_mean": 15.0,
+  "counterparts": "data/counterparts.jsonl",
+  "tokens": {
+    "input": 166905,
+    "output": 77421
+  },
+  "cost_usd": 0.4155,
+  "duration_s": 218.8,
+  "generated_at": "2026-10-07T11:38:12-0600",
+  "refiltered": {
+    "terms": 701,
+    "dropped_sentences": {
+      "fewer_than_2_terms": 63
+    },
+    "kept_pairs": 522,
+    "at": "2026-10-07T13:07:45-0600"
+  }
+}

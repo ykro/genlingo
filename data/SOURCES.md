@@ -212,3 +212,66 @@ verbatim from its page, the parents' version is the curator's):
 | https://bloygo.yoigo.com/glosario/definicion-rizz/ | Bloygo (Yoigo) | ES |
 
 All are all-rights-reserved pages: only the short example sentence is quoted, with its URL, for evaluation.
+
+## Round 5 (2026-10-07): sentences that combine several slang terms
+
+Why: the hypothesis of this round is that the big model knows terms one at a time, but in sentences that pack
+2–4 slang terms of one country the small model can win. Earlier rounds had few real sentences like that outside
+Guatemala and Colombia. Same policy as before: facts paraphrased, short attributed quotations, exact URL per record
+(`raw/web_usage_2026-10-07.jsonl`, all `example_origin: "source"`, every sentence re-fetched and checked verbatim
+against its page on 2026-10-07; rewrites by the curator; new terms in `raw/terms_2026-10-07.jsonl`). Accessed 2026-10-07.
+
+- Half of the sentences that meet the combinations rule (`evals/combos.py`) are held out for the combinations niche
+  (`eval/combos.jsonl`, `evals/niche.md` amendment 2), by a stable hash of the id; the rest are training and dev.
+- Most real multi-term sentences are social posts (X, Bluesky, Steam reviews, YouTube titles) and blog or forum
+  comments: slang explainer pages rarely give a sentence with more than one term. Authors' ages are not known.
+- Only the four countries the page knows are used (MX, GT, CO, LATAM). From Argentina, Chile, Perú, Venezuela, Spain
+  and US outlets only sentences with pan-Hispanic Gen Z slang were taken, labelled LATAM; sentences with
+  country-specific slang of those countries were skipped.
+- S93 (Magikitos) examples are written by the site's editors for many countries with the same template, not by real
+  speakers: they are kept for training only (`kind: "editorial example"`) and never enter the niche.
+- Reddit, Quora, TikTok and HiNative could not be fetched by the checker (login walls), so nothing was taken from them.
+
+| id | url | owner | license | country | taken |
+| --- | --- | --- | --- | --- | --- |
+| S93 | https://magikitos.com/castellanario/a-puchis (+86 pages of the same site) | Magikitos «Castellanario» (Spain; examples written by the site's editors) | © Magikitos, all rights reserved; short attributed quotation (research/education) | CO, GT | 120 editor-written usage examples (`kind: editorial example`, training only, never in the niche), 119 new terms |
+| S94 | https://blogs.eltiempo.com/el-blogotazo/2006/10/21/diccionario-de-nuevos-bogotanismos-aun-no-acunados/ | El Blogotazo (El Tiempo blogs, Andrés Ospina) and its reader comments | Reader comment, all rights reserved by the author | CO | 20 usage examples (real), 22 new terms |
+| S95 | https://www.ciclobr.com/lenguajejoven.html | ciclobr.com ("El lenguaje de los jóvenes", Bogotá 2010) | © ciclobr.com, all rights reserved | CO | 13 usage examples (real), 17 new terms |
+| S96 | https://nataliajaramillomoreno.wordpress.com/2015/06/15/jergas-modismos-y-expresiones-colombianas/ | Natalia Jaramillo Moreno (blog "Un poco sobre Colombia") | © the author, all rights reserved | CO | 10 usage examples (real), 14 new terms |
+| S97 | https://enmediodelparlache.blogspot.com/2013/ | Blog "El parlache" (enmediodelparlache.blogspot.com) | © the author, all rights reserved | CO | 5 usage examples (real), 8 new terms |
+| S98 | https://www.elcolombiano.com/cultura/el-parlache-se-habla-ahora-en-cualquier-parche-MF7214871 (+1 pages of the same site) | Mónica Quintero Restrepo, El Colombiano | © El Colombiano, all rights reserved | CO | 2 usage examples (real), 2 new terms |
+| S99 | https://los40.com.co/los40/2023/07/18/actualidad/1689642932_509795.html | Los40 Colombia (quote by singer Blessd) | © Los40 / PRISA Media, all rights reserved | CO | 1 usage example (real), 1 new terms |
+| S100 | https://www.infobae.com/colombia/2025/01/08/estos-fueron-los-mejores-memes-y-reacciones-de-la-primera-noche-de-yo-me-llamo-2025/ (+1 pages of the same site) | Infobae Colombia (X post quoted) | © Infobae / post © its author, all rights reserved | CO | 3 usage examples (real), 3 new terms |
+| S101 | https://www.wattpad.com/233667167-this-is-colombia-parce-tarde-como-la-polic%C3%ADa (+1 pages of the same site) | Wattpad user mxgconmendes ("This is Colombia, parce!") | Wattpad user content, all rights reserved by the author | CO | 4 usage examples (real), 2 new terms |
+| S102 | https://unpocodesur.com/palabras-colombianas-diccionario-colombiano/ | Un Poco de Sur (unpocodesur.com), reader comments | Reader comment, all rights reserved by the author | CO | 16 usage examples (real), 12 new terms |
+| S103 | https://seecolombia.travel/blog/2021/08/8-frases-que-solo-he-escuchado-en-colombia/ | See Colombia Travel blog, reader comment by Lore | Reader comment, all rights reserved by the author | CO | 4 usage examples (real), 3 new terms |
+| S104 | http://identidadchapina.blogspot.com/2009/02/el-que-madruga_21.html | identidad chapina (Blogger); comment by user 'insaid intel' | Blog comment, all rights reserved by the author | GT | 1 usage example (real), 1 new terms |
+| S105 | http://babosadasyhierbas.blogspot.com/2006/03/glosario.html | Babosadas Mías y Demás Hierbas (La Chachi, Blogger); anonymous comment | CC BY-NC-ND 2.5 (blog); comment by anonymous user | GT | 1 usage example (real) |
+| S106 | http://catalanenguate.blogspot.com/2015/01/chapinismos.html | Un catalán en Guatemala (Blogger) | © the blog author, all rights reserved | GT | 1 usage example (real) |
+| S107 | http://orgullochapin.blogspot.com/2007/01/asi-habla-un-chapin-y-qu.html | Orgulloso de ser chapín (Mochis, Blogger) | © the blog author, all rights reserved | GT | 2 usage examples (real), 2 new terms |
+| S108 | https://steamcommunity.com/profiles/76561198076758453/recommended/1030300/ (+22 pages of the same site) | Steam user reviews filed under «Español - Latinoamérica» (one page per review) | Steam user review, all rights reserved by the author | LATAM | 23 usage examples (real), 9 new terms |
+| S109 | https://bsky.app/profile/alfy227.bsky.social/post/3likdwgt2us2t (+42 pages of the same site) | Bluesky users (one post per page; author country from the profile, Spain excluded) | Bluesky user content, all rights reserved by the author | LATAM | 44 usage examples (real), 25 new terms |
+| S110 | https://www.biobiochile.cl/noticias/sociedad/viral/2022/10/20/eres-o-no-eres-fixa-20-expresiones-que-usan-los-centennials-y-que-ni-los-millennials-entienden.shtml | BioBioChile | © BioBioChile, all rights reserved | LATAM | 1 usage example (real), 1 new terms |
+| S111 | https://marketing4ecommerce.mx/palabras-mas-usadas-millennials-generacion-z/ | Marketing4eCommerce México | © Marketing4eCommerce, all rights reserved | LATAM | 1 usage example (real) |
+| S112 | https://www.primeraedicion.com.ar/nota/100666754/terminos-para-entender-como-hablan-los-centennials/ | Primera Edición (Misiones) | © Primera Edición, all rights reserved | LATAM | 1 usage example (real) |
+| S113 | https://www.lacapitalmdp.com/lunfardo-digital-las-10-palabras-mas-usadas-por-los-jovenes-en-argentina/ | La Capital de Mar del Plata | © La Capital de Mar del Plata, all rights reserved | LATAM | 1 usage example (real) |
+| S114 | https://www.brainlang.com/blog/que-es-random-cringe-crush-diccionario-generacion-z.html | BrainLang (blog) | © BrainLang, all rights reserved | LATAM | 4 usage examples (real), 5 new terms |
+| S115 | https://bcncoolhunter.com/2025/04/lenguaje-generacion-z-espana/ | BCN Coolhunter | © BCN Coolhunter, all rights reserved | LATAM | 5 usage examples (real), 4 new terms |
+| S116 | https://www.mundiario.com/articulo/mundistyle/glosario-satirico-sobrevivir-2025/20250710181450349944.html | Mundiario (Francisco R. Breijo-Márquez) | © Mundiario, all rights reserved | LATAM | 1 usage example (real), 1 new terms |
+| S117 | https://ourensenarede.com/lenguaje-adolescente-actual/ | Ourensenarede.com | © Ourensenarede.com, all rights reserved | LATAM | 1 usage example (real), 1 new terms |
+| S118 | https://officialpress.es/guia-definitiva-para-entender-como-hablan-los-adolescentes/ | Official Press | © Official Press, all rights reserved | LATAM | 2 usage examples (real), 1 new terms |
+| S119 | https://trykaiwa.com/blog/spanish-social-media-language-guide-realistic | Kaiwa (blog) | © Kaiwa, all rights reserved | LATAM | 1 usage example (real) |
+| S120 | https://x.com/10aleks/status/1892380954129301889 (+103 pages of the same site) | X (Twitter) users (one post per page; checked on the post page or publish.twitter.com/oembed) | X/Twitter user content, all rights reserved by the author | LATAM, MX | 104 usage examples (real), 55 new terms |
+| S121 | https://www.youtube.com/watch?v=G5zh8Hm32_A (+6 pages of the same site) | YouTube channels (video titles, checked with youtube.com/oembed) | YouTube user content, all rights reserved by the author | LATAM | 7 usage examples (real), 2 new terms |
+| S122 | https://www.elpreg.org/efe-reportaje/el-lenguaje-de-la-generaci%C3%B3n-z | El Pregonero (EFE reportaje) | © El Pregonero / EFE, all rights reserved | LATAM | 1 usage example (real), 1 new terms |
+| S123 | https://www.juanofwords.com/2012/03/mexi-vocabulario-gueywuey/ | Juan of Words | © Juan of Words, all rights reserved | MX | 1 usage example (real), 1 new terms |
+| S124 | https://baselang.com/blog/vocabulary/mexican-slang/ | BaseLang | © BaseLang, all rights reserved | MX | 3 usage examples (real), 1 new terms |
+| S125 | https://convertspanish.com/mexican-slang | Convert Spanish | © Convert Spanish, all rights reserved | MX | 1 usage example (real), 2 new terms |
+| S126 | https://slangtips.com/guey-mexican-slang/ | slangtips.com | © slangtips.com, all rights reserved | MX | 2 usage examples (real), 1 new terms |
+| S127 | https://consalsa.app/blog/guey-wey-buey | ConSalsa | © ConSalsa, all rights reserved | MX | 1 usage example (real) |
+| S128 | https://www.spanishdict.com/answers/278260/explanation-of-23-mexican-expressions-no.1-gey | SpanishDict Answers (user post) | SpanishDict Answers user content, all rights reserved by the author | MX | 3 usage examples (real), 1 new terms |
+| S129 | https://parapente-mexico.com/en/carnet-de-bord/mexican-slang/ | Parapente Mexico | © Parapente Mexico, all rights reserved | MX | 1 usage example (real), 1 new terms |
+| S130 | https://storylearning.com/learn/spanish/spanish-tips/mexican-slang-words | StoryLearning | © StoryLearning, all rights reserved | MX | 1 usage example (real) |
+| S131 | https://www.tellmeinspanish.com/mexico/mexican-slang/chela/ (+5 pages of the same site) | Tell Me In Spanish (Daniela Sanchez) | © Tell Me In Spanish, all rights reserved | MX | 7 usage examples (real), 4 new terms |
+| S132 | https://www.verbling.com/discussion/vocabulario-mexicano | Verbling discussion (user post) | Verbling user content, all rights reserved by the author | MX | 1 usage example (real) |
+| S133 | https://www.somoselmedio.com/modismos-mexicanos-palabras-significado/ | Somos el Medio | © Somos el Medio, all rights reserved | MX | 1 usage example (real), 1 new terms |

@@ -69,13 +69,22 @@ def with_gold(glossary: Glossary, bank: TermBank, entries: list[dict], p) -> tup
     return out, gold, show
 
 
-async def build(style: str, out: Path, exclude: tuple[str, ...] = ()) -> dict:
+def _keep_share(pid: str, share: float) -> bool:
+    """Stable subsample: the same pair is always in or out for a given share."""
+    return int(hashlib.sha1(f"cap|{pid}".encode()).hexdigest()[:8], 16) / 0xFFFFFFFF < share
+
+
+async def build(style: str, out: Path, exclude: tuple[str, ...] = (), shares: dict[str, float] | None = None) -> dict:
     s = get_settings()
     from genlingo_duel.dataset import PAIR_FILES
 
     skip = {PAIR_FILES[k] for k in exclude}  # ablations: leave a whole data file out
     skip_ids = set().union(*_ids(skip)) if skip else set()
-    pairs = [p for p in train_pairs(DATA) if p.id not in skip_ids]
+    # rebalancing: keep only a share of a file's pairs (stable by id), e.g. synthetic=0.5
+    drop_ids: set[str] = set()
+    for key, share in (shares or {}).items():
+        drop_ids |= {i for i in set().union(*_ids({PAIR_FILES[key]})) if not _keep_share(i, share)}
+    pairs = [p for p in train_pairs(DATA) if p.id not in skip_ids and p.id not in drop_ids]
     glossary = None
     bank = TermBank(read_jsonl(DATA / "terms.jsonl"))
     if style in GLOSSARY_STYLES:
@@ -109,7 +118,7 @@ async def build(style: str, out: Path, exclude: tuple[str, ...] = ()) -> dict:
     by_origin: dict[str, int] = {}
     for p in pairs:
         by_origin[p.origin] = by_origin.get(p.origin, 0) + 1
-    meta = {"excluded": list(exclude), "prompt_style": style, "prompt_version": prompt_version(style), "examples": len(pairs), "by_origin": by_origin,
+    meta = {"excluded": list(exclude), "shares": shares or {}, "prompt_style": style, "prompt_version": prompt_version(style), "examples": len(pairs), "by_origin": by_origin,
             "with_glossary": with_glossary, "embedding_model": s.embedding_model if glossary else None,
             "gold_in_glossary": round(gold_shown / gold_rows, 3) if gold_rows else None}
     out.with_name(out.stem + ".meta.json").write_text(json.dumps(meta, indent=2) + "\n")
@@ -121,8 +130,10 @@ def main() -> None:
     ap.add_argument("--style", default="lexicon", choices=STYLES)
     ap.add_argument("--out", default=str(DATA / "train" / "chat.jsonl"))
     ap.add_argument("--exclude", default="", help="comma-separated PAIR_FILES keys to leave out (ablations)")
+    ap.add_argument("--share", default="", help="keep a stable share of a file's pairs, e.g. synthetic=0.5,synthetic_genz=0.5")
     args = ap.parse_args()
-    meta = asyncio.run(build(args.style, Path(args.out), tuple(k for k in args.exclude.split(",") if k)))
+    shares = {k: float(v) for k, v in (x.split("=") for x in args.share.split(",") if x)}
+    meta = asyncio.run(build(args.style, Path(args.out), tuple(k for k in args.exclude.split(",") if k), shares))
     print(f"{meta['examples']} training examples {meta['by_origin']} ({meta['prompt_version']}) -> {args.out}")
 
 

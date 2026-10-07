@@ -212,6 +212,8 @@ async def main_async(args) -> None:
         pairs = [p for p in load_pairs(s.data_dir, ["pairs/dev_real.jsonl"]) if p.status in ("auto_validated", "approved")]
     elif args.split == "probe":  # held-out pan-Hispanic Gen Z probe (data/eval/probe_genz.jsonl, evals/probe_report.py)
         pairs = load_pairs(s.data_dir, ["eval/probe_genz.jsonl"])
+    elif args.split == "combos":  # combinations niche (evals/niche.md, amendment 2; evals/combos_report.py)
+        pairs = [p for p in load_pairs(s.data_dir, ["eval/combos.jsonl"]) if p.status in ("auto_validated", "approved")]
     else:
         pairs = test_pairs(s.data_dir)
     reviewed = True
@@ -312,6 +314,9 @@ async def main_async(args) -> None:
         raw["latency"] = {"file": Path(args.latency_from).name, "n": len(lr["pairs"]), "by_model": by}
     name = f"{stamp}.json" if args.split == "test" else f"{args.split}-{stamp}.json"
     (out_dir / name).write_text(json.dumps(raw, ensure_ascii=False, indent=1))
+    if args.split == "combos":  # the niche's report is written from these results by evals/combos_report.py
+        print(f"raw -> evals/results/{name} (report: evals/combos_report.py)")
+        return
     if args.split == "probe":
         from probe_report import write_probe_report  # same folder (evals/)
 
@@ -329,8 +334,9 @@ def main() -> None:
     ap.add_argument("--models", default="")
     ap.add_argument("--no-goliath", action="store_true")
     ap.add_argument("--merge-with", default="", help="earlier raw results to merge these variants into")
-    ap.add_argument("--split", choices=["test", "dev", "probe"], default="test",
-                    help="dev: data decisions; test: once per round; probe: held-out pan-Hispanic Gen Z probe")
+    ap.add_argument("--split", choices=["test", "dev", "probe", "combos"], default="test",
+                    help="dev: data decisions; test: once per round; probe: held-out pan-Hispanic Gen Z probe; "
+                         "combos: the combinations niche (real sentences with 2+ slang terms)")
     ap.add_argument("--latency-from", default="", help="raw results of an exclusive latency run (p50/p95 come from there)")
     ap.add_argument("--nbest", type=int, default=int(__import__("os").environ.get("EVAL_NBEST", "1")),
                     help="also run each glossary-trained David with N candidates reranked by the term bank")

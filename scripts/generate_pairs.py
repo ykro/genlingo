@@ -287,7 +287,7 @@ def test_sentences(data_dir: Path) -> TextIndex:
     texts: list[str] = []
     for row in read_jsonl(data_dir / "raw" / "web_usage.jsonl"):
         texts += [row["example"], row.get("rewrite", "")]
-    for rel in ("pairs/test_web.jsonl", "eval/probe_genz.jsonl", "pairs/dev_real.jsonl"):
+    for rel in ("pairs/test_web.jsonl", "eval/probe_genz.jsonl", "pairs/dev_real.jsonl", "eval/combos.jsonl"):
         for row in read_jsonl(data_dir / rel):
             texts += [row["source"], row["target"]]
     return TextIndex(texts)
@@ -352,11 +352,12 @@ async def main_async(args: argparse.Namespace) -> None:
     print(json.dumps(meta, ensure_ascii=False))
 
 
-def refilter(data: Path) -> None:
+def refilter(data: Path, rel: str = "pairs/synthetic.jsonl") -> None:
     """Re-validate existing synthetic pairs against the CURRENT term bank (it grows each research
-    round) and drop those that now break a rule; the meta file records how many and why."""
+    round) and drop those that now break a rule; the meta file records how many and why.
+    `rel`: any single-term synthetic file (synthetic.jsonl, synthetic_genz.jsonl, synthetic_p2g.jsonl)."""
     bank = TermBank(read_jsonl(data / "terms.jsonl"))
-    path = data / "pairs" / "synthetic.jsonl"
+    path = data / rel
     kept, dropped = [], {}
     for p in read_jsonl(path):
         pr = p["provenance"]
@@ -377,8 +378,9 @@ def refilter(data: Path) -> None:
 
 
 def main() -> None:
-    if "--refilter" in sys.argv:
-        return refilter(get_settings().data_dir)
+    if "--refilter" in sys.argv:  # --refilter [pairs/<file>.jsonl]
+        rest = sys.argv[sys.argv.index("--refilter") + 1:]
+        return refilter(get_settings().data_dir, *(rest[:1]))
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--target", type=int, default=int(__import__("os").environ.get("SYNTHETIC_PAIRS_TARGET", 1500)))
     ap.add_argument("--seed", type=int, default=2027)

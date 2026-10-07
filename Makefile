@@ -6,7 +6,7 @@ UV      := uv run --project duel
 TAG     ?= genlingo-$(shell date +%Y-%m)
 
 .PHONY: help deploy check check-candidates screenshots capacity projections test eval eval-dev niches counterparts train train-data \
-        test-set real-pairs ambiguous-terms pairs datasheet data
+        test-set real-pairs ambiguous-terms pairs datasheet data eval-combos combos-set
 
 help:
 	@grep -hE '^[a-z-]+:.*## ' Makefile | awk -F':.*## ' '{printf "  make %-16s %s\n", $$1, $$2}'
@@ -53,6 +53,10 @@ eval-probe: ## Held-out pan-Hispanic Gen Z probe (real web sentences, LATAM and 
 	bash infra/06-eval-job.sh --split probe $(EVAL_ARGS)
 	$(UV) python evals/probe_report.py $$(ls -t evals/results/probe-*.json | head -1)
 
+eval-combos: ## Combinations niche (real sentences with 2+ slang terms, evals/niche.md amendment 2) -> evals/report_combos.md: make eval-combos COMBOS_DAVID=<tag> [EVAL_ARGS="--models a,b"]
+	bash infra/06-eval-job.sh --split combos $(EVAL_ARGS)
+	$(UV) python evals/combos_report.py --david $(COMBOS_DAVID) --combos $$(ls -t evals/results/combos-*.json | head -1)
+
 niches: ## Pre-registered niches (evals/niche.md) from the latest test eval -> evals/niche_report.md
 	$(UV) python evals/niche_report.py
 
@@ -70,6 +74,9 @@ STT_CORPUS := data/.cache/stt_all.json
 ambiguous-terms: ## Flag term-bank entries that are also ordinary words (general-speech corpus, CC BY 4.0)
 	@[ -f $(STT_CORPUS) ] || curl -sL https://huggingface.co/datasets/shraavb/spanish-slang-stt-data/resolve/main/splits/all.json -o $(STT_CORPUS)
 	$(UV) python scripts/flag_ambiguous_terms.py $(STT_CORPUS)
+
+combos-set: ## Combinations niche: real test sentences with 2+ slang terms + held-out round-5 sentences, validated -> data/eval/combos.jsonl
+	$(UV) python scripts/build_combos_set.py
 
 real-pairs: ## Training pairs anchored in real web sentences (both directions), validated against the term bank; 20 % to dev
 	$(UV) python scripts/build_real_pairs.py

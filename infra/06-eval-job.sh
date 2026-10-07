@@ -7,6 +7,9 @@
 source "$(dirname "$0")/env.sh"
 ROOT="$(cd "$INFRA_DIR/.." && pwd)"
 set -a; [ -f "$ROOT/.env" ] && source "$ROOT/.env" || source "$ROOT/.env.example"; set +a
+# EVAL_DAVID_TAGS (optional) evaluates other Davids than .env's DAVID_TAGS (e.g. a new round's variants before
+# anyone decides to put one on the page; DAVID_MODEL_TAG, the page's David, stays as it is).
+DAVID_TAGS="${EVAL_DAVID_TAGS:-$DAVID_TAGS}"
 JOB="${APP}-eval"
 SA="${APP}-eval"
 SA_EMAIL="${SA}@${PROJECT_ID}.iam.gserviceaccount.com"

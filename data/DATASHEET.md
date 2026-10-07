@@ -25,43 +25,43 @@ Each record is a pair: `id`, `direction` (`genz_to_parent` | `parent_to_genz`), 
 
 |  | genz_to_parent | parent_to_genz | total |
 | --- | --- | --- | --- |
-| dev · web | 79 | 72 | 151 |
+| dev · web | 145 | 135 | 280 |
 | test · web | 294 | 228 | 522 |
-| train · synthetic | 1681 | 2335 | 4016 |
-| train · web | 287 | 278 | 565 |
-| **total** | 2341 | 2913 | 5254 |
+| train · synthetic | 1903 | 3018 | 4921 |
+| train · web | 581 | 557 | 1138 |
+| **total** | 2923 | 3938 | 6861 |
 
 ### Pairs by split and origin × country
 
 |  | MX | GT | CO | LATAM | total |
 | --- | --- | --- | --- | --- | --- |
-| dev · web | 13 | 69 | 67 | 2 | 151 |
+| dev · web | 37 | 85 | 110 | 48 | 280 |
 | test · web | 101 | 150 | 185 | 86 | 522 |
-| train · synthetic | 834 | 844 | 660 | 1678 | 4016 |
-| train · web | 18 | 268 | 255 | 24 | 565 |
-| **total** | 966 | 1331 | 1167 | 1790 | 5254 |
+| train · synthetic | 1055 | 897 | 881 | 2088 | 4921 |
+| train · web | 115 | 340 | 472 | 211 | 1138 |
+| **total** | 1308 | 1472 | 1648 | 2433 | 6861 |
 
 ### Pairs by split and origin × status
 
 |  | auto_validated | approved | pending_review | rejected | total |
 | --- | --- | --- | --- | --- | --- |
-| dev · web | 151 | 0 | 0 | 0 | 151 |
+| dev · web | 280 | 0 | 0 | 0 | 280 |
 | test · web | 399 | 0 | 0 | 123 | 522 |
-| train · synthetic | 0 | 4016 | 0 | 0 | 4016 |
-| train · web | 565 | 0 | 0 | 0 | 565 |
-| **total** | 1115 | 4016 | 0 | 123 | 5254 |
+| train · synthetic | 0 | 4921 | 0 | 0 | 4921 |
+| train · web | 1138 | 0 | 0 | 0 | 1138 |
+| **total** | 1817 | 4921 | 0 | 123 | 6861 |
 
 ### Term bank (`data/terms.jsonl`)
 
-532 terms from 76 web sources (see `SOURCES.md`; S63 there is a general-speech corpus used only to
+734 terms from 98 web sources (see `SOURCES.md`; S63 there is a general-speech corpus used only to
 count ambiguous terms, not a source of terms or sentences).
 
 | country | genz | parent | total |
 | --- | --- | --- | --- |
-| MX | 42 | 39 | 81 |
-| GT | 82 | 82 | 164 |
-| CO | 131 | 87 | 218 |
-| LATAM | 49 | 20 | 69 |
+| MX | 73 | 39 | 112 |
+| GT | 117 | 82 | 199 |
+| CO | 235 | 87 | 322 |
+| LATAM | 81 | 20 | 101 |
 
 ### Web usage examples (`data/raw/web_usage.jsonl`, source of the test set)
 
@@ -93,7 +93,7 @@ private bucket (`make data-pull` -> `data/.private/`). Details in `SOURCES.md` (
    call names the slang term and, only when it exists, its **meaning-validated** counterpart in the other
    generation, both from the pair's country (`data/counterparts.jsonl`, `scripts/build_counterparts.py`:
    mutual nearest neighbours by meaning with cosine ≥ 0.65, or Gemini's pick among the top 5 confirmed by
-   a shared content word in the meanings or cosine ≥ 0.60; 112 of 504 terms have one). Without a
+   a shared content word in the meanings or cosine ≥ 0.60; 174 of 701 terms have one). Without a
    counterpart, the parents' side says the term's meaning in plain words, and kinds that need a parents'
    term are skipped. Pair kinds:
    `g2p_genz` 531, `g2p_parent` 69, `p2g_genz` 542, `p2g_parent` 32, `p2g_trap` 326. `p2g_trap` pairs are **hard negatives**: they name a similar term from another country
@@ -105,7 +105,7 @@ private bucket (`make data-pull` -> `data/.private/`). Details in `SOURCES.md` (
    test-set leakage. Last run: 2464 generated, 1745 valid,
    1500 kept after rebalancing; rejected by reason: target_missing_term 210, source_missing_term 154, foreign_term 116, genz_slang_in_source 99, slang_left_in_target 79, parent_term_left_in_target 27, duplicate 27, test_leak 7. Cost
    ≈ $0.7067 in 585.1 s.
-   Re-validated against the grown term bank (532 terms): 1431 kept, dropped foreign_term 45, parent_term_left_in_target 8, genz_slang_in_source 1, slang_left_in_target 1.
+   Re-validated against the grown term bank (734 terms): 1657 kept, dropped genz_slang_in_source 20, foreign_term 11, slang_left_in_target 27.
    **Multi-term pairs** (`data/pairs/synthetic_multi.jsonl`, `synthetic-multi-2026-10b`, 701 pairs,
    `scripts/generate_multi_pairs.py`): 2–3 slang terms change in the same sentence and every expected
    counterpart must be present; ≈ $0.5127. Not in the stage recipe: `make train-data`
@@ -122,7 +122,7 @@ private bucket (`make data-pull` -> `data/.private/`). Details in `SOURCES.md` (
    term of their country and the reference must replace it; papás → Gen Z references must contain
    Gen Z slang of the country; no other-country terms; sane length; no overlap with training.
    Passing pairs are `auto_validated`, failing ones `rejected` with the reason.
-5. **Dev pairs** (`origin=web`, `split=dev`, `data/pairs/dev_real.jsonl`, 151 pairs). One real sentence in five
+5. **Dev pairs** (`origin=web`, `split=dev`, `data/pairs/dev_real.jsonl`, 280 pairs). One real sentence in five
    from the training side (stable hash of the sentence id, both directions together) is held out to
    decide data rounds and ablations, so the test set is touched once per round. Dev never overlaps a
    test, niche or training sentence (also checked as substrings). Davids trained before 2026-10-02 saw
