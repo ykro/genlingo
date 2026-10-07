@@ -98,3 +98,67 @@ como en escena, y Goliath + glosario se reporta al lado.
 Las decisiones de las rondas de datos se toman en `data/pairs/dev_real.jsonl` (20 % de los pares reales de
 entrenamiento, por hash estable de la oración, más oraciones nuevas de investigación separadas igual),
 nunca en el set de prueba ni en los nichos. El set de prueba se evalúa una sola vez al final de cada ronda.
+
+## Enmienda 2 · «Combinaciones» (registrada el 2026-10-07 10:55 CST, antes de calcularla)
+
+Escrita antes de buscar las oraciones nuevas, antes de entrenar la ronda 5 y antes de calcular ningún corte por
+número de términos (de ningún modelo, en ningún set). La definición no cambia después de ver resultados.
+
+**Hipótesis.** El modelo grande conoce muchos términos sueltos y algunas frases hechas, pero en una frase que junta
+varios términos de jerga del mismo país (p. ej. «no manches güey, el profe está bien mamón y la tarea está cañona»)
+el modelo pequeño, entrenado con los datos de ese país, puede ganar.
+
+### Frases
+
+- **Regla de la combinación:** el lado Gen Z del par (la fuente en Gen Z → papás; la referencia en papás → Gen Z)
+  contiene **al menos 2 términos Gen Z distintos** del banco congelado (`data/eval/terms_test.jsonl`, sin los
+  marcados `ambiguous`) del país del par o de LATAM. Dos términos cuentan como uno si una forma de uno está
+  contenida en una forma del otro («chido» y «bien chido»).
+- **Solo oraciones reales** (`origin = web`), nunca sintéticas: una referencia escrita por Gemini sesga hacia Goliath.
+- **De dónde salen**, en un archivo aparte (`data/eval/combos.jsonl`, `make eval-combos`):
+  1. los pares del set de prueba congelado (`pairs/test_web.jsonl`, `auto_validated`) que cumplen la regla;
+  2. oraciones reales nuevas de la ronda 5 de investigación (`raw/web_usage_2026-10-07.jsonl`) que cumplen la
+     regla y que un hash estable del id (`sha1("combos|" + id)`, la mitad) aparta para este nicho **antes** de
+     correr ningún modelo sobre ellas. Cada oración entra en las dos direcciones, como en la sonda: la oración
+     real → la versión de papás del curador, y la versión del curador → la oración real.
+- **Validación automática**, la misma del set de prueba (`scripts/validate_test_set.py: check`, con el banco
+  congelado): largo, sin jerga de otro país en la referencia, la fuente Gen Z con su jerga y la referencia sin
+  ella, y **sin solapamiento** (también como subcadena) con ningún archivo de entrenamiento ni de desarrollo,
+  incluidos `synthetic_genz`, `synthetic_multi` y los de la ronda 5.
+- Ninguna oración se elige ni se descarta mirando la salida de un modelo.
+
+### Quién compite y cómo
+
+- **David:** el ganador de la ronda 5 elegido en desarrollo (abajo), con su prompt de entrenamiento (país +
+  léxico). Al lado, el David de la página antes de la ronda (`genlingo-2026-10d-e2b`).
+- **Goliath:** `GEMINI_MODEL` como en la página (país, sin glosario): es el rival. Goliath con el mismo glosario se
+  reporta al lado y no decide.
+- El país del prompt es el del par.
+
+### Métrica y regla de victoria
+
+- **Jerga correcta** (`evals/term_accuracy.py: correct_slang`) en la versión vigente el día del eval final:
+  incluye la corrección que se está haciendo en paralelo (Gen Z → papás solo es correcta si la salida no deja
+  ninguna jerga, ni otra; papás → Gen Z solo con jerga del país del par). Al lado: jerga resuelta y chrF++.
+- IC 95 % por bootstrap pareado de la diferencia David − Goliath (10,000 remuestreos por frase, semilla 2027).
+  Gana David si el límite inferior es mayor que 0; empate si el intervalo cruza el 0; gana Goliath si el
+  superior es menor que 0.
+- **Cortes con veredicto** (si n ≥ 30): todo el nicho; por país (MX, CO, LATAM, GT); por dirección. País ×
+  dirección se reporta siempre, con veredicto solo si n ≥ 30 (si no, «n insuficiente»).
+
+### Cómo se elige el David de la ronda 5 (en desarrollo, nunca en prueba)
+
+- Desarrollo: `pairs/dev_real.jsonl` (20 % de las oraciones reales de entrenamiento por hash estable, más el 20 % de
+  las oraciones de la ronda 5 que no fueron al nicho). «Combinaciones en desarrollo» = los pares de dev que
+  cumplen la misma regla.
+- Gana la variante con más jerga correcta en combinaciones de desarrollo, siempre que en todo el desarrollo no
+  baje más de 2 puntos de jerga correcta contra `genlingo-2026-10d-e2b` y su p50 quede bajo 1 s. Empate (≤ 1
+  punto): la de más jerga correcta en todo el desarrollo.
+- El nicho, el set de prueba y la sonda se corren una sola vez, con el ganador ya elegido.
+
+**Aclaración (2026-10-07 11:45 CST, antes de calcular nada).** De la parte 2 (oraciones nuevas) quedan fuera, y
+van solo a entrenamiento, las oraciones de páginas cuyos ejemplos escriben los editores de un sitio para muchos
+países a la vez con la misma plantilla (p. ej. el «Castellanario» de magikitos.com, de España, con el mismo
+editor para Guatemala, Colombia y México): no son habla real de jóvenes de ese país, y pueden estar generadas.
+Esa marca se pone por fuente (`kind: "editorial example"` en `raw/web_usage_2026-10-07.jsonl`) antes de correr
+ningún modelo y no depende de lo que diga ninguna salida.
