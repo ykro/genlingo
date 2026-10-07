@@ -30,19 +30,18 @@ Goliath on the right. At the bottom, «¿Cómo se lee esta página?» explains �
 
 ![David and Goliath translate «esa tu tarea te quedó bien chafa»](demo/02-comparar-genz-a-papas.png)
 
-Tap the three «Gen Z → papás» examples, one by one. The human reference translation appears at the top, with its
+Tap the two «Gen Z → papás» examples, one by one. The human reference translation appears at the top, with its
 source. Under each column, each slang term with ✓ or ✗.
 
 | Example | David | Goliath |
 | --- | --- | --- |
-| esa tu tarea te quedó bien **chafa** | Esa tarea tuya te quedó muy mala | Esa tu tarea te quedó pura lata |
-| No te creo vos, ¡ya sé que vos solo **pajas** sos! | No te creo vos, ¡ya sé que vos solo mentís! | No te creo vos, ¡si ya sé que pura casaca sos! |
-| **Simón, de ley** llego al partido. | Sí, seguro llego al partido. | Cabal, sin falta llego al partido. |
+| esa tu tarea te quedó bien **chafa** | esa tu tarea te quedó bien mal hecha | Esa tu tarea te quedó pura lata. |
+| **Simón, de ley** llego al partido. | Sí, seguro llego al partido. | Cabal, fijo llego al partido. |
 
 Goliath's wording varies a little from one run to the next; in every test it swapped the slang for more slang
 instead of saying it the way a parent would.
 
-> «Chafa», «pajas», «simón, de ley»: David knows what they mean and says it the way your mom would. Goliath
+> «Chafa», «simón, de ley»: David knows what they mean and says it the way your mom would. Goliath
 > swaps slang for more slang. And look at the time: David answers in half a second; Goliath, in several.
 
 Each column's cost is what that translation cost: Gemini bills by token; David, by his GPU's seconds. A single
@@ -57,7 +56,7 @@ Tap the «Papás → Gen Z» example.
 
 | Example | David | Goliath |
 | --- | --- | --- |
-| Voy a comprar algo de **refacción** para media mañana. | Voy a comprar algo de refa para media mañana. | Voy a conseguir un munchies para el bajón de media mañana. |
+| Voy a comprar algo de **refacción** para media mañana. | Voy a comprar algo de refa para media mañana. | Voy a conseguir un moncheo para el bajón de media mañana. |
 
 > The hard direction: you have to produce the right local slang. David says «refa», as they say in Guatemala;
 > Goliath makes up «munchies».
@@ -82,13 +81,16 @@ A typed phrase isn't checked in advance: either side can get it wrong.
 
 ## Where the examples come from
 
-The four examples are in `data/translate_examples.json`, with their source, license, why they're there and the
-live runs with both models. They're Guatemalan slang phrases from the test set: David never saw them in
-training. The 51 short Guatemalan phrases the term-by-term check can judge were run 3 times with each model, and
-the ones David got right and Goliath got wrong all 3 times were kept. After moving David to the cloud they were
-run 3 more times each against the Cloud Run David: David got all 12 right and Goliath none. They're from
-Guatemala because that's where David gets more slang right than Gemini (52 % vs 23 %,
-[evals/niche_report.md](../evals/niche_report.md)).
+The three examples are in `data/translate_examples.json`, with their source, license, why they're there and the
+live runs with both models. They're Guatemalan slang phrases from the test set (David never saw them in
+training), from openly licensed sources (WikiLengua and diccionario-chapin): sentences from all-rights-reserved
+sources can't be shown. Each was run 3 times against the cloud David (`genlingo-2026-10d-e2b`) and Gemini: David
+got all 9 right and Goliath none. They're from Guatemala because that's where David gets more slang right than
+Gemini (50 % vs 20 %, [evals/niche_report.md](../evals/niche_report.md)). The 38 open-source test phrases from
+Mexico, Colombia and neutral Spanish were also tried: none passed every check (in Colombia and neutral Spanish
+Goliath did as well or better; in Mexico David won by eye in 3, but the page's ✓/✗ check can't tell). With
+general Gen Z slang («cringe», «random», «crush») both get it right about equally: if someone types it live,
+expect a tie.
 
 ## If something fails
 

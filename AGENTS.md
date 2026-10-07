@@ -13,7 +13,7 @@ A small Gemma model (David), fine-tuned on Gen Z ↔ parent phrase pairs, transl
 | Compress without losing slang | quantization sweep (Q4_K_M, Q5_K_M, Q6_K, Q8_0, imatrix) vs f16: size, latency and slang lost |
 | Term-level evals | chrF++ plus a copy-the-phrase baseline, correct slang (meaning-validated), slang handled and reference-change recall, a separate dev set for data decisions, Goliath with and without David's glossary, David's losses shown; the eval runs as a Cloud Run GPU job |
 | Your own model on your own GPU | `david/` image (Ollama + model baked in), private service, identity token from the page, wake-up on page open |
-| Retraining on new data | model tags by data date (on the page: `genlingo-2026-10c-e2b-nomulti`); the README's experiments section shows every round's numbers |
+| Retraining on new data | model tags by data date (on the page: `genlingo-2026-10d-e2b`); the README's experiments section shows every round's numbers |
 | Show only what David wins | page examples from the niche David wins (Guatemalan slang), each verified live 3× with both models (`data/translate_examples.json`); losses (and the cloud cost) stay documented in the README, DECISIONES, BITACORA and evals, never on the page |
 
 ## Components

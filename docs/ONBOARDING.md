@@ -83,7 +83,7 @@ make deploy                   # 5. con DAVID_MODEL_TAG=<tag nuevo> en .env: Davi
 make check                    # 6. la página en vivo con los ejemplos
 ```
 
-`make train` sigue la receta del David de la página (`genlingo-2026-10c-e2b-nomulti`): sin los pares de varios términos (`--exclude synthetic_multi`) y sin la etapa ORPO, porque ninguno de los dos mejoró el set de desarrollo. Con los datos de hoy, `make train-data` da los mismos 2,271 ejemplos (1,715 sintéticos + 556 anclados en oraciones reales) que registra `train/runs/genlingo-2026-10c-e2b-nomulti.json`. Para repetir una variante descartada en una ablación: `MULTI=1` incluye `data/pairs/synthetic_multi.jsonl` y `ORPO=1` arma `data/train/pref.jsonl` y agrega la etapa de preferencias al job.
+`make train` sigue la receta del David de la página (`genlingo-2026-10d-e2b`): sin los pares de varios términos (`--exclude synthetic_multi`) y sin la etapa ORPO, porque ninguno de los dos mejoró el set de desarrollo. Antes, `make data-pull` baja del bucket privado las oraciones citadas de fuentes que no se pueden redistribuir (sin ellas los scripts de datos se detienen con un mensaje que lo dice). Con los datos de hoy, `make train-data` da los mismos 3,880 ejemplos (3,315 sintéticos + 565 anclados en oraciones reales) que registra `train/runs/genlingo-2026-10d-e2b.json`. Para repetir una variante descartada en una ablación: `MULTI=1` incluye `data/pairs/synthetic_multi.jsonl` y `ORPO=1` arma `data/train/pref.jsonl` y agrega la etapa de preferencias al job.
 
 Qué pasa en cada paso:
 

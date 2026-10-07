@@ -32,19 +32,18 @@ costo.
 
 ![David y Goliath traducen «esa tu tarea te quedó bien chafa»](demo/02-comparar-genz-a-papas.png)
 
-Toca los tres ejemplos de «Gen Z → papás», uno por uno. Arriba aparece la traducción de referencia, hecha por
+Toca los dos ejemplos de «Gen Z → papás», uno por uno. Arriba aparece la traducción de referencia, hecha por
 personas, con su fuente. Debajo de cada columna, cada término de jerga con ✓ o ✗.
 
 | Ejemplo | David | Goliath |
 | --- | --- | --- |
-| esa tu tarea te quedó bien **chafa** | Esa tarea tuya te quedó muy mala | Esa tu tarea te quedó pura lata |
-| No te creo vos, ¡ya sé que vos solo **pajas** sos! | No te creo vos, ¡ya sé que vos solo mentís! | No te creo vos, ¡si ya sé que pura casaca sos! |
-| **Simón, de ley** llego al partido. | Sí, seguro llego al partido. | Cabal, sin falta llego al partido. |
+| esa tu tarea te quedó bien **chafa** | esa tu tarea te quedó bien mal hecha | Esa tu tarea te quedó pura lata. |
+| **Simón, de ley** llego al partido. | Sí, seguro llego al partido. | Cabal, fijo llego al partido. |
 
 Lo que dice Goliath varía un poco de una vez a otra; en todas las pruebas cambió la jerga por otra jerga en vez
 de decirlo como un papá.
 
-> «Chafa», «pajas», «simón, de ley»: David sabe qué significan y lo dice como lo diría tu mamá. Goliath cambia
+> «Chafa», «simón, de ley»: David sabe qué significan y lo dice como lo diría tu mamá. Goliath cambia
 > la jerga por más jerga. Y miren el tiempo: David responde en medio segundo; Goliath, en varios.
 
 El costo de cada columna es lo que costó esa traducción: Gemini cobra por tokens; David, por los segundos de su
@@ -60,7 +59,7 @@ Toca el ejemplo de «Papás → Gen Z».
 
 | Ejemplo | David | Goliath |
 | --- | --- | --- |
-| Voy a comprar algo de **refacción** para media mañana. | Voy a comprar algo de refa para media mañana. | Voy a conseguir un munchies para el bajón de media mañana. |
+| Voy a comprar algo de **refacción** para media mañana. | Voy a comprar algo de refa para media mañana. | Voy a conseguir un moncheo para el bajón de media mañana. |
 
 > La dirección difícil: hay que poner la jerga correcta de aquí. David dice «refa», como se dice en Guatemala;
 > Goliath inventa «munchies».
@@ -85,13 +84,16 @@ Una frase escrita no está verificada de antemano: cualquiera de los dos puede e
 
 ## De dónde salen los ejemplos
 
-Los cuatro ejemplos están en `data/translate_examples.json`, con su fuente, su licencia, la razón por la que
-están y las pruebas en vivo con los dos modelos. Son frases de jerga chapina del set de prueba: David nunca las
-vio al entrenar. Se probaron las 51 frases chapinas cortas que la revisión término por término puede juzgar,
-3 veces con cada modelo, y quedaron las que David tradujo bien y Goliath mal las 3 veces. Después de pasar a
-David a la nube se volvieron a probar 3 veces cada una contra el David de Cloud Run: David acertó las 12 veces y
-Goliath ninguna. Se eligieron de Guatemala porque ahí David acierta más jerga que Gemini (52 % contra 23 %,
-[evals/niche_report.md](../evals/niche_report.md)).
+Los tres ejemplos están en `data/translate_examples.json`, con su fuente, su licencia, la razón por la que
+están y las pruebas en vivo con los dos modelos. Son frases de jerga chapina del set de prueba (David nunca las
+vio al entrenar), de fuentes con licencia abierta (WikiLengua y diccionario-chapin): las de fuentes con todos los
+derechos reservados no se pueden mostrar. Se probaron 3 veces cada una contra el David de la nube
+(`genlingo-2026-10d-e2b`) y Gemini: David acertó las 9 veces y Goliath ninguna. Se eligieron de Guatemala porque
+ahí David acierta más jerga que Gemini (50 % contra 20 %, [evals/niche_report.md](../evals/niche_report.md)).
+También se probaron las 38 frases de fuentes abiertas de México, Colombia y español neutro: ninguna pasó todas
+las pruebas (en Colombia y en español neutro Goliath tradujo igual o mejor; en México David ganó a ojo en 3, pero
+la revisión ✓/✗ de la página no lo distingue). Con jerga Gen Z general («cringe», «random», «crush») los dos
+aciertan igual: si alguien la escribe en vivo, esperen un empate.
 
 ## Si algo falla
 
