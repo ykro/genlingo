@@ -30,8 +30,16 @@ capacity: ## Measure David's throughput (1/4/8/16 at a time) and both sides' tim
 test: ## Run all tests (no network: MOCK_AI in tests)
 	cd duel && MOCK_AI=1 uv run pytest -q
 
-eval: ## Test set through base models, every David and Goliath, in a Cloud Run GPU job -> evals/report.md (once per data round)
-	bash infra/06-eval-job.sh $(EVAL_ARGS)
+# A Cloud Run GPU job runs at most 1 h and loading each model from the bucket takes minutes, so `make eval` runs
+# these groups as separate jobs, one after another (one L4 of quota), and merges them.
+EVAL_GROUPS ?= genlingo-2026-10d-e2b,genlingo-2026-10d-e2b-f16,genlingo-2026-10c-e2b-nomulti,genlingo-2026-10c-e2b-nomulti-f16 \
+               genlingo-2026-10b-e2b,genlingo-2026-10b-e2b-f16,genlingo-2026-10-e2b-q5_k_m \
+               genlingo-2026-10-e2b,genlingo-2026-10-e2b-f16,genlingo-2026-09,genlingo-2026-09-f16 \
+               base,goliath,goliath_glossary
+eval: ## Test set through base models, every David and Goliath -> evals/report.md (once per data round): one Cloud Run GPU job per group in EVAL_GROUPS, merged
+	@\
+	for g in $(EVAL_GROUPS); do bash infra/06-eval-job.sh --models $$g || exit 1; done; \
+	$(UV) python evals/merge_results.py $$(ls -t evals/results/2*.json | grep -v merged | head -$(words $(EVAL_GROUPS)))
 
 eval-dev: ## Dev set (data decisions, ablations), same job -> evals/report_dev.md: make eval-dev [EVAL_ARGS="--nbest 4"]
 	bash infra/06-eval-job.sh --split dev $(EVAL_ARGS)

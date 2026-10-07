@@ -187,3 +187,40 @@ una L4 que carga cada modelo desde el bucket de uno en uno. En la laptop no qued
   `make pull-model`, `make train-local`, `make train-finish` y `make quant-sweep`. Todo sigue en el historial
   de git.
 
+
+## 8 · Gen Z fuera de Guatemala: ronda 4 de datos y una sonda nueva (2026-10-06/07)
+
+Quien probó la página con jerga Gen Z que no es chapina («cringe», «random», «crush», «stalkear») vio
+que fallaba. La razón está en los datos: de los 556 pares anclados en oraciones reales, 268 eran de
+Guatemala, 255 de Colombia, 24 de español neutro y 9 de México; y la página traduce siempre «como en
+Guatemala», así que David convierte cualquier frase a jerga chapina.
+
+- **La sonda** (`data/eval/probe_genz.jsonl`, `make eval-probe`): 32 oraciones reales de jerga Gen Z general
+  sacadas de 14 páginas que nunca se usan para entrenar, en las dos direcciones, preguntadas como español
+  neutro y como Guatemala. Juicio determinista e igual para todos (`evals/probe_report.py`).
+  - Antes de la ronda (`10c`): 91 % en español neutro y 69 % como Guatemala. Goliath: 94 % y 77 %.
+  - **Empate:** en jerga Gen Z general David no le gana a Goliath.
+- **La ronda 4:** 1,600 pares sintéticos anclados en términos Gen Z de México y del español neutro
+  (`pairs/synthetic_genz.jsonl`, $1.02 de Gemini, solo para entrenar), 17 oraciones reales más de México y
+  del español neutro, y `genlingo-2026-10d-e2b` entrenado con 3,880 ejemplos ($1.49, 68 min en la nube).
+- **Resultado** (jerga correcta, `10d` contra `10c`):
+  - Desarrollo (151 pares): 46 % contra 40 %. Por eso `10d` es el David de la página.
+  - Prueba (399, eval completo del 2026-10-07 en la nube): 44 % contra 41 %, chrF++ 60.0 contra 59.5. Español
+    neutro de 32 % a 43 % y México igual (46 %); Guatemala de 52 % a 50 % y papás → Gen Z de Guatemala y Colombia
+    de 44 % a 33 %.
+  - Sonda: 91 % en español neutro (igual) y 77 % como Guatemala (antes 69 %), igual que Goliath.
+- **Contra Goliath, por caso** (jerga correcta en prueba, IC 95 % por bootstrap pareado):
+  - Gana David: todo el set (44 % contra 24 %, +19.5 [+13.5, +25.6]), Guatemala en las dos direcciones
+    (50 % contra 20 %), Colombia de Gen Z a papás (43 % contra 15 %) y México de Gen Z a papás (51 % contra 22 %).
+  - Empate: español neutro (43 % contra 32 %, [−1.3, +22.7]), papás → Gen Z en México, Colombia y español neutro,
+    y la jerga Gen Z general de la sonda.
+- **Ejemplos de la página:** se probaron en vivo, 3 veces con cada modelo, las 38 frases de prueba de fuentes
+  abiertas de fuera de Guatemala. Ninguna pasó todas las pruebas: en Colombia y en español neutro Goliath
+  traduce igual o mejor; en México David ganó a ojo en 3 frases, pero la revisión término por término de la
+  página no lo distingue. La página se queda con 3 ejemplos chapines. Que David gane en México y en español
+  neutro de Gen Z a papás se ve en el eval, no en un ejemplo.
+- **Licencias:** las oraciones citadas de fuentes con todos los derechos reservados salieron del repo; viven en un
+  bucket privado (`make data-pull`). Los ejemplos de la página son solo de fuentes abiertas.
+- **El eval en la nube** usa ahora los kernels de CUDA ya compilados de David: cada modelo responde las 399
+  frases en ~80 s, con p50 de 237 ms para el David de la página (antes algunas frases tardaban de 3 a 13 s). Como un job con GPU dura como máximo 1 hora,
+  `make eval` corre los modelos en cuatro jobs seguidos y los junta.

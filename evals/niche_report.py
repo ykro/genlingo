@@ -118,7 +118,7 @@ def table(head, rows):
 
 
 def main() -> None:
-    path = Path(sys.argv[1]) if len(sys.argv) > 1 else sorted((ROOT / "evals" / "results").glob("2*.json"))[-1]  # test runs only, never dev-*
+    path = Path(sys.argv[1]) if len(sys.argv) > 1 else sorted((ROOT / "evals" / "results").glob("2*.json"))[-1]  # test runs only (never dev-* or probe-*); a merged run sorts after its parts
     raw = json.loads(path.read_text())
     bank = TermBank(_jsonl(eval_terms_path(DATA)), ignore_ambiguous=True)  # frozen with the test set
     linked = {u["id"]: u.get("term_ids", []) for u in _jsonl(DATA / "raw" / "web_usage.jsonl")}
