@@ -41,6 +41,7 @@
   body { margin: 0; min-height: 100vh; background: var(--paper); color: var(--ink); font: 400 var(--step-0)/1.45 var(--body); -webkit-font-smoothing: antialiased; }
   button, textarea { font: inherit; color: inherit; }
   :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; border-radius: 6px; }
+  [hidden] { display: none !important; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   main { max-width: 1680px; min-height: 100vh; margin: 0 auto; padding: clamp(0.9rem, 2vh, 2.25rem) var(--gutter) clamp(1rem, 2.5vh, 2.5rem); display: grid; grid-template-rows: auto auto auto auto 1fr; gap: clamp(0.75rem, 1.9vh, 1.6rem); }
@@ -121,7 +122,8 @@
   .terms li { display: grid; grid-template-columns: auto 1fr; gap: 0.7rem; align-items: center; }
   .mark { display: inline-grid; place-items: center; min-width: 6.2rem; padding: 0.3rem 0.7rem; border-radius: 999px; font-weight: 700; font-size: 0.85em; }
   .mark.ok { background: var(--ok-wash); color: var(--ok); }
-  .mark.no { background: var(--bad-wash); color: var(--bad); }
+  .mark.no { background: var(--bad-wash); color: var(--bad); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--bad) 35%, transparent); }
+  .mark.ok { box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ok) 30%, transparent); }
   .terms b { font-weight: 700; }
   .terms em { font-style: normal; color: var(--side-2); }
 
@@ -131,11 +133,45 @@
   .stats dt { font: 700 0.75em/1 var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--side-2); }
   .stats dd { margin: 0; font: 700 var(--step-2)/1.1 var(--display); font-variant-numeric: tabular-nums; }
 
+  .meaning q.note { quotes: none; font-size: var(--step-0); font-weight: 500; color: var(--ink); }
+
+  /* ---- how to read it ---- */
+  .howto { border-top: 1px solid var(--rule); padding-top: 0.4rem; color: var(--ink-2); }
+  .howto summary { cursor: pointer; font-weight: 700; color: var(--ink); padding: 0.6rem 0; list-style: none; display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
+  .howto summary::-webkit-details-marker { display: none; }
+  .howto summary::before { content: "+"; display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; border: 1px solid var(--rule); background: var(--card); font-weight: 700; }
+  .howto[open] summary::before { content: "−"; }
+  .howto dl { margin: 0.2rem 0 0.6rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 0.9rem 2rem; }
+  .howto dt { font-weight: 700; color: var(--ink); }
+  .howto dd { margin: 0.2rem 0 0; font-size: 0.95em; }
+  .howto .eg { display: block; margin-top: 0.35rem; }
+
   @media (max-width: 900px) {
     .composer { grid-template-columns: 1fr; }
-    .dir { justify-self: start; }
+    .dir { justify-self: stretch; grid-auto-columns: 1fr; }
+    .dir button { padding: 0.65rem 0.6rem; }
     .go { padding: 0.9rem; }
     .sides { grid-template-columns: 1fr; }
+    .side { min-height: 0; }
+  }
+  @media (max-width: 600px) {
+    main { gap: 0.85rem; }
+    .brand { gap: 0.3rem 0.9rem; }
+    .brand p { font-size: 0.95rem; }
+    .net { font-size: 0.8rem; }
+    .group { display: grid; gap: 0.45rem; }
+    .group > span { min-width: 0; font-size: 0.9rem; }
+    .ex { width: 100%; border-radius: 14px; }
+    .side { border-radius: 18px; padding: 1.1rem; }
+    .answer { font-size: clamp(1.45rem, 1rem + 2.4vw, 2rem); }
+    .answer.hint, .answer.wait, .answer.off, .answer.boot { font-size: 1.15rem; }
+    .answer.boot strong, .answer.off strong { font-size: 1.6rem; }
+    .who h2 { font-size: 2rem; }
+    .mark { min-width: 5.2rem; }
+    .stats { gap: 1.5rem; flex-wrap: wrap; }
+    .stats dd { font-size: 1.5rem; }
+    .meaning p { gap: 0.3rem 0.9rem; }
+    .meaning q { font-size: 1.15rem; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -187,6 +223,32 @@
       <dl class="stats" id="goliath-stats"></dl>
     </section>
   </div>
+
+  <details class="howto" id="howto">
+    <summary>¿Cómo se lee esta página?</summary>
+    <dl>
+      <div>
+        <dt>✓ Bien · ✗ Mal</dt>
+        <dd>Para cada palabra de jerga de la frase, un programa revisa si la traducción la cambió por algo que
+          significa lo mismo. Usa nuestro banco de jerga (<span id="bank-size">cientos de</span> palabras y expresiones,
+          cada una con su significado y su fuente); ningún modelo califica a otro.
+          <span class="eg">Ejemplo: «chafa» significa «de mala calidad». «Te quedó muy mala» → ✓ Bien.
+          «Te quedó pura lata» → ✗ Mal: cambió una jerga por otra y no dice lo mismo.</span></dd>
+      </div>
+      <div>
+        <dt>Tiempo</dt>
+        <dd>Desde que se pide la traducción hasta que llega a esta página.</dd>
+      </div>
+      <div>
+        <dt>Costo</dt>
+        <dd><b>Goliath</b> cobra por cada pedazo de texto que lee y escribe (tokens):
+          <span id="goliath-price">un precio fijo por millón</span>.
+          <b>David</b> corre en una computadora con GPU en la nube que se cobra por segundo
+          (<span id="david-price">un precio por hora</span>): su costo es lo que cuesta esa GPU durante la traducción.
+          Cuánto sale cada uno según cuántas traducciones se hacen está en el README del proyecto.</dd>
+      </div>
+    </dl>
+  </details>
 </main>
 <script>
   const DIR = { genz_to_parent: "Gen Z → papás", parent_to_genz: "Papás → Gen Z" };
@@ -200,6 +262,13 @@
 
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
   const seconds = (ms) => ms == null ? "—" : `${(ms / 1000).toFixed(1)} s`;
+  /** US$ with enough decimals to show the first two significant digits (a translation costs fractions of a cent). */
+  const money = (usd) => {
+    if (usd == null) return "—";
+    if (usd === 0) return "US$ 0";
+    const digits = Math.min(8, Math.max(2, 1 - Math.floor(Math.log10(usd))));
+    return `US$ ${usd.toFixed(digits)}`;
+  };
 
   /** The phrase with its slang terms in bold (accents and case ignored), so each button says what it tests. */
   function highlight(text, terms) {
@@ -293,7 +362,8 @@
         }
         body.append(ul);
       }
-      stats(side, [["Tiempo", seconds(data.latency_ms)]]);
+      stats(side, [["Tiempo", seconds(data.latency_ms)], ["Costo", money(data.cost_usd)]]);
+      if (data.checked === "typed") showCheck(data.terms || []);
       return;
     }
     body.append(p);
@@ -320,15 +390,35 @@
     const phrase = $("phrase").value.trim();
     if (!phrase) { $("phrase").focus(); return; }
     if (current && (current.text !== phrase || current.direction !== direction)) showExample(null);
+    if (!current) $("meaning").classList.remove("show");
     const mine = ++ticket;
     $("go").disabled = true;
     paint("david", "wait"); paint("goliath", "wait");
+    // On a phone the two columns are below the examples: bring them into view.
+    if (window.matchMedia("(max-width: 900px)").matches) document.querySelector(".sides").scrollIntoView({ behavior: "smooth", block: "start" });
     await Promise.all(["david", "goliath"].map((s) => translateSide(s, phrase, direction, current?.id ?? null, mine)));
     if (mine === ticket) $("go").disabled = !davidReady;
   }
 
+  /** Typed text: say in the band what the automatic check could look at. */
+  function showCheck(terms) {
+    if (current) return;
+    $("meaning").classList.add("show");
+    $("meaning").querySelector(".k").textContent = "Revisión automática";
+    $("source").hidden = true;
+    const q = $("reference");
+    q.replaceChildren();
+    q.classList.add("note");
+    q.textContent = terms.length
+      ? `Se revisa la jerga que conoce el banco: ${[...new Set(terms.map((t) => t.term))].join(", ")}.`
+      : "Esta frase no tiene jerga que conozca el banco: no hay nada que revisar automáticamente. Compara tú las dos traducciones.";
+  }
+
   function showExample(ex) {
     current = ex;
+    $("meaning").querySelector(".k").textContent = "Traducción de referencia";
+    $("reference").classList.remove("note");
+    $("source").hidden = false;
     document.querySelectorAll(".ex").forEach((b) => b.setAttribute("aria-pressed", String(!!ex && b.dataset.id === ex.id)));
     $("meaning").classList.toggle("show", !!ex);
     if (ex) {
@@ -366,10 +456,22 @@
     if (davidReady) return;
     try {
       const st = await (await fetch("/api/status", { cache: "no-store" })).json();
+      prices(st);
       if (st.david.phase === "ready") setReady(true);
       else $("clock").textContent = mmss(st.david.seconds);
     } catch { /* the next poll tries again */ }
   }
+  let priced = false;
+  function prices(st) {
+    if (priced || !st.goliath_usd_per_m) return;
+    priced = true;
+    const m = st.goliath_usd_per_m;
+    $("goliath-price").textContent = `US$ ${m.input.toFixed(2)} por millón de tokens que lee y US$ ${m.output.toFixed(2)} por millón que escribe`;
+    $("david-price").textContent = `unos US$ ${st.david_usd_per_hour.toFixed(2)} por hora encendida`;
+    if (st.terms_in_bank) $("bank-size").textContent = st.terms_in_bank.toLocaleString("es");
+  }
+  fetch("/api/status", { cache: "no-store" }).then((r) => r.json()).then(prices).catch(() => {});
+
   async function wake() {
     try {
       const st = await (await fetch("/api/david/wake", { method: "POST" })).json();

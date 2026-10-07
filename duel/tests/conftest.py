@@ -32,7 +32,7 @@ def settings(tmp_path: Path) -> Settings:
     return Settings(
         mock_ai=True, data_dir=tmp_path / "data",
         runs_dir=runs, david_tag="genlingo-test", gemini_model="goliath-model",
-        gemini_input_usd_per_m=1.0, gemini_output_usd_per_m=10.0,
+        gemini_input_usd_per_m=1.0, gemini_output_usd_per_m=10.0, david_usd_per_s=0.0003,
     )
 
 

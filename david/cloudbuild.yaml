@@ -1,5 +1,6 @@
-# Cloud Build recipe for David's image (infra/04-david.sh): copy the stage GGUF + Modelfile from the
-# models bucket into the build context, then build and push.
+# Cloud Build recipe for David's image (infra/04-david.sh): copy the stage GGUF + Modelfile and the
+# compiled CUDA kernels (infra/07-david-jit-cache.sh; empty if not made yet) from the models bucket into the
+# build context, then build and push.
 steps:
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     entrypoint: bash
@@ -7,8 +8,9 @@ steps:
       - -c
       - |
         set -e
-        mkdir -p model
+        mkdir -p model cuda-jit
         gcloud storage cp "${_MODELS_BUCKET}/${_DAVID_TAG}/Modelfile" "${_MODELS_BUCKET}/${_DAVID_TAG}/${_GGUF}" model/
+        gcloud storage cp -r "${_JIT_CACHE}/*" cuda-jit/ 2>/dev/null || echo "no compiled CUDA kernels yet"
   - name: gcr.io/cloud-builders/docker
     args: [build, -t, "${_IMAGE}", --build-arg, "DAVID_TAG=${_DAVID_TAG}", --build-arg, "EMBEDDING_MODEL=${_EMBEDDING_MODEL}", .]
 images: ["${_IMAGE}"]

@@ -38,7 +38,10 @@ def test_each_side_translates_on_its_own_and_nothing_is_recorded(settings):
         assert d["status"] == g["status"] == "ok"
         assert d["model"] == "genlingo-test" and g["model"] == "goliath-model"
         assert d["latency_ms"] > 0 and g["cost_usd"] > 0
-        assert "terms" not in d  # typed text: just the two translations
+        # David's cost is his GPU seconds: the translation's time × the service's rate per second
+        assert d["cost_usd"] == round(d["latency_ms"] / 1000 * settings.david_usd_per_s, 7)
+        # typed text is checked against the term bank alone ("mid" is in it)
+        assert d["checked"] == "typed" and [t["term"] for t in d["terms"]] == ["mid"]
         assert c.post("/api/translate/judge", json={"phrase": "x", "direction": "genz_to_parent"}).status_code == 422
         # nothing else is exposed: no rounds, votes or scoreboard
         for path in ("/rounds", "/scoreboard", "/queue", "/duel", "/reset"):
@@ -53,9 +56,19 @@ def test_an_example_comes_back_with_the_term_check(settings):
                        "source": "https://x", "license": "MIT", "slang": ["mid"]}]
         d = c.post("/api/translate/david", json={"phrase": "estuvo bien mid", "direction": "genz_to_parent", "example_id": "e1"}).json()
         assert d["terms"] == [{"term": "mid", "expected": "regular, mediocre", "ok": True}]
-        # the check belongs to the example's phrase: edited text gets no check
+        assert d["checked"] == "example"
+        # the reference belongs to the example's phrase: edited text is checked like typed text
         edited = c.post("/api/translate/david", json={"phrase": "estuvo bien mid hoy", "direction": "genz_to_parent", "example_id": "e1"}).json()
-        assert "terms" not in edited
+        assert edited["checked"] == "typed"
+
+
+def test_typed_text_without_known_slang_says_there_is_nothing_to_check(settings):
+    with TestClient(create_app(settings)) as c:
+        d = c.post("/api/translate/david", json={"phrase": "mañana voy al mercado", "direction": "genz_to_parent"}).json()
+        assert d["status"] == "ok" and d["terms"] == [] and d["checked"] == "typed"
+        st = c.get("/api/status").json()
+        assert st["david_usd_per_hour"] == round(settings.david_usd_per_s * 3600, 2)
+        assert st["goliath_usd_per_m"]["input"] > 0 and st["terms_in_bank"] > 0
 
 
 class FakeDavid:

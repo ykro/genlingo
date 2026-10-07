@@ -58,6 +58,11 @@ class Settings:
     country: str = field(default_factory=lambda: _env("EVENT_COUNTRY", "GT"))
     # David's N-best: candidates generated in parallel and reranked with the term bank (1 = off).
     david_nbest: int = field(default_factory=lambda: int(_env("DAVID_NBEST", "1")))
+    # What David's GPU service costs per second while it runs (Cloud Run: L4 + vCPU + memory, billed by the
+    # second; infra/04-david.sh sizes it). The page shows David's cost as these seconds × this rate.
+    david_usd_per_s: float = field(default_factory=lambda: (
+        _float("CLOUD_RUN_L4_USD_PER_S", 0.0) + _float("DAVID_CPU", 4) * _float("CLOUD_RUN_VCPU_USD_PER_S", 0.0)
+        + _float("DAVID_MEMORY_GIB", 16) * _float("CLOUD_RUN_GIB_USD_PER_S", 0.0)))
 
 
 def goliath_prices(s: "Settings") -> PriceSchedule:

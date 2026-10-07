@@ -1,0 +1,56 @@
+{
+  "measured_at": "2026-10-07T03:20:41+00:00",
+  "david_model": "genlingo-2026-10c-e2b-nomulti",
+  "goliath_model": "gemini-3.8-flash",
+  "david_usd_per_hour": 1.0465,
+  "david": [
+    {
+      "concurrency": 1,
+      "n": 48,
+      "errors": 0,
+      "wall_s": 42.01,
+      "per_hour": 4114,
+      "median_ms": 602,
+      "p95_ms": 781
+    },
+    {
+      "concurrency": 4,
+      "n": 48,
+      "errors": 0,
+      "wall_s": 10.47,
+      "per_hour": 16499,
+      "median_ms": 803,
+      "p95_ms": 1076
+    },
+    {
+      "concurrency": 8,
+      "n": 48,
+      "errors": 0,
+      "wall_s": 6.65,
+      "per_hour": 25984,
+      "median_ms": 1021,
+      "p95_ms": 1289
+    },
+    {
+      "concurrency": 16,
+      "n": 48,
+      "errors": 0,
+      "wall_s": 5.84,
+      "per_hour": 29586,
+      "median_ms": 1733,
+      "p95_ms": 2253
+    }
+  ],
+  "goliath": {
+    "n": 48,
+    "errors": 2,
+    "median_ms": 3191,
+    "p95_ms": 12939,
+    "mean_input_tokens": 125.4,
+    "mean_output_tokens": 298.2,
+    "usd_per_translation": {
+      "2026-09-30": 0.0012125,
+      "2027-01-01": 0.0024249
+    }
+  }
+}

@@ -21,8 +21,8 @@ from pydantic import BaseModel, Field
 
 from .arena import Arena
 from .prompts import Direction
-from .settings import Settings, get_settings
-from .translate_page import FONTS, PAGE, check_terms, find_example, load_examples
+from .settings import Settings, get_settings, goliath_prices
+from .translate_page import FONTS, PAGE, check_terms, find_example, load_examples, terms_in_bank
 
 log = logging.getLogger("genlingo.page")
 
@@ -130,7 +130,12 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None) -> 
 
     @app.get("/api/status")
     async def status() -> dict:
-        return {"david": david.view(), "david_model": s.david_tag, "goliath_model": s.gemini_model}
+        price = goliath_prices(s).at()
+        return {"david": david.view(), "david_model": s.david_tag, "goliath_model": s.gemini_model,
+                # for the page's "how to read it" note: what each side's cost is made of
+                "david_usd_per_hour": round(s.david_usd_per_s * 3600, 2),
+                "goliath_usd_per_m": {"input": price.input_per_million, "output": price.output_per_million},
+                "terms_in_bank": terms_in_bank(s.data_dir)}
 
     @app.post("/api/david/wake")
     async def david_wake() -> dict:
@@ -158,11 +163,21 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None) -> 
                 david.set("ready")
         if res.status != "ok":
             log.warning("%s did not answer: %s", side, res.error)
-        out = {"status": res.status, "text": res.text, "latency_ms": res.latency_ms, "cost_usd": res.cost_usd, "model": res.model,
+        cost = res.cost_usd
+        if side == "david" and res.latency_ms is not None:
+            # David's GPU is billed by the second: the seconds this translation took × the service's rate.
+            cost = round(res.latency_ms / 1000 * s.david_usd_per_s, 7)
+        out = {"status": res.status, "text": res.text, "latency_ms": res.latency_ms, "cost_usd": cost, "model": res.model,
                "error": res.error}
-        example = find_example(s.data_dir, req.example_id)
-        if example and example["text"] == req.phrase.strip() and res.status == "ok":
-            out["terms"] = check_terms(s.data_dir, example, s.country, res.text)
+        if res.status == "ok":
+            # ✓/✗ per slang term: an example is checked against its human reference too; typed text against the
+            # term bank alone. [] means the phrase has no slang the bank knows (nothing to check automatically).
+            example = find_example(s.data_dir, req.example_id)
+            if example and example["text"] == req.phrase.strip():
+                out["terms"], out["checked"] = check_terms(s.data_dir, example, s.country, res.text), "example"
+            else:
+                typed = {"text": req.phrase.strip(), "direction": req.direction, "reference": None}
+                out["terms"], out["checked"] = check_terms(s.data_dir, typed, s.country, res.text), "typed"
         return out
 
     @app.get("/api/health")

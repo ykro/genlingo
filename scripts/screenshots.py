@@ -3,7 +3,9 @@
     uv run --with playwright python scripts/screenshots.py [--url https://…]
 
 Waits for David to be ready (a cold start shows "Preparando a David…" first, also captured), then
-taps one example per direction. 1920×1080 (projector) and 1280×800 (laptop).
+taps one example per direction and translates a typed phrase (TYPED, checked against the term bank
+like any phrase someone types). 1920×1080 (projector), 1280×800 (laptop), 768×1024 (tablet) and
+375×812 / 414×896 (phones), plus the "¿Cómo se lee esta página?" note open.
 """
 
 from __future__ import annotations
@@ -18,6 +20,8 @@ from pathlib import Path
 from playwright.async_api import async_playwright
 
 OUT = Path(__file__).resolve().parents[1] / "docs" / "demo"
+# A typed phrase (not an example) with Guatemalan slang the term bank knows.
+TYPED = ("genz_to_parent", "Tengo un clavo: no traigo pisto para el bus")
 
 
 def page_url() -> str:
@@ -46,9 +50,30 @@ async def shoot(url: str) -> None:
             await page.wait_for_function("() => !document.querySelector('.side .answer.wait')", timeout=120_000)
             await page.wait_for_timeout(700)
             await page.screenshot(path=OUT / f"{name}.png")
-        await page.set_viewport_size({"width": 1280, "height": 800})
-        await page.wait_for_timeout(500)
-        await page.screenshot(path=OUT / "04-laptop-1280.png", full_page=True)
+        direction, text = TYPED
+        await page.locator(f'.dir button[data-dir="{direction}"]').click()
+        await page.fill("#phrase", text)
+        await page.locator("#go").click()
+        await page.wait_for_timeout(300)
+        await page.wait_for_function("() => !document.querySelector('.side .answer.wait')", timeout=120_000)
+        await page.wait_for_timeout(700)
+        await page.screenshot(path=OUT / "04-frase-escrita.png")
+        await page.locator("#howto summary").click()
+        await page.wait_for_timeout(400)
+        await page.locator("#howto").screenshot(path=OUT / "05-como-se-lee.png")
+        await page.locator("#howto summary").click()
+        # Back to the first example for the other screen sizes.
+        await page.locator("#ex-genz_to_parent .ex").first.click()
+        await page.wait_for_timeout(300)
+        await page.wait_for_function("() => !document.querySelector('.side .answer.wait')", timeout=120_000)
+        for name, w, h in (("06-laptop-1280", 1280, 800), ("07-tableta-768", 768, 1024),
+                           ("08-telefono-375", 375, 812), ("09-telefono-414", 414, 896)):
+            await page.set_viewport_size({"width": w, "height": h})
+            await page.wait_for_timeout(600)
+            overflow = await page.evaluate("() => document.documentElement.scrollWidth - window.innerWidth")
+            if overflow > 0:
+                print(f"{name}: la página se sale {overflow} px a lo ancho")
+            await page.screenshot(path=OUT / f"{name}.png", full_page=True)
         await browser.close()
 
 

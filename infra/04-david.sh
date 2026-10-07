@@ -12,8 +12,11 @@ SA="${APP}-david"
 SA_EMAIL="${SA}@${PROJECT_ID}.iam.gserviceaccount.com"
 EU_AR="${DAVID_REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}"
 GGUF="${DAVID_MODEL_TAG}-$(echo "${QUANT}" | tr 'A-Z' 'a-z').gguf"
-HASH="$( (cat "$ROOT/david/Dockerfile" "$ROOT/david/cloudbuild.yaml"; echo "$DAVID_MODEL_TAG $GGUF $EMBEDDING_MODEL";
-          gcloud storage objects describe "${MODELS_BUCKET}/${DAVID_MODEL_TAG}/${GGUF}" --format='value(md5_hash)') | shasum -a 256 | cut -c1-12)"
+# Compiled CUDA kernels for the L4 (infra/07-david-jit-cache.sh), baked into the image when they exist.
+JIT_CACHE="${MODELS_BUCKET}/cuda-jit/ollama-$(sed -n 's/^ARG OLLAMA_VERSION=//p' "$ROOT/david/Dockerfile")-l4"
+HASH="$( (cat "$ROOT/david/Dockerfile" "$ROOT/david/start.sh" "$ROOT/david/cloudbuild.yaml"; echo "$DAVID_MODEL_TAG $GGUF $EMBEDDING_MODEL";
+          gcloud storage objects describe "${MODELS_BUCKET}/${DAVID_MODEL_TAG}/${GGUF}" --format='value(md5_hash)'
+          gcloud storage ls -L "${JIT_CACHE}/**" 2>/dev/null | grep -i "hash (md5)") | shasum -a 256 | cut -c1-12)"
 IMAGE="${EU_AR}/${SERVICE}:${HASH}"
 
 say "Artifact Registry ${AR_REPO} in ${DAVID_REGION}"
@@ -30,14 +33,14 @@ if exists gcloud artifacts docker images describe "$IMAGE"; then
 else
   say "Building ${IMAGE} (Cloud Build, ~10 min)"
   gcloud builds submit "$ROOT/david" --config "$ROOT/david/cloudbuild.yaml" --region "$REGION" --quiet \
-    --substitutions "_IMAGE=${IMAGE},_MODELS_BUCKET=${MODELS_BUCKET},_DAVID_TAG=${DAVID_MODEL_TAG},_GGUF=${GGUF},_EMBEDDING_MODEL=${EMBEDDING_MODEL}"
+    --substitutions "_IMAGE=${IMAGE},_MODELS_BUCKET=${MODELS_BUCKET},_DAVID_TAG=${DAVID_MODEL_TAG},_GGUF=${GGUF},_EMBEDDING_MODEL=${EMBEDDING_MODEL},_JIT_CACHE=${JIT_CACHE}"
 fi
 
 say "Deploying ${SERVICE} (${DAVID_REGION}, 1x L4)"
 gcloud run deploy "$SERVICE" --image "$IMAGE" --region "$DAVID_REGION" --quiet \
   --service-account "$SA_EMAIL" --no-allow-unauthenticated \
   --gpu 1 --gpu-type nvidia-l4 --no-gpu-zonal-redundancy \
-  --cpu 4 --memory 16Gi --no-cpu-throttling \
-  --min-instances 0 --max-instances 1 --concurrency 8 --timeout 600 \
+  --cpu "${DAVID_CPU:-4}" --memory "${DAVID_MEMORY_GIB:-16}Gi" --no-cpu-throttling \
+  --min-instances 0 --max-instances 1 --concurrency 32 --timeout 600 \
   --port 8080 --labels "app=${APP}"
 gcloud run services describe "$SERVICE" --region "$DAVID_REGION" --format='value(status.url)'

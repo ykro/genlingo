@@ -5,7 +5,7 @@ export
 UV      := uv run --project duel
 TAG     ?= genlingo-$(shell date +%Y-%m)
 
-.PHONY: help deploy check screenshots test eval eval-dev niches counterparts train train-data \
+.PHONY: help deploy check screenshots capacity projections test eval eval-dev niches counterparts train train-data \
         test-set real-pairs ambiguous-terms pairs datasheet data
 
 help:
@@ -20,6 +20,12 @@ check: ## Check the live page end to end: wakes David, translates every example 
 
 screenshots: ## Screenshots of the live page for docs/demo/ (real browser, light theme)
 	uv run --project duel --with playwright python scripts/screenshots.py
+
+projections: ## Rewrite the README's "time and cost in the cloud" section (es + en) from docs/data/capacity.json
+	python3 scripts/projections.py
+
+capacity: ## Measure David's throughput (1/4/8/16 at a time) and both sides' time and cost per translation -> docs/data/capacity.json (README projections; open the page first so David is awake)
+	cd duel && uv run python ../scripts/bench_capacity.py
 
 test: ## Run all tests (no network: MOCK_AI in tests)
 	cd duel && MOCK_AI=1 uv run pytest -q

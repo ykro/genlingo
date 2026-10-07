@@ -1,10 +1,10 @@
 """The comparison page: David and Goliath translate Gen Z ↔ papás side by side.
 
-A text box, a direction switch and example buttons; each column shows its translation and how long
-it took. No scores, rounds or votes. The examples (data/translate_examples.json) are
+A text box, a direction switch and example buttons; each column shows its translation, how long it
+took and what it cost. No scores, rounds or votes. The examples (data/translate_examples.json) are
 Guatemalan slang from the test set, the use case David wins; each one was checked live with both
-models. For an example the page also shows the human reference and a ✓/✗ per slang term
-(term_check.py, the same rules as the eval's *jerga correcta*).
+models. Every translation gets a ✓/✗ per slang term the bank knows (term_check.py, the same rules as
+the eval's *jerga correcta*); for an example the page also shows the human reference.
 """
 
 from __future__ import annotations
@@ -56,6 +56,11 @@ def _bank(data_dir: Path) -> tuple[TermBank, dict[str, str | None]]:
     frozen = data_dir / "eval" / "terms_test.jsonl"
     terms = read_jsonl(frozen if frozen.exists() else data_dir / "terms.jsonl")
     return TermBank(terms, ignore_ambiguous=True), load_counterparts(data_dir / "counterparts.jsonl")
+
+
+def terms_in_bank(data_dir: Path) -> int:
+    """How many slang terms the check knows (the frozen test bank, ordinary-word entries left out)."""
+    return len(_bank(data_dir)[0].terms)
 
 
 def check_terms(data_dir: Path, example: dict, country: str, hypothesis: str) -> list[dict]:
