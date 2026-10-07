@@ -1,0 +1,485 @@
+{
+ "about": "Candidatos a ejemplo de la página con el David de la ronda 5 (genlingo-2026-10e-e2b), 2026-10-07: todas las frases de prueba que se pueden mostrar (fuente abierta o escrita por el curador) de México, Colombia y español neutro, más las chapinas con 2 o más términos y los ejemplos actuales. Las referencias se leyeron una por una en las que pasan en vivo; las que no se sostienen al leerlas quedan anotadas.",
+ "candidates": [
+  {
+   "pair_id": "test-w-0024",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0035",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0036",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0037",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0038",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0040",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0041",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0042",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0054",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0055",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0086",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0087",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0088",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0093",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0125",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0134",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0135",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0141",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0142",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0144",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0145",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0176",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0179",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0188",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0204",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0206",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0209",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0210",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0213",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0214",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0218",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0219",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0280",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0286",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0287",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0288",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0289",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0290",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0291",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0292",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0308",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w-0309",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0310",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0311",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0312",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0313",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0314",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0316",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0317",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0318",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0319",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0046",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0049",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0054",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0059",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0060",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0066",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0140",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0143",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0145",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0151",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0153",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0157",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0329",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0331",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0334",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0336",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0339",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0345",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0348",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0351",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0353",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0358",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0360",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0361",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0364",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0365",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0367",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0372",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0374",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0377",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0378",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0379",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0380",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0381",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0382",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0383",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0384",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0385",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0409",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0412",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0413",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0414",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0418",
+   "reference_ok": true,
+   "note": "combinación"
+  },
+  {
+   "pair_id": "test-w2-0419",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0420",
+   "reference_ok": true,
+   "note": ""
+  }
+ ]
+}

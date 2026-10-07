@@ -1,32 +1,82 @@
 {
- "about": "Ejemplos de la página de comparación: frases reales del set de prueba (David nunca las vio al entrenar), solo de fuentes con licencia abierta (WikiLengua CC BY-SA 3.0, diccionario-chapin MIT, Wikcionario CC BY-SA 4.0), porque las demás no se pueden redistribuir. Cada ejemplo se traduce con la jerga de su país. El 2026-10-07 se probaron en vivo las 38 frases de prueba de fuentes abiertas de México, Colombia y español neutro, más los 4 ejemplos chapines anteriores, 3 veces con cada modelo, contra el David de la nube (genlingo-2026-10d-e2b, GPU L4) y Gemini, los dos a temperatura 0. Quedaron las que David tradujo bien las 3 veces, donde Goliath dejó jerga o cambió el significado las 3 veces y donde la revisión término por término de la página lo muestra igual (✓ David, ✗ Goliath). Pasaron 3 frases chapinas. Fuera de Guatemala no pasó ninguna: en Colombia y en español neutro Goliath tradujo igual o mejor; en México David ganó a ojo en 3 frases de Gen Z a papás («de partir la madre» → «a todo dar», «un chingo de chamba» → «un montón de trabajo», «madrear… carrilla» → «golpear… haciendo burla»), pero la revisión de la página no lo distingue (marca ✗ a «a todo dar» y da por buenas las respuestas de Goliath con otra jerga, «un friego», «toreando»). Para la jerga Gen Z general (cringe, random, crush…) la sonda da empate (evals/report_probe.md). «No te creo vos, ¡ya sé que vos solo pajas sos!» salió: una vez Goliath dijo «mentiroso», que también es correcto. live_runs guarda las respuestas.",
- "david_model": "genlingo-2026-10d-e2b",
+ "about": "Ejemplos de la página de comparación: frases reales del set de prueba (David nunca las vio al entrenar), solo de fuentes con licencia abierta o escritas por el curador sobre una fuente abierta (diccionario-chapin MIT, WikiLengua CC BY-SA 3.0, Wikcionario CC BY-SA 4.0). Cada ejemplo se traduce con la jerga de su país. El 2026-10-07 se probaron en vivo con el David de la ronda 5 (genlingo-2026-10e-e2b, GPU L4 en la nube) y Gemini, los dos a temperatura 0, 3 veces cada uno, las 96 frases de prueba que se pueden mostrar: todas las de México (24), Colombia (24) y español neutro (26), más las chapinas con 2 o más términos y los ejemplos anteriores (22; make check-candidates, evals/experiments/2026-10-07-ejemplos-ronda5.md). Pasaron la revisión automática 18 (MX 6, CO 3, neutro 1, GT 8). Al leerlas quedaron 6: las que David tradujo bien las 3 veces, donde la respuesta de Goliath está mal las 3 veces al leerla y la referencia es correcta. Cuatro son combinaciones de 2 términos. Fuera: Colombia y español neutro, porque Goliath dijo algo correcto que el banco no reconoce («qué vaina», «acuerpado», «arranco», «se le van a ir encima»); en México, «qué oso» y «un chingo de chamba», donde Goliath acertó alguna vez («híjole, mano», «un montón de trabajo»), y «pipiris nice», donde las dos respuestas son jerga válida. «esa tu tarea te quedó bien chafa» salió: el David nuevo dice «rascuache» (otra jerga). live_runs guarda las respuestas.",
+ "david_model": "genlingo-2026-10e-e2b",
  "goliath_model": "gemini-3.8-flash",
  "verified": "2026-10-07",
  "examples": [
   {
-   "pair_id": "test-w-0179",
+   "pair_id": "test-w-0209",
    "direction": "genz_to_parent",
-   "text": "esa tu tarea te quedó bien chafa",
-   "reference": "esa tarea te quedó muy mal hecha",
-   "source": "https://www.wikilengua.org/index.php/Jerga_juvenil/Guatemala",
-   "license": "CC BY-SA 3.0",
-   "why": "David dice que la tarea quedó mala, como lo diría un papá; Goliath cambia «chafa» por otra jerga («pura lata»).",
+   "text": "No tengo pisto, préstame unas baras.",
+   "reference": "No traigo dinero, prestame unos quetzales.",
+   "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/bara.md",
+   "license": "MIT License",
+   "why": "Dos términos en una frase: David dice «dinero» y «quetzales»; Goliath deja «pisto» y cambia «baras» por «lenes» o «pesos».",
    "live_runs": [
     {
-     "david": "esa tu tarea te quedó bien mal hecha",
-     "goliath": "Esa tu tarea te quedó bien pura lata."
+     "david": "No tengo dinero, préstame unos quetzales.",
+     "goliath": "No tengo pisto, prestame unos lenes."
     },
     {
-     "david": "esa tu tarea te quedó bien mal hecha",
-     "goliath": "Esa tu tarea te quedó pura lata."
+     "david": "No tengo dinero, préstame unos quetzales.",
+     "goliath": "No tengo pisto, prestame unos lenes."
     },
     {
-     "david": "esa tu tarea te quedó bien mal hecha",
-     "goliath": "Esa tu tarea te quedó bien pura lata."
+     "david": "No tengo dinero, préstame unos quetzales.",
+     "goliath": "No tengo pisto, prestame unos pesos."
     }
    ],
-   "david": "esa tu tarea te quedó bien mal hecha",
+   "david": "No tengo dinero, préstame unos quetzales.",
+   "country": "GT"
+  },
+  {
+   "pair_id": "test-w-0188",
+   "direction": "genz_to_parent",
+   "text": "Ese maje está bien engasado con ella.",
+   "reference": "Ese muchacho está muy enamorado de ella.",
+   "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/engasado.md",
+   "license": "MIT License",
+   "why": "Dos términos: David dice «muchacho» y «enamorado»; Goliath cambia la jerga por otra jerga («pishcoy», «colgado», «clavado»).",
+   "live_runs": [
+    {
+     "david": "Ese muchacho está muy enamorado de ella.",
+     "goliath": "Ese pishcoy está bien colgado de ella."
+    },
+    {
+     "david": "Ese muchacho está muy enamorado de ella.",
+     "goliath": "Ese patojo está bien enculado con ella."
+    },
+    {
+     "david": "Ese muchacho está muy enamorado de ella.",
+     "goliath": "Aquel pizado está bien clavado con ella."
+    }
+   ],
+   "david": "Ese muchacho está muy enamorado de ella.",
+   "country": "GT"
+  },
+  {
+   "pair_id": "test-w2-0145",
+   "direction": "genz_to_parent",
+   "text": "Chotealo, que ese maje se quiere colar.",
+   "reference": "Vigilalo, que ese muchacho se quiere colar.",
+   "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/chotear.md",
+   "license": "MIT License",
+   "why": "Dos términos: David dice «vigílalo» y «muchacho»; Goliath cambia «maje» por «pisado» o «patojo», que siguen siendo jerga.",
+   "live_runs": [
+    {
+     "david": "Vigílalo, que ese muchacho se quiere meter.",
+     "goliath": "Miralo, que ese pisado se quiere meter a la brava."
+    },
+    {
+     "david": "Vigílalo, que ese muchacho se quiere meter.",
+     "goliath": "Miralo, que ese pisado se quiere meter a la brava."
+    },
+    {
+     "david": "Vigílalo, que ese muchacho se quiere meter.",
+     "goliath": "Miralo bien, que ese patojo se quiere meter a la brava."
+    }
+   ],
+   "david": "Vigílalo, que ese muchacho se quiere meter.",
    "country": "GT"
   },
   {
@@ -36,23 +86,48 @@
    "reference": "Sí, seguro que llego al partido.",
    "source": "https://www.wikilengua.org/index.php/Jerga_juvenil/Guatemala",
    "license": "CC BY-SA 3.0",
-   "why": "David dice «Sí, seguro»; Goliath cambia «simón, de ley» por más jerga («cabal», «fijo»).",
+   "why": "Dos términos: David dice «Sí, seguro»; Goliath cambia «simón, de ley» por más jerga («cabal», «fijo») o la deja.",
    "live_runs": [
     {
      "david": "Sí, seguro llego al partido.",
-     "goliath": "Va pues, fijo llego al partido."
+     "goliath": "Simón, sin falta llego al partido."
+    },
+    {
+     "david": "Sí, seguro llego al partido.",
+     "goliath": "Simón, fijo llego al partido."
     },
     {
      "david": "Sí, seguro llego al partido.",
      "goliath": "Cabal, sin falta llego al partido."
-    },
-    {
-     "david": "Sí, seguro llego al partido.",
-     "goliath": "Cabal, fijo llego al partido."
     }
    ],
    "david": "Sí, seguro llego al partido.",
    "country": "GT"
+  },
+  {
+   "pair_id": "test-w2-0383",
+   "direction": "genz_to_parent",
+   "text": "Ese concierto estuvo de partir la madre.",
+   "reference": "Ese concierto estuvo buenísimo.",
+   "source": "https://es.wiktionary.org/wiki/partir_la_madre",
+   "license": "CC BY-SA 4.0",
+   "why": "David dice «buenísimo»; Goliath cambia una grosería de jerga por otra («de poca madre», «a toda madre»).",
+   "live_runs": [
+    {
+     "david": "Ese concierto estuvo buenísimo.",
+     "goliath": "Ese concierto estuvo a toda madre."
+    },
+    {
+     "david": "Ese concierto estuvo buenísimo.",
+     "goliath": "Ese concierto estuvo de poca madre."
+    },
+    {
+     "david": "Ese concierto estuvo buenísimo.",
+     "goliath": "Ese concierto estuvo de poca madre."
+    }
+   ],
+   "david": "Ese concierto estuvo buenísimo.",
+   "country": "MX"
   },
   {
    "pair_id": "test-w2-0066",
@@ -61,19 +136,19 @@
    "reference": "Voy a comprar algo de refa para media mañana.",
    "source": "https://github.com/abisai7/diccionario-chapin/blob/main/src/content/words-es/refaccion.md",
    "license": "MIT License",
-   "why": "David dice «refa», como lo dice Gen Z en Guatemala; Goliath inventa «munchies» y «monchear», que no son chapines.",
+   "why": "David dice «refa», como lo dice Gen Z en Guatemala; Goliath inventa «munchies», que no es chapín.",
    "live_runs": [
     {
      "david": "Voy a comprar algo de refa para media mañana.",
-     "goliath": "Voy a conseguir un moncheo para el bajón de media mañana."
+     "goliath": "Voy a conseguir un munchies para media mañana."
     },
     {
      "david": "Voy a comprar algo de refa para media mañana.",
-     "goliath": "Voy a conseguirme un moncheo para el bajón de media mañana."
+     "goliath": "Voy a conseguir un munchies para media mañana."
     },
     {
      "david": "Voy a comprar algo de refa para media mañana.",
-     "goliath": "Voy a conseguir algo de moncha para el bajón de media mañana."
+     "goliath": "Voy a conseguir un munchies para el bajón de media mañana."
     }
    ],
    "david": "Voy a comprar algo de refa para media mañana.",
