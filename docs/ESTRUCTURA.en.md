@@ -40,7 +40,7 @@ david/                David's image: Ollama with the model, EmbeddingGemma and t
                       fill-jit-cache.sh, cloudbuild.yaml)
 data/                 terms.jsonl, raw/, pairs/, eval/, counterparts.jsonl, SOURCES.md, DATASHEET.md,
                       translate_examples.json (the page's examples, verified live)
-scripts/              Data building, check_page.py (make check), screenshots.py (make screenshots), bench_capacity.py (make capacity)
+scripts/              Data building, check_page.py (make check), check_candidates.py (make check-candidates), screenshots.py (make screenshots), bench_capacity.py (make capacity)
 train/                train_lora.py, finish.py, preference.py, submit_job.py, notebook, runs/
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/,
                       Dockerfile + cloud_eval.sh (the eval job)

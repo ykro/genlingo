@@ -1,0 +1,275 @@
+{
+ "about": "Candidatos a ejemplo de la página por país (México, Colombia, español neutro y Guatemala), 2026-10-07. Solo pares del set de prueba que la página puede mostrar (fuente abierta o frase escrita por el curador; nunca texto citado de una fuente cerrada) y que el David de la página no vio al entrenar. Preseleccionados con las salidas guardadas del eval del 2026-10-07 (evals/results/20261007-053721-merged.json) y la revisión término por término corregida: David con todo ✓ y Goliath con al menos un ✗; más test-w2-0384 («un chingo de chamba»), el caso que motivó el arreglo. reference_ok = la referencia humana que muestra la página es correcta (revisión de una persona; null = sin revisar). Para volver a probarlos contra otro David: make check-candidates (DAVID_MODEL_TAG del .env).",
+ "candidates": [
+  {
+   "pair_id": "test-w-0038",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0040",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0041",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0086",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0134",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0179",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0182",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0185",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0186",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0188",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0189",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0191",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0197",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0198",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0199",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0201",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0202",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0206",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0210",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0214",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0237",
+   "reference_ok": false,
+   "note": "la referencia cambia «chucho» por «perro»: no es más Gen Z, y el chucho sigue siendo chapín"
+  },
+  {
+   "pair_id": "test-w-0280",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0287",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w-0312",
+   "reference_ok": true,
+   "note": "«no te ataques» suena más mexicano que neutro"
+  },
+  {
+   "pair_id": "test-w2-0007",
+   "reference_ok": true,
+   "note": "«burra»: carro o camioneta vieja (diccionario chapín)"
+  },
+  {
+   "pair_id": "test-w2-0010",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0012",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0026",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0040",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0044",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0046",
+   "reference_ok": false,
+   "note": "«cabal» es «exacto»; la referencia usa «de ley» («seguro»), que no significa lo mismo"
+  },
+  {
+   "pair_id": "test-w2-0062",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0064",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0066",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0067",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0068",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0133",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0140",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0145",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0151",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0156",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0157",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0345",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0348",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0353",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0364",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0365",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0377",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0380",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0382",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0383",
+   "reference_ok": true,
+   "note": ""
+  },
+  {
+   "pair_id": "test-w2-0385",
+   "reference_ok": true,
+   "note": "la revisión solo mira «güey»; «echarse la pinta» (irse de pinta) no está en el banco: revisar a mano que David no cambie el sentido"
+  },
+  {
+   "pair_id": "test-w2-0413",
+   "reference_ok": false,
+   "note": "la referencia agrega «cero drama, pero literal es tardísimo», que no está en la frase"
+  },
+  {
+   "pair_id": "test-w2-0384",
+   "reference_ok": true,
+   "note": "el caso del arreglo: Goliath dijo «un friego de trabajo» (otra jerga) y la revisión anterior lo daba por bueno"
+  }
+ ]
+}

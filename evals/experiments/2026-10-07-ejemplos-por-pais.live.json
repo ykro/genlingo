@@ -1,0 +1,5397 @@
+{
+ "checked_at": "2026-10-07 11:17",
+ "david_model": "genlingo-2026-10d-e2b",
+ "goliath_model": "gemini-3.8-flash",
+ "runs": 3,
+ "mock": false,
+ "results": [
+  {
+   "pair_id": "test-w-0038",
+   "reference_ok": true,
+   "note": "",
+   "country": "MX",
+   "direction": "genz_to_parent",
+   "text": "Güey, le mandé el mensaje a mi ex por error, qué oso.",
+   "reference": "Oye, le mandé el mensaje a mi ex por equivocación, qué vergüenza.",
+   "source_id": "S05",
+   "runs": [
+    {
+     "david": {
+      "text": "Amigo, le mandé el mensaje a mi ex por error, ¡trágame tierra!",
+      "error": null,
+      "latency_ms": 1725.8,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": true
+       },
+       {
+        "term": "qué oso",
+        "expected": "qué vergüenza; hacer el ridículo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Híjole, mano, le mandé el recado a mi ex por equivocación, qué pena me dio.",
+      "error": null,
+      "latency_ms": 2772.5,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": false
+       },
+       {
+        "term": "qué oso",
+        "expected": "qué vergüenza; hacer el ridículo",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Amigo, le mandé el mensaje a mi ex por error, ¡trágame tierra!",
+      "error": null,
+      "latency_ms": 1273.3,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": true
+       },
+       {
+        "term": "qué oso",
+        "expected": "qué vergüenza; hacer el ridículo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mano, le mandé el mensaje a mi ex por equivocación, qué pena me dio.",
+      "error": null,
+      "latency_ms": 1336.8,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": false
+       },
+       {
+        "term": "qué oso",
+        "expected": "qué vergüenza; hacer el ridículo",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Amigo, le mandé el mensaje a mi ex por error, ¡trágame tierra!",
+      "error": null,
+      "latency_ms": 591.0,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": true
+       },
+       {
+        "term": "qué oso",
+        "expected": "qué vergüenza; hacer el ridículo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Oye, le mandé el mensaje a mi ex por equivocación, qué pena me dio.",
+      "error": null,
+      "latency_ms": 1462.0,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": true
+       },
+       {
+        "term": "qué oso",
+        "expected": "qué vergüenza; hacer el ridículo",
+        "ok": true
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3"
+  },
+  {
+   "pair_id": "test-w-0040",
+   "reference_ok": true,
+   "note": "",
+   "country": "MX",
+   "direction": "genz_to_parent",
+   "text": "Me agüité porque el examen estuvo cañón.",
+   "reference": "Me desanimé porque el examen estuvo muy difícil.",
+   "source_id": "S19",
+   "runs": [
+    {
+     "david": {
+      "text": "Me arrastré la cobija porque el examen estuvo difícil.",
+      "error": null,
+      "latency_ms": 1620.6,
+      "terms": [
+       {
+        "term": "agüitarse",
+        "expected": "ponerse triste o desanimado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Me achicopalé porque el examen estuvo pesadísimo.",
+      "error": null,
+      "latency_ms": 10336.3,
+      "terms": [
+       {
+        "term": "agüitarse",
+        "expected": "ponerse triste o desanimado",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Me arrastré la cobija porque el examen estuvo difícil.",
+      "error": null,
+      "latency_ms": 528.0,
+      "terms": [
+       {
+        "term": "agüitarse",
+        "expected": "ponerse triste o desanimado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Me achicopalé porque el examen estuvo en chino.",
+      "error": null,
+      "latency_ms": 6931.8,
+      "terms": [
+       {
+        "term": "agüitarse",
+        "expected": "ponerse triste o desanimado",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Me arrastré la cobija porque el examen estuvo difícil.",
+      "error": null,
+      "latency_ms": 593.9,
+      "terms": [
+       {
+        "term": "agüitarse",
+        "expected": "ponerse triste o desanimado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Me achicopalé porque el examen estuvo bien canijo.",
+      "error": null,
+      "latency_ms": 5566.1,
+      "terms": [
+       {
+        "term": "agüitarse",
+        "expected": "ponerse triste o desanimado",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0041",
+   "reference_ok": true,
+   "note": "",
+   "country": "MX",
+   "direction": "genz_to_parent",
+   "text": "Mis compas me traen de carrilla por mi corte de pelo.",
+   "reference": "Mis amigos no dejan de burlarse de mi corte de pelo.",
+   "source_id": "S19",
+   "runs": [
+    {
+     "david": {
+      "text": "Mis amigos me hacen burla por mi corte de pelo.",
+      "error": null,
+      "latency_ms": 1593.0,
+      "terms": [
+       {
+        "term": "compa",
+        "expected": "amigo, compañero",
+        "ok": true
+       },
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mis amigos me están agarrando de su puerquito por mi corte de pelo.",
+      "error": null,
+      "latency_ms": 2460.5,
+      "terms": [
+       {
+        "term": "compa",
+        "expected": "amigo, compañero",
+        "ok": true
+       },
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Mis amigos me hacen burla por mi corte de pelo.",
+      "error": null,
+      "latency_ms": 1216.6,
+      "terms": [
+       {
+        "term": "compa",
+        "expected": "amigo, compañero",
+        "ok": true
+       },
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mis amigos me traen de bajada por mi corte de pelo.",
+      "error": null,
+      "latency_ms": 1226.6,
+      "terms": [
+       {
+        "term": "compa",
+        "expected": "amigo, compañero",
+        "ok": true
+       },
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Mis amigos me hacen burla por mi corte de pelo.",
+      "error": null,
+      "latency_ms": 658.0,
+      "terms": [
+       {
+        "term": "compa",
+        "expected": "amigo, compañero",
+        "ok": true
+       },
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mis cuates me están agarrando de bajada por mi corte de pelo.",
+      "error": null,
+      "latency_ms": 1525.9,
+      "terms": [
+       {
+        "term": "compa",
+        "expected": "amigo, compañero",
+        "ok": true
+       },
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0086",
+   "reference_ok": true,
+   "note": "",
+   "country": "MX",
+   "direction": "parent_to_genz",
+   "text": "Oye, qué padre te quedó el cuarto, está a todo dar.",
+   "reference": "Güey, tu cuarto quedó bien chido, está bien aesthetic.",
+   "source_id": "S37",
+   "runs": [
+    {
+     "david": {
+      "text": "Oye, qué chingón te quedó el cuarto, está a todo dar.",
+      "error": null,
+      "latency_ms": 1683.3,
+      "terms": [
+       {
+        "term": "a todo dar",
+        "expected": "aesthetic · carnal · chingón · compa · güey",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Oye, qué chido te quedó el cuarto, está bien perro.",
+      "error": null,
+      "latency_ms": 2367.6,
+      "terms": [
+       {
+        "term": "a todo dar",
+        "expected": "aesthetic · carnal · chingón · compa · güey",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Oye, qué chingón te quedó el cuarto, está a todo dar.",
+      "error": null,
+      "latency_ms": 1298.4,
+      "terms": [
+       {
+        "term": "a todo dar",
+        "expected": "aesthetic · carnal · chingón · compa · güey",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Oye, qué chido te quedó el cuarto, está bien perro.",
+      "error": null,
+      "latency_ms": 1324.1,
+      "terms": [
+       {
+        "term": "a todo dar",
+        "expected": "aesthetic · carnal · chingón · compa · güey",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Oye, qué chingón te quedó el cuarto, está a todo dar.",
+      "error": null,
+      "latency_ms": 737.0,
+      "terms": [
+       {
+        "term": "a todo dar",
+        "expected": "aesthetic · carnal · chingón · compa · güey",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Oye, qué perro te quedó el cuarto, está bien god.",
+      "error": null,
+      "latency_ms": 5343.3,
+      "terms": [
+       {
+        "term": "a todo dar",
+        "expected": "aesthetic · carnal · chingón · compa · güey",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0134",
+   "reference_ok": true,
+   "note": "",
+   "country": "CO",
+   "direction": "genz_to_parent",
+   "text": "Paila, se acabaron las polas.",
+   "reference": "Qué pesar, se acabaron las cervezas.",
+   "source_id": "S17",
+   "runs": [
+    {
+     "david": {
+      "text": "Ni modo, se acabaron las cervezas.",
+      "error": null,
+      "latency_ms": 524.4,
+      "terms": [
+       {
+        "term": "pola",
+        "expected": "cerveza",
+        "ok": true
+       },
+       {
+        "term": "¡paila!",
+        "expected": "qué mala suerte, ni modo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Qué vaina, se acabaron las cervezas.",
+      "error": null,
+      "latency_ms": 3524.3,
+      "terms": [
+       {
+        "term": "pola",
+        "expected": "cerveza",
+        "ok": true
+       },
+       {
+        "term": "¡paila!",
+        "expected": "qué mala suerte, ni modo",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ni modo, se acabaron las cervezas.",
+      "error": null,
+      "latency_ms": 492.0,
+      "terms": [
+       {
+        "term": "pola",
+        "expected": "cerveza",
+        "ok": true
+       },
+       {
+        "term": "¡paila!",
+        "expected": "qué mala suerte, ni modo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Qué vaina, se acabaron las cervezas.",
+      "error": null,
+      "latency_ms": 3083.6,
+      "terms": [
+       {
+        "term": "pola",
+        "expected": "cerveza",
+        "ok": true
+       },
+       {
+        "term": "¡paila!",
+        "expected": "qué mala suerte, ni modo",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ni modo, se acabaron las cervezas.",
+      "error": null,
+      "latency_ms": 473.7,
+      "terms": [
+       {
+        "term": "pola",
+        "expected": "cerveza",
+        "ok": true
+       },
+       {
+        "term": "¡paila!",
+        "expected": "qué mala suerte, ni modo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Qué vaina, se acabaron las cervezas.",
+      "error": null,
+      "latency_ms": 4739.1,
+      "terms": [
+       {
+        "term": "pola",
+        "expected": "cerveza",
+        "ok": true
+       },
+       {
+        "term": "¡paila!",
+        "expected": "qué mala suerte, ni modo",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0179",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "esa tu tarea te quedó bien chafa",
+   "reference": "esa tarea te quedó muy mal hecha",
+   "source_id": "S01",
+   "runs": [
+    {
+     "david": {
+      "text": "esa tu tarea te quedó bien mal hecha",
+      "error": null,
+      "latency_ms": 528.9,
+      "terms": [
+       {
+        "term": "chafa",
+        "expected": "de mala calidad, malo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Esa tu tarea te quedó bien pura lata.",
+      "error": null,
+      "latency_ms": 3411.9,
+      "terms": [
+       {
+        "term": "chafa",
+        "expected": "de mala calidad, malo",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "esa tu tarea te quedó bien mal hecha",
+      "error": null,
+      "latency_ms": 536.9,
+      "terms": [
+       {
+        "term": "chafa",
+        "expected": "de mala calidad, malo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Esa tu tarea te quedó pura lata.",
+      "error": null,
+      "latency_ms": 8317.7,
+      "terms": [
+       {
+        "term": "chafa",
+        "expected": "de mala calidad, malo",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "esa tu tarea te quedó bien mal hecha",
+      "error": null,
+      "latency_ms": 625.6,
+      "terms": [
+       {
+        "term": "chafa",
+        "expected": "de mala calidad, malo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Esa tu tarea te quedó bien garra.",
+      "error": null,
+      "latency_ms": 9174.9,
+      "terms": [
+       {
+        "term": "chafa",
+        "expected": "de mala calidad, malo",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0182",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Chish, huele horrible aquí.",
+   "reference": "¡Púchica, qué feo huele aquí!",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "¡Qué asco, huele mal aquí!",
+      "error": null,
+      "latency_ms": 551.1,
+      "terms": [
+       {
+        "term": "¡chish!",
+        "expected": "¡qué asco!; también \"¡qué fácil!\"",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Fuchi, qué gran tufo hay aquí.",
+      "error": null,
+      "latency_ms": 5335.0,
+      "terms": [
+       {
+        "term": "¡chish!",
+        "expected": "¡qué asco!; también \"¡qué fácil!\"",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¡Qué asco, huele mal aquí!",
+      "error": null,
+      "latency_ms": 475.1,
+      "terms": [
+       {
+        "term": "¡chish!",
+        "expected": "¡qué asco!; también \"¡qué fácil!\"",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Fuchi, qué peste hay aquí.",
+      "error": null,
+      "latency_ms": 4672.0,
+      "terms": [
+       {
+        "term": "¡chish!",
+        "expected": "¡qué asco!; también \"¡qué fácil!\"",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¡Qué asco, huele mal aquí!",
+      "error": null,
+      "latency_ms": 477.4,
+      "terms": [
+       {
+        "term": "¡chish!",
+        "expected": "¡qué asco!; también \"¡qué fácil!\"",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Fuchi, qué tufo se siente aquí.",
+      "error": null,
+      "latency_ms": 7240.4,
+      "terms": [
+       {
+        "term": "¡chish!",
+        "expected": "¡qué asco!; también \"¡qué fácil!\"",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0185",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Ese patojo es bien chispudo para las matemáticas.",
+   "reference": "Ese muchacho es muy listo para las matemáticas.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Ese muchacho es muy listo para las matemáticas.",
+      "error": null,
+      "latency_ms": 531.8,
+      "terms": [
+       {
+        "term": "chispudo",
+        "expected": "listo, hábil, ingenioso",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese patojo es bien abusado para las matemáticas.",
+      "error": null,
+      "latency_ms": 5810.7,
+      "terms": [
+       {
+        "term": "chispudo",
+        "expected": "listo, hábil, ingenioso",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese muchacho es muy listo para las matemáticas.",
+      "error": null,
+      "latency_ms": 517.7,
+      "terms": [
+       {
+        "term": "chispudo",
+        "expected": "listo, hábil, ingenioso",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese muchacho es bien abusado para las matemáticas.",
+      "error": null,
+      "latency_ms": 8166.8,
+      "terms": [
+       {
+        "term": "chispudo",
+        "expected": "listo, hábil, ingenioso",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese muchacho es muy listo para las matemáticas.",
+      "error": null,
+      "latency_ms": 561.4,
+      "terms": [
+       {
+        "term": "chispudo",
+        "expected": "listo, hábil, ingenioso",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese patojo es bien pilas para las matemáticas.",
+      "error": null,
+      "latency_ms": 6552.9,
+      "terms": [
+       {
+        "term": "chispudo",
+        "expected": "listo, hábil, ingenioso",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3"
+  },
+  {
+   "pair_id": "test-w-0186",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Qué buena onda sos, me llegas.",
+   "reference": "Qué buena persona sos, me caés muy bien.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Qué chilero sos, me caes muy bien.",
+      "error": null,
+      "latency_ms": 562.4,
+      "terms": [
+       {
+        "term": "me llegás",
+        "expected": "me cae muy bien; me encanta",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Qué bien me caés, de verdad qué calidad de persona sos.",
+      "error": null,
+      "latency_ms": 1129.1,
+      "terms": [
+       {
+        "term": "me llegás",
+        "expected": "me cae muy bien; me encanta",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Qué chilero sos, me caes muy bien.",
+      "error": null,
+      "latency_ms": 484.4,
+      "terms": [
+       {
+        "term": "me llegás",
+        "expected": "me cae muy bien; me encanta",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Qué de a huevo sos, me caés bien.",
+      "error": null,
+      "latency_ms": 1208.4,
+      "terms": [
+       {
+        "term": "me llegás",
+        "expected": "me cae muy bien; me encanta",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Qué chilero sos, me caes muy bien.",
+      "error": null,
+      "latency_ms": 618.1,
+      "terms": [
+       {
+        "term": "me llegás",
+        "expected": "me cae muy bien; me encanta",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Qué de a huevo sos, me caés re bien.",
+      "error": null,
+      "latency_ms": 1258.7,
+      "terms": [
+       {
+        "term": "me llegás",
+        "expected": "me cae muy bien; me encanta",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3"
+  },
+  {
+   "pair_id": "test-w-0188",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Ese maje está bien engasado con ella.",
+   "reference": "Ese muchacho está muy enamorado de ella.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Ese muchacho está muy enamorado de ella.",
+      "error": null,
+      "latency_ms": 599.8,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Aquel pisado está bien clavado con ella.",
+      "error": null,
+      "latency_ms": 1846.4,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": false
+       },
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese muchacho está muy enamorado de ella.",
+      "error": null,
+      "latency_ms": 612.5,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese chavo está bien clavado con ella.",
+      "error": null,
+      "latency_ms": 6832.7,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": false
+       },
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese muchacho está muy enamorado de ella.",
+      "error": null,
+      "latency_ms": 1036.0,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Aquel cuatio está bien enculado con ella.",
+      "error": null,
+      "latency_ms": 1119.8,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": false
+       },
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0189",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Estas muy engasado, no es para tanto.",
+   "reference": "Estás muy entusiasmado, no es para tanto.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Estás muy entusiasmado, no es para tanto.",
+      "error": null,
+      "latency_ms": 653.4,
+      "terms": [
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Estás muy clavado, no es para tanto.",
+      "error": null,
+      "latency_ms": 1892.4,
+      "terms": [
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Estás muy entusiasmado, no es para tanto.",
+      "error": null,
+      "latency_ms": 562.1,
+      "terms": [
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Estás muy clavado, no es para tanto.",
+      "error": null,
+      "latency_ms": 1390.3,
+      "terms": [
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Estás muy entusiasmado, no es para tanto.",
+      "error": null,
+      "latency_ms": 509.2,
+      "terms": [
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Estás muy clavado, no es para tanto.",
+      "error": null,
+      "latency_ms": 1204.4,
+      "terms": [
+       {
+        "term": "engasado",
+        "expected": "muy entusiasmado o enamorado",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0191",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Agarrá tus chivas y nos vamos al partido de fut.",
+   "reference": "Agarrá tus cosas y nos vamos al partido de fútbol.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Agarrá tus cosas y nos vamos al partido de fútbol.",
+      "error": null,
+      "latency_ms": 704.8,
+      "terms": [
+       {
+        "term": "chivas",
+        "expected": "cosas, pertenencias",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Agarrá tus chunches y nos vamos a la chamusca.",
+      "error": null,
+      "latency_ms": 6930.3,
+      "terms": [
+       {
+        "term": "chivas",
+        "expected": "cosas, pertenencias",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Agarrá tus cosas y nos vamos al partido de fútbol.",
+      "error": null,
+      "latency_ms": 1838.1,
+      "terms": [
+       {
+        "term": "chivas",
+        "expected": "cosas, pertenencias",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Agarrá tus chunches y nos vamos a la chamusca.",
+      "error": null,
+      "latency_ms": 8940.1,
+      "terms": [
+       {
+        "term": "chivas",
+        "expected": "cosas, pertenencias",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Agarrá tus cosas y nos vamos al partido de fútbol.",
+      "error": null,
+      "latency_ms": 510.5,
+      "terms": [
+       {
+        "term": "chivas",
+        "expected": "cosas, pertenencias",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Agarrá tus tiliches y nos vamos al partido de fútbol.",
+      "error": null,
+      "latency_ms": 8568.3,
+      "terms": [
+       {
+        "term": "chivas",
+        "expected": "cosas, pertenencias",
+        "ok": true
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3"
+  },
+  {
+   "pair_id": "test-w-0197",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "No quiero manejar bolo, mejor me voy en taxi.",
+   "reference": "No quiero manejar tomado, mejor me voy en taxi.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "No quiero manejar borracho, mejor me voy en taxi.",
+      "error": null,
+      "latency_ms": 562.1,
+      "terms": [
+       {
+        "term": "bolo",
+        "expected": "borracho",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No quiero manejar tomado, mejor me voy en taxi.",
+      "error": null,
+      "latency_ms": 1382.3,
+      "terms": [
+       {
+        "term": "bolo",
+        "expected": "borracho",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "No quiero manejar borracho, mejor me voy en taxi.",
+      "error": null,
+      "latency_ms": 523.5,
+      "terms": [
+       {
+        "term": "bolo",
+        "expected": "borracho",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No quiero manejar tomado, mejor agarro un taxi.",
+      "error": null,
+      "latency_ms": 2372.9,
+      "terms": [
+       {
+        "term": "bolo",
+        "expected": "borracho",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "No quiero manejar borracho, mejor me voy en taxi.",
+      "error": null,
+      "latency_ms": 1087.4,
+      "terms": [
+       {
+        "term": "bolo",
+        "expected": "borracho",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No quiero manejar bolo, mejor me voy en taxi.",
+      "error": null,
+      "latency_ms": 1478.8,
+      "terms": [
+       {
+        "term": "bolo",
+        "expected": "borracho",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 1/3"
+  },
+  {
+   "pair_id": "test-w-0198",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Hacé eso al chilazo antes de que llegue tu mamá.",
+   "reference": "Hacé eso rapidito antes de que llegue tu mamá.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Hacé eso de inmediato antes de que llegue tu mamá.",
+      "error": null,
+      "latency_ms": 616.7,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Hacé eso rapidito antes de que venga tu mamá.",
+      "error": null,
+      "latency_ms": 1006.3,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Hacé eso de inmediato antes de que llegue tu mamá.",
+      "error": null,
+      "latency_ms": 583.0,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Hacé eso a la carrera antes de que venga tu mamá.",
+      "error": null,
+      "latency_ms": 1126.2,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Hacé eso de inmediato antes de que llegue tu mamá.",
+      "error": null,
+      "latency_ms": 527.0,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Hacé eso a la carrera antes de que venga tu mamá.",
+      "error": null,
+      "latency_ms": 1601.3,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3"
+  },
+  {
+   "pair_id": "test-w-0199",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Terminá al chilazo tu tarea para que podamos salir.",
+   "reference": "Terminá pronto tu tarea para que podamos salir.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Terminá rápido tu tarea para que podamos salir.",
+      "error": null,
+      "latency_ms": 571.1,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Apurate a terminar la tarea para que podamos salir.",
+      "error": null,
+      "latency_ms": 7450.7,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Terminá rápido tu tarea para que podamos salir.",
+      "error": null,
+      "latency_ms": 734.9,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Terminá rápido tu tarea para que podamos salir.",
+      "error": null,
+      "latency_ms": 3431.1,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Terminá rápido tu tarea para que podamos salir.",
+      "error": null,
+      "latency_ms": 484.0,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Terminá rápido tu tarea para que podamos salir.",
+      "error": null,
+      "latency_ms": 1346.3,
+      "terms": [
+       {
+        "term": "al chilazo",
+        "expected": "rapidito, de inmediato",
+        "ok": true
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 1/3"
+  },
+  {
+   "pair_id": "test-w-0201",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "¡Puchis! Qué caro está todo.",
+   "reference": "¡Qué barbaridad! Qué caro está todo.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "¡Púchica! Qué caro está todo.",
+      "error": null,
+      "latency_ms": 575.3,
+      "terms": [
+       {
+        "term": "¡puchis!",
+        "expected": "expresión de sorpresa o fastidio",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¡Púchica! Todo está por las nubes.",
+      "error": null,
+      "latency_ms": 6419.8,
+      "terms": [
+       {
+        "term": "¡puchis!",
+        "expected": "expresión de sorpresa o fastidio",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¡Púchica! Qué caro está todo.",
+      "error": null,
+      "latency_ms": 508.6,
+      "terms": [
+       {
+        "term": "¡puchis!",
+        "expected": "expresión de sorpresa o fastidio",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¡Ala gran chucha! Qué caro está todo.",
+      "error": null,
+      "latency_ms": 1276.5,
+      "terms": [
+       {
+        "term": "¡puchis!",
+        "expected": "expresión de sorpresa o fastidio",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¡Púchica! Qué caro está todo.",
+      "error": null,
+      "latency_ms": 802.8,
+      "terms": [
+       {
+        "term": "¡puchis!",
+        "expected": "expresión de sorpresa o fastidio",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¡Dios guarde! Qué caro está todo.",
+      "error": null,
+      "latency_ms": 5387.1,
+      "terms": [
+       {
+        "term": "¡puchis!",
+        "expected": "expresión de sorpresa o fastidio",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3"
+  },
+  {
+   "pair_id": "test-w-0202",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "No te creo vos, ¡ya sé que vos solo pajas sos!",
+   "reference": "No te creo, ¡ya sé que vos solo mentiras decís!",
+   "source_id": "S01",
+   "runs": [
+    {
+     "david": {
+      "text": "No te creo vos, ¡ya sé que vos solo mentís sos!",
+      "error": null,
+      "latency_ms": 572.7,
+      "terms": [
+       {
+        "term": "paja",
+        "expected": "mentira(s)",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No te creo, mano, ¡ya sé que vos sos pura casaca!",
+      "error": null,
+      "latency_ms": 4061.7,
+      "terms": [
+       {
+        "term": "paja",
+        "expected": "mentira(s)",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "No te creo vos, ¡ya sé que vos solo mentís sos!",
+      "error": null,
+      "latency_ms": 900.3,
+      "terms": [
+       {
+        "term": "paja",
+        "expected": "mentira(s)",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No te creo mano, ¡ya sé que vos pura casaca sos!",
+      "error": null,
+      "latency_ms": 4292.6,
+      "terms": [
+       {
+        "term": "paja",
+        "expected": "mentira(s)",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "No te creo vos, ¡ya sé que vos solo mentís sos!",
+      "error": null,
+      "latency_ms": 624.4,
+      "terms": [
+       {
+        "term": "paja",
+        "expected": "mentira(s)",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No sea casaquero mano, ¡si bien sé que puras mentiras son las suyas!",
+      "error": null,
+      "latency_ms": 4059.1,
+      "terms": [
+       {
+        "term": "paja",
+        "expected": "mentira(s)",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0206",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Simón, de ley llego al partido.",
+   "reference": "Sí, seguro que llego al partido.",
+   "source_id": "S01",
+   "runs": [
+    {
+     "david": {
+      "text": "Sí, seguro llego al partido.",
+      "error": null,
+      "latency_ms": 512.4,
+      "terms": [
+       {
+        "term": "simón",
+        "expected": "sí (a veces con ironía)",
+        "ok": true
+       },
+       {
+        "term": "de ley",
+        "expected": "seguro, sin duda",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Cabal, sin falta llego al partido.",
+      "error": null,
+      "latency_ms": 7050.9,
+      "terms": [
+       {
+        "term": "simón",
+        "expected": "sí (a veces con ironía)",
+        "ok": false
+       },
+       {
+        "term": "de ley",
+        "expected": "seguro, sin duda",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Sí, seguro llego al partido.",
+      "error": null,
+      "latency_ms": 513.3,
+      "terms": [
+       {
+        "term": "simón",
+        "expected": "sí (a veces con ironía)",
+        "ok": true
+       },
+       {
+        "term": "de ley",
+        "expected": "seguro, sin duda",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Va, seguro que llego a la chamusca.",
+      "error": null,
+      "latency_ms": 5429.6,
+      "terms": [
+       {
+        "term": "simón",
+        "expected": "sí (a veces con ironía)",
+        "ok": false
+       },
+       {
+        "term": "de ley",
+        "expected": "seguro, sin duda",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Sí, seguro llego al partido.",
+      "error": null,
+      "latency_ms": 450.3,
+      "terms": [
+       {
+        "term": "simón",
+        "expected": "sí (a veces con ironía)",
+        "ok": true
+       },
+       {
+        "term": "de ley",
+        "expected": "seguro, sin duda",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Va pues, sin falta llego al partido.",
+      "error": null,
+      "latency_ms": 4479.2,
+      "terms": [
+       {
+        "term": "simón",
+        "expected": "sí (a veces con ironía)",
+        "ok": false
+       },
+       {
+        "term": "de ley",
+        "expected": "seguro, sin duda",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0210",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "El viaje estuvo chilero, lo volvería a hacer.",
+   "reference": "El viaje estuvo calidá, maje, de ley lo repito.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "El viaje estuvo nítido, lo volvería a hacer.",
+      "error": null,
+      "latency_ms": 604.7,
+      "terms": [
+       {
+        "term": "chilero",
+        "expected": "aesthetic · calidá · cerote · de ley · maje · nítido · ¡a huevo!",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "El viaje estuvo bien god, lo repetiría mil veces.",
+      "error": null,
+      "latency_ms": 1401.6,
+      "terms": [
+       {
+        "term": "chilero",
+        "expected": "aesthetic · calidá · cerote · de ley · maje · nítido · ¡a huevo!",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "El viaje estuvo nítido, lo volvería a hacer.",
+      "error": null,
+      "latency_ms": 550.9,
+      "terms": [
+       {
+        "term": "chilero",
+        "expected": "aesthetic · calidá · cerote · de ley · maje · nítido · ¡a huevo!",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "El viaje estuvo bien god, lo repetiría mil veces.",
+      "error": null,
+      "latency_ms": 1099.5,
+      "terms": [
+       {
+        "term": "chilero",
+        "expected": "aesthetic · calidá · cerote · de ley · maje · nítido · ¡a huevo!",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "El viaje estuvo nítido, lo volvería a hacer.",
+      "error": null,
+      "latency_ms": 649.9,
+      "terms": [
+       {
+        "term": "chilero",
+        "expected": "aesthetic · calidá · cerote · de ley · maje · nítido · ¡a huevo!",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "El viaje estuvo god, fijo lo repetiría.",
+      "error": null,
+      "latency_ms": 1227.0,
+      "terms": [
+       {
+        "term": "chilero",
+        "expected": "aesthetic · calidá · cerote · de ley · maje · nítido · ¡a huevo!",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0214",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "¡Púchica, qué bonita tu casa!",
+   "reference": "¡Puchis, qué calidá tu casa!",
+   "source_id": "S05",
+   "runs": [
+    {
+     "david": {
+      "text": "¡Puchis, qué bonita tu casa!",
+      "error": null,
+      "latency_ms": 509.8,
+      "terms": [
+       {
+        "term": "¡púchica!",
+        "expected": "calidá · nítido · ¡a huevo! · ¡puchis!",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ala madre, qué de ahuevo tu chante.",
+      "error": null,
+      "latency_ms": 1348.7,
+      "terms": [
+       {
+        "term": "¡púchica!",
+        "expected": "calidá · nítido · ¡a huevo! · ¡puchis!",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¡Puchis, qué bonita tu casa!",
+      "error": null,
+      "latency_ms": 610.8,
+      "terms": [
+       {
+        "term": "¡púchica!",
+        "expected": "calidá · nítido · ¡a huevo! · ¡puchis!",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ala gran, qué chilera tu choza.",
+      "error": null,
+      "latency_ms": 3868.3,
+      "terms": [
+       {
+        "term": "¡púchica!",
+        "expected": "calidá · nítido · ¡a huevo! · ¡puchis!",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¡Puchis, qué bonita tu casa!",
+      "error": null,
+      "latency_ms": 608.5,
+      "terms": [
+       {
+        "term": "¡púchica!",
+        "expected": "calidá · nítido · ¡a huevo! · ¡puchis!",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¡A la gran, qué aesthetic tu chante!",
+      "error": null,
+      "latency_ms": 1717.3,
+      "terms": [
+       {
+        "term": "¡púchica!",
+        "expected": "calidá · nítido · ¡a huevo! · ¡puchis!",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w-0237",
+   "reference_ok": false,
+   "note": "la referencia cambia «chucho» por «perro»: no es más Gen Z, y el chucho sigue siendo chapín",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "Qué chulo tu chucho, colocho.",
+   "reference": "Qué calidá tu perro, colocho.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Qué nítido tu chucho, maje.",
+      "error": null,
+      "latency_ms": 630.2,
+      "terms": [
+       {
+        "term": "chulo",
+        "expected": "aesthetic · calidá · nítido · ¡a huevo!",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Qué cool tu chucho, bro.",
+      "error": null,
+      "latency_ms": 7477.1,
+      "terms": [
+       {
+        "term": "chulo",
+        "expected": "aesthetic · calidá · nítido · ¡a huevo!",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Qué nítido tu chucho, maje.",
+      "error": null,
+      "latency_ms": 510.1,
+      "terms": [
+       {
+        "term": "chulo",
+        "expected": "aesthetic · calidá · nítido · ¡a huevo!",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Qué chilero tu chucho, colocho.",
+      "error": null,
+      "latency_ms": 10066.2,
+      "terms": [
+       {
+        "term": "chulo",
+        "expected": "aesthetic · calidá · nítido · ¡a huevo!",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Qué nítido tu chucho, maje.",
+      "error": null,
+      "latency_ms": 549.9,
+      "terms": [
+       {
+        "term": "chulo",
+        "expected": "aesthetic · calidá · nítido · ¡a huevo!",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Qué lindo tu perro, bro.",
+      "error": null,
+      "latency_ms": 1167.5,
+      "terms": [
+       {
+        "term": "chulo",
+        "expected": "aesthetic · calidá · nítido · ¡a huevo!",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3 · referencia incorrecta"
+  },
+  {
+   "pair_id": "test-w-0280",
+   "reference_ok": true,
+   "note": "",
+   "country": "LATAM",
+   "direction": "genz_to_parent",
+   "text": "No entendí el mensaje y preparé la cena porque flasheé que venías hoy.",
+   "reference": "No entendí el recado y preparé la cena porque creí que venías hoy.",
+   "source_id": "S05",
+   "runs": [
+    {
+     "david": {
+      "text": "No entendí el mensaje y preparé la cena porque me imaginé que venías hoy.",
+      "error": null,
+      "latency_ms": 619.3,
+      "terms": [
+       {
+        "term": "flashear",
+        "expected": "imaginar cosas, malinterpretar; flipar",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No entendí bien el mensaje y preparé la cena porque me hice la idea de que venías hoy.",
+      "error": null,
+      "latency_ms": 2020.1,
+      "terms": [
+       {
+        "term": "flashear",
+        "expected": "imaginar cosas, malinterpretar; flipar",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "No entendí el mensaje y preparé la cena porque me imaginé que venías hoy.",
+      "error": null,
+      "latency_ms": 726.9,
+      "terms": [
+       {
+        "term": "flashear",
+        "expected": "imaginar cosas, malinterpretar; flipar",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No entendí el mensaje y preparé la cena porque me imaginé que venías hoy.",
+      "error": null,
+      "latency_ms": 6785.1,
+      "terms": [
+       {
+        "term": "flashear",
+        "expected": "imaginar cosas, malinterpretar; flipar",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "No entendí el mensaje y preparé la cena porque me imaginé que venías hoy.",
+      "error": null,
+      "latency_ms": 607.4,
+      "terms": [
+       {
+        "term": "flashear",
+        "expected": "imaginar cosas, malinterpretar; flipar",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No entendí el mensaje y preparé la cena porque me hice la idea de que venías hoy.",
+      "error": null,
+      "latency_ms": 5230.0,
+      "terms": [
+       {
+        "term": "flashear",
+        "expected": "imaginar cosas, malinterpretar; flipar",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3"
+  },
+  {
+   "pair_id": "test-w-0287",
+   "reference_ok": true,
+   "note": "",
+   "country": "LATAM",
+   "direction": "genz_to_parent",
+   "text": "Me la pasé stalkeando a mi crush toda la noche, qué cringe.",
+   "reference": "Me pasé la noche espiando las fotos del muchacho que me gusta, qué vergüenza.",
+   "source_id": "S09",
+   "runs": [
+    {
+     "david": {
+      "text": "Me la pasé revisándole el perfil a escondidas a mi persona favorita toda la noche, qué pena ajena.",
+      "error": null,
+      "latency_ms": 645.4,
+      "terms": [
+       {
+        "term": "cringe",
+        "expected": "vergüenza ajena; algo incómodo o ridículo",
+        "ok": true
+       },
+       {
+        "term": "stalkear",
+        "expected": "revisar a escondidas las redes de alguien",
+        "ok": true
+       },
+       {
+        "term": "crush",
+        "expected": "persona que te gusta",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Me la pasé espiando a la persona que me gusta toda la noche, qué pena ajena.",
+      "error": null,
+      "latency_ms": 2705.7,
+      "terms": [
+       {
+        "term": "cringe",
+        "expected": "vergüenza ajena; algo incómodo o ridículo",
+        "ok": true
+       },
+       {
+        "term": "stalkear",
+        "expected": "revisar a escondidas las redes de alguien",
+        "ok": true
+       },
+       {
+        "term": "crush",
+        "expected": "persona que te gusta",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Me la pasé revisándole el perfil a escondidas a mi persona favorita toda la noche, qué pena ajena.",
+      "error": null,
+      "latency_ms": 650.9,
+      "terms": [
+       {
+        "term": "cringe",
+        "expected": "vergüenza ajena; algo incómodo o ridículo",
+        "ok": true
+       },
+       {
+        "term": "stalkear",
+        "expected": "revisar a escondidas las redes de alguien",
+        "ok": true
+       },
+       {
+        "term": "crush",
+        "expected": "persona que te gusta",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Me la pasé espiando las redes de la persona que me gusta toda la noche, qué vergüenza.",
+      "error": null,
+      "latency_ms": 4562.6,
+      "terms": [
+       {
+        "term": "cringe",
+        "expected": "vergüenza ajena; algo incómodo o ridículo",
+        "ok": true
+       },
+       {
+        "term": "stalkear",
+        "expected": "revisar a escondidas las redes de alguien",
+        "ok": true
+       },
+       {
+        "term": "crush",
+        "expected": "persona que te gusta",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Me la pasé revisándole el perfil a escondidas a mi persona favorita toda la noche, qué pena ajena.",
+      "error": null,
+      "latency_ms": 753.4,
+      "terms": [
+       {
+        "term": "cringe",
+        "expected": "vergüenza ajena; algo incómodo o ridículo",
+        "ok": true
+       },
+       {
+        "term": "stalkear",
+        "expected": "revisar a escondidas las redes de alguien",
+        "ok": true
+       },
+       {
+        "term": "crush",
+        "expected": "persona que te gusta",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Me la pasé espiando a mi amor platónico toda la noche, qué pena ajena.",
+      "error": null,
+      "latency_ms": 2644.7,
+      "terms": [
+       {
+        "term": "cringe",
+        "expected": "vergüenza ajena; algo incómodo o ridículo",
+        "ok": true
+       },
+       {
+        "term": "stalkear",
+        "expected": "revisar a escondidas las redes de alguien",
+        "ok": true
+       },
+       {
+        "term": "crush",
+        "expected": "persona que te gusta",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 1/3"
+  },
+  {
+   "pair_id": "test-w-0312",
+   "reference_ok": true,
+   "note": "«no te ataques» suena más mexicano que neutro",
+   "country": "LATAM",
+   "direction": "parent_to_genz",
+   "text": "No te sulfures, que no es para tanto.",
+   "reference": "Relax, no te ataques, cero drama.",
+   "source_id": "S30",
+   "runs": [
+    {
+     "david": {
+      "text": "Cero drama, que no es para tanto.",
+      "error": null,
+      "latency_ms": 565.9,
+      "terms": [
+       {
+        "term": "sulfurarse",
+        "expected": "cero drama",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No te ataques, que ni es para tanto.",
+      "error": null,
+      "latency_ms": 3100.9,
+      "terms": [
+       {
+        "term": "sulfurarse",
+        "expected": "cero drama",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Cero drama, bro, que no es para tanto.",
+      "error": null,
+      "latency_ms": 517.1,
+      "terms": [
+       {
+        "term": "sulfurarse",
+        "expected": "cero drama",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No te ataques, que ni es para tanto.",
+      "error": null,
+      "latency_ms": 1419.2,
+      "terms": [
+       {
+        "term": "sulfurarse",
+        "expected": "cero drama",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Cero drama, bro, que no es para tanto.",
+      "error": null,
+      "latency_ms": 557.2,
+      "terms": [
+       {
+        "term": "sulfurarse",
+        "expected": "cero drama",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No te ataques, ni es para tanto.",
+      "error": null,
+      "latency_ms": 1628.7,
+      "terms": [
+       {
+        "term": "sulfurarse",
+        "expected": "cero drama",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0007",
+   "reference_ok": true,
+   "note": "«burra»: carro o camioneta vieja (diccionario chapín)",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Mi burra me ha llevado a todos lados",
+   "reference": "Mi camioneta vieja me ha llevado a todos lados.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Mi camioneta me ha llevado a todos lados",
+      "error": null,
+      "latency_ms": 577.5,
+      "terms": [
+       {
+        "term": "burra",
+        "expected": "bus urbano, sobre todo uno viejo o destartalado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mi nave me ha llevado a todos lados",
+      "error": null,
+      "latency_ms": 7212.6,
+      "terms": [
+       {
+        "term": "burra",
+        "expected": "bus urbano, sobre todo uno viejo o destartalado",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Mi camioneta me ha llevado a todos lados",
+      "error": null,
+      "latency_ms": 541.6,
+      "terms": [
+       {
+        "term": "burra",
+        "expected": "bus urbano, sobre todo uno viejo o destartalado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mi carcachita me ha llevado a todos lados",
+      "error": null,
+      "latency_ms": 1688.9,
+      "terms": [
+       {
+        "term": "burra",
+        "expected": "bus urbano, sobre todo uno viejo o destartalado",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Mi camioneta me ha llevado a todos lados",
+      "error": null,
+      "latency_ms": 542.1,
+      "terms": [
+       {
+        "term": "burra",
+        "expected": "bus urbano, sobre todo uno viejo o destartalado",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mi carcachita me ha llevado a todos lados",
+      "error": null,
+      "latency_ms": 1306.8,
+      "terms": [
+       {
+        "term": "burra",
+        "expected": "bus urbano, sobre todo uno viejo o destartalado",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0010",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "No me vengás con casacas.",
+   "reference": "No me vengás con mentiras.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "No me vengas con tus mentiras.",
+      "error": null,
+      "latency_ms": 515.9,
+      "terms": [
+       {
+        "term": "casaca",
+        "expected": "mentira o labia (para conquistar); también algo muy fácil",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No me vengás con cuentos.",
+      "error": null,
+      "latency_ms": 5935.6,
+      "terms": [
+       {
+        "term": "casaca",
+        "expected": "mentira o labia (para conquistar); también algo muy fácil",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "No me vengas con tus mentiras.",
+      "error": null,
+      "latency_ms": 588.2,
+      "terms": [
+       {
+        "term": "casaca",
+        "expected": "mentira o labia (para conquistar); también algo muy fácil",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No me vengás con cuentos.",
+      "error": null,
+      "latency_ms": 1924.0,
+      "terms": [
+       {
+        "term": "casaca",
+        "expected": "mentira o labia (para conquistar); también algo muy fácil",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "No me vengas con tus mentiras.",
+      "error": null,
+      "latency_ms": 508.5,
+      "terms": [
+       {
+        "term": "casaca",
+        "expected": "mentira o labia (para conquistar); también algo muy fácil",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No me vengás con cuentos.",
+      "error": null,
+      "latency_ms": 7512.2,
+      "terms": [
+       {
+        "term": "casaca",
+        "expected": "mentira o labia (para conquistar); también algo muy fácil",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0012",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Chotea bien la comida, no vaya a ser que se queme.",
+   "reference": "Vigilá bien la comida, no vaya a ser que se queme.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Vigile bien la comida, no vaya a ser que se queme.",
+      "error": null,
+      "latency_ms": 565.0,
+      "terms": [
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Echale un ojo a la comida, no vaya a ser que se queme.",
+      "error": null,
+      "latency_ms": 2989.0,
+      "terms": [
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Vigile bien la comida, no vaya a ser que se queme.",
+      "error": null,
+      "latency_ms": 733.0,
+      "terms": [
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Echale un ojo a la comida, no vaya a ser que se queme.",
+      "error": null,
+      "latency_ms": 6231.6,
+      "terms": [
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Vigile bien la comida, no vaya a ser que se queme.",
+      "error": null,
+      "latency_ms": 543.5,
+      "terms": [
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Echale un buen ojo a la comida, no vaya a ser que se queme.",
+      "error": null,
+      "latency_ms": 2602.0,
+      "terms": [
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0026",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Esa canche canta muy bonito.",
+   "reference": "Esa muchacha rubia canta muy bonito.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Esa muchacha rubia canta muy bonito.",
+      "error": null,
+      "latency_ms": 531.2,
+      "terms": [
+       {
+        "term": "canche",
+        "expected": "persona rubia o de pelo claro",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Esa chelita canta bien rebonito.",
+      "error": null,
+      "latency_ms": 1392.1,
+      "terms": [
+       {
+        "term": "canche",
+        "expected": "persona rubia o de pelo claro",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Esa muchacha rubia canta muy bonito.",
+      "error": null,
+      "latency_ms": 970.5,
+      "terms": [
+       {
+        "term": "canche",
+        "expected": "persona rubia o de pelo claro",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Esa güera canta bien chulo.",
+      "error": null,
+      "latency_ms": 1307.0,
+      "terms": [
+       {
+        "term": "canche",
+        "expected": "persona rubia o de pelo claro",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Esa muchacha rubia canta muy bonito.",
+      "error": null,
+      "latency_ms": 623.3,
+      "terms": [
+       {
+        "term": "canche",
+        "expected": "persona rubia o de pelo claro",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Esa canche canta bien chulo.",
+      "error": null,
+      "latency_ms": 1354.2,
+      "terms": [
+       {
+        "term": "canche",
+        "expected": "persona rubia o de pelo claro",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0040",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "No tengo pisto para salir este fin",
+   "reference": "No tengo dinero para salir este fin de semana.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "No tengo dinero para salir este fin",
+      "error": null,
+      "latency_ms": 490.4,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No tengo pisto para salir este fin de semana",
+      "error": null,
+      "latency_ms": 5393.9,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "No tengo dinero para salir este fin",
+      "error": null,
+      "latency_ms": 732.7,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No tengo pisto para salir este fin de semana.",
+      "error": null,
+      "latency_ms": 2531.8,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "No tengo dinero para salir este fin",
+      "error": null,
+      "latency_ms": 487.9,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No tengo pisto para salir este fin de semana.",
+      "error": null,
+      "latency_ms": 3728.0,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0044",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "Épale, que se te va a caer.",
+   "reference": "¡Trucha, maje, que lo vas a botar!",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Trucha, maje, que se te va a caer.",
+      "error": null,
+      "latency_ms": 540.5,
+      "terms": [
+       {
+        "term": "¡aguas!",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Pilas, que se te va a caer.",
+      "error": null,
+      "latency_ms": 4619.5,
+      "terms": [
+       {
+        "term": "¡aguas!",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Trucha, maje, que se te va a caer.",
+      "error": null,
+      "latency_ms": 509.1,
+      "terms": [
+       {
+        "term": "¡aguas!",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Aguas, que se te va a caer.",
+      "error": null,
+      "latency_ms": 5584.7,
+      "terms": [
+       {
+        "term": "¡aguas!",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Trucha, maje, que se te va a caer.",
+      "error": null,
+      "latency_ms": 674.8,
+      "terms": [
+       {
+        "term": "¡aguas!",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Aguas, que se te va a caer.",
+      "error": null,
+      "latency_ms": 4580.1,
+      "terms": [
+       {
+        "term": "¡aguas!",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0046",
+   "reference_ok": false,
+   "note": "«cabal» es «exacto»; la referencia usa «de ley» («seguro»), que no significa lo mismo",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "Llegaste cabal a la hora.",
+   "reference": "Llegaste de ley a la hora, maje.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Llegaste literal a la hora.",
+      "error": null,
+      "latency_ms": 584.9,
+      "terms": [
+       {
+        "term": "cabal",
+        "expected": "cerote · de ley · literal · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Caíste en punto, literal.",
+      "error": null,
+      "latency_ms": 4169.8,
+      "terms": [
+       {
+        "term": "cabal",
+        "expected": "cerote · de ley · literal · maje",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Llegaste literal a la hora.",
+      "error": null,
+      "latency_ms": 776.2,
+      "terms": [
+       {
+        "term": "cabal",
+        "expected": "cerote · de ley · literal · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Caíste al toque a la hora.",
+      "error": null,
+      "latency_ms": 5055.3,
+      "terms": [
+       {
+        "term": "cabal",
+        "expected": "cerote · de ley · literal · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Llegaste literal a la hora.",
+      "error": null,
+      "latency_ms": 526.8,
+      "terms": [
+       {
+        "term": "cabal",
+        "expected": "cerote · de ley · literal · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Llegaste en el mero punto.",
+      "error": null,
+      "latency_ms": 6135.8,
+      "terms": [
+       {
+        "term": "cabal",
+        "expected": "cerote · de ley · literal · maje",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3 · referencia incorrecta"
+  },
+  {
+   "pair_id": "test-w2-0062",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "El tata de Juan es carpintero.",
+   "reference": "El papá de Juan es carpintero, maje.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "El papá de Juan es carpintero, maje.",
+      "error": null,
+      "latency_ms": 570.1,
+      "terms": [
+       {
+        "term": "tata",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "El jefe de Juan es carpintero.",
+      "error": null,
+      "latency_ms": 7651.5,
+      "terms": [
+       {
+        "term": "tata",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "El papá de Juan es carpintero, maje.",
+      "error": null,
+      "latency_ms": 638.6,
+      "terms": [
+       {
+        "term": "tata",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "El ruco de Juan es carpintero.",
+      "error": null,
+      "latency_ms": 5464.8,
+      "terms": [
+       {
+        "term": "tata",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "El papá de Juan es carpintero, maje.",
+      "error": null,
+      "latency_ms": 503.3,
+      "terms": [
+       {
+        "term": "tata",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "El jefe de Juan es carpintero.",
+      "error": null,
+      "latency_ms": 2997.4,
+      "terms": [
+       {
+        "term": "tata",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0064",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "Aquél le dio un talegazo con el palo.",
+   "reference": "Aquel maje le dio un golpazo con el palo.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Él lo somató con el palo, maje.",
+      "error": null,
+      "latency_ms": 764.4,
+      "terms": [
+       {
+        "term": "talegazo",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese chavo le sampó un riendazo con el palo.",
+      "error": null,
+      "latency_ms": 1421.7,
+      "terms": [
+       {
+        "term": "talegazo",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Él lo somató con el palo, maje.",
+      "error": null,
+      "latency_ms": 715.5,
+      "terms": [
+       {
+        "term": "talegazo",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese pisado le metió un vergazo con el palo.",
+      "error": null,
+      "latency_ms": 1319.6,
+      "terms": [
+       {
+        "term": "talegazo",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Él lo somató con el palo, maje.",
+      "error": null,
+      "latency_ms": 504.4,
+      "terms": [
+       {
+        "term": "talegazo",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese maje le sampó un vergazo con el palo.",
+      "error": null,
+      "latency_ms": 1045.5,
+      "terms": [
+       {
+        "term": "talegazo",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3"
+  },
+  {
+   "pair_id": "test-w2-0066",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "Voy a comprar algo de refacción para media mañana.",
+   "reference": "Voy a comprar algo de refa para media mañana.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Voy a comprar algo de refa para media mañana.",
+      "error": null,
+      "latency_ms": 649.3,
+      "terms": [
+       {
+        "term": "refacción",
+        "expected": "refa",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Voy a conseguirme un moncheo para el bajón de media mañana.",
+      "error": null,
+      "latency_ms": 1766.9,
+      "terms": [
+       {
+        "term": "refacción",
+        "expected": "refa",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Voy a comprar algo de refa para media mañana.",
+      "error": null,
+      "latency_ms": 885.0,
+      "terms": [
+       {
+        "term": "refacción",
+        "expected": "refa",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Voy a conseguir un munchies para el bajón de media mañana.",
+      "error": null,
+      "latency_ms": 2287.5,
+      "terms": [
+       {
+        "term": "refacción",
+        "expected": "refa",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Voy a comprar algo de refa para media mañana.",
+      "error": null,
+      "latency_ms": 535.1,
+      "terms": [
+       {
+        "term": "refacción",
+        "expected": "refa",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Voy a ir a traer un bajón para el moncheo de media mañana.",
+      "error": null,
+      "latency_ms": 1002.6,
+      "terms": [
+       {
+        "term": "refacción",
+        "expected": "refa",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0067",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "Solo quiero un cachito de tu tiempo.",
+   "reference": "Maje, solo quiero un ratito de tu tiempo.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Solo te pido un poquito de tu tiempo, maje.",
+      "error": null,
+      "latency_ms": 946.7,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Solo te robo un toque de tu tiempo.",
+      "error": null,
+      "latency_ms": 1878.3,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Solo te pido un poquito de tu tiempo, maje.",
+      "error": null,
+      "latency_ms": 847.6,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Solo te robo un toque de tu tiempo.",
+      "error": null,
+      "latency_ms": 3157.2,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Solo te pido un poquito de tu tiempo, maje.",
+      "error": null,
+      "latency_ms": 568.3,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Solo dame un toque de tu tiempo.",
+      "error": null,
+      "latency_ms": 3226.7,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0068",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "¿Puedes darme un cachito de queso?",
+   "reference": "¿Me regalás un poquito de queso, maje?",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "¿Me podés regalar un pedacito de queso, maje?",
+      "error": null,
+      "latency_ms": 585.5,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¿Me tirás una nada de queso?",
+      "error": null,
+      "latency_ms": 944.8,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¿Me podés regalar un pedacito de queso, maje?",
+      "error": null,
+      "latency_ms": 624.1,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¿Me tirás un pedacito de queso?",
+      "error": null,
+      "latency_ms": 1391.4,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¿Me podés regalar un pedacito de queso, maje?",
+      "error": null,
+      "latency_ms": 610.1,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¿Me pasás un cacho de queso, porfa?",
+      "error": null,
+      "latency_ms": 1856.4,
+      "terms": [
+       {
+        "term": "cachito",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0133",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Ya te colgaste de esa patoja, se te nota.",
+   "reference": "Ya te enamoraste de esa muchacha, se te nota.",
+   "source_id": "S52",
+   "runs": [
+    {
+     "david": {
+      "text": "Ya te cantineaste de esa muchacha, se te nota.",
+      "error": null,
+      "latency_ms": 724.3,
+      "terms": [
+       {
+        "term": "colgarse",
+        "expected": "enamorarse de alguien",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ya te tragaste de esa patoja, se te nota.",
+      "error": null,
+      "latency_ms": 6115.0,
+      "terms": [
+       {
+        "term": "colgarse",
+        "expected": "enamorarse de alguien",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ya te cantineaste de esa muchacha, se te nota.",
+      "error": null,
+      "latency_ms": 625.7,
+      "terms": [
+       {
+        "term": "colgarse",
+        "expected": "enamorarse de alguien",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ya te clavaste con esa patoja, se te nota.",
+      "error": null,
+      "latency_ms": 8141.2,
+      "terms": [
+       {
+        "term": "colgarse",
+        "expected": "enamorarse de alguien",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ya te cantineaste de esa muchacha, se te nota.",
+      "error": null,
+      "latency_ms": 581.4,
+      "terms": [
+       {
+        "term": "colgarse",
+        "expected": "enamorarse de alguien",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ya estás bien tragado de esa patoja, se te nota.",
+      "error": null,
+      "latency_ms": 8313.5,
+      "terms": [
+       {
+        "term": "colgarse",
+        "expected": "enamorarse de alguien",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0140",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "¿Vamos por una refa? Yo pongo el pisto.",
+   "reference": "¿Vamos a comer algo? Yo pago.",
+   "source_id": "S48",
+   "runs": [
+    {
+     "david": {
+      "text": "¿Vamos por una refacción? Yo pongo el dinero.",
+      "error": null,
+      "latency_ms": 744.9,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": true
+       },
+       {
+        "term": "refa",
+        "expected": "la refacción: algo para picar entre comidas",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¿Vamos a echarnos una refacción? Yo disparo.",
+      "error": null,
+      "latency_ms": 3392.4,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": false
+       },
+       {
+        "term": "refa",
+        "expected": "la refacción: algo para picar entre comidas",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¿Vamos por una refacción? Yo pongo el dinero.",
+      "error": null,
+      "latency_ms": 522.7,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": true
+       },
+       {
+        "term": "refa",
+        "expected": "la refacción: algo para picar entre comidas",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¿Vamos a refaccionar? Yo disparo.",
+      "error": null,
+      "latency_ms": 5795.4,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": false
+       },
+       {
+        "term": "refa",
+        "expected": "la refacción: algo para picar entre comidas",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¿Vamos por una refacción? Yo pongo el dinero.",
+      "error": null,
+      "latency_ms": 688.5,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": true
+       },
+       {
+        "term": "refa",
+        "expected": "la refacción: algo para picar entre comidas",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¿Vamos a refaccionar? Yo disparo.",
+      "error": null,
+      "latency_ms": 5935.4,
+      "terms": [
+       {
+        "term": "pisto",
+        "expected": "dinero",
+        "ok": false
+       },
+       {
+        "term": "refa",
+        "expected": "la refacción: algo para picar entre comidas",
+        "ok": true
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0145",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "Chotealo, que ese maje se quiere colar.",
+   "reference": "Vigilalo, que ese muchacho se quiere colar.",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "Vigílalo, que ese muchacho se quiere meter.",
+      "error": null,
+      "latency_ms": 624.8,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Miralo, que ese pizado se quiere meter a la brava.",
+      "error": null,
+      "latency_ms": 926.6,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": false
+       },
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Vigílalo, que ese muchacho se quiere meter.",
+      "error": null,
+      "latency_ms": 997.5,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Miralo bien, que ese chato se quiere meter a la brava.",
+      "error": null,
+      "latency_ms": 1352.5,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": false
+       },
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Vigílalo, que ese muchacho se quiere meter.",
+      "error": null,
+      "latency_ms": 506.9,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Échale el ojo, que ese cuate se quiere meter.",
+      "error": null,
+      "latency_ms": 6035.8,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "chotear",
+        "expected": "vigilar o estar pendiente de alguien o algo con la mirada",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0151",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "genz_to_parent",
+   "text": "¿Cachaste lo que dijo el profe, maje?",
+   "reference": "¿Entendiste lo que dijo el profesor?",
+   "source_id": "S04",
+   "runs": [
+    {
+     "david": {
+      "text": "¿Entendiste lo que dijo el profesor?",
+      "error": null,
+      "latency_ms": 699.8,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "cachar",
+        "expected": "entender, captar lo que se dice",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¿Le entendiste a lo que dijo el profesor, vos?",
+      "error": null,
+      "latency_ms": 2044.6,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "cachar",
+        "expected": "entender, captar lo que se dice",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¿Entendiste lo que dijo el profesor?",
+      "error": null,
+      "latency_ms": 594.9,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "cachar",
+        "expected": "entender, captar lo que se dice",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¿Le entendiste a lo que dijo el profesor, vos?",
+      "error": null,
+      "latency_ms": 1266.6,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "cachar",
+        "expected": "entender, captar lo que se dice",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "¿Entendiste lo que dijo el profesor?",
+      "error": null,
+      "latency_ms": 551.9,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "cachar",
+        "expected": "entender, captar lo que se dice",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¿Le entendiste a lo que dijo el profesor, vos?",
+      "error": null,
+      "latency_ms": 1887.7,
+      "terms": [
+       {
+        "term": "maje",
+        "expected": "amigo, cuate; también \"tonto\" según el tono",
+        "ok": true
+       },
+       {
+        "term": "cachar",
+        "expected": "entender, captar lo que se dice",
+        "ok": true
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 0/3"
+  },
+  {
+   "pair_id": "test-w2-0156",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "Haceme la campaña de ir a traer las tortillas, mijo.",
+   "reference": "Maje, ¿me echás la mano y vas por las tortillas?",
+   "source_id": "S54",
+   "runs": [
+    {
+     "david": {
+      "text": "Haceme la pala de ir a traer las tortillas, maje.",
+      "error": null,
+      "latency_ms": 568.4,
+      "terms": [
+       {
+        "term": "haceme la campaña",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Haceme paro de ir a traer las tortillas, bro.",
+      "error": null,
+      "latency_ms": 2123.0,
+      "terms": [
+       {
+        "term": "haceme la campaña",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Haceme la pala de ir a traer las tortillas, maje.",
+      "error": null,
+      "latency_ms": 618.3,
+      "terms": [
+       {
+        "term": "haceme la campaña",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Haceme la segunda de ir por las tortillas, bro.",
+      "error": null,
+      "latency_ms": 4149.2,
+      "terms": [
+       {
+        "term": "haceme la campaña",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Haceme la pala de ir a traer las tortillas, maje.",
+      "error": null,
+      "latency_ms": 571.6,
+      "terms": [
+       {
+        "term": "haceme la campaña",
+        "expected": "cerote · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Haceme la segunda de ir por las tortillas, bro.",
+      "error": null,
+      "latency_ms": 3536.0,
+      "terms": [
+       {
+        "term": "haceme la campaña",
+        "expected": "cerote · maje",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0157",
+   "reference_ok": true,
+   "note": "",
+   "country": "GT",
+   "direction": "parent_to_genz",
+   "text": "Ese muchacho la anda cantineando desde el año pasado.",
+   "reference": "Ese maje anda casaqueando a la patoja desde el año pasado.",
+   "source_id": "S54",
+   "runs": [
+    {
+     "david": {
+      "text": "Ese chavo la anda colgando desde el año pasado.",
+      "error": null,
+      "latency_ms": 621.4,
+      "terms": [
+       {
+        "term": "cantinear",
+        "expected": "casaca · cerote · colgarse · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese chavo le anda tirando la onda desde el año pasado.",
+      "error": null,
+      "latency_ms": 1803.2,
+      "terms": [
+       {
+        "term": "cantinear",
+        "expected": "casaca · cerote · colgarse · maje",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese chavo la anda colgando desde el año pasado.",
+      "error": null,
+      "latency_ms": 512.0,
+      "terms": [
+       {
+        "term": "cantinear",
+        "expected": "casaca · cerote · colgarse · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese chavo le anda tirando casaca desde el año pasado.",
+      "error": null,
+      "latency_ms": 7406.9,
+      "terms": [
+       {
+        "term": "cantinear",
+        "expected": "casaca · cerote · colgarse · maje",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese chavo la anda colgando desde el año pasado.",
+      "error": null,
+      "latency_ms": 789.1,
+      "terms": [
+       {
+        "term": "cantinear",
+        "expected": "casaca · cerote · colgarse · maje",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese pizado le anda tirando la onda desde el año pasado.",
+      "error": null,
+      "latency_ms": 1759.5,
+      "terms": [
+       {
+        "term": "cantinear",
+        "expected": "casaca · cerote · colgarse · maje",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3"
+  },
+  {
+   "pair_id": "test-w2-0345",
+   "reference_ok": true,
+   "note": "",
+   "country": "CO",
+   "direction": "genz_to_parent",
+   "text": "Parce, me piso, que mi cucha me está llamando.",
+   "reference": "Amigo, me voy, que mi mamá me está llamando.",
+   "source_id": "S56",
+   "runs": [
+    {
+     "david": {
+      "text": "Amigo, me voy, que mi mamá me está llamando.",
+      "error": null,
+      "latency_ms": 576.3,
+      "terms": [
+       {
+        "term": "parce",
+        "expected": "amigo cercano; forma de llamar a alguien",
+        "ok": true
+       },
+       {
+        "term": "cucho",
+        "expected": "señor o señora mayor; también el papá o la mamá",
+        "ok": true
+       },
+       {
+        "term": "me piso",
+        "expected": "me voy",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Hermano, me voy yendo que mi mamá me está llamando.",
+      "error": null,
+      "latency_ms": 4059.4,
+      "terms": [
+       {
+        "term": "parce",
+        "expected": "amigo cercano; forma de llamar a alguien",
+        "ok": false
+       },
+       {
+        "term": "cucho",
+        "expected": "señor o señora mayor; también el papá o la mamá",
+        "ok": true
+       },
+       {
+        "term": "me piso",
+        "expected": "me voy",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Amigo, me voy, que mi mamá me está llamando.",
+      "error": null,
+      "latency_ms": 863.4,
+      "terms": [
+       {
+        "term": "parce",
+        "expected": "amigo cercano; forma de llamar a alguien",
+        "ok": true
+       },
+       {
+        "term": "cucho",
+        "expected": "señor o señora mayor; también el papá o la mamá",
+        "ok": true
+       },
+       {
+        "term": "me piso",
+        "expected": "me voy",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Hermano, me voy yendo, que mi mamá me está llamando.",
+      "error": null,
+      "latency_ms": 6174.6,
+      "terms": [
+       {
+        "term": "parce",
+        "expected": "amigo cercano; forma de llamar a alguien",
+        "ok": false
+       },
+       {
+        "term": "cucho",
+        "expected": "señor o señora mayor; también el papá o la mamá",
+        "ok": true
+       },
+       {
+        "term": "me piso",
+        "expected": "me voy",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Amigo, me voy, que mi mamá me está llamando.",
+      "error": null,
+      "latency_ms": 833.2,
+      "terms": [
+       {
+        "term": "parce",
+        "expected": "amigo cercano; forma de llamar a alguien",
+        "ok": true
+       },
+       {
+        "term": "cucho",
+        "expected": "señor o señora mayor; también el papá o la mamá",
+        "ok": true
+       },
+       {
+        "term": "me piso",
+        "expected": "me voy",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Hermano, me abro, que mi mamá me está llamando.",
+      "error": null,
+      "latency_ms": 7895.4,
+      "terms": [
+       {
+        "term": "parce",
+        "expected": "amigo cercano; forma de llamar a alguien",
+        "ok": false
+       },
+       {
+        "term": "cucho",
+        "expected": "señor o señora mayor; también el papá o la mamá",
+        "ok": true
+       },
+       {
+        "term": "me piso",
+        "expected": "me voy",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0348",
+   "reference_ok": true,
+   "note": "",
+   "country": "CO",
+   "direction": "genz_to_parent",
+   "text": "Desde que terminó con la novia anda con una tusa terrible.",
+   "reference": "Desde que terminó con la novia anda muy triste y despechado.",
+   "source_id": "S44",
+   "runs": [
+    {
+     "david": {
+      "text": "Desde que terminó con la novia anda con un guayabo terrible.",
+      "error": null,
+      "latency_ms": 554.8,
+      "terms": [
+       {
+        "term": "tusa",
+        "expected": "despecho, tristeza por una ruptura",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Desde que terminó con la novia anda con un despecho terrible.",
+      "error": null,
+      "latency_ms": 4224.4,
+      "terms": [
+       {
+        "term": "tusa",
+        "expected": "despecho, tristeza por una ruptura",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Desde que terminó con la novia anda con un guayabo terrible.",
+      "error": null,
+      "latency_ms": 981.7,
+      "terms": [
+       {
+        "term": "tusa",
+        "expected": "despecho, tristeza por una ruptura",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Desde que terminó con la novia anda con un despecho tremendo.",
+      "error": null,
+      "latency_ms": 4221.6,
+      "terms": [
+       {
+        "term": "tusa",
+        "expected": "despecho, tristeza por una ruptura",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Desde que terminó con la novia anda con un guayabo terrible.",
+      "error": null,
+      "latency_ms": 690.8,
+      "terms": [
+       {
+        "term": "tusa",
+        "expected": "despecho, tristeza por una ruptura",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Desde que terminó con la novia anda con una dicha de despecho tenaz.",
+      "error": null,
+      "latency_ms": 1889.2,
+      "terms": [
+       {
+        "term": "tusa",
+        "expected": "despecho, tristeza por una ruptura",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 1/3"
+  },
+  {
+   "pair_id": "test-w2-0353",
+   "reference_ok": true,
+   "note": "",
+   "country": "CO",
+   "direction": "genz_to_parent",
+   "text": "Mi hermano está mera viga desde que entró al gimnasio.",
+   "reference": "Mi hermano está muy musculoso desde que entró al gimnasio.",
+   "source_id": "S20",
+   "runs": [
+    {
+     "david": {
+      "text": "Mi hermano está muy musculoso desde que entró al gimnasio.",
+      "error": null,
+      "latency_ms": 939.5,
+      "terms": [
+       {
+        "term": "viga",
+        "expected": "musculoso, fornido",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mi hermano se puso acuerpadísimo desde que se metió al gimnasio.",
+      "error": null,
+      "latency_ms": 1640.6,
+      "terms": [
+       {
+        "term": "viga",
+        "expected": "musculoso, fornido",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Mi hermano está muy musculoso desde que entró al gimnasio.",
+      "error": null,
+      "latency_ms": 613.6,
+      "terms": [
+       {
+        "term": "viga",
+        "expected": "musculoso, fornido",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mi hermano está todo acuerpado desde que se metió al gimnasio.",
+      "error": null,
+      "latency_ms": 7735.0,
+      "terms": [
+       {
+        "term": "viga",
+        "expected": "musculoso, fornido",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Mi hermano está muy musculoso desde que entró al gimnasio.",
+      "error": null,
+      "latency_ms": 745.0,
+      "terms": [
+       {
+        "term": "viga",
+        "expected": "musculoso, fornido",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mi hermano se puso acuerpadísimo desde que entró al gimnasio.",
+      "error": null,
+      "latency_ms": 1329.3,
+      "terms": [
+       {
+        "term": "viga",
+        "expected": "musculoso, fornido",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0364",
+   "reference_ok": true,
+   "note": "",
+   "country": "CO",
+   "direction": "parent_to_genz",
+   "text": "Ese sardino no sabe ni manejar todavía.",
+   "reference": "Ese pelado es un buñuelo, todavía no sabe ni manejar.",
+   "source_id": "S62",
+   "runs": [
+    {
+     "david": {
+      "text": "Ese man no sabe ni manejar todavía.",
+      "error": null,
+      "latency_ms": 588.9,
+      "terms": [
+       {
+        "term": "sardino",
+        "expected": "buñuelo · man",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese pelao no sabe ni manejar todavía.",
+      "error": null,
+      "latency_ms": 5479.8,
+      "terms": [
+       {
+        "term": "sardino",
+        "expected": "buñuelo · man",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese man no sabe ni manejar todavía.",
+      "error": null,
+      "latency_ms": 488.3,
+      "terms": [
+       {
+        "term": "sardino",
+        "expected": "buñuelo · man",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese pelao no sabe ni manejar todavía.",
+      "error": null,
+      "latency_ms": 3923.9,
+      "terms": [
+       {
+        "term": "sardino",
+        "expected": "buñuelo · man",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese man no sabe ni manejar todavía.",
+      "error": null,
+      "latency_ms": 939.0,
+      "terms": [
+       {
+        "term": "sardino",
+        "expected": "buñuelo · man",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese pelao ni sabe manejar todavía.",
+      "error": null,
+      "latency_ms": 4967.2,
+      "terms": [
+       {
+        "term": "sardino",
+        "expected": "buñuelo · man",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0365",
+   "reference_ok": true,
+   "note": "",
+   "country": "CO",
+   "direction": "parent_to_genz",
+   "text": "Deje de darme la lata con ese celular nuevo.",
+   "reference": "Deje de ser tan cansón con ese cel nuevo, parce.",
+   "source_id": "S62",
+   "runs": [
+    {
+     "david": {
+      "text": "Deje de hablarme de ese celular nuevo, parce.",
+      "error": null,
+      "latency_ms": 539.6,
+      "terms": [
+       {
+        "term": "cansón / parce",
+        "expected": "cansón · parce",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Deje de intensiar con ese cel nuevo.",
+      "error": null,
+      "latency_ms": 3346.3,
+      "terms": [
+       {
+        "term": "cansón / parce",
+        "expected": "cansón · parce",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Deje de hablarme de ese celular nuevo, parce.",
+      "error": null,
+      "latency_ms": 983.7,
+      "terms": [
+       {
+        "term": "cansón / parce",
+        "expected": "cansón · parce",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Deje de rayarme tanto con ese cel nuevo.",
+      "error": null,
+      "latency_ms": 3386.0,
+      "terms": [
+       {
+        "term": "cansón / parce",
+        "expected": "cansón · parce",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Deje de hablarme de ese celular nuevo, parce.",
+      "error": null,
+      "latency_ms": 503.7,
+      "terms": [
+       {
+        "term": "cansón / parce",
+        "expected": "cansón · parce",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Deje de chimbar con ese cel nuevo.",
+      "error": null,
+      "latency_ms": 7146.0,
+      "terms": [
+       {
+        "term": "cansón / parce",
+        "expected": "cansón · parce",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0377",
+   "reference_ok": true,
+   "note": "",
+   "country": "MX",
+   "direction": "parent_to_genz",
+   "text": "la marmaja la quiero en efectivo no me vayas a salir que solo tienes cheques te lo advierto.",
+   "reference": "La feria la quiero en efectivo, güey, no me salgas con que solo traes cheques.",
+   "source_id": "S62",
+   "runs": [
+    {
+     "david": {
+      "text": "La feria la quiero en efectivo, no me vayas a salir que solo tienes cheques, te lo advierto.",
+      "error": null,
+      "latency_ms": 1466.9,
+      "terms": [
+       {
+        "term": "marmaja",
+        "expected": "carnal · compa · feria · güey",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "La feria la quiero en cash, no me vayas a salir con que pura transferencia, neta te aviso.",
+      "error": null,
+      "latency_ms": 3700.9,
+      "terms": [
+       {
+        "term": "marmaja",
+        "expected": "carnal · compa · feria · güey",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "La feria la quiero en efectivo, no me vayas a salir que solo tienes cheques, la neta.",
+      "error": null,
+      "latency_ms": 646.4,
+      "terms": [
+       {
+        "term": "marmaja",
+        "expected": "carnal · compa · feria · güey",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "El varo lo quiero en cash, no me vayas a salir con que pura transferencia, te estoy avisando.",
+      "error": null,
+      "latency_ms": 1651.0,
+      "terms": [
+       {
+        "term": "marmaja",
+        "expected": "carnal · compa · feria · güey",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "La feria la quiero en efectivo, no me vayas a salir que solo tienes cheques, la neta.",
+      "error": null,
+      "latency_ms": 995.5,
+      "terms": [
+       {
+        "term": "marmaja",
+        "expected": "carnal · compa · feria · güey",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "La feria la quiero en cash, no me vayas a salir con que pura transferencia, te lo juro.",
+      "error": null,
+      "latency_ms": 1259.7,
+      "terms": [
+       {
+        "term": "marmaja",
+        "expected": "carnal · compa · feria · güey",
+        "ok": true
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 1/3"
+  },
+  {
+   "pair_id": "test-w2-0380",
+   "reference_ok": true,
+   "note": "",
+   "country": "MX",
+   "direction": "parent_to_genz",
+   "text": "En suma, no me es posible encontrar un solo defecto en La llegada. Es la neta del planeta.",
+   "reference": "No le encuentro ni un defecto a La llegada. Está bien chingona, neta.",
+   "source_id": "S62",
+   "runs": [
+    {
+     "david": {
+      "text": "En suma, no me es posible encontrar un solo defecto en La llegada. Es god.",
+      "error": null,
+      "latency_ms": 611.9,
+      "terms": [
+       {
+        "term": "la neta del planeta",
+        "expected": "chingón · god · la neta",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Literal no le encuentro ni un solo pero a La llegada. Es cine, está god.",
+      "error": null,
+      "latency_ms": 6295.9,
+      "terms": [
+       {
+        "term": "la neta del planeta",
+        "expected": "chingón · god · la neta",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "En suma, no me es posible encontrar un solo defecto en La llegada. Es god.",
+      "error": null,
+      "latency_ms": 577.0,
+      "terms": [
+       {
+        "term": "la neta del planeta",
+        "expected": "chingón · god · la neta",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "En resumen, cero quejas con La llegada, es una joya total y devoró durísimo.",
+      "error": null,
+      "latency_ms": 3923.3,
+      "terms": [
+       {
+        "term": "la neta del planeta",
+        "expected": "chingón · god · la neta",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "En suma, no me es posible encontrar un solo defecto en La llegada. Es god.",
+      "error": null,
+      "latency_ms": 571.8,
+      "terms": [
+       {
+        "term": "la neta del planeta",
+        "expected": "chingón · god · la neta",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "En resumen, literal no le encuentro ni un solo fallo a La llegada. Es cine, está god.",
+      "error": null,
+      "latency_ms": 3643.5,
+      "terms": [
+       {
+        "term": "la neta del planeta",
+        "expected": "chingón · god · la neta",
+        "ok": true
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 1/3"
+  },
+  {
+   "pair_id": "test-w2-0382",
+   "reference_ok": true,
+   "note": "",
+   "country": "MX",
+   "direction": "genz_to_parent",
+   "text": "Ese vato te va a madrear si le sigues echando carrilla.",
+   "reference": "Ese muchacho te va a dar una golpiza si lo sigues molestando.",
+   "source_id": "S62",
+   "runs": [
+    {
+     "david": {
+      "text": "Ese muchacho te va a golpear si le sigues haciendo burla.",
+      "error": null,
+      "latency_ms": 614.2,
+      "terms": [
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": true
+       },
+       {
+        "term": "vato",
+        "expected": "tipo, cuate",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese tipo te va a acomodar unos trancazos si lo sigues toreando.",
+      "error": null,
+      "latency_ms": 9204.2,
+      "terms": [
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": false
+       },
+       {
+        "term": "vato",
+        "expected": "tipo, cuate",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese muchacho te va a golpear si le sigues haciendo burla.",
+      "error": null,
+      "latency_ms": 657.0,
+      "terms": [
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": true
+       },
+       {
+        "term": "vato",
+        "expected": "tipo, cuate",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese tipo te va a poner una friega si le sigues picando la cresta.",
+      "error": null,
+      "latency_ms": 5413.2,
+      "terms": [
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": false
+       },
+       {
+        "term": "vato",
+        "expected": "tipo, cuate",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese muchacho te va a golpear si le sigues haciendo burla.",
+      "error": null,
+      "latency_ms": 875.0,
+      "terms": [
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": true
+       },
+       {
+        "term": "vato",
+        "expected": "tipo, cuate",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese muchacho te va a poner unos trancazos si lo sigues toreando.",
+      "error": null,
+      "latency_ms": 8387.0,
+      "terms": [
+       {
+        "term": "carrilla",
+        "expected": "burla constante, molestar a alguien",
+        "ok": false
+       },
+       {
+        "term": "vato",
+        "expected": "tipo, cuate",
+        "ok": true
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0383",
+   "reference_ok": true,
+   "note": "",
+   "country": "MX",
+   "direction": "genz_to_parent",
+   "text": "Ese concierto estuvo de partir la madre.",
+   "reference": "Ese concierto estuvo buenísimo.",
+   "source_id": "S62",
+   "runs": [
+    {
+     "david": {
+      "text": "Ese concierto estuvo a todo dar.",
+      "error": null,
+      "latency_ms": 490.4,
+      "terms": [
+       {
+        "term": "partir la madre",
+        "expected": "dar una paliza; (de algo) estar buenísimo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese concierto estuvo a toda madre.",
+      "error": null,
+      "latency_ms": 4691.0,
+      "terms": [
+       {
+        "term": "partir la madre",
+        "expected": "dar una paliza; (de algo) estar buenísimo",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese concierto estuvo a todo dar.",
+      "error": null,
+      "latency_ms": 480.5,
+      "terms": [
+       {
+        "term": "partir la madre",
+        "expected": "dar una paliza; (de algo) estar buenísimo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese concierto estuvo a toda madre.",
+      "error": null,
+      "latency_ms": 4595.6,
+      "terms": [
+       {
+        "term": "partir la madre",
+        "expected": "dar una paliza; (de algo) estar buenísimo",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Ese concierto estuvo a todo dar.",
+      "error": null,
+      "latency_ms": 475.4,
+      "terms": [
+       {
+        "term": "partir la madre",
+        "expected": "dar una paliza; (de algo) estar buenísimo",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Ese concierto estuvo de poca madre.",
+      "error": null,
+      "latency_ms": 5777.9,
+      "terms": [
+       {
+        "term": "partir la madre",
+        "expected": "dar una paliza; (de algo) estar buenísimo",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": true,
+   "why": "David 3/3 todo ✓ · Goliath falla 3/3"
+  },
+  {
+   "pair_id": "test-w2-0385",
+   "reference_ok": true,
+   "note": "la revisión solo mira «güey»; «echarse la pinta» (irse de pinta) no está en el banco: revisar a mano que David no cambie el sentido",
+   "country": "MX",
+   "direction": "genz_to_parent",
+   "text": "Güey, ¿nos echamos la pinta y vamos al cine?",
+   "reference": "Oye, ¿nos saltamos la clase y vamos al cine?",
+   "source_id": "S62",
+   "runs": [
+    {
+     "david": {
+      "text": "Amigo, ¿nos ponemos de acuerdo y vamos al cine?",
+      "error": null,
+      "latency_ms": 582.4,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Oye, ¿nos vamos de pinta y nos lanzamos al cine?",
+      "error": null,
+      "latency_ms": 6287.2,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Amigo, ¿nos ponemos de acuerdo y vamos al cine?",
+      "error": null,
+      "latency_ms": 841.1,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Mano, ¿nos vamos de pinta y nos lanzamos al cine?",
+      "error": null,
+      "latency_ms": 1814.5,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Amigo, ¿nos ponemos de acuerdo y vamos al cine?",
+      "error": null,
+      "latency_ms": 516.1,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Güey, ¿nos vamos de pinta y nos lanzamos al cine?",
+      "error": null,
+      "latency_ms": 7413.5,
+      "terms": [
+       {
+        "term": "güey",
+        "expected": "amigo, compa; forma de llamar a alguien de confianza (también \"tonto\")",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3"
+  },
+  {
+   "pair_id": "test-w2-0413",
+   "reference_ok": false,
+   "note": "la referencia agrega «cero drama, pero literal es tardísimo», que no está en la frase",
+   "country": "LATAM",
+   "direction": "parent_to_genz",
+   "text": "¡Qué barbaridad! ¿Ya viste a qué hora llegaste?",
+   "reference": "Bro, ¿ya viste la hora a la que llegaste? Cero drama, pero literal es tardísimo.",
+   "source_id": "S61",
+   "runs": [
+    {
+     "david": {
+      "text": "Literal, ¿ya viste a qué hora llegaste?",
+      "error": null,
+      "latency_ms": 788.4,
+      "terms": [
+       {
+        "term": "¡qué barbaridad!",
+        "expected": "bro · cero drama · literal",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "No manches, ¿ya viste la hora a la que llegas?",
+      "error": null,
+      "latency_ms": 1321.0,
+      "terms": [
+       {
+        "term": "¡qué barbaridad!",
+        "expected": "bro · cero drama · literal",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Literal, ¿ya viste a qué hora llegaste?",
+      "error": null,
+      "latency_ms": 497.4,
+      "terms": [
+       {
+        "term": "¡qué barbaridad!",
+        "expected": "bro · cero drama · literal",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "¡Te pasas, literal! ¿Ya viste a qué hora caes?",
+      "error": null,
+      "latency_ms": 5676.7,
+      "terms": [
+       {
+        "term": "¡qué barbaridad!",
+        "expected": "bro · cero drama · literal",
+        "ok": true
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Literal, ¿ya viste a qué hora llegaste?",
+      "error": null,
+      "latency_ms": 745.6,
+      "terms": [
+       {
+        "term": "¡qué barbaridad!",
+        "expected": "bro · cero drama · literal",
+        "ok": true
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Qué onda, te pasaste, ¿ya viste la hora a la que llegas?",
+      "error": null,
+      "latency_ms": 1456.9,
+      "terms": [
+       {
+        "term": "¡qué barbaridad!",
+        "expected": "bro · cero drama · literal",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 3/3 todo ✓ · Goliath falla 2/3 · referencia incorrecta"
+  },
+  {
+   "pair_id": "test-w2-0384",
+   "reference_ok": true,
+   "note": "el caso del arreglo: Goliath dijo «un friego de trabajo» (otra jerga) y la revisión anterior lo daba por bueno",
+   "country": "MX",
+   "direction": "genz_to_parent",
+   "text": "Tengo un chingo de chamba y no salgo hasta las nueve.",
+   "reference": "Tengo muchísimo trabajo y no salgo hasta las nueve.",
+   "source_id": "S62",
+   "runs": [
+    {
+     "david": {
+      "text": "Tengo un montón de trabajo y no salgo hasta las nueve.",
+      "error": null,
+      "latency_ms": 567.7,
+      "terms": [
+       {
+        "term": "chamba",
+        "expected": "trabajo; trabajar",
+        "ok": true
+       },
+       {
+        "term": "un chingo",
+        "expected": "mucho, gran cantidad (vulgar leve)",
+        "ok": false
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Tengo un friego de trabajo y no salgo hasta las nueve.",
+      "error": null,
+      "latency_ms": 5386.9,
+      "terms": [
+       {
+        "term": "chamba",
+        "expected": "trabajo; trabajar",
+        "ok": true
+       },
+       {
+        "term": "un chingo",
+        "expected": "mucho, gran cantidad (vulgar leve)",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Tengo un montón de trabajo y no salgo hasta las nueve.",
+      "error": null,
+      "latency_ms": 515.0,
+      "terms": [
+       {
+        "term": "chamba",
+        "expected": "trabajo; trabajar",
+        "ok": true
+       },
+       {
+        "term": "un chingo",
+        "expected": "mucho, gran cantidad (vulgar leve)",
+        "ok": false
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Tengo un montón de trabajo y no salgo hasta las nueve.",
+      "error": null,
+      "latency_ms": 6263.2,
+      "terms": [
+       {
+        "term": "chamba",
+        "expected": "trabajo; trabajar",
+        "ok": true
+       },
+       {
+        "term": "un chingo",
+        "expected": "mucho, gran cantidad (vulgar leve)",
+        "ok": false
+       }
+      ]
+     }
+    },
+    {
+     "david": {
+      "text": "Tengo un montón de trabajo y no salgo hasta las nueve.",
+      "error": null,
+      "latency_ms": 995.3,
+      "terms": [
+       {
+        "term": "chamba",
+        "expected": "trabajo; trabajar",
+        "ok": true
+       },
+       {
+        "term": "un chingo",
+        "expected": "mucho, gran cantidad (vulgar leve)",
+        "ok": false
+       }
+      ]
+     },
+     "goliath": {
+      "text": "Tengo un friego de trabajo y no salgo hasta las nueve.",
+      "error": null,
+      "latency_ms": 3071.3,
+      "terms": [
+       {
+        "term": "chamba",
+        "expected": "trabajo; trabajar",
+        "ok": true
+       },
+       {
+        "term": "un chingo",
+        "expected": "mucho, gran cantidad (vulgar leve)",
+        "ok": false
+       }
+      ]
+     }
+    }
+   ],
+   "qualifies": false,
+   "why": "David 0/3 todo ✓ · Goliath falla 3/3"
+  }
+ ]
+}

@@ -40,7 +40,7 @@ david/                Imagen de David: Ollama con el modelo, EmbeddingGemma y lo
                       fill-jit-cache.sh, cloudbuild.yaml)
 data/                 terms.jsonl, raw/, pairs/, eval/, counterparts.jsonl, SOURCES.md, DATASHEET.md,
                       translate_examples.json (los ejemplos de la página, verificados en vivo)
-scripts/              Construcción de datos, check_page.py (make check), screenshots.py (make screenshots), bench_capacity.py (make capacity)
+scripts/              Construcción de datos, check_page.py (make check), check_candidates.py (make check-candidates), screenshots.py (make screenshots), bench_capacity.py (make capacity)
 train/                train_lora.py, finish.py, preference.py, submit_job.py, notebook, runs/
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/,
                       Dockerfile + cloud_eval.sh (el job del eval)

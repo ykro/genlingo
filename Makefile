@@ -5,7 +5,7 @@ export
 UV      := uv run --project duel
 TAG     ?= genlingo-$(shell date +%Y-%m)
 
-.PHONY: help deploy check screenshots capacity projections test eval eval-dev niches counterparts train train-data \
+.PHONY: help deploy check check-candidates screenshots capacity projections test eval eval-dev niches counterparts train train-data \
         test-set real-pairs ambiguous-terms pairs datasheet data
 
 help:
@@ -17,6 +17,11 @@ deploy: ## Deploy David (Cloud Run GPU, europe-west4) and the comparison page (p
 
 check: ## Check the live page end to end: wakes David, translates every example on both sides
 	$(UV) python scripts/check_page.py
+
+CANDIDATES ?= evals/experiments/2026-10-07-ejemplos-por-pais.json
+RUNS ?= 3
+check-candidates: ## Try candidate page examples live with their own country (David + Goliath, RUNS times each) -> results into the candidates' .md: make check-candidates [CANDIDATES=…] [RUNS=3] [ONLY=MX,CO]
+	$(UV) python scripts/check_candidates.py $(CANDIDATES) --runs $(RUNS) $(if $(ONLY),--only $(ONLY))
 
 screenshots: ## Screenshots of the live page for docs/demo/ (real browser, light theme)
 	uv run --project duel --with playwright python scripts/screenshots.py
