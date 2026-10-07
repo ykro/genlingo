@@ -35,25 +35,26 @@ chrF++ premia parecerse a la referencia, y una reescritura de registro conserva 
 - **Jerga resuelta**: Gen Z → papás, no queda en la salida ningún término Gen Z del banco que tenía la frase; papás → Gen Z, la salida usa al menos un término Gen Z del banco del país. Mide que cambió el registro, no que el significado sea correcto.
 - **Cambios acertados**: de las palabras que la referencia humana cambió respecto al original, cuántas aparecen en la salida. Mide significado, pero solo con palabras exactas: un sinónimo válido cuenta como fallo para todos.
 
-- **Jerga correcta** y **cambios acertados con sinónimos** (enmienda 1 de `evals/niche.md`): el término producido tiene que significar lo mismo, según la tabla de contrapartes validada por significado (`data/counterparts.jsonl`); con sinónimos, una palabra cuenta si coincide la raíz o es un término enlazado.
+- **Jerga correcta** (enmienda 1 de `evals/niche.md`, la misma revisión ✓/✗ de la página, `duel/genlingo_duel/term_check.py`): la frase cuenta si cada término de jerga sale bien. Gen Z → papás: la jerga desaparece y en su lugar queda el significado llano (su significado en el banco, su contraparte de papás o lo que puso ahí la referencia humana), sin otra jerga de ningún país. Papás → Gen Z: la salida usa jerga válida para el país de la frase (la contraparte validada por significado, `data/counterparts.jsonl`, o lo que usó la referencia); la misma idea con jerga de otro país no cuenta.
+- **Cambios acertados con sinónimos**: una palabra cuenta si coincide la raíz o es un término enlazado.
 
 | modelo | jerga resuelta Gen Z → papás | jerga resuelta papás → Gen Z | jerga resuelta total | cambios acertados | jerga correcta | cambios acertados (sinónimos) |
 | --- | --- | --- | --- | --- | --- | --- |
 | copiar la frase (línea base) | 0 % (n=226) | 3 % (n=173) | 1 % (n=399) | 0 % | 1 % (n=399) | 4 % |
-| gemma4:e2b-it-qat | 94 % (n=226) | 10 % (n=173) | 58 % (n=399) | 14 % | 14 % (n=399) | 17 % |
-| gemma4:e2b-it-qat + léxico | 98 % (n=226) | 16 % (n=173) | 62 % (n=399) | 24 % | 42 % (n=399) | 28 % |
-| gemma4:e4b | 98 % (n=226) | 31 % (n=173) | 69 % (n=399) | 17 % | 18 % (n=399) | 21 % |
-| gemini-3.8-flash | 96 % (n=226) | 51 % (n=173) | 77 % (n=399) | 25 % | 24 % (n=399) | 28 % |
-| gemini-3.8-flash + léxico | 99 % (n=226) | 63 % (n=173) | 83 % (n=399) | 28 % | 41 % (n=399) | 31 % |
-| genlingo-2026-10-e2b + glosario | 96 % (n=226) | 30 % (n=173) | 67 % (n=399) | 16 % | 26 % (n=399) | 19 % |
-| genlingo-2026-10-e2b-f16 + glosario | 98 % (n=226) | 41 % (n=173) | 73 % (n=399) | 19 % | 28 % (n=399) | 22 % |
-| genlingo-2026-09 | 93 % (n=226) | 21 % (n=173) | 62 % (n=399) | 14 % | 17 % (n=399) | 18 % |
-| genlingo-2026-10b-e2b + glosario | 99 % (n=226) | 57 % (n=173) | 81 % (n=399) | 22 % | 33 % (n=399) | 26 % |
-| genlingo-2026-10-e2b-q5_k_m + glosario | 97 % (n=226) | 42 % (n=173) | 73 % (n=399) | 18 % | 26 % (n=399) | 21 % |
-| genlingo-2026-10d-e2b + léxico | 100 % (n=226) | 54 % (n=173) | 80 % (n=399) | 28 % | 44 % (n=399) | 32 % |
-| genlingo-2026-10d-e2b-f16 + léxico | 100 % (n=226) | 62 % (n=173) | 84 % (n=399) | 28 % | 43 % (n=399) | 31 % |
-| genlingo-2026-10c-e2b-nomulti + léxico | 100 % (n=226) | 59 % (n=173) | 82 % (n=399) | 28 % | 41 % (n=399) | 32 % |
-| genlingo-2026-10c-e2b-nomulti-f16 + léxico | 99 % (n=226) | 58 % (n=173) | 81 % (n=399) | 28 % | 43 % (n=399) | 32 % |
+| gemma4:e2b-it-qat | 94 % (n=226) | 10 % (n=173) | 58 % (n=399) | 14 % | 21 % (n=399) | 17 % |
+| gemma4:e2b-it-qat + léxico | 98 % (n=226) | 16 % (n=173) | 62 % (n=399) | 24 % | 47 % (n=399) | 28 % |
+| gemma4:e4b | 98 % (n=226) | 31 % (n=173) | 69 % (n=399) | 17 % | 27 % (n=399) | 21 % |
+| gemini-3.8-flash | 96 % (n=226) | 51 % (n=173) | 77 % (n=399) | 25 % | 34 % (n=399) | 28 % |
+| gemini-3.8-flash + léxico | 99 % (n=226) | 63 % (n=173) | 83 % (n=399) | 28 % | 49 % (n=399) | 31 % |
+| genlingo-2026-10-e2b + glosario | 96 % (n=226) | 30 % (n=173) | 67 % (n=399) | 16 % | 33 % (n=399) | 19 % |
+| genlingo-2026-10-e2b-f16 + glosario | 98 % (n=226) | 41 % (n=173) | 73 % (n=399) | 19 % | 36 % (n=399) | 22 % |
+| genlingo-2026-09 | 93 % (n=226) | 21 % (n=173) | 62 % (n=399) | 14 % | 23 % (n=399) | 18 % |
+| genlingo-2026-10b-e2b + glosario | 99 % (n=226) | 57 % (n=173) | 81 % (n=399) | 22 % | 41 % (n=399) | 26 % |
+| genlingo-2026-10-e2b-q5_k_m + glosario | 97 % (n=226) | 42 % (n=173) | 73 % (n=399) | 18 % | 34 % (n=399) | 21 % |
+| genlingo-2026-10d-e2b + léxico | 100 % (n=226) | 54 % (n=173) | 80 % (n=399) | 28 % | 54 % (n=399) | 32 % |
+| genlingo-2026-10d-e2b-f16 + léxico | 100 % (n=226) | 62 % (n=173) | 84 % (n=399) | 28 % | 53 % (n=399) | 31 % |
+| genlingo-2026-10c-e2b-nomulti + léxico | 100 % (n=226) | 59 % (n=173) | 82 % (n=399) | 28 % | 50 % (n=399) | 32 % |
+| genlingo-2026-10c-e2b-nomulti-f16 + léxico | 99 % (n=226) | 58 % (n=173) | 81 % (n=399) | 28 % | 51 % (n=399) | 32 % |
 
 **David de la página:** `genlingo-2026-10c-e2b-nomulti + léxico` (3.62 GB, p50 236 ms): el archivo más pequeño a ≤ 2 puntos de `genlingo-2026-10d-e2b-f16 + léxico` (84 % de jerga resuelta), con p50 < 1 s (empate de tamaño: gana el mayor chrF++). Resuelve 82 %.
 

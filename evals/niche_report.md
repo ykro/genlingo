@@ -32,25 +32,25 @@ David: `genlingo-2026-10d-e2b + léxico`. Rival del nicho: `gemini-3.8-flash` (c
 
 | corte | n | David | rival | Δ (puntos) | IC 95 % | victorias de David | chrF++ David / rival | veredicto |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Slang chapín (GT) | 115 | 50 % | 20 % | +30.4 | [+19.1, +41.7] | 83 % (44–9) | 66.1 / 53.0 | **gana David** |
-| Papás → Gen Z (GT/CO) | 107 | 33 % | 20 % | +13.1 | [+1.9, +25.2] | 66 % (29–15) | 48.4 / 40.9 | **gana David** |
-| Todo el set | 399 | 44 % | 24 % | +19.5 | [+13.5, +25.6] | 74 % (120–42) | 60.0 / 53.7 | **gana David** |
-| País GT | 115 | 50 % | 20 % | +30.4 | [+19.1, +41.7] | 83 % (44–9) | 66.1 / 53.0 | **gana David** |
-| País MX | 78 | 46 % | 33 % | +12.8 | [-1.3, +26.9] | 66 % (21–11) | 53.6 / 49.7 | **empate estadístico** |
-| País CO | 131 | 37 % | 18 % | +19.1 | [+8.4, +29.8] | 73 % (40–15) | 60.9 / 52.9 | **gana David** |
-| País LATAM | 75 | 43 % | 32 % | +10.7 | [-1.3, +22.7] | 68 % (15–7) | 56.1 / 59.7 | **empate estadístico** |
+| Slang chapín (GT) | 115 | 59 % | 23 % | +36.5 | [+25.2, +47.8] | 86 % (50–8) | 66.1 / 53.0 | **gana David** |
+| Papás → Gen Z (GT/CO) | 107 | 31 % | 18 % | +13.1 | [+1.9, +25.2] | 66 % (29–15) | 48.4 / 40.9 | **gana David** |
+| Todo el set | 399 | 54 % | 34 % | +20.3 | [+14.3, +26.6] | 73 % (127–46) | 60.0 / 53.7 | **gana David** |
+| País GT | 115 | 59 % | 23 % | +36.5 | [+25.2, +47.8] | 86 % (50–8) | 66.1 / 53.0 | **gana David** |
+| País MX | 78 | 55 % | 44 % | +11.5 | [-3.8, +25.6] | 63 % (22–13) | 53.6 / 49.7 | **empate estadístico** |
+| País CO | 131 | 49 % | 27 % | +22.1 | [+11.5, +32.8] | 75 % (43–14) | 60.9 / 52.9 | **gana David** |
+| País LATAM | 75 | 55 % | 53 % | +1.3 | [-10.7, +13.3] | 52 % (12–11) | 56.1 / 59.7 | **empate estadístico** |
 
 ## Jerga correcta, contra Goliath con el mismo glosario (referencia, no decide)
 
 | corte | n | David | rival | Δ (puntos) | IC 95 % | victorias de David | chrF++ David / rival | veredicto |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Slang chapín (GT) | 115 | 50 % | 37 % | +13.9 | [+3.5, +24.3] | 68 % (30–14) | 66.1 / 59.8 | **gana David** |
-| Papás → Gen Z (GT/CO) | 107 | 33 % | 35 % | -1.9 | [-13.1, +9.3] | 48 % (19–21) | 48.4 / 45.9 | **empate estadístico** |
-| Todo el set | 399 | 44 % | 41 % | +2.5 | [-3.3, +8.5] | 54 % (76–66) | 60.0 / 56.4 | **empate estadístico** |
-| País GT | 115 | 50 % | 37 % | +13.9 | [+3.5, +24.3] | 68 % (30–14) | 66.1 / 59.8 | **gana David** |
-| País MX | 78 | 46 % | 58 % | -11.5 | [-23.1, +0.0] | 30 % (7–16) | 53.6 / 52.2 | **empate estadístico** |
-| País CO | 131 | 37 % | 31 % | +6.9 | [-3.8, +17.6] | 59 % (30–21) | 60.9 / 54.0 | **empate estadístico** |
-| País LATAM | 75 | 43 % | 51 % | -8.0 | [-20.0, +4.0] | 38 % (9–15) | 56.1 / 60.1 | **empate estadístico** |
+| Slang chapín (GT) | 115 | 59 % | 39 % | +20.0 | [+8.7, +31.3] | 73 % (37–14) | 66.1 / 59.8 | **gana David** |
+| Papás → Gen Z (GT/CO) | 107 | 31 % | 34 % | -2.8 | [-14.0, +8.4] | 46 % (19–22) | 48.4 / 45.9 | **empate estadístico** |
+| Todo el set | 399 | 54 % | 49 % | +5.5 | [-0.5, +11.5] | 57 % (85–63) | 60.0 / 56.4 | **empate estadístico** |
+| País GT | 115 | 59 % | 39 % | +20.0 | [+8.7, +31.3] | 73 % (37–14) | 66.1 / 59.8 | **gana David** |
+| País MX | 78 | 55 % | 63 % | -7.7 | [-19.2, +3.8] | 38 % (9–15) | 53.6 / 52.2 | **empate estadístico** |
+| País CO | 131 | 49 % | 38 % | +10.7 | [+0.0, +21.4] | 63 % (33–19) | 60.9 / 54.0 | **empate estadístico** |
+| País LATAM | 75 | 55 % | 67 % | -12.0 | [-22.7, +0.0] | 29 % (6–15) | 56.1 / 60.1 | **empate estadístico** |
 
 ## Slang reciente
 

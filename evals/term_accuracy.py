@@ -23,7 +23,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "duel"))
 
-from genlingo_duel.terms import STOPWORDS, TermBank, normalize, variants  # noqa: F401  (re-exported)
+from genlingo_duel.term_check import equivalents, term_checks  # noqa: E402,F401  (equivalents re-exported)
+from genlingo_duel.terms import STOPWORDS, TermBank, normalize, variants  # noqa: E402,F401  (re-exported)
 
 
 def slang_handled(bank: TermBank, pair: dict, linked_term_ids: list[str], hypothesis: str) -> bool | None:
@@ -64,49 +65,12 @@ def foreign_slang(bank: TermBank, pair: dict, hypothesis: str) -> bool:
 # Amendment 1 (evals/niche.md, registered 2026-10-02 10:50): meaning-aware metrics. They use the
 # meaning-validated counterpart table (data/counterparts.jsonl): term_id -> counterpart_id or None.
 # ---------------------------------------------------------------------------------------------
-def _stems(text: str) -> set[str]:
-    return {w[:5] for w in normalize(text).split() if len(w) > 3 and w not in STOPWORDS}
-
-
-def equivalents(cps: dict[str, str | None], tid: str) -> set[str]:
-    """tid, its validated counterpart, and same-generation terms that share that counterpart."""
-    out = {tid}
-    cp = cps.get(tid)
-    if cp:
-        out.add(cp)
-        out |= {t for t, c in cps.items() if c == cp}
-        out |= {t for t, c in cps.items() if t == cp and c}
-    return out
-
-
 def correct_slang(bank: TermBank, cps: dict[str, str | None], pair: dict, hypothesis: str) -> bool | None:
-    """Jerga correcta: the slang produced means the same as what had to be said. None = not judgeable."""
-    src, ref, country = pair["source"], pair["target"], pair["country"]
-    allowed = [country, "LATAM"]
-    if pair["direction"] == "parent_to_genz":
-        accept: set[str] = set()
-        for t in bank.found_in(ref, bank.ids("genz", allowed)):
-            accept |= equivalents(cps, t)
-        for t in bank.found_in(src, bank.ids("parent")):
-            if cps.get(t):
-                accept |= equivalents(cps, cps[t])
-        accept = {t for t in accept if t in bank.terms and bank.terms[t]["generation"] == "genz"}
-        if not accept:
-            return None
-        return any(bank.found(t, hypothesis) for t in accept)
-    slang = bank.found_in(src, bank.ids("genz"))
-    if not slang:
-        return None
-    if any(bank.found(t, hypothesis) for t in slang):
-        return False
-    hyp_stems = _stems(hypothesis)
-    for t in slang:
-        cp = cps.get(t)
-        if cp and cp in bank.terms and bank.found(cp, hypothesis):
-            continue
-        if not (_stems(bank.terms[t]["meaning"]) & hyp_stems):
-            return False
-    return True
+    """Jerga correcta: every slang term of the pair gets a ✓ in the page's term-by-term check
+    (duel/genlingo_duel/term_check.py, rules there), with the pair's reference as the human translation.
+    None = the bank can't judge the pair."""
+    checks = term_checks(bank, cps, pair["source"], pair["direction"], pair["country"], hypothesis, pair.get("target") or None)
+    return all(c["ok"] for c in checks) if checks else None
 
 
 def change_recall_synonyms(bank: TermBank, cps: dict[str, str | None], pair: dict, hypothesis: str) -> float | None:

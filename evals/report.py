@@ -93,9 +93,13 @@ def term_section(raw: dict, summary: dict[str, dict], data_dir: Path, rates: dic
         "- **Cambios acertados**: de las palabras que la referencia humana cambió respecto al original, cuántas aparecen en la salida. "
         "Mide significado, pero solo con palabras exactas: un sinónimo válido cuenta como fallo para todos.",
         "",
-        "- **Jerga correcta** y **cambios acertados con sinónimos** (enmienda 1 de `evals/niche.md`): el término "
-        "producido tiene que significar lo mismo, según la tabla de contrapartes validada por significado "
-        "(`data/counterparts.jsonl`); con sinónimos, una palabra cuenta si coincide la raíz o es un término enlazado.",
+        "- **Jerga correcta** (enmienda 1 de `evals/niche.md`, la misma revisión ✓/✗ de la página, "
+        "`duel/genlingo_duel/term_check.py`): la frase cuenta si cada término de jerga sale bien. Gen Z → papás: la jerga "
+        "desaparece y en su lugar queda el significado llano (su significado en el banco, su contraparte de papás o lo que "
+        "puso ahí la referencia humana), sin otra jerga de ningún país. Papás → Gen Z: la salida usa jerga válida para el "
+        "país de la frase (la contraparte validada por significado, `data/counterparts.jsonl`, o lo que usó la referencia); "
+        "la misma idea con jerga de otro país no cuenta.",
+        "- **Cambios acertados con sinónimos**: una palabra cuenta si coincide la raíz o es un término enlazado.",
         "",
         table(["modelo", "jerga resuelta Gen Z → papás", "jerga resuelta papás → Gen Z", "jerga resuelta total", "cambios acertados",
                "jerga correcta", "cambios acertados (sinónimos)"], rows),

@@ -57,6 +57,12 @@ class TermBank:
         norm = normalize(text)
         return any(p.search(norm) for p in self._patterns.get(term_id, []))
 
+    def spans(self, term_id: str, text: str) -> list[tuple[int, int]]:
+        """Where the term is, as word positions [start, end) in normalize(text).split()."""
+        norm = normalize(text)
+        return [(norm[: m.start()].count(" "), norm[: m.end()].count(" ") + 1)
+                for p in self._patterns.get(term_id, []) for m in p.finditer(norm)]
+
     def genz_terms(self, country: str) -> list[str]:
         return [tid for tid, t in self.terms.items() if t["generation"] == "genz" and t["country"] in (country, "LATAM")]
 
