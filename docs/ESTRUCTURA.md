@@ -36,16 +36,18 @@ duel/                 La página de comparación (FastAPI) — corre en Cloud Ru
                       token de identidad para David (cloud_auth.py) y la página (static/index.html)
   tests/              Pruebas (MOCK_AI=1)
   Dockerfile          Imagen de la página
-david/                Imagen de David: Ollama con el modelo y EmbeddingGemma dentro (Dockerfile, cloudbuild.yaml)
+david/                Imagen de David: Ollama con el modelo, EmbeddingGemma y los kernels de CUDA compilados (Dockerfile, start.sh,
+                      fill-jit-cache.sh, cloudbuild.yaml)
 data/                 terms.jsonl, raw/, pairs/, eval/, counterparts.jsonl, SOURCES.md, DATASHEET.md,
                       translate_examples.json (los ejemplos de la página, verificados en vivo)
-scripts/              Construcción de datos, check_page.py (make check), screenshots.py (make screenshots)
+scripts/              Construcción de datos, check_page.py (make check), screenshots.py (make screenshots), bench_capacity.py (make capacity)
 train/                train_lora.py, finish.py, preference.py, submit_job.py, notebook, runs/
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/,
                       Dockerfile + cloud_eval.sh (el job del eval)
-infra/                Scripts gcloud numerados: 01–03 entrenamiento, 04 David, 05 la página, 06 el eval
+infra/                Scripts gcloud numerados: 01–03 entrenamiento, 04 David, 05 la página, 06 el eval,
+                      07 los kernels de CUDA de David
 docs/                 DEMO, ONBOARDING, BITACORA, DECISIONES, COMANDOS, ESTRUCTURA, CREDITOS,
-                      diagrams/ (HTML + SVG + PNG), demo/ (capturas de la página)
+                      diagrams/ (HTML + SVG + PNG), demo/ (capturas de la página), data/capacity.json (make capacity)
 ```
 
 ## Versiones

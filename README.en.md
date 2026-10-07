@@ -8,9 +8,10 @@ Demo for the talk *"David vs. Goliath: how a small model beats a frontier model"
 
 One public page on Cloud Run: **https://genlingo-611681112050.us-central1.run.app**. Nothing to install or run on talk day: open the page a few minutes before and that's it.
 
-- Pick the direction (Gen Z → parents or parents → Gen Z), type a phrase or tap an example, and both translate the same phrase at the same time. Each column shows its translation and how long it took.
-- For the examples, the page also shows the human reference translation and, under each column, whether it got each slang term right (✓ or ✗).
-- David shuts down on his own when nobody uses him, so nothing bills between talks. When the page opens, the top right says «Preparando a David…» with a clock while his GPU starts; from zero it takes about four minutes ([measured](docs/DECISIONES.en.md#david-in-the-cloud)). Once it says «David listo» everything answers right away, and the page keeps him on while it stays open.
+- Pick the direction (Gen Z → parents or parents → Gen Z), type a phrase or tap an example, and both translate the same phrase at the same time. Each column shows its translation, how long it took and what it cost ([how it's computed and when each one pays off](#time-and-cost-in-the-cloud)).
+- Under each column, each slang word in the phrase with ✓ (translated with its meaning) or ✗, per our slang bank. For the examples, also the human reference translation. If a typed phrase has no slang the bank knows, the page says so instead of grading.
+- At the bottom, «¿Cómo se lee esta página?» explains ✓/✗, time and cost in plain words. The page works on a projector, a laptop and a phone.
+- David shuts down on his own when nobody uses him, so nothing bills between talks. When the page opens, the top right says «Preparando a David…» with a clock while his GPU starts; from zero it takes about 35 seconds ([measured](docs/DECISIONES.en.md#david-in-the-cloud); it used to be almost 4 minutes). Once it says «David listo» everything answers right away, and the page keeps him on while it stays open.
 
 ![The comparison page: David and Goliath translate «esa tu tarea te quedó bien chafa»](docs/demo/02-comparar-genz-a-papas.png)
 
@@ -27,14 +28,18 @@ The four examples are Guatemalan slang from the test set, the case where David w
 5. **Evals with term metrics:** chrF++ plus *correct slang*, *slang handled* and *reference changes*, with a separate dev set for decisions and niches defined before looking at results.
 6. **Your model on your own GPU:** David runs with Ollama on Cloud Run with an L4, private, and scales to zero between talks; the page wakes him when it opens. Training, evaluating and serving: all in the cloud, nothing on the laptop.
 
-## The metrics
+## The metrics, in plain words
 
-- **Correct slang** (*jerga correcta*): the slang the model produces means the same as the original, per the meaning-validated counterpart table (`data/counterparts.jsonl`). The main metric.
-- **Slang handled** (*jerga resuelta*): the register changed. Gen Z → parents: no Gen Z bank slang is left; parents → Gen Z: the output uses at least one Gen Z term of the country. It doesn't check meaning.
-- **Reference changes** (*cambios acertados*): of the words the human reference changed, how many appear in the output.
-- **chrF++:** character overlap with the reference. A register rewrite keeps most words, so copying the phrase untranslated already scores 53.2; that's why it doesn't decide on its own.
+No model grades another: every metric is computed by a program with fixed rules.
 
-All deterministic: no model judges another. Test-set numbers come from the 2026-10-04 eval on 399 `auto_validated` web phrases David never saw ([evals/report.md](evals/report.md)), unless another date is given. That eval ran David in Ollama on a Mac (before he moved to the cloud): the latencies in the tables are from there. In the cloud David answers in ~0.5 s and his cost is the GPU's ([David in the cloud](#david-in-the-cloud)).
+- **Correct slang** (*jerga correcta*; the main one, and what the page shows as ✓ Bien and ✗ Mal): for each slang word in the phrase, did the translation replace it with something that means the same? The program uses our slang bank (532 terms, each with its meaning, country and source) and a meaning-validated counterpart table (`data/counterparts.jsonl`).
+  *Example:* «esa tu tarea te quedó bien **chafa**» (chafa = poor quality). «Esa tarea tuya te quedó muy mala» → ✓. «Esa tu tarea te quedó bien pura lata» → ✗: it swapped one slang word for another that doesn't mean the same.
+- **Slang handled** (*jerga resuelta*): did the register change? Gen Z → parents: no Gen Z bank slang is left; parents → Gen Z: the translation uses at least one Gen Z term of the country. It doesn't check whether the meaning is right, so it isn't the main one.
+- **Reference changes** (*cambios acertados*): of the words the person changed when translating, how many appear unchanged in the model's translation.
+- **chrF++:** how similar the translation is to the one a person wrote, counting the chunks of letters and words they share: 0 is nothing in common and 100 is identical.
+  *Example:* if the person wrote «esa tarea te quedó muy mal hecha», «esa tarea tuya te quedó muy mala» shares almost everything and scores high; «te quedó pura lata» shares little and scores low. In this task most words stay the same, so copying the phrase untranslated already scores 53.2: that's why chrF++ doesn't decide on its own.
+
+Test-set numbers come from the 2026-10-04 eval on 399 `auto_validated` web phrases David never saw ([evals/report.md](evals/report.md)), unless another date is given. That eval ran David in Ollama on a Mac (before he moved to the cloud): the latencies and costs in those tables are from there. David's time and cost in the cloud are measured separately ([Time and cost in the cloud](#time-and-cost-in-the-cloud)).
 
 ## Final result
 
@@ -76,6 +81,45 @@ Niches defined before looking at results ([evals/niche.md](evals/niche.md)); 95 
 | David | 60.4 | 65.3 | 56.5 | 53.6 | 67.4 | 49.1 |
 | Goliath | 53.8 | 52.9 | 55.4 | 51.5 | 61.0 | 43.0 |
 | Goliath + glossary | 54.3 | 60.1 | 58.9 | 56.0 | 63.8 | 47.6 |
+
+## Time and cost in the cloud
+
+<!-- projections: make projections -->
+Measured on 2026-10-07 with `make capacity` ([`scripts/bench_capacity.py`](scripts/bench_capacity.py) → [`docs/data/capacity.json`](docs/data/capacity.json)): 48 test-set phrases, with the page's own code, against the Cloud Run David (1 NVIDIA L4) and against Gemini. `make projections` writes the tables from that file.
+
+**Time per translation** (from the request to the answer)
+
+| | Median | p95 | Translations per hour |
+| --- | ---: | ---: | ---: |
+| David, 1 at a time | 0.6 s | 0.8 s | 4,114 |
+| David, 4 at a time | 0.8 s | 1.1 s | 16,499 |
+| David, 8 at a time | 1.0 s | 1.3 s | 25,984 |
+| David, 16 at a time | 1.7 s | 2.3 s | 29,586 |
+| Goliath (Gemini) | 3.2 s | 12.9 s | no limit of its own |
+
+David is faster in every case measured: his median with 16 translations at a time (1.7 s) is still below Goliath's (3.2 s). Of the 48 Gemini calls, 2 failed because Vertex AI was saturated (429); the page retries on its own.
+
+**Cost.** David's GPU is billed by the second while it's on, whatever it does: R = L4 + 4 vCPU + 16 GiB ≈ **$1.05 per hour**. Gemini bills by token: in the measurement each translation used 125 input and 298 output tokens on average (its reasoning included), so g ≈ **$0.0012** at today's price ($0.75 / $3.75 per million) and **$0.0024** from 2027-01-01 ($1.50 / $7.50).
+
+- David per translation = R ÷ V, for V translations per hour. One GPU handles up to C = 29,586 per hour (the best measured, 16 at a time); beyond that, add GPUs: ⌈V ÷ C⌉ × R ÷ V.
+- Goliath per translation = g, the same at any volume.
+- Break-even: V = R ÷ g. Per month: 730 hours at that volume.
+
+| Translations per hour | David's GPUs | David per translation | Goliath per translation (today) | Goliath (from 2027-01-01) | David per month | Goliath per month (today) | Goliath per month (from 2027-01-01) |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 50 | 1 | $0.021 | **$0.0012** | **$0.0024** | $764 | **$44.26** | $88.51 |
+| 500 | 1 | $0.0021 | **$0.0012** | $0.0024 | $764 | **$443** | $885 |
+| 1,000 | 1 | **$0.0010** | $0.0012 | $0.0024 | **$764** | $885 | $1,770 |
+| 5,000 | 1 | **$0.00021** | $0.0012 | $0.0024 | **$764** | $4,426 | $8,851 |
+| 20,000 | 1 | **$0.000052** | $0.0012 | $0.0024 | **$764** | $17,702 | $35,404 |
+| 50,000 | 2 | **$0.000042** | $0.0012 | $0.0024 | **$1,528** | $44,256 | $88,509 |
+
+**Where David wins:** from about **863 translations per hour** at today's price and **432** at the 2027-01-01 one. With his GPU full, each translation costs **$0.000035**: 34 times less than Gemini today and 69 times less from 2027-01-01. A translator serving an organization all day is in that zone.
+
+**Where Goliath wins:** at low volume. At a talk (about 50 phrases in an hour) the GPU costs ~$1.05 for that hour and Gemini ~$0.061 for the 50 phrases. That's why David shuts down on his own between talks: he costs nothing while nobody uses him.
+
+On the page, David's cost is the GPU seconds that translation used (serving one at a time), and Goliath's is what Gemini billed for its tokens.
+<!-- /projections -->
 
 ## All the experiments
 
@@ -186,8 +230,8 @@ Details and dates in [docs/BITACORA.md](docs/BITACORA.md) (Spanish); technical d
     - *Learned:* it doesn't fit the 1 s budget; it's off (`DAVID_NBEST=1`).
 16. **David in the cloud** (2026-10-06).
     - *Tested:* serving the same David with Ollama on Cloud Run with an L4 GPU (europe-west4), private and scaling to zero, with the public page calling him with an identity token.
-    - *Result:* with the GPU on, David answers in ~0.5 s through the page (Goliath, between 0.8 and 18.6 s that day). Starting the GPU from zero, loading the model and warming it takes about four minutes. The 4 examples came out as on the Mac: David 12 of 12 right, Goliath 0.
-    - *Learned:* in the cloud David is still faster, but no longer free: the GPU costs about $1.05 per hour while it's on, and at a talk's volume that's more than what Gemini charges for the same phrases. So the page shows time, not cost ([details](docs/DECISIONES.en.md#david-in-the-cloud)).
+    - *Result:* with the GPU on, David answers in ~0.5 s through the page (Goliath, between 0.8 and 18.6 s that day). Starting the GPU from zero, loading the model and warming it took almost four minutes; reading the files in one go and shipping the CUDA kernels already compiled in the image brought it down to about 35 seconds. The 4 examples came out as on the Mac: David 12 of 12 right, Goliath 0.
+    - *Learned:* in the cloud David is still faster, but no longer free: the GPU costs about $1.05 per hour while it's on, and at a talk's volume that's more than what Gemini charges for the same phrases. The page first showed only the time; with the GPU's capacity measured, it shows both, and the README has the projections: at volume, David costs a fraction of Gemini ([Time and cost in the cloud](#time-and-cost-in-the-cloud)).
 
 **Total cost:** the logged training runs cost $9.15, including five of the six failed ones ($3.44; the sixth left no cost record).
 
@@ -203,17 +247,30 @@ The page uses `genlingo-2026-10c-e2b-nomulti` in Q5_K_M with the lexicon prompt,
 
 ## Quick start
 
-To use the demo you need nothing: open the page. To rebuild it (Google Cloud with `gcloud` and ADC, `uv`):
+Using the demo takes nothing: open the page. To try the code without the cloud: `make test` (simulated models, `MOCK_AI=1`).
+
+## Reproduce it in your own project
+
+The models (David's GGUFs and the compiled CUDA kernels) and the training data live in **private buckets** of the talk's Google Cloud project; they don't come with the repo. To reproduce everything you need your own Google Cloud project (with L4 GPU quota) and your own buckets:
+
+1. **Configuration:** `cp .env.example .env` and change `GOOGLE_CLOUD_PROJECT`, `MODELS_BUCKET` (the models), `STAGING_BUCKET` (training and evals, in the GPU's region) and `DAVID_URL` (filled in after the first `make deploy`). The `infra/` scripts create the service accounts and the image repository ([docs/ONBOARDING.md](docs/ONBOARDING.md), section 3).
+2. **Data:** `make data` rebuilds the test set, the pairs anchored in real sentences and the synthetic ones from the sources in [data/SOURCES.md](data/SOURCES.md) (Gemini writes the synthetic ones, at a cost).
+3. **Train:** `make train` (an L4 trains and a CPU job merges and publishes the GGUF to your `MODELS_BUCKET`).
+4. **Measure:** `make eval` and `make eval-dev` (a GPU job in the cloud).
+5. **Publish:** `bash infra/04-david.sh` (David on Cloud Run with a GPU), `bash infra/07-david-jit-cache.sh` and `infra/04-david.sh` again (compiled CUDA kernels, so he starts in ~35 s) and `bash infra/05-page.sh` (the page). `make check` tests it live.
 
 ```bash
-cp .env.example .env && (cd duel && uv sync)
+cp .env.example .env && (cd duel && uv sync)   # and edit .env with your project and buckets
 gcloud auth application-default login
-make deploy   # David on Cloud Run with a GPU (europe-west4) + the public page (us-central1)
-make check    # the live page: wakes David and translates every example with both
-make test     # tests without network (MOCK_AI=1)
+make data && make train TAG=genlingo-YYYY-MM && make eval
+make deploy && make check
 ```
 
-All commands in [docs/COMANDOS.en.md](docs/COMANDOS.en.md).
+Full command list in [docs/COMANDOS.en.md](docs/COMANDOS.en.md).
+
+## License
+
+The code is Apache 2.0 ([LICENSE](LICENSE)). The data cites its source and license in every record, and David, as a Gemma fine-tune, follows the Gemma terms of use: details in [THIRD_PARTY.md](THIRD_PARTY.md).
 
 ## Documentation
 

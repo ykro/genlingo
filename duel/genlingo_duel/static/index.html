@@ -339,11 +339,12 @@
     } else if (state === "boot") {
       p.classList.add("boot");
       p.append(el("strong", null, "Preparando a David"), "Se está encendiendo su servidor con GPU y cargando el modelo.",
-               el("small", null, "Pasa solo la primera vez después de un rato sin uso: tarda unos cuatro minutos."));
+               el("small", null, "Pasa solo la primera vez después de un rato sin uso: tarda menos de un minuto."));
       stats(side, []);
     } else if (state === "error") {
       p.classList.add("off");
-      p.append(el("strong", null, "No respondió"), side === "david" ? "David tardó demasiado. Vuelve a intentar en unos segundos." : "Gemini tardó demasiado o falló. Vuelve a intentar.");
+      p.append(el("strong", null, data?.limit ? "Límite" : "No respondió"), data?.limit
+        || (side === "david" ? "David tardó demasiado. Vuelve a intentar en unos segundos." : "Gemini tardó demasiado o falló. Vuelve a intentar."));
       stats(side, []);
     } else {
       p.classList.add("in");
@@ -375,6 +376,7 @@
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phrase, direction: dir, example_id: exampleId }),
       });
+      if (res.status === 429) { if (mine === ticket) paint(side, "error", { limit: (await res.json()).detail }); return; }
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
       if (mine !== ticket) return;
@@ -436,9 +438,16 @@
 
   // David runs on a GPU server that turns off when nobody uses it. Opening the page turns it on
   // (POST /api/david/wake answers when he is ready) and a ping every minute keeps it on while the
-  // page is open and visible, for at most three hours.
+  // page is open and visible and someone used it in the last 45 minutes (a forgotten tab must not
+  // keep a GPU on all day). Using the page again wakes him again.
   let davidReady = false;
-  const opened = Date.now();
+  let lastUse = Date.now();
+  const KEEP_ALIVE_MS = 45 * 60 * 1000;
+  for (const ev of ["pointerdown", "keydown"]) document.addEventListener(ev, () => {
+    const idle = Date.now() - lastUse > KEEP_ALIVE_MS;
+    lastUse = Date.now();
+    if (idle && !davidReady) wake();
+  }, { passive: true });
   const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
   function setReady(ready, label) {
     const changed = ready !== davidReady;
@@ -475,6 +484,7 @@
   async function wake() {
     try {
       const st = await (await fetch("/api/david/wake", { method: "POST" })).json();
+      if (st.detail) { setReady(false, st.detail); return; }  // a spending limit (429): no retry
       if (st.phase === "ready") setReady(true);
       else if (st.phase === "error") { setReady(false, "David no respondió · reintentando"); setTimeout(wake, 5000); }
       else setTimeout(wake, 2000);
@@ -482,7 +492,7 @@
   }
   setInterval(poll, 1000);
   setInterval(() => {
-    if (document.visibilityState === "visible" && Date.now() - opened < 3 * 3600 * 1000) {
+    if (document.visibilityState === "visible" && Date.now() - lastUse < KEEP_ALIVE_MS) {
       fetch("/api/david/wake", { method: "POST" }).then((r) => r.json()).then((st) => { if (st.phase !== "ready") { setReady(false); wake(); } }).catch(() => {});
     }
   }, 60 * 1000);

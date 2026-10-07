@@ -1,19 +1,19 @@
 # Guion de la demo
 
 La demo es una sola página en la nube: David y Goliath traducen la misma frase al mismo tiempo, lado a lado,
-entre la jerga de Gen Z y el español de los papás. Cada columna muestra su traducción y cuánto tardó. Unos
-4 minutos. [English version](DEMO.en.md).
+entre la jerga de Gen Z y el español de los papás. Cada columna muestra su traducción, cuánto tardó y cuánto
+costó, y debajo, cada palabra de jerga con ✓ o ✗. Unos 4 minutos. [English version](DEMO.en.md).
 
 ## Antes de la charla
 
-Abre esta página en Chrome **unos diez minutos antes** y déjala abierta:
+Abre esta página en Chrome **unos minutos antes** y déjala abierta:
 
 **https://genlingo-611681112050.us-central1.run.app**
 
 ![La página mientras se enciende David](demo/01-preparando-a-david.png)
 
 Arriba a la derecha dice «Preparando a David…» con un reloj: se está encendiendo su servidor con GPU, que se
-apaga solo cuando nadie lo usa. Tarda unos cuatro minutos. Cuando dice «David listo» ya está, y la página lo
+apaga solo cuando nadie lo usa. Tarda menos de un minuto (unos 35 segundos). Cuando dice «David listo» ya está, y la página lo
 mantiene encendido mientras siga abierta. Ponla a pantalla completa (`⌃⌘F`) y comprueba desde el fondo de la
 sala que se lea.
 
@@ -22,7 +22,8 @@ sala que se lea.
 ### 1 · La página (30 s)
 
 Qué se ve: arriba la dirección, el cuadro de texto y los ejemplos; abajo, dos columnas, David a la izquierda y
-Goliath a la derecha.
+Goliath a la derecha. Al final, «¿Cómo se lee esta página?» explica en una línea qué es ✓/✗, el tiempo y el
+costo.
 
 > A la izquierda, David: un modelo pequeño, ajustado con nuestros datos, en un servidor que es solo suyo. A la
 > derecha, Goliath: Gemini, el modelo grande de Google. Los dos van a traducir la misma frase al mismo tiempo.
@@ -44,7 +45,12 @@ Lo que dice Goliath varía un poco de una vez a otra; en todas las pruebas cambi
 de decirlo como un papá.
 
 > «Chafa», «pajas», «simón, de ley»: David sabe qué significan y lo dice como lo diría tu mamá. Goliath cambia
-> la jerga por más jerga. Y miren el tiempo: David responde en medio segundo.
+> la jerga por más jerga. Y miren el tiempo: David responde en medio segundo; Goliath, en varios.
+
+El costo de cada columna es lo que costó esa traducción: Gemini cobra por tokens; David, por los segundos de su
+GPU. Una sola frase puede salir más cara en David o en Goliath; el ahorro de David aparece con volumen (las
+proyecciones están en el README). En la charla, lo que se dice del costo es eso: «con volumen, David cuesta una
+fracción».
 
 ### 3 · De papás a Gen Z (1 min)
 
@@ -61,8 +67,17 @@ Toca el ejemplo de «Papás → Gen Z».
 
 ### 4 · Una frase escrita (30 s, opcional)
 
-Escribe en el cuadro una frase con jerga chapina y pulsa **Traducir**. En las frases escritas la página muestra
-las dos traducciones y el tiempo, sin la revisión por término.
+![Una frase escrita: «Tengo un clavo: no traigo pisto para el bus»](demo/04-frase-escrita.png)
+
+Escribe en el cuadro una frase con jerga chapina y pulsa **Traducir**, por ejemplo:
+
+```
+Tengo un clavo: no traigo pisto para el bus
+```
+
+Arriba dice qué jerga de la frase conoce el banco («clavo», «pisto»), y cada columna la marca con ✓ o ✗, igual
+que en los ejemplos. Si la frase no tiene jerga que el banco conozca, la página lo dice: no hay nada que revisar
+automáticamente.
 
 > Cualquier frase, en vivo.
 
@@ -82,7 +97,7 @@ Goliath ninguna. Se eligieron de Guatemala porque ahí David acierta más jerga 
 
 | Síntoma | Qué hacer |
 | --- | --- |
-| Sigue en «Preparando a David…» después de 5 minutos | Recarga la página: vuelve a pedir que se encienda. |
+| Sigue en «Preparando a David…» después de 2 minutos | Recarga la página: vuelve a pedir que se encienda. |
 | Arriba dice «David no respondió · reintentando» | La página reintenta sola cada pocos segundos; espera a «David listo». |
 | La columna de David dice «No respondió» | Pulsa **Traducir** otra vez. |
 | Goliath tarda mucho | Gemini está lento; la columna de David ya respondió. Sigue con el siguiente ejemplo. |

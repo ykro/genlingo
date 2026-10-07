@@ -15,11 +15,12 @@ import logging
 import time
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 from .arena import Arena
+from .limits import Limits
 from .prompts import Direction
 from .settings import Settings, get_settings, goliath_prices
 from .translate_page import FONTS, PAGE, check_terms, find_example, load_examples, terms_in_bank
@@ -75,6 +76,8 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None) -> 
 
     app = FastAPI(title="Genlingo · David contra Goliath", docs_url=None, redoc_url=None)
     app.state.arena, app.state.david = arena, david
+    limits = Limits.from_settings(s)
+    app.state.limits = limits
 
     async def wake() -> None:
         """Start David's instance (the first request waits for it) and load both models."""
@@ -138,14 +141,16 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None) -> 
                 "terms_in_bank": terms_in_bank(s.data_dir)}
 
     @app.post("/api/david/wake")
-    async def david_wake() -> dict:
+    async def david_wake(request: Request) -> dict:
         """Called by the page when it opens and every minute while it is open: wakes David if he is
         cold (the request stays open until he is ready, so this instance keeps its CPU meanwhile),
         otherwise a cheap ping that keeps his instance alive. Concurrent calls share one wake-up."""
+        limits.check_ip(request, "wake")
         if s.mock_ai:
             return david.view()
         if not (david.task and not david.task.done()):
             if david.view()["phase"] in ("idle", "error"):
+                limits.count_daily("wake")  # only a real start of David's GPU counts, not the keep-alive pings
                 david.set("waking")
                 david.task = asyncio.create_task(wake())
             else:
@@ -154,8 +159,11 @@ def create_app(settings: Settings | None = None, arena: Arena | None = None) -> 
         return david.view()
 
     @app.post("/api/translate/{side}")
-    async def translate(req: TranslateRequest, side: Literal["david", "goliath"]) -> dict:
+    async def translate(req: TranslateRequest, side: Literal["david", "goliath"], request: Request) -> dict:
         """One side's translation (the page asks both at once): no score, nothing recorded."""
+        limits.check_ip(request, "translate")
+        if side == "goliath":
+            limits.count_daily("gemini")
         res = await arena.translate_one(side, req.phrase.strip(), req.direction, s.country)
         if side == "david" and res.status == "ok":
             david.seen()

@@ -203,3 +203,35 @@ def test_page_examples_are_guatemalan_test_pairs_that_david_gets_right_and_golia
             check = lambda hyp: [t["ok"] for t in term_checks(bank, cps, e["text"], e["direction"], "GT", hyp, e["reference"])]  # noqa: E731
             assert check(run["david"]) and all(check(run["david"])), run
             assert run["goliath"] is None or not all(check(run["goliath"])), run
+
+
+def test_a_visitor_over_the_per_minute_limit_gets_a_plain_message(settings):
+    settings.limit_translate_per_min = 4
+    with TestClient(create_app(settings)) as c:
+        body = {"phrase": "estuvo bien mid", "direction": "genz_to_parent"}
+        ok = [c.post("/api/translate/david", json=body, headers={"x-forwarded-for": "1.1.1.1"}).status_code for _ in range(4)]
+        over = c.post("/api/translate/david", json=body, headers={"x-forwarded-for": "1.1.1.1"})
+        assert ok == [200] * 4 and over.status_code == 429 and "Espera un minuto" in over.json()["detail"]
+        # another visitor is not affected
+        assert c.post("/api/translate/david", json=body, headers={"x-forwarded-for": "2.2.2.2"}).status_code == 200
+
+
+def test_the_daily_gemini_cap_stops_goliath_only(settings):
+    settings.limit_gemini_per_day = 2
+    with TestClient(create_app(settings)) as c:
+        body = {"phrase": "estuvo bien mid", "direction": "genz_to_parent"}
+        assert [c.post("/api/translate/goliath", json=body).status_code for _ in range(2)] == [200, 200]
+        over = c.post("/api/translate/goliath", json=body)
+        assert over.status_code == 429 and "límite diario" in over.json()["detail"]
+        assert c.post("/api/translate/david", json=body).status_code == 200
+
+
+def test_the_daily_cap_counts_starts_of_david_not_keep_alive_pings():
+    from genlingo_duel.limits import Limits
+    lim = Limits(wakes_per_day=1)
+    lim.count_daily("wake")
+    import pytest
+    from fastapi import HTTPException
+    with pytest.raises(HTTPException) as e:
+        lim.count_daily("wake")
+    assert e.value.status_code == 429 and "encendidos de David" in e.value.detail

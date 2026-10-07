@@ -8,9 +8,10 @@ Demo de la charla *«David vs. Goliath: cómo un modelo pequeño le gana a un mo
 
 Una sola página pública en Cloud Run: **https://genlingo-611681112050.us-central1.run.app**. No hay nada que instalar ni que ejecutar el día de la charla: se abre la página unos minutos antes y listo.
 
-- Se elige la dirección (Gen Z → papás o papás → Gen Z), se escribe una frase o se toca un ejemplo, y los dos traducen la misma frase al mismo tiempo. Cada columna muestra su traducción y cuánto tardó.
-- En los ejemplos, la página muestra además la traducción de referencia hecha por personas y, debajo de cada columna, si acertó cada término de jerga (✓ o ✗).
-- David se apaga solo cuando nadie lo usa, para no cobrar entre charlas. Al abrir la página, arriba a la derecha dice «Preparando a David…» con un reloj mientras se enciende su GPU; tarda unos cuatro minutos desde cero ([medido](docs/DECISIONES.md#david-en-la-nube)). Cuando dice «David listo», todo responde al instante, y la página lo mantiene encendido mientras esté abierta.
+- Se elige la dirección (Gen Z → papás o papás → Gen Z), se escribe una frase o se toca un ejemplo, y los dos traducen la misma frase al mismo tiempo. Cada columna muestra su traducción, cuánto tardó y cuánto costó ([cómo se calcula y cuándo conviene cada uno](#tiempo-y-costo-en-la-nube)).
+- Debajo de cada columna, cada palabra de jerga de la frase con ✓ (la tradujo con su significado) o ✗, según nuestro banco de jerga. En los ejemplos, además, la traducción de referencia hecha por personas. Si una frase escrita no tiene jerga que el banco conozca, la página lo dice en vez de calificar.
+- Al final, «¿Cómo se lee esta página?» explica en palabras simples qué es ✓/✗, el tiempo y el costo. La página se ve bien en el proyector, en una laptop y en el teléfono.
+- David se apaga solo cuando nadie lo usa, para no cobrar entre charlas. Al abrir la página, arriba a la derecha dice «Preparando a David…» con un reloj mientras se enciende su GPU; tarda unos 35 segundos desde cero ([medido](docs/DECISIONES.md#david-en-la-nube); antes eran casi 4 minutos). Cuando dice «David listo», todo responde al instante, y la página lo mantiene encendido mientras esté abierta.
 
 ![La página de comparación: David y Goliath traducen «esa tu tarea te quedó bien chafa»](docs/demo/02-comparar-genz-a-papas.png)
 
@@ -27,14 +28,18 @@ Los cuatro ejemplos son jerga chapina del set de prueba, el caso donde David gan
 5. **Evals con métricas de término:** chrF++ más *jerga correcta*, *jerga resuelta* y *cambios acertados*, con un set de desarrollo aparte para decidir y nichos definidos antes de mirar resultados.
 6. **Tu modelo en tu propia GPU:** David corre con Ollama en Cloud Run con una L4, privado, y escala a cero entre charlas; la página lo despierta al abrirse. Entrenar, evaluar y servir: todo en la nube, nada en la laptop.
 
-## Las métricas
+## Las métricas, en palabras simples
 
-- **Jerga correcta:** la jerga que produce el modelo significa lo mismo que el original, según la tabla de contrapartes validadas por significado (`data/counterparts.jsonl`). Es la métrica principal.
-- **Jerga resuelta:** el registro cambió. En Gen Z → papás no queda jerga Gen Z del banco; en papás → Gen Z la salida usa al menos un término Gen Z del país. No mira el significado.
-- **Cambios acertados:** de las palabras que cambió la referencia humana, cuántas aparecen en la salida.
-- **chrF++:** parecido de caracteres con la referencia. Una reescritura de registro conserva casi todas las palabras, así que copiar la frase sin traducir ya saca 53.2; por eso no decide por sí sola.
+Ningún modelo califica a otro: todas las métricas las calcula un programa con reglas fijas.
 
-Todo es determinista: ningún modelo juzga a otro. Los números del set de prueba son del eval del 2026-10-04 sobre 399 frases web `auto_validated` que David nunca vio ([evals/report.md](evals/report.md)), salvo donde se indica otra fecha. Ese eval corrió a David en Ollama en una Mac (antes de pasarlo a la nube): las latencias de las tablas son de ahí, y el costo de David que se muestra es el de esa máquina. En la nube, David responde en ~0.5 s y su costo es el de la GPU ([David en la nube](#david-en-la-nube)).
+- **Jerga correcta** (la principal, y la que la página muestra con ✓ Bien y ✗ Mal): por cada palabra de jerga de la frase, ¿la traducción la cambió por algo que significa lo mismo? El programa usa nuestro banco de jerga (532 términos, cada uno con su significado, su país y su fuente) y una tabla de equivalencias validada por significado (`data/counterparts.jsonl`).
+  *Ejemplo:* «esa tu tarea te quedó bien **chafa**» (chafa = de mala calidad). «Esa tarea tuya te quedó muy mala» → ✓. «Esa tu tarea te quedó bien pura lata» → ✗: cambió una jerga por otra que no dice lo mismo.
+- **Jerga resuelta:** ¿cambió el registro? En Gen Z → papás, que no quede jerga Gen Z del banco; en papás → Gen Z, que la traducción use al menos una jerga Gen Z del país. No mira si el significado es el correcto, por eso no es la principal.
+- **Cambios acertados:** de las palabras que la persona cambió al traducir, cuántas aparecen igual en la traducción del modelo.
+- **chrF++:** qué tanto se parece la traducción a la que escribió una persona, contando los pedazos de letras y de palabras que tienen en común: 0 es nada en común y 100 es idéntica.
+  *Ejemplo:* si la persona escribió «esa tarea te quedó muy mal hecha», «esa tarea tuya te quedó muy mala» comparte casi todo y saca un número alto; «te quedó pura lata» comparte poco y saca uno bajo. En esta tarea casi todas las palabras se quedan iguales, así que copiar la frase sin traducir ya saca 53.2: por eso chrF++ no decide solo.
+
+Los números del set de prueba son del eval del 2026-10-04 sobre 399 frases web `auto_validated` que David nunca vio ([evals/report.md](evals/report.md)), salvo donde se indica otra fecha. Ese eval corrió a David en Ollama en una Mac (antes de pasarlo a la nube): las latencias y costos de esas tablas son de ahí. El tiempo y el costo de David en la nube están medidos aparte ([Tiempo y costo en la nube](#tiempo-y-costo-en-la-nube)).
 
 ## Resultado final
 
@@ -76,6 +81,45 @@ Nichos definidos antes de mirar resultados ([evals/niche.md](evals/niche.md)); I
 | David | 60.4 | 65.3 | 56.5 | 53.6 | 67.4 | 49.1 |
 | Goliath | 53.8 | 52.9 | 55.4 | 51.5 | 61.0 | 43.0 |
 | Goliath + glosario | 54.3 | 60.1 | 58.9 | 56.0 | 63.8 | 47.6 |
+
+## Tiempo y costo en la nube
+
+<!-- projections: make projections -->
+Medido el 2026-10-07 con `make capacity` ([`scripts/bench_capacity.py`](scripts/bench_capacity.py) → [`docs/data/capacity.json`](docs/data/capacity.json)): 48 frases del set de prueba, con el mismo código de la página, contra el David de Cloud Run (1 NVIDIA L4) y contra Gemini. Las tablas las escribe `make projections` a partir de ese archivo.
+
+**Tiempo por traducción** (de que se pide a que llega la respuesta)
+
+| | Mediana | p95 | Traducciones por hora |
+| --- | ---: | ---: | ---: |
+| David, 1 a la vez | 0.6 s | 0.8 s | 4,114 |
+| David, 4 a la vez | 0.8 s | 1.1 s | 16,499 |
+| David, 8 a la vez | 1.0 s | 1.3 s | 25,984 |
+| David, 16 a la vez | 1.7 s | 2.3 s | 29,586 |
+| Goliath (Gemini) | 3.2 s | 12.9 s | sin límite propio |
+
+David es más rápido en todos los casos medidos: su mediana con 16 traducciones a la vez (1.7 s) sigue debajo de la de Goliath (3.2 s). De las 48 llamadas a Gemini, 2 fallaron por saturación de Vertex AI (429); la página reintenta sola.
+
+**Costo.** La GPU de David se cobra por segundo mientras está encendida, haga lo que haga: R = L4 + 4 vCPU + 16 GiB ≈ **$1.05 por hora**. Gemini cobra por token: en la medición cada traducción usó en promedio 125 tokens de entrada y 298 de salida (incluye su razonamiento), o sea g ≈ **$0.0012** con la tarifa de hoy ($0.75 / $3.75 por millón) y **$0.0024** desde el 2027-01-01 ($1.50 / $7.50).
+
+- David por traducción = R ÷ V, con V traducciones por hora. Una GPU aguanta hasta C = 29,586 por hora (lo mejor medido, 16 a la vez); con más, se suman GPUs: ⌈V ÷ C⌉ × R ÷ V.
+- Goliath por traducción = g, igual a cualquier volumen.
+- Equilibrio: V = R ÷ g. Al mes: 730 horas a ese volumen.
+
+| Traducciones por hora | GPUs de David | David por traducción | Goliath por traducción (hoy) | Goliath (desde 2027-01-01) | David al mes | Goliath al mes (hoy) | Goliath al mes (desde 2027-01-01) |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 50 | 1 | $0.021 | **$0.0012** | **$0.0024** | $764 | **$44.26** | $88.51 |
+| 500 | 1 | $0.0021 | **$0.0012** | $0.0024 | $764 | **$443** | $885 |
+| 1,000 | 1 | **$0.0010** | $0.0012 | $0.0024 | **$764** | $885 | $1,770 |
+| 5,000 | 1 | **$0.00021** | $0.0012 | $0.0024 | **$764** | $4,426 | $8,851 |
+| 20,000 | 1 | **$0.000052** | $0.0012 | $0.0024 | **$764** | $17,702 | $35,404 |
+| 50,000 | 2 | **$0.000042** | $0.0012 | $0.0024 | **$1,528** | $44,256 | $88,509 |
+
+**Dónde gana David:** desde unas **863 traducciones por hora** con la tarifa de hoy y **432** con la de 2027-01-01. Con su GPU llena, cada traducción cuesta **$0.000035**: 34 veces menos que Gemini hoy y 69 veces menos desde 2027-01-01. Un traductor que atiende a una organización todo el día está en esa zona.
+
+**Dónde gana Goliath:** con poco volumen. En una charla (unas 50 frases en una hora) la GPU cuesta ~$1.05 por esa hora y Gemini ~$0.061 por las 50 frases. Por eso David se apaga solo entre charlas: así no cuesta nada mientras nadie lo usa.
+
+En la página, el costo de David es el de los segundos de GPU que usó esa traducción (atendiendo una a la vez), y el de Goliath, lo que Gemini cobró por sus tokens.
+<!-- /projections -->
 
 ## Todos los experimentos
 
@@ -186,8 +230,8 @@ Detalle y fechas en [docs/BITACORA.md](docs/BITACORA.md); decisiones técnicas e
     - *Qué aprendimos:* no entra en el presupuesto de 1 s; está apagado (`DAVID_NBEST=1`).
 16. **David en la nube** (2026-10-06).
     - *Qué probó:* servir el mismo David con Ollama en Cloud Run con una GPU L4 (europe-west4), privado y con escala a cero, y que la página pública lo llame con un token de identidad.
-    - *Resultado:* con la GPU encendida, David responde en ~0.5 s a través de la página (Goliath, entre 0.8 y 18.6 s ese día). Encender la GPU desde cero, cargar el modelo y calentarlo tarda unos cuatro minutos. Los 4 ejemplos dieron lo mismo que en la Mac: 12 de 12 aciertos de David, 0 de Goliath.
-    - *Qué aprendimos:* en la nube David sigue siendo más rápido, pero ya no es gratis: la GPU cuesta unos $1.05 por hora mientras está encendida, y con el uso de una charla eso es más que lo que cobra Gemini por las mismas frases. Por eso la página muestra el tiempo y no el costo ([detalle](docs/DECISIONES.md#david-en-la-nube)).
+    - *Resultado:* con la GPU encendida, David responde en ~0.5 s a través de la página (Goliath, entre 0.8 y 18.6 s ese día). Encender la GPU desde cero, cargar el modelo y calentarlo tardaba casi cuatro minutos; leer los archivos de una vez y llevar los kernels de CUDA ya compilados en la imagen lo bajó a unos 35 segundos. Los 4 ejemplos dieron lo mismo que en la Mac: 12 de 12 aciertos de David, 0 de Goliath.
+    - *Qué aprendimos:* en la nube David sigue siendo más rápido, pero ya no es gratis: la GPU cuesta unos $1.05 por hora mientras está encendida, y con el uso de una charla eso es más que lo que cobra Gemini por las mismas frases. La página mostró primero solo el tiempo; con la capacidad de la GPU medida, muestra los dos, y el README tiene las proyecciones: con volumen, David cuesta una fracción de Gemini ([Tiempo y costo en la nube](#tiempo-y-costo-en-la-nube)).
 
 **Costo total:** las ejecuciones de entrenamiento con registro costaron $9.15, incluidas cinco de las seis fallidas ($3.44; la sexta no dejó registro de costo).
 
@@ -203,17 +247,30 @@ La página usa `genlingo-2026-10c-e2b-nomulti` en Q5_K_M con el prompt de léxic
 
 ## Arranque rápido
 
-Para usar la demo no hace falta nada: abre la página. Para reconstruirla (Google Cloud con `gcloud` y ADC, `uv`):
+Para usar la demo no hace falta nada: abre la página. Para probar el código sin nube: `make test` (modelos simulados, `MOCK_AI=1`).
+
+## Reproducirlo en tu propio proyecto
+
+Los modelos (los GGUF de David y los kernels de CUDA compilados) y los datos de entrenamiento viven en **buckets privados** del proyecto de Google Cloud de la charla; al clonar el repo no vienen. Para reproducir todo necesitas tu propio proyecto de Google Cloud (con cuota de GPU L4) y tus buckets:
+
+1. **Configuración:** `cp .env.example .env` y cambia `GOOGLE_CLOUD_PROJECT`, `MODELS_BUCKET` (los modelos), `STAGING_BUCKET` (entrenamiento y evals, en la región de la GPU) y `DAVID_URL` (se llena después del primer `make deploy`). Las cuentas de servicio y el repositorio de imágenes los crean los scripts de `infra/` ([docs/ONBOARDING.md](docs/ONBOARDING.md), sección 3).
+2. **Datos:** `make data` vuelve a construir el set de prueba, los pares anclados en oraciones reales y los sintéticos desde las fuentes de [data/SOURCES.md](data/SOURCES.md) (los sintéticos los escribe Gemini, con costo).
+3. **Entrenar:** `make train` (una L4 entrena y un job de CPU fusiona y publica el GGUF en tu `MODELS_BUCKET`).
+4. **Medir:** `make eval` y `make eval-dev` (un job con GPU en la nube).
+5. **Publicar:** `bash infra/04-david.sh` (David en Cloud Run con GPU), `bash infra/07-david-jit-cache.sh` y otra vez `infra/04-david.sh` (kernels de CUDA compilados, para que arranque en ~35 s) y `bash infra/05-page.sh` (la página). `make check` la prueba en vivo.
 
 ```bash
-cp .env.example .env && (cd duel && uv sync)
+cp .env.example .env && (cd duel && uv sync)   # y edita .env con tu proyecto y tus buckets
 gcloud auth application-default login
-make deploy   # David en Cloud Run con GPU (europe-west4) + la página pública (us-central1)
-make check    # la página en vivo: despierta a David y traduce cada ejemplo con los dos
-make test     # pruebas sin red (MOCK_AI=1)
+make data && make train TAG=genlingo-YYYY-MM && make eval
+make deploy && make check
 ```
 
 Comandos completos en [docs/COMANDOS.md](docs/COMANDOS.md).
+
+## Licencia
+
+El código está bajo Apache 2.0 ([LICENSE](LICENSE)). Los datos citan su fuente y su licencia en cada registro, y David, como ajuste de Gemma, sigue los términos de uso de Gemma: el detalle está en [THIRD_PARTY.md](THIRD_PARTY.md).
 
 ## Documentación
 

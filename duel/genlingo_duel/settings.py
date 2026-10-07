@@ -58,6 +58,11 @@ class Settings:
     country: str = field(default_factory=lambda: _env("EVENT_COUNTRY", "GT"))
     # David's N-best: candidates generated in parallel and reranked with the term bank (1 = off).
     david_nbest: int = field(default_factory=lambda: int(_env("DAVID_NBEST", "1")))
+    # Spending limits of the public page (limits.py): per visitor per minute, and per day for the whole page.
+    limit_translate_per_min: int = field(default_factory=lambda: int(_env("LIMIT_TRANSLATE_PER_MIN", "60")))
+    limit_wake_per_min: int = field(default_factory=lambda: int(_env("LIMIT_WAKE_PER_MIN", "12")))
+    limit_gemini_per_day: int = field(default_factory=lambda: int(_env("LIMIT_GEMINI_PER_DAY", "1500")))
+    limit_wakes_per_day: int = field(default_factory=lambda: int(_env("LIMIT_WAKES_PER_DAY", "24")))
     # What David's GPU service costs per second while it runs (Cloud Run: L4 + vCPU + memory, billed by the
     # second; infra/04-david.sh sizes it). The page shows David's cost as these seconds × this rate.
     david_usd_per_s: float = field(default_factory=lambda: (

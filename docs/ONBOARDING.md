@@ -66,8 +66,9 @@ Todos cargan `infra/env.sh` (proyecto, regiones, Artifact Registry) y `infra/app
 | 01 | `bash infra/01-train-service-account.sh` | Cuenta `genlingo-train`: `storage.objectAdmin` en los dos buckets, lectura de Artifact Registry y acceso a `hf-token` si existe. | Una vez. |
 | 02 | `bash infra/02-train-image.sh` | Construye la imagen de entrenamiento con Cloud Build (`e2-highcpu-8`, ~15 min la primera vez). El tag es un hash de sus archivos: si no cambiaron, no reconstruye. | Lo llama `make train`. |
 | 03 | `bash infra/03-train-job.sh` | Crea o actualiza dos Cloud Run Jobs en `europe-west4`: `genlingo-train` (1× L4, 8 vCPU, 32 GiB, tope de 1 h, `ADAPTER_ONLY=1`) y `genlingo-finish` (solo CPU, 8 vCPU, 32 GiB, `python /app/finish.py`, disco efímero de 10 GiB para el GGUF f16). Los dos montan el bucket de staging en `/mnt/work`. | Lo llama `make train`. |
-| 04 | `bash infra/04-david.sh` | Cuenta `genlingo-david` (sin roles). Construye con Cloud Build la imagen de David (`david/Dockerfile`: Ollama 0.35.0 con el GGUF de `DAVID_MODEL_TAG` y `EMBEDDING_MODEL` adentro; el tag es un hash de la receta y del GGUF) y la despliega como servicio privado `genlingo-david` en `europe-west4`: 1× L4, 4 vCPU, 16 GiB, CPU siempre asignada, `min-instances=0`, `max-instances=1`, concurrencia 8, tiempo máximo 600 s. | Lo llama `make deploy`. |
+| 04 | `bash infra/04-david.sh` | Cuenta `genlingo-david` (sin roles). Construye con Cloud Build la imagen de David (`david/Dockerfile`: Ollama 0.35.0 con el GGUF de `DAVID_MODEL_TAG`, `EMBEDDING_MODEL` y los kernels de CUDA compilados de `cuda-jit/` en el bucket de modelos; `david/start.sh` lee los archivos de una vez y carga los dos modelos al arrancar; el tag es un hash de la receta, del GGUF y de los kernels) y la despliega como servicio privado `genlingo-david` en `europe-west4`: 1× L4, `DAVID_CPU` vCPU, `DAVID_MEMORY_GIB` GiB, CPU siempre asignada, `min-instances=0`, `max-instances=1`, concurrencia 32 (Ollama atiende 16 a la vez), tiempo máximo 600 s. | Lo llama `make deploy`. |
 | 05 | `bash infra/05-page.sh` | Cuenta `genlingo-page` con `aiplatform.user` y `run.invoker` sobre `genlingo-david`. Construye la página (`duel/Dockerfile`, desde la raíz del repo) y la despliega como servicio público `genlingo` en `us-central1`: `min-instances=0`, `max-instances=3`, 1 vCPU, 1 GiB, tiempo máximo 900 s (la primera llamada espera a que David encienda). | Lo llama `make deploy`. |
+| 07 | `bash infra/07-david-jit-cache.sh` | Corre `david/fill-jit-cache.sh` como job de una vez (`genlingo-david-jit`, 1× L4) con la imagen actual de David: arranca a David, pasa por todas las formas de llamada de la página y guarda los kernels de CUDA que compiló el driver en `gs://…-genlingo-models/cuda-jit/ollama-<versión>-l4/` (~140 MB). Sin ellos, cada arranque compilaba los kernels (~1.5 min). | Al cambiar la versión de Ollama; después, `infra/04-david.sh`. |
 | 06 | `bash infra/06-eval-job.sh [args de run_eval.py]` | Cuenta `genlingo-eval` (lectura del bucket de modelos, escritura en staging, Vertex AI). Construye la imagen del eval (`evals/Dockerfile`), crea o actualiza el job `genlingo-eval` (1× L4, 8 vCPU, 32 GiB, bucket de modelos montado de solo lectura en `/mnt/models`, staging en `/mnt/staging`), lo ejecuta y copia el reporte a `evals/`. | Lo llaman `make eval` y `make eval-dev`. |
 
 ## 4. Datos, entrenamiento y eval: la cadena completa
@@ -101,9 +102,10 @@ Se elige la dirección, se escribe una frase o se toca un ejemplo, y David y Gol
 
 David escala a cero cuando nadie lo usa. Al abrir la página:
 
-1. La página llama `POST /api/david/wake`. Esa llamada enciende la instancia de David (Cloud Run la retiene hasta que arranca), carga David y EmbeddingGemma si no están en memoria (`/api/ps`, `/api/chat` vacío, `/api/embed`), traduce frases de calentamiento (los ejemplos, en las dos direcciones) hasta que tres seguidas tardan menos de 1 s, y responde. Los primeros minutos de una instancia recién encendida son lentos (la imagen todavía se descarga por partes); así «David listo» significa rápido. Mientras tanto la página consulta `GET /api/status` cada segundo para mostrar el reloj de «Preparando a David…».
+1. La página llama `POST /api/david/wake`. Esa llamada enciende la instancia de David (Cloud Run la retiene hasta que arranca), carga David y EmbeddingGemma si no están en memoria (`/api/ps`, `/api/chat` vacío, `/api/embed`), traduce frases de calentamiento (los ejemplos, en las dos direcciones) hasta que tres seguidas tardan menos de 1 s, y responde. Con los kernels de CUDA ya compilados en la imagen, eso tarda unos 35 s desde cero; las frases de calentamiento aseguran que «David listo» signifique rápido. Mientras tanto la página consulta `GET /api/status` cada segundo para mostrar el reloj de «Preparando a David…».
 2. Con «David listo», los botones se activan.
-3. Cada minuto, mientras la página está abierta y visible (hasta tres horas), vuelve a llamar `POST /api/david/wake`: una consulta barata que mantiene encendida la instancia. Si David se apagó, lo vuelve a encender.
+3. Cada minuto, mientras la página está abierta y visible y alguien la usó en los últimos 45 minutos, vuelve a llamar `POST /api/david/wake`: una consulta barata que mantiene encendida la instancia. Una pestaña olvidada deja de mantenerlo, y David se apaga solo; al volver a usar la página, lo enciende otra vez.
+4. **Límites de gasto** (`duel/genlingo_duel/limits.py`): la página es pública, así que cada conexión puede pedir hasta 60 traducciones (30 frases) y 12 despertares por minuto, y la página entera hasta 1,500 llamadas a Gemini y 24 encendidos de David por día. Al pasarse, la página lo dice en español en vez de traducir. Una charla usa unas decenas de frases y uno o dos encendidos. Se cambian con `LIMIT_*` en `.env`.
 
 Ensayo sin nube: `MOCK_AI=1 uv run --project duel uvicorn genlingo_duel.main:create_app --factory --port 8080` levanta la página con modelos simulados en `http://127.0.0.1:8080`.
 
@@ -126,7 +128,7 @@ Ensayo sin nube: `MOCK_AI=1 uv run --project duel uvicorn genlingo_duel.main:cre
 
 | Síntoma | Causa y solución |
 | --- | --- |
-| La página se queda en «Preparando a David…» más de 5 minutos | Cloud Run no consiguió una GPU (la cuota de L4 de `europe-west4` es compartida con otras demos y jobs) o la instancia no arrancó. Revisa `gcloud run services logs read genlingo-david --region europe-west4` y recarga la página. |
+| La página se queda en «Preparando a David…» más de 2 minutos | Cloud Run no consiguió una GPU (la cuota de L4 de `europe-west4` es compartida con otras demos y jobs) o la instancia no arrancó. Revisa `gcloud run services logs read genlingo-david --region europe-west4` y recarga la página. |
 | La página dice «David no respondió · reintentando» | La llamada de encendido falló (tiempo agotado o error de David); la página reintenta cada 5 s. Si sigue, mira los registros de `genlingo-david`. |
 | La columna de David dice «No respondió» | David se apagó entre la última llamada y esta (más de ~15 min sin uso) o tardó más de 120 s. Pulsa **Traducir** otra vez. |
 | Goliath dice «No respondió» | Gemini tardó más de 30 s o falló. Vuelve a intentar. |
@@ -138,7 +140,7 @@ Ensayo sin nube: `MOCK_AI=1 uv run --project duel uvicorn genlingo_duel.main:cre
 
 ## 9. Día de la charla
 
-- [ ] Abrir **https://genlingo-611681112050.us-central1.run.app** en Chrome unos diez minutos antes y esperar «David listo».
+- [ ] Abrir **https://genlingo-611681112050.us-central1.run.app** en Chrome unos minutos antes y esperar «David listo» (menos de un minuto).
 - [ ] Pantalla completa y comprobar desde el fondo de la sala que se lea.
 
 Nada que ejecutar antes ni después: David se apaga solo unos 15 minutos después de cerrar la página.

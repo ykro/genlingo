@@ -36,16 +36,18 @@ duel/                 The comparison page (FastAPI) — runs on Cloud Run
                       identity token for David (cloud_auth.py) and the page (static/index.html)
   tests/              Tests (MOCK_AI=1)
   Dockerfile          The page's image
-david/                David's image: Ollama with the model and EmbeddingGemma inside (Dockerfile, cloudbuild.yaml)
+david/                David's image: Ollama with the model, EmbeddingGemma and the compiled CUDA kernels (Dockerfile, start.sh,
+                      fill-jit-cache.sh, cloudbuild.yaml)
 data/                 terms.jsonl, raw/, pairs/, eval/, counterparts.jsonl, SOURCES.md, DATASHEET.md,
                       translate_examples.json (the page's examples, verified live)
-scripts/              Data building, check_page.py (make check), screenshots.py (make screenshots)
+scripts/              Data building, check_page.py (make check), screenshots.py (make screenshots), bench_capacity.py (make capacity)
 train/                train_lora.py, finish.py, preference.py, submit_job.py, notebook, runs/
 evals/                run_eval.py, term_accuracy.py, report.py, report.md, experiments/,
                       Dockerfile + cloud_eval.sh (the eval job)
-infra/                Numbered gcloud scripts: 01–03 training, 04 David, 05 the page, 06 the eval
+infra/                Numbered gcloud scripts: 01–03 training, 04 David, 05 the page, 06 the eval,
+                      07 David's CUDA kernels
 docs/                 DEMO, ONBOARDING, BITACORA, DECISIONES, COMANDOS, ESTRUCTURA, CREDITOS,
-                      diagrams/ (HTML + SVG + PNG), demo/ (screenshots of the page)
+                      diagrams/ (HTML + SVG + PNG), demo/ (screenshots of the page), data/capacity.json (make capacity)
 ```
 
 ## Versions
