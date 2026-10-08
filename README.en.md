@@ -13,16 +13,16 @@ One public page on Cloud Run: **https://genlingo-611681112050.us-central1.run.ap
 - At the bottom, «¿Cómo se lee esta página?» explains ✓/✗, time and cost in plain words. The page works on a projector, a laptop and a phone.
 - David shuts down on his own when nobody uses him, so nothing bills between talks. When the page opens, the top right says «Preparando a David…» with a clock while his GPU starts; from zero it takes about 35 seconds ([measured](docs/DECISIONES.en.md#david-in-the-cloud); it used to be almost 4 minutes). Once it says «David listo» everything answers right away, and the page keeps him on while it stays open.
 
-![The comparison page: David and Goliath translate «esa tu tarea te quedó bien chafa»](docs/demo/02-comparar-genz-a-papas.png)
+![The comparison page: David and Goliath translate «No tengo pisto, préstame unas baras»](docs/demo/02-comparar-genz-a-papas.png)
 
-The three examples are Guatemalan slang from the test set (David never saw them in training), from openly licensed sources. Each was run live 3 times with each model against the cloud David: David got all 9 right and Goliath none. The 38 open-source phrases from Mexico, Colombia and neutral Spanish were also tried, and none passed every check ([why](#and-gen-z-slang-that-isnt-guatemalan)). Each example, with its source, license and the answers of every run, is in [`data/translate_examples.json`](data/translate_examples.json). The script is in [docs/DEMO.en.md](docs/DEMO.en.md).
+The five examples are test-set phrases (David never saw them in training), from openly licensed sources: three combine two Guatemalan terms («No tengo **pisto**, préstame unas **baras**»), one is from Mexico («de **partir la madre**») and one goes parents → Gen Z. They were run live, 3 times with each model, with the page's David (`genlingo-2026-10e-e2b`): of the 96 showable test phrases, 18 passed the automatic check and, read one by one, 5 hold up. Colombia and neutral Spanish have no example: in the ones that passed, Goliath said something correct that the bank doesn't recognize ([details](evals/experiments/2026-10-07-ejemplos-ronda5.md), Spanish). Each example, with its source, license and the answers of every run, is in [`data/translate_examples.json`](data/translate_examples.json). The script is in [docs/DEMO.en.md](docs/DEMO.en.md): first a slang word from all over the internet («cringe»), where they tie, then local slang and combinations, where David wins.
 
 ![What runs where: the page, David and Goliath in the cloud](docs/diagrams/arquitectura.png)
 
 ## What you'll learn
 
 1. **Your own data with `origin`:** every pair says where it came from (`web`, `synthetic` or `human`); without that you can't evaluate or retrain monthly.
-2. **Term bank and real sentences:** 532 terms from 92 sources, meaning-validated counterparts and 565 pairs anchored in real sentences; David's edge is his data. Sentences from sources that can't be redistributed live in a private bucket, not in the repo ([data/SOURCES.md](data/SOURCES.md)).
+2. **Term bank and real sentences:** 734 terms from 133 sources, meaning-validated counterparts and 1,138 pairs anchored in real sentences; David's edge is his data. Sentences from sources that can't be redistributed live in a private bucket, not in the repo ([data/SOURCES.md](data/SOURCES.md)).
 3. **LoRA on Cloud Run Jobs:** an L4 trains and a CPU job merges and exports GGUF; each run records its duration and cost.
 4. **The cost of compression:** f16 vs Q4_K_M, Q5_K_M, Q6_K, Q8_0 and imatrix, in size, latency and lost slang.
 5. **Evals with term metrics:** chrF++ plus *correct slang*, *slang handled* and *reference changes*, with a separate dev set for decisions and niches defined before looking at results.
@@ -32,69 +32,86 @@ The three examples are Guatemalan slang from the test set (David never saw them 
 
 No model grades another: every metric is computed by a program with fixed rules.
 
-- **Correct slang** (*jerga correcta*; the main one, and what the page shows as ✓ Bien and ✗ Mal): for each slang word in the phrase, did the translation replace it with something that means the same? The program uses our slang bank (532 terms, each with its meaning, country and source) and a meaning-validated counterpart table (`data/counterparts.jsonl`).
+- **Correct slang** (*jerga correcta*; the main one, and what the page shows as ✓ Bien and ✗ Mal): for each slang word in the phrase, did the translation replace it with something that means the same? The program uses our slang bank (734 terms, each with its meaning, country and source) and a meaning-validated counterpart table (`data/counterparts.jsonl`).
   *Example:* «esa tu tarea te quedó bien **chafa**» (chafa = poor quality). «Esa tarea tuya te quedó muy mala» → ✓. «Esa tu tarea te quedó bien pura lata» → ✗: it swapped one slang word for another that doesn't mean the same.
 - **Slang handled** (*jerga resuelta*): did the register change? Gen Z → parents: no Gen Z bank slang is left; parents → Gen Z: the translation uses at least one Gen Z term of the country. It doesn't check whether the meaning is right, so it isn't the main one.
 - **Reference changes** (*cambios acertados*): of the words the person changed when translating, how many appear unchanged in the model's translation.
 - **chrF++:** how similar the translation is to the one a person wrote, counting the chunks of letters and words they share: 0 is nothing in common and 100 is identical.
   *Example:* if the person wrote «esa tarea te quedó muy mal hecha», «esa tarea tuya te quedó muy mala» shares almost everything and scores high; «te quedó pura lata» shares little and scores low. In this task most words stay the same, so copying the phrase untranslated already scores 53.2: that's why chrF++ doesn't decide on its own.
 
-Test-set numbers come from the 2026-10-07 eval on 399 `auto_validated` web phrases David never saw, run in the cloud (Cloud Run with an L4, the same GPU as the page; [evals/report.md](evals/report.md)), unless another date is given. The page's time and cost are measured separately ([Time and cost in the cloud](#time-and-cost-in-the-cloud)).
+Test-set numbers come from the eval of the night of 2026-10-07 (every model with the round-5 bank and the term-by-term check) on 399 `auto_validated` web phrases David never saw, run in the cloud (Cloud Run with an L4, the same GPU as the page; [evals/report.md](evals/report.md)), unless another date is given. The page's time and cost are measured separately ([Time and cost in the cloud](#time-and-cost-in-the-cloud)).
 
 ## Final result
 
 | | Correct slang | Slang handled | chrF++ | p50 (eval) |
 | --- | ---: | ---: | ---: | ---: |
-| **David** (`genlingo-2026-10d-e2b`, Q5_K_M, 3.62 GB) | **44 %** | **80 %** | **60.0** | **237 ms** |
-| Goliath `gemini-3.8-flash` | 24 % | 77 % | 53.7 | 3.06 s |
-| Goliath with David's lexicon (reference) | 41 % | 83 % | 56.4 | 3.20 s |
+| **David** (`genlingo-2026-10e-e2b`, Q5_K_M, 3.62 GB) | **58 %** | **81 %** | **60.7** | **253 ms** |
+| Previous David (`genlingo-2026-10d-e2b`) | 54 % | 78 % | 59.8 | 256 ms |
+| Goliath `gemini-3.8-flash` | 34 % | 77 % | 53.2 | 3.49 s |
+| Goliath with David's lexicon (reference) | 48 % | 81 % | 56.9 | 3.28 s |
 | Copy the phrase (baseline) | 1 % | 1 % | 53.2 | — |
 
-- **Correct slang:** +19.5 points over Goliath (95 % CI [+13.5, +25.6]). 120 phrases only David gets right and 42 only Goliath.
-- **Slang handled:** +3.3 [−1.3, +7.8], a statistical tie.
-- **chrF++:** 60.0 against 53.7 for Goliath and 56.4 for Goliath with the lexicon.
-- **Goliath's cost:** $1.14 per 1,000 phrases in that eval; $2.28 at the price from 2027-01-01.
+- **Correct slang:** +24.1 points over Goliath (95 % CI [+18.6, +29.6]). 126 phrases only David gets right and 30 only Goliath.
+- **Slang handled:** +4.0 [−0.3, +8.3], a statistical tie.
+- **chrF++:** 60.7 against 53.2 for Goliath and 56.9 for Goliath with the lexicon.
+- **Goliath's cost:** $1.22 per 1,000 phrases in that eval; $2.43 at the price from 2027-01-01.
 
-### By niche (correct slang, David vs Goliath without glossary)
+### Phrases with several slang terms (round 5)
 
-Niches defined before looking at results ([evals/niche.md](evals/niche.md)); 95 % CI by paired bootstrap ([evals/niche_report.md](evals/niche_report.md)).
+The hypothesis: Goliath knows many terms on their own, but when a phrase combines several from the same country, David, trained on that country, can win. The «Combinations» niche was registered before gathering data and training ([evals/niche.md](evals/niche.md), amendment 2): 174 real web phrases with 2 or more terms from the frozen bank, in both directions (91 from the test set and 83 from new sentences set aside before running any model). Correct slang, 95 % CI by paired bootstrap ([evals/report_combos.md](evals/report_combos.md)).
 
-| Niche | n | David | Goliath | Δ | 95 % CI | Verdict |
+| Slice | n | David | Goliath | Δ | 95 % CI | Verdict |
 | --- | ---: | ---: | ---: | ---: | --- | --- |
-| Guatemalan slang (GT) | 115 | 50 % | 20 % | +30.4 | [+19.1, +41.7] | David wins |
-| Parents → Gen Z (GT/CO) | 107 | 33 % | 20 % | +13.1 | [+1.9, +25.2] | David wins |
-| Country CO | 131 | 37 % | 18 % | +19.1 | [+8.4, +29.8] | David wins |
-| Country MX | 78 | 46 % | 33 % | +12.8 | [−1.3, +26.9] | statistical tie |
-| Country LATAM (neutral Spanish) | 75 | 43 % | 32 % | +10.7 | [−1.3, +22.7] | statistical tie |
-| Whole set | 399 | 44 % | 24 % | +19.5 | [+13.5, +25.6] | David wins |
+| **Combinations** | 174 | **62 %** | 45 % | +16.7 | [+7.5, +25.9] | **David wins** |
+| Gen Z → parents | 78 | 63 % | 33 % | +29.5 | [+15.4, +43.6] | David wins |
+| Parents → Gen Z | 96 | 61 % | 55 % | +6.2 | [−5.2, +17.7] | tie |
+| Mexico | 67 | 66 % | 52 % | +13.4 | [−1.5, +26.9] | tie |
+| Colombia | 46 | 52 % | 33 % | +19.6 | [+0.0, +39.1] | tie (bound at 0) |
+| Neutral Spanish | 39 | 72 % | 64 % | +7.7 | [−10.3, +25.6] | tie |
+| Guatemala | 22 | 55 % | 18 % | +36.4 | [+9.1, +63.6] | n < 30, no verdict |
 
-By country and direction (not pre-registered; same bootstrap): David wins Gen Z → parents in Mexico (51 % vs 22 %) and Colombia (43 % vs 15 %); in neutral Spanish Gen Z → parents it's 50 % vs 36 %, on the edge of a tie. Parents → Gen Z outside Guatemala is a tie in all three.
+- **The previous David lost here:** `10d` scored 39 % against 45 % for Goliath (−6.3 [−16.7, +3.4]); it lost in Mexico and neutral Spanish. Round 5 added 23 points.
+- **Against Goliath with the same lexicon:** 62 % vs 61 %, a tie. With the same data the big model catches up with David on combinations; without it, it doesn't.
 
-- **Against Goliath with the same lexicon:** David wins on Guatemalan slang (+13.9 [+3.5, +24.3]); ties on the whole set (+2.5), on parents → Gen Z and in Colombia; in Mexico (46 % vs 58 %) and neutral Spanish (43 % vs 51 %) Goliath is ahead without a significant difference.
+### By country and direction (correct slang, David vs Goliath without glossary)
 
-### And Gen Z slang that isn't Guatemalan?
+Niches from [evals/niche.md](evals/niche.md); 95 % CI by paired bootstrap ([evals/niche_report.md](evals/niche_report.md), [evals/report_combos.md](evals/report_combos.md)).
 
-The first version of the bank and the real sentences came almost entirely from Guatemala and Colombia (268 and 255 of 556 real pairs; Mexico 9, neutral Spanish 24), and the page always translates with Guatemalan slang. So with «cringe», «random» or «crush» David answered the Guatemalan way. It was measured and worked on in two ways:
+| Slice | n | David | Goliath | Δ | 95 % CI | Verdict |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| Guatemalan slang (GT) | 115 | 61 % | 18 % | +42.6 | [+32.2, +53.0] | David wins |
+| Parents → Gen Z (GT/CO) | 107 | 33 % | 15 % | +17.8 | [+6.5, +29.0] | David wins |
+| Country CO | 131 | 53 % | 28 % | +24.4 | [+14.5, +34.4] | David wins |
+| Country MX | 77 | 65 % | 48 % | +16.9 | [+5.2, +28.6] | David wins (with `10d`, a tie) |
+| Country LATAM (neutral Spanish) | 75 | 55 % | 52 % | +2.7 | [−9.3, +14.7] | statistical tie |
+| Gen Z → parents | 226 | 77 % | 41 % | +36.3 | [+29.2, +43.4] | David wins |
+| Parents → Gen Z | 172 | 32 % | 24 % | +8.1 | [−1.2, +16.9] | statistical tie |
+| Whole set | 398 | 58 % | 34 % | +24.1 | [+18.6, +29.6] | David wins |
 
-- **A separate probe** ([evals/report_probe.md](evals/report_probe.md), `make eval-probe`): 32 real sentences of general Gen Z slang (cringe, random, crush, stalkear, funar, ghostear, shippear, mid, mood, delulu, basado, rizz, slay, red flag, prime…) from 14 pages never used for training, in both directions.
+- **Gen Z → parents, David wins in all four countries:** Mexico 84 % vs 51 %, Colombia 71 % vs 37 %, neutral Spanish 80 % vs 64 % and Guatemala 80 % vs 22 %.
+- **Parents → Gen Z:** he wins in Guatemala (37 % vs 14 %); ties in Mexico (48 % vs 45 %) and Colombia (29 % vs 16 %); in neutral Spanish he loses (4 % vs 28 %, 25 phrases).
+- **Against Goliath with the same lexicon:** David wins on the whole set (58 % vs 48 %, +9.8 [+4.3, +15.5]), in Guatemala and in Colombia; ties in Mexico and neutral Spanish.
 
-  | | As neutral Spanish | As Guatemala |
-  | --- | ---: | ---: |
-  | David before (`10c`) | 91 % | 69 % |
-  | **David today (`10d`)** | **91 %** | **77 %** |
-  | Goliath | 94 % | 77 % |
+### Slang from all over the internet: a tie
 
-- **Data round 4:** 1,600 training pairs anchored in Gen Z slang of Mexico and neutral Spanish, plus 17 real sentences; `10d` won on dev (46 % vs 40 % correct slang) and is the page's David.
+With general Gen Z slang (cringe, random, crush, stalkear, funar, mid, delulu…) David and Goliath tie. It's measured with a separate probe ([evals/report_probe.md](evals/report_probe.md), `make eval-probe`): 32 real sentences from 14 pages never used for training, in both directions.
 
-**Short answer:** David does translate general Gen Z slang (91 % on the probe), but there he doesn't beat Goliath: they tie. He wins with the slang of a country the big model knows little about: Guatemala, Colombia and, Gen Z → parents, Mexico. That's why the page's examples are Guatemalan.
+| | As neutral Spanish | As Guatemala |
+| --- | ---: | ---: |
+| `10c` (round 3) | 91 % | 69 % |
+| `10d` (round 4) | 91 % | 73 % |
+| **`10e` (round 5, on the page)** | **88 %** | **69 %** |
+| Goliath | 94 % | 69 % |
+
+Any big model already knows that slang. David's edge is in the slang of a country the big model knows little about and in phrases that combine several terms from that country. The demo starts there: «cringe» is a tie, «pisto» and «baras» in the same phrase are not.
 
 ### chrF++ by country and by direction
 
 | | CO | GT | LATAM | MX | Gen Z → parents | Parents → Gen Z |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| David | 60.9 | 66.1 | 56.1 | 53.6 | 68.3 | 48.6 |
-| Goliath | 52.9 | 53.0 | 59.7 | 49.7 | 61.4 | 43.1 |
-| Goliath + lexicon | 54.0 | 59.8 | 60.1 | 52.2 | 62.7 | 47.7 |
+| David | 61.0 | 66.7 | 57.9 | 54.4 | 69.5 | 48.5 |
+| Goliath | 52.4 | 52.5 | 57.4 | 51.0 | 60.1 | 43.4 |
+| Goliath + lexicon | 55.0 | 60.4 | 58.8 | 53.2 | 63.1 | 48.2 |
 
 ## Time and cost in the cloud
 
@@ -135,29 +152,51 @@ David is faster in every case measured: his median with 16 translations at a tim
 On the page, David's cost is the GPU seconds that translation used (serving one at a time), and Goliath's is what Gemini billed for its tokens.
 <!-- /projections -->
 
+This measurement was made with `genlingo-2026-10d-e2b`, the previous David. `genlingo-2026-10e-e2b` is the same size (3.62 GB, Q5_K_M), runs on the same service and answers just as fast in the eval (p50 of 253 ms vs 256 ms), so it wasn't measured again.
+
 ## All the experiments
 
-### Every variant on the test set (399 phrases, 2026-10-07 eval in the cloud)
+### Every variant on the test set (399 phrases, eval of the night of 2026-10-07 in the cloud)
+
+Every model with the round-5 bank (734 terms) and the term-by-term check; that's why the earlier Davids' numbers don't match the ones published in their round.
 
 | Variant | Correct slang | Slang handled (Gen Z → parents / parents → Gen Z / total) | Changes matched | chrF++ | p50 | Size | Training |
 | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: |
-| Base `gemma4:e2b-it-qat` | 14 % | 94 % / 10 % / 58 % | 14 % | 50.3 | 151 ms | 4.34 GB | — |
-| Base E2B + lexicon | 42 % | 98 % / 16 % / 62 % | 24 % | 54.9 | 213 ms | 4.34 GB | — |
-| Base `gemma4:e4b` | 18 % | 98 % / 31 % / 69 % | 17 % | 48.2 | 224 ms | 6.58 GB | — |
-| `genlingo-2026-09` (minimal edits, Q4_K_M) | 17 % | 93 % / 21 % / 62 % | 14 % | 54.9 | 157 ms | 3.42 GB | $0.41 |
-| `genlingo-2026-10-e2b` + glossary (Q4_K_M) | 26 % | 96 % / 30 % / 67 % | 16 % | 55.7 | 196 ms | 3.42 GB | $0.67 |
-| `genlingo-2026-10-e2b-q5_k_m` + glossary | 26 % | 97 % / 42 % / 73 % | 18 % | 55.4 | 212 ms | 3.62 GB | — |
-| `genlingo-2026-10-e2b-f16` + glossary | 28 % | 98 % / 41 % / 73 % | 19 % | 56.2 | 358 ms | 9.27 GB | — |
-| `genlingo-2026-10b-e2b` + glossary (Q5_K_M) | 33 % | 99 % / 57 % / 81 % | 22 % | 56.4 | 206 ms | 3.62 GB | $0.71 |
-| `genlingo-2026-10c-e2b-nomulti` + lexicon (Q5_K_M) | 41 % | 100 % / 59 % / 82 % | 28 % | 59.5 | 236 ms | 3.62 GB | $0.97 |
-| `genlingo-2026-10c-e2b-nomulti-f16` + lexicon | 43 % | 99 % / 58 % / 81 % | 28 % | 59.5 | 377 ms | 9.27 GB | — |
-| **`genlingo-2026-10d-e2b` + lexicon (Q5_K_M)** | 44 % | 100 % / 54 % / 80 % | 28 % | 60.0 | 237 ms | 3.62 GB | $1.49 |
-| `genlingo-2026-10d-e2b-f16` + lexicon | 43 % | 100 % / 62 % / 84 % | 28 % | 59.7 | 378 ms | 9.27 GB | — |
-| Goliath `gemini-3.8-flash` | 24 % | 96 % / 51 % / 77 % | 25 % | 53.7 | 3.06 s | — | — |
-| Goliath + lexicon | 41 % | 99 % / 63 % / 83 % | 28 % | 56.4 | 3.20 s | — | — |
+| Base `gemma4:e2b-it-qat` | 21 % | 94 % / 10 % / 58 % | 14 % | 50.3 | 152 ms | 4.34 GB | — |
+| Base E2B + lexicon | 47 % | 98 % / 16 % / 62 % | 25 % | 55.0 | 228 ms | 4.34 GB | — |
+| Base `gemma4:e4b` | 27 % | 98 % / 31 % / 69 % | 17 % | 48.2 | 222 ms | 6.58 GB | — |
+| `genlingo-2026-09` (minimal edits, Q4_K_M) | 23 % | 93 % / 21 % / 62 % | 14 % | 54.9 | 155 ms | 3.42 GB | $0.41 |
+| `genlingo-2026-10-e2b` + glossary (Q4_K_M) | 33 % | 96 % / 29 % / 67 % | 17 % | 55.9 | 199 ms | 3.42 GB | $0.67 |
+| `genlingo-2026-10-e2b-q5_k_m` + glossary | 33 % | 97 % / 36 % / 71 % | 17 % | 55.6 | 216 ms | 3.62 GB | — |
+| `genlingo-2026-10-e2b-f16` + glossary | 35 % | 98 % / 34 % / 70 % | 18 % | 56.3 | 360 ms | 9.27 GB | — |
+| `genlingo-2026-10b-e2b` + glossary (Q5_K_M) | 41 % | 99 % / 53 % / 79 % | 23 % | 56.5 | 214 ms | 3.62 GB | $0.71 |
+| `genlingo-2026-10c-e2b-nomulti` + lexicon (Q5_K_M) | 49 % | 100 % / 50 % / 78 % | 26 % | 59.0 | 249 ms | 3.62 GB | $0.97 |
+| `genlingo-2026-10c-e2b-nomulti-f16` + lexicon | 49 % | 99 % / 54 % / 80 % | 28 % | 59.2 | 387 ms | 9.27 GB | — |
+| `genlingo-2026-10d-e2b` + lexicon (Q5_K_M) | 54 % | 100 % / 50 % / 78 % | 28 % | 59.8 | 256 ms | 3.62 GB | $1.49 |
+| `genlingo-2026-10d-e2b-f16` + lexicon | 53 % | 100 % / 53 % / 80 % | 27 % | 59.4 | 402 ms | 9.27 GB | — |
+| **`genlingo-2026-10e-e2b` + lexicon (Q5_K_M)** | **58 %** | 100 % / 57 % / 81 % | 29 % | **60.7** | 253 ms | 3.62 GB | $1.44 |
+| `genlingo-2026-10e-e2b-f16` + lexicon | 56 % | 100 % / 54 % / 80 % | 30 % | 60.9 | 394 ms | 9.27 GB | — |
+| Goliath `gemini-3.8-flash` | 34 % | 97 % / 51 % / 77 % | 25 % | 53.2 | 3.49 s | — | — |
+| Goliath + lexicon | 48 % | 100 % / 57 % / 81 % | 25 % | 56.9 | 3.28 s | — | — |
 | Copy the phrase | 1 % | 0 % / 3 % / 1 % | 0 % | 53.2 | — | — | — |
 
-Latencies are from an L4 in the cloud with Ollama (David answers one phrase at a time; Goliath four at a time). The 2026-10-04 version, run on a Mac, is in `evals/report.md`'s history.
+Latencies are from an L4 in the cloud with Ollama (David answers one phrase at a time; Goliath four at a time). Earlier versions of this table are in `evals/report.md`'s history.
+
+### Round 5 on the dev set (280 pairs, 69 of them with several terms; 2026-10-07)
+
+Round 5 was decided here, with the rule registered before training: more correct slang on the dev combinations, without dropping more than 2 points on the whole dev set against `10d` and with p50 < 1 s ([evals/report_dev.md](evals/report_dev.md), [note](evals/experiments/2026-10-07-ronda5-combinaciones.md), Spanish).
+
+| Variant | What it tests | Examples | Correct slang (dev) | On combinations (dev) | p50 | Training |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| **`genlingo-2026-10e-e2b`** | all the new data, old synthetic pairs at 60 % | 4,321 | 58.1 % | **56.5 %** | 275 ms | $1.44 |
+| `…-all` | everything, untrimmed (1.9 epochs) | 5,670 | 57.3 % | 49.3 % | 272 ms | $1.39 |
+| `…-webonly` | only the new real sentences | 3,073 | 56.4 % | 47.8 % | 271 ms | $1.24 |
+| `…-nocombo` | without the synthetic combinations | 3,673 | 53.1 % | 46.4 % | 273 ms | $1.44 |
+| `…-v2` | like the winner, with the cleaned bank | 4,042 | 59.3 % | 52.2 % | 270 ms | $1.39 |
+| `…-v2-nocombo` | `-v2` without synthetic combinations | 3,520 | 54.4 % | 40.6 % | 270 ms | $1.33 |
+| `genlingo-2026-10d-e2b` | the previous David | — | 49.0 % | 34.8 % | 278 ms | — |
+| Goliath | rival | — | 39.6 % | 35.3 % | 3.38 s | — |
+| Goliath + lexicon | reference | — | 58.9 % | 59.4 % | 3.40 s | — |
 
 ### Round 3 on the dev set (146 pairs, 2026-10-04 eval)
 
@@ -265,17 +304,33 @@ Details and dates in [docs/BITACORA.md](docs/BITACORA.md) (Spanish); technical d
     - *Tested:* running the eval in a Cloud Run Job with the same L4 and David's precompiled CUDA kernels.
     - *Result:* each model answers the 399 phrases in ~80 s, with p50 of 237 ms for David. A GPU job lasts at most an hour, so `make eval` runs the models in four jobs in a row and merges them.
 
-**Total cost:** the logged training runs cost $10.64 ($9.15 through round 3 plus $1.49 for round 4), including five of the six failed ones ($3.44; the sixth left no cost record).
+21. **Round 5: phrases with several slang terms** (`genlingo-2026-10e-e2b`, 2026-10-07).
+    - *Tested:* whether David wins when a phrase combines 2–4 terms from the same country. Data: 422 new real sentences checked word by word (Mexico 89, neutral Spanish 130, Colombia 150, Guatemala 53; 120 are editor-written examples and only serve for training), 202 new terms, 324 natural synthetic phrases with 2–3 terms validated one at a time by meaning ($0.42) and 600 synthetic parents → Gen Z pairs outside Guatemala ($0.30).
+    - *Why it doesn't repeat experiment 12's mistake:* short (5–22 words), natural phrases instead of forced terms, each term checked by meaning, both directions and 15 % of training. p50 stayed at 253 ms.
+    - *Result:* on the combinations niche, 62 % vs 45 % for Goliath (+16.7 [+7.5, +25.9]); on the whole set, 58 % vs 34 %; Mexico flips to a win (65 % vs 48 %). Cost $1.44 (66 min in the cloud).
+    - *Learned:* the validated synthetic combinations added the most (without them, 46 % on the dev combinations). Neutral Spanish, parents → Gen Z and slang from all over the internet are still ties.
+22. **Only the new real sentences** (`…-webonly`).
+    - *Result:* 47.8 % on the dev combinations vs 56.5 % for the winner; 3,073 examples, $1.24.
+    - *Learned:* real sentences with several terms are scarce on the web (pages that explain slang almost never give a phrase with more than one term); the validated synthetic ones multiply them.
+23. **All the data, untrimmed** (`…-all`).
+    - *Result:* 49.3 % on the dev combinations; with 5,670 examples only 1.9 epochs fit in the hour a GPU job lasts.
+    - *Learned:* trimming the old synthetic pairs to 60 % leaves room for 2.5 epochs and performs better.
+24. **The cleaned bank** (`…-v2`, `…-v2-nocombo`).
+    - *Tested:* retraining after removing 121 terms that were ordinary words («pues», «video») or duplicates.
+    - *Result:* 52.2 % on the dev combinations vs 56.5 % for the winner (which was trained before the cleanup and uses the cleaned bank in the eval); without combinations, 40.6 %.
+    - *Learned:* the registered rule picked `10e`; the difference between the two is 3 phrases out of 69. The `-v2-all` variant never trained (uploading its data failed).
+
+**Total cost:** the logged training runs cost $18.87 ($9.15 through round 3, $1.49 for round 4 and $8.23 for the six round-5 variants), including five of the six failed ones ($3.44; the sixth left no cost record).
 
 ## Why the demo uses only the final model
 
-The page uses `genlingo-2026-10d-e2b` in Q5_K_M with the lexicon prompt, and no other David:
+The page uses `genlingo-2026-10e-e2b` in Q5_K_M with the lexicon prompt, and no other David:
 
-- **It's the best at what the demo shows.** It has the highest correct slang on the test set: 44 %, vs 41 % for `10c`, 33 % for `10b`, 26 % for `10-e2b` and 17 % for `2026-09`, and the highest chrF++ (60.0). It was chosen on the dev set (46 % vs 40 % for `10c`), not on the test set.
-- **It fits the 1 s budget.** p50 of 237 ms in the cloud eval and ~0.6 s through the page, at 3.62 GB. The multi-term variant was around 2 s on dev, and picking among 4 answers around 4.4 s.
-- **Q5_K_M loses no slang vs f16** (44 % vs 43 %) and is 2.6 times smaller. Q4_K_M did lose slang.
-- **The earlier ones teach nothing new on the page.** Their story (from 14 % to 44 % correct slang, at $0.41–$1.49 per training round) is in the tables above and in the logbook.
-- **The page's examples are from the case where he wins:** Guatemalan slang (+30.4 points of correct slang). Mexico, Colombia parents → Gen Z, neutral Spanish and general Gen Z slang, where David ties, are documented here and not shown as examples.
+- **It's the best at what the demo shows.** It has the highest correct slang on the test set: 58 %, vs 54 % for `10d`, 49 % for `10c`, 41 % for `10b`, 33 % for `10-e2b` and 23 % for `2026-09`, and the highest chrF++ (60.7). On the combinations niche it beats Goliath (62 % vs 45 %), where `10d` didn't. It was chosen on the dev set, not on the test set.
+- **It fits the 1 s budget.** p50 of 253 ms in the cloud eval and ~0.5 s through the page, at 3.62 GB.
+- **Q5_K_M loses no slang vs f16** (58 % vs 56 %) and is 2.6 times smaller.
+- **The earlier ones teach nothing new on the page.** Their story (from 21 % to 58 % correct slang, at $0.41–$1.49 per training round) is in the tables above and in the logbook. `genlingo-2026-10d-e2b` stays in the bucket to roll back.
+- **The page's examples are from what he wins:** Guatemalan slang, two-term phrases and a Mexican one. Slang from all over the internet, where he ties, is typed live so the tie shows; Colombia and neutral Spanish are documented here.
 
 ## Quick start
 
