@@ -249,5 +249,12 @@ oraciones reales de la web con 2 o más términos del banco congelado, en las do
   - Todo el set: 58 % contra 34 % (+24.1). México pasa de empate a **gana David** (65 % contra 48 %).
   - Siguen en empate: el español neutro, papás → Gen Z y la jerga Gen Z general de la sonda (88 % contra 94 %);
     papás → Gen Z en español neutro lo pierde David (4 % contra 28 %, 25 frases).
-- **Estado:** `genlingo-2026-10e-e2b` está publicado en el bucket de modelos; la página sigue con
-  `genlingo-2026-10d-e2b` hasta que se despliegue (`DAVID_MODEL_TAG=genlingo-2026-10e-e2b`, `make deploy`).
+- **En la página** desde el 2026-10-07 (`genlingo-2026-10d-e2b` sigue en el bucket para volver atrás). Ejemplos: de
+  las 96 frases de prueba que se pueden mostrar, probadas en vivo 3 veces con cada modelo, pasaron la revisión
+  automática 18 y al leerlas se sostienen 5: tres chapinas con dos términos («No tengo pisto, préstame unas baras»),
+  una mexicana («de partir la madre») y una de papás → Gen Z («refacción» → «refa»). Colombia y español neutro no
+  tienen ejemplo: Goliath dijo algo correcto que el banco no reconoce («qué vaina», «acuerpado»).
+- **La demo** empieza con una frase de jerga de todo internet («Qué cringe tu foto de perfil»): los dos responden
+  igual. Después, las combinaciones y la jerga local, donde gana David.
+- **Limpieza:** los modelos y datos de entrenamiento de las cinco variantes que perdieron se borraron del bucket;
+  sus registros siguen en `train/runs/`.

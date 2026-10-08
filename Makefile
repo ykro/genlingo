@@ -92,12 +92,16 @@ datasheet: ## Recount data/DATASHEET.md
 
 data: test-set real-pairs pairs datasheet ## Rebuild all data (test set, real-anchored pairs, synthetic pairs, datasheet)
 
-# Stage recipe (genlingo-2026-10c-e2b-nomulti): no multi-term pairs, no ORPO stage. Both were tried
-# and left out (no gain on the dev set); MULTI=1 / ORPO=1 bring them back for an ablation.
+# Stage recipe (genlingo-2026-10e-e2b, round 5): no round-3 multi-term pairs (synthetic_multi), no ORPO stage
+# (neither helped on dev; MULTI=1 / ORPO=1 bring them back for an ablation), the round-3 and round-4 synthetic
+# pairs kept at 60 % (stable by id) to make room for the round-5 combinations, and 2.5 epochs so training fits the
+# 1-hour limit of a Cloud Run GPU job.
 TRAIN_EXCLUDE := $(if $(filter 1,$(MULTI)),,--exclude synthetic_multi)
+TRAIN_SHARE   ?= synthetic=0.6,synthetic_genz=0.6
+TRAIN_ARGS    ?= --epochs=2.5
 
-train-data: ## Render training pairs into chat JSONL with the lexicon glossary (stage recipe) [MULTI=1] [ORPO=1]
-	$(UV) python scripts/build_train_set.py $(TRAIN_EXCLUDE)
+train-data: ## Render training pairs into chat JSONL with the lexicon glossary (stage recipe) [MULTI=1] [ORPO=1] [TRAIN_SHARE=…]
+	$(UV) python scripts/build_train_set.py $(TRAIN_EXCLUDE) $(if $(TRAIN_SHARE),--share $(TRAIN_SHARE))
 	$(if $(filter 1,$(ORPO)),$(UV) python scripts/build_pref_set.py)
 
 train: train-data ## Fine-tune in the cloud (L4 job trains, CPU job merges + GGUF): make train [TAG=genlingo-YYYY-MM, default today] [QUANT=Q5_K_M] [TRAIN_ARGS=…]

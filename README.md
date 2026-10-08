@@ -13,16 +13,16 @@ Una sola página pública en Cloud Run: **https://genlingo-611681112050.us-centr
 - Al final, «¿Cómo se lee esta página?» explica en palabras simples qué es ✓/✗, el tiempo y el costo. La página se ve bien en el proyector, en una laptop y en el teléfono.
 - David se apaga solo cuando nadie lo usa, para no cobrar entre charlas. Al abrir la página, arriba a la derecha dice «Preparando a David…» con un reloj mientras se enciende su GPU; tarda unos 35 segundos desde cero ([medido](docs/DECISIONES.md#david-en-la-nube); antes eran casi 4 minutos). Cuando dice «David listo», todo responde al instante, y la página lo mantiene encendido mientras esté abierta.
 
-![La página de comparación: David y Goliath traducen «esa tu tarea te quedó bien chafa»](docs/demo/02-comparar-genz-a-papas.png)
+![La página de comparación: David y Goliath traducen «No tengo pisto, préstame unas baras»](docs/demo/02-comparar-genz-a-papas.png)
 
-Los tres ejemplos son jerga chapina del set de prueba (David nunca los vio al entrenar), de fuentes con licencia abierta. Se probaron en vivo, 3 veces con cada modelo, contra el David de la nube: David acertó las 9 veces y Goliath ninguna. Fuera de Guatemala también se probaron las 38 frases de fuentes abiertas de México, Colombia y español neutro, y ninguna pasó todas las pruebas ([por qué](#y-la-jerga-gen-z-que-no-es-chapina)). Cada ejemplo, con su fuente, su licencia y las respuestas de cada prueba, está en [`data/translate_examples.json`](data/translate_examples.json). El guion está en [docs/DEMO.md](docs/DEMO.md).
+Los cinco ejemplos son frases del set de prueba (David nunca las vio al entrenar), de fuentes con licencia abierta: tres combinan dos términos chapines («No tengo **pisto**, préstame unas **baras**»), uno es de México («de **partir la madre**») y uno va de papás a Gen Z. Se probaron en vivo, 3 veces con cada modelo, con el David de la página (`genlingo-2026-10e-e2b`): de las 96 frases de prueba que se pueden mostrar, pasaron la revisión automática 18 y, leídas una por una, se sostienen 5. Colombia y español neutro no tienen ejemplo: en las que pasaban, Goliath dijo algo correcto que el banco no reconoce ([detalle](evals/experiments/2026-10-07-ejemplos-ronda5.md)). Cada ejemplo, con su fuente, su licencia y las respuestas de cada prueba, está en [`data/translate_examples.json`](data/translate_examples.json). El guion está en [docs/DEMO.md](docs/DEMO.md): primero una palabra de jerga de todo internet («cringe»), donde empatan, y después la jerga local y las combinaciones, donde gana David.
 
 ![Qué corre dónde: la página, David y Goliath en la nube](docs/diagrams/arquitectura.png)
 
 ## Qué vas a aprender
 
 1. **Datos propios con `origin`:** cada par dice de dónde salió (`web`, `synthetic` o `human`); sin eso no se puede evaluar ni reentrenar cada mes.
-2. **Banco de términos y oraciones reales:** 532 términos de 92 fuentes, contrapartes validadas por significado y 565 pares anclados en oraciones reales; la ventaja de David son sus datos. Las oraciones de fuentes que no se pueden redistribuir viven en un bucket privado, no en el repo ([data/SOURCES.md](data/SOURCES.md)).
+2. **Banco de términos y oraciones reales:** 734 términos de 133 fuentes, contrapartes validadas por significado y 1,138 pares anclados en oraciones reales; la ventaja de David son sus datos. Las oraciones de fuentes que no se pueden redistribuir viven en un bucket privado, no en el repo ([data/SOURCES.md](data/SOURCES.md)).
 3. **LoRA en Cloud Run Jobs:** una L4 entrena y un job de CPU fusiona y exporta GGUF; cada ejecución registra su duración y costo.
 4. **El costo de comprimir:** f16 contra Q4_K_M, Q5_K_M, Q6_K, Q8_0 e imatrix, en tamaño, latencia y jerga perdida.
 5. **Evals con métricas de término:** chrF++ más *jerga correcta*, *jerga resuelta* y *cambios acertados*, con un set de desarrollo aparte para decidir y nichos definidos antes de mirar resultados.
@@ -32,69 +32,86 @@ Los tres ejemplos son jerga chapina del set de prueba (David nunca los vio al en
 
 Ningún modelo califica a otro: todas las métricas las calcula un programa con reglas fijas.
 
-- **Jerga correcta** (la principal, y la que la página muestra con ✓ Bien y ✗ Mal): por cada palabra de jerga de la frase, ¿la traducción la cambió por algo que significa lo mismo? El programa usa nuestro banco de jerga (532 términos, cada uno con su significado, su país y su fuente) y una tabla de equivalencias validada por significado (`data/counterparts.jsonl`).
+- **Jerga correcta** (la principal, y la que la página muestra con ✓ Bien y ✗ Mal): por cada palabra de jerga de la frase, ¿la traducción la cambió por algo que significa lo mismo? El programa usa nuestro banco de jerga (734 términos, cada uno con su significado, su país y su fuente) y una tabla de equivalencias validada por significado (`data/counterparts.jsonl`).
   *Ejemplo:* «esa tu tarea te quedó bien **chafa**» (chafa = de mala calidad). «Esa tarea tuya te quedó muy mala» → ✓. «Esa tu tarea te quedó bien pura lata» → ✗: cambió una jerga por otra que no dice lo mismo.
 - **Jerga resuelta:** ¿cambió el registro? En Gen Z → papás, que no quede jerga Gen Z del banco; en papás → Gen Z, que la traducción use al menos una jerga Gen Z del país. No mira si el significado es el correcto, por eso no es la principal.
 - **Cambios acertados:** de las palabras que la persona cambió al traducir, cuántas aparecen igual en la traducción del modelo.
 - **chrF++:** qué tanto se parece la traducción a la que escribió una persona, contando los pedazos de letras y de palabras que tienen en común: 0 es nada en común y 100 es idéntica.
   *Ejemplo:* si la persona escribió «esa tarea te quedó muy mal hecha», «esa tarea tuya te quedó muy mala» comparte casi todo y saca un número alto; «te quedó pura lata» comparte poco y saca uno bajo. En esta tarea casi todas las palabras se quedan iguales, así que copiar la frase sin traducir ya saca 53.2: por eso chrF++ no decide solo.
 
-Los números del set de prueba son del eval del 2026-10-07 sobre 399 frases web `auto_validated` que David nunca vio, corrido en la nube (Cloud Run con una L4, la misma GPU que la página; [evals/report.md](evals/report.md)), salvo donde se indica otra fecha. El tiempo y el costo de la página están medidos aparte ([Tiempo y costo en la nube](#tiempo-y-costo-en-la-nube)).
+Los números del set de prueba son del eval de la noche del 2026-10-07 (todos los modelos con el banco de la ronda 5 y la revisión término por término) sobre 399 frases web `auto_validated` que David nunca vio, corrido en la nube (Cloud Run con una L4, la misma GPU que la página; [evals/report.md](evals/report.md)), salvo donde se indica otra fecha. El tiempo y el costo de la página están medidos aparte ([Tiempo y costo en la nube](#tiempo-y-costo-en-la-nube)).
 
 ## Resultado final
 
 | | Jerga correcta | Jerga resuelta | chrF++ | p50 (eval) |
 | --- | ---: | ---: | ---: | ---: |
-| **David** (`genlingo-2026-10d-e2b`, Q5_K_M, 3.62 GB) | **44 %** | **80 %** | **60.0** | **237 ms** |
-| Goliath `gemini-3.8-flash` | 24 % | 77 % | 53.7 | 3.06 s |
-| Goliath con el léxico de David (referencia) | 41 % | 83 % | 56.4 | 3.20 s |
+| **David** (`genlingo-2026-10e-e2b`, Q5_K_M, 3.62 GB) | **58 %** | **81 %** | **60.7** | **253 ms** |
+| David anterior (`genlingo-2026-10d-e2b`) | 54 % | 78 % | 59.8 | 256 ms |
+| Goliath `gemini-3.8-flash` | 34 % | 77 % | 53.2 | 3.49 s |
+| Goliath con el léxico de David (referencia) | 48 % | 81 % | 56.9 | 3.28 s |
 | Copiar la frase (línea base) | 1 % | 1 % | 53.2 | — |
 
-- **Jerga correcta:** +19.5 puntos sobre Goliath (IC 95 % [+13.5, +25.6]). 120 frases las acierta solo David y 42 solo Goliath.
-- **Jerga resuelta:** +3.3 [−1.3, +7.8], empate estadístico.
-- **chrF++:** 60.0 contra 53.7 de Goliath y 56.4 de Goliath con el léxico.
-- **Costo de Goliath:** $1.14 por 1,000 frases en ese eval; con la tarifa desde el 2027-01-01 serían $2.28.
+- **Jerga correcta:** +24.1 puntos sobre Goliath (IC 95 % [+18.6, +29.6]). 126 frases las acierta solo David y 30 solo Goliath.
+- **Jerga resuelta:** +4.0 [−0.3, +8.3], empate estadístico.
+- **chrF++:** 60.7 contra 53.2 de Goliath y 56.9 de Goliath con el léxico.
+- **Costo de Goliath:** $1.22 por 1,000 frases en ese eval; con la tarifa desde el 2027-01-01 serían $2.43.
 
-### Por nicho (jerga correcta, David contra Goliath sin glosario)
+### Frases con varios términos de jerga (ronda 5)
 
-Nichos definidos antes de mirar resultados ([evals/niche.md](evals/niche.md)); IC 95 % por bootstrap pareado ([evals/niche_report.md](evals/niche_report.md)).
+La hipótesis: Goliath conoce muchos términos sueltos, pero cuando una frase junta varios del mismo país, David, entrenado con ese país, puede ganar. El nicho «Combinaciones» se registró antes de buscar datos y de entrenar ([evals/niche.md](evals/niche.md), enmienda 2): 174 frases reales de la web con 2 o más términos del banco congelado, en las dos direcciones (91 del set de prueba y 83 de oraciones nuevas apartadas antes de correr ningún modelo). Jerga correcta, IC 95 % por bootstrap pareado ([evals/report_combos.md](evals/report_combos.md)).
 
-| Nicho | n | David | Goliath | Δ | IC 95 % | Veredicto |
+| Corte | n | David | Goliath | Δ | IC 95 % | Veredicto |
 | --- | ---: | ---: | ---: | ---: | --- | --- |
-| Slang chapín (GT) | 115 | 50 % | 20 % | +30.4 | [+19.1, +41.7] | gana David |
-| Papás → Gen Z (GT/CO) | 107 | 33 % | 20 % | +13.1 | [+1.9, +25.2] | gana David |
-| País CO | 131 | 37 % | 18 % | +19.1 | [+8.4, +29.8] | gana David |
-| País MX | 78 | 46 % | 33 % | +12.8 | [−1.3, +26.9] | empate estadístico |
-| País LATAM (español neutro) | 75 | 43 % | 32 % | +10.7 | [−1.3, +22.7] | empate estadístico |
-| Todo el set | 399 | 44 % | 24 % | +19.5 | [+13.5, +25.6] | gana David |
+| **Combinaciones** | 174 | **62 %** | 45 % | +16.7 | [+7.5, +25.9] | **gana David** |
+| Gen Z → papás | 78 | 63 % | 33 % | +29.5 | [+15.4, +43.6] | gana David |
+| Papás → Gen Z | 96 | 61 % | 55 % | +6.2 | [−5.2, +17.7] | empate |
+| México | 67 | 66 % | 52 % | +13.4 | [−1.5, +26.9] | empate |
+| Colombia | 46 | 52 % | 33 % | +19.6 | [+0.0, +39.1] | empate (límite en 0) |
+| Español neutro | 39 | 72 % | 64 % | +7.7 | [−10.3, +25.6] | empate |
+| Guatemala | 22 | 55 % | 18 % | +36.4 | [+9.1, +63.6] | n < 30, sin veredicto |
 
-Por país y dirección (no pre-registrado; mismo bootstrap): David gana de Gen Z a papás en México (51 % contra 22 %) y en Colombia (43 % contra 15 %); en español neutro de Gen Z a papás queda 50 % contra 36 %, en el borde del empate. De papás a Gen Z fuera de Guatemala es empate en los tres.
+- **El David anterior perdía aquí:** `10d` sacaba 39 % contra 45 % de Goliath (−6.3 [−16.7, +3.4]); en México y en español neutro perdía. La ronda 5 sumó 23 puntos.
+- **Contra Goliath con el mismo léxico:** 62 % contra 61 %, empate. Con los mismos datos el modelo grande alcanza a David en combinaciones; sin ellos, no.
 
-- **Contra Goliath con el mismo léxico:** David gana en slang chapín (+13.9 [+3.5, +24.3]); empata en el set completo (+2.5), en papás → Gen Z y en Colombia; en México (46 % contra 58 %) y en español neutro (43 % contra 51 %) Goliath queda arriba sin que la diferencia sea significativa.
+### Por país y dirección (jerga correcta, David contra Goliath sin glosario)
 
-### ¿Y la jerga Gen Z que no es chapina?
+Nichos de [evals/niche.md](evals/niche.md); IC 95 % por bootstrap pareado ([evals/niche_report.md](evals/niche_report.md), [evals/report_combos.md](evals/report_combos.md)).
 
-La primera versión del banco y de las oraciones reales venía casi toda de Guatemala y Colombia (268 y 255 de 556 pares reales; México 9, español neutro 24), y la página traduce siempre con la jerga de Guatemala. Por eso con «cringe», «random» o «crush» David respondía a la chapina. Se midió y se trabajó en dos frentes:
+| Corte | n | David | Goliath | Δ | IC 95 % | Veredicto |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| Slang chapín (GT) | 115 | 61 % | 18 % | +42.6 | [+32.2, +53.0] | gana David |
+| Papás → Gen Z (GT/CO) | 107 | 33 % | 15 % | +17.8 | [+6.5, +29.0] | gana David |
+| País CO | 131 | 53 % | 28 % | +24.4 | [+14.5, +34.4] | gana David |
+| País MX | 77 | 65 % | 48 % | +16.9 | [+5.2, +28.6] | gana David (con `10d`, empate) |
+| País LATAM (español neutro) | 75 | 55 % | 52 % | +2.7 | [−9.3, +14.7] | empate estadístico |
+| Gen Z → papás | 226 | 77 % | 41 % | +36.3 | [+29.2, +43.4] | gana David |
+| Papás → Gen Z | 172 | 32 % | 24 % | +8.1 | [−1.2, +16.9] | empate estadístico |
+| Todo el set | 398 | 58 % | 34 % | +24.1 | [+18.6, +29.6] | gana David |
 
-- **Una sonda aparte** ([evals/report_probe.md](evals/report_probe.md), `make eval-probe`): 32 oraciones reales de jerga Gen Z general (cringe, random, crush, stalkear, funar, ghostear, shippear, mid, mood, delulu, basado, rizz, slay, red flag, prime…) sacadas de 14 páginas que nunca se usan para entrenar, en las dos direcciones.
+- **Gen Z → papás gana David en los cuatro países:** México 84 % contra 51 %, Colombia 71 % contra 37 %, español neutro 80 % contra 64 % y Guatemala 80 % contra 22 %.
+- **Papás → Gen Z:** gana en Guatemala (37 % contra 14 %); empata en México (48 % contra 45 %) y en Colombia (29 % contra 16 %); en español neutro pierde (4 % contra 28 %, 25 frases).
+- **Contra Goliath con el mismo léxico:** David gana en el set completo (58 % contra 48 %, +9.8 [+4.3, +15.5]), en Guatemala y en Colombia; empata en México y en español neutro.
 
-  | | Como español neutro | Como Guatemala |
-  | --- | ---: | ---: |
-  | David antes (`10c`) | 91 % | 69 % |
-  | **David hoy (`10d`)** | **91 %** | **77 %** |
-  | Goliath | 94 % | 77 % |
+### La jerga de todo internet: empate
 
-- **La ronda 4 de datos:** 1,600 pares para entrenar anclados en jerga Gen Z de México y del español neutro, más 17 oraciones reales; `10d` ganó en desarrollo (46 % contra 40 % de jerga correcta) y es el David de la página.
+Con jerga Gen Z general (cringe, random, crush, stalkear, funar, mid, delulu…) David y Goliath empatan. Se mide con una sonda aparte ([evals/report_probe.md](evals/report_probe.md), `make eval-probe`): 32 oraciones reales de 14 páginas que nunca se usan para entrenar, en las dos direcciones.
 
-**Respuesta corta:** David sí traduce jerga Gen Z general (91 % en la sonda), pero ahí no le gana a Goliath: empatan. Donde gana es con jerga de un país que el modelo grande conoce poco: Guatemala, Colombia y, de Gen Z a papás, México. Por eso los ejemplos de la página son chapines.
+| | Como español neutro | Como Guatemala |
+| --- | ---: | ---: |
+| `10c` (ronda 3) | 91 % | 69 % |
+| `10d` (ronda 4) | 91 % | 73 % |
+| **`10e` (ronda 5, en la página)** | **88 %** | **69 %** |
+| Goliath | 94 % | 69 % |
+
+Esa jerga ya la conoce cualquier modelo grande. La ventaja de David está en la jerga de un país que el modelo grande conoce poco y en las frases que juntan varios términos de ese país. La demo empieza por ahí: «cringe» empata, «pisto» y «baras» en la misma frase no.
 
 ### chrF++ por país y por dirección
 
 | | CO | GT | LATAM | MX | Gen Z → papás | Papás → Gen Z |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| David | 60.9 | 66.1 | 56.1 | 53.6 | 68.3 | 48.6 |
-| Goliath | 52.9 | 53.0 | 59.7 | 49.7 | 61.4 | 43.1 |
-| Goliath + léxico | 54.0 | 59.8 | 60.1 | 52.2 | 62.7 | 47.7 |
+| David | 61.0 | 66.7 | 57.9 | 54.4 | 69.5 | 48.5 |
+| Goliath | 52.4 | 52.5 | 57.4 | 51.0 | 60.1 | 43.4 |
+| Goliath + léxico | 55.0 | 60.4 | 58.8 | 53.2 | 63.1 | 48.2 |
 
 ## Tiempo y costo en la nube
 
@@ -135,29 +152,51 @@ David es más rápido en todos los casos medidos: su mediana con 16 traducciones
 En la página, el costo de David es el de los segundos de GPU que usó esa traducción (atendiendo una a la vez), y el de Goliath, lo que Gemini cobró por sus tokens.
 <!-- /projections -->
 
+Esta medición se hizo con `genlingo-2026-10d-e2b`, el David anterior. `genlingo-2026-10e-e2b` tiene el mismo tamaño (3.62 GB, Q5_K_M), corre en el mismo servicio y en el eval responde igual de rápido (p50 de 253 ms contra 256 ms), así que no se volvió a medir.
+
 ## Todos los experimentos
 
-### Todas las variantes en el set de prueba (399 frases, eval del 2026-10-07 en la nube)
+### Todas las variantes en el set de prueba (399 frases, eval de la noche del 2026-10-07 en la nube)
+
+Todos los modelos con el banco de la ronda 5 (734 términos) y la revisión término por término; por eso los números de los Davids anteriores no coinciden con los que se publicaron en su ronda.
 
 | Variante | Jerga correcta | Jerga resuelta (Gen Z → papás / papás → Gen Z / total) | Cambios acertados | chrF++ | p50 | Tamaño | Entrenar |
 | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: |
-| Base `gemma4:e2b-it-qat` | 14 % | 94 % / 10 % / 58 % | 14 % | 50.3 | 151 ms | 4.34 GB | — |
-| Base E2B + léxico | 42 % | 98 % / 16 % / 62 % | 24 % | 54.9 | 213 ms | 4.34 GB | — |
-| Base `gemma4:e4b` | 18 % | 98 % / 31 % / 69 % | 17 % | 48.2 | 224 ms | 6.58 GB | — |
-| `genlingo-2026-09` (edición mínima, Q4_K_M) | 17 % | 93 % / 21 % / 62 % | 14 % | 54.9 | 157 ms | 3.42 GB | $0.41 |
-| `genlingo-2026-10-e2b` + glosario (Q4_K_M) | 26 % | 96 % / 30 % / 67 % | 16 % | 55.7 | 196 ms | 3.42 GB | $0.67 |
-| `genlingo-2026-10-e2b-q5_k_m` + glosario | 26 % | 97 % / 42 % / 73 % | 18 % | 55.4 | 212 ms | 3.62 GB | — |
-| `genlingo-2026-10-e2b-f16` + glosario | 28 % | 98 % / 41 % / 73 % | 19 % | 56.2 | 358 ms | 9.27 GB | — |
-| `genlingo-2026-10b-e2b` + glosario (Q5_K_M) | 33 % | 99 % / 57 % / 81 % | 22 % | 56.4 | 206 ms | 3.62 GB | $0.71 |
-| `genlingo-2026-10c-e2b-nomulti` + léxico (Q5_K_M) | 41 % | 100 % / 59 % / 82 % | 28 % | 59.5 | 236 ms | 3.62 GB | $0.97 |
-| `genlingo-2026-10c-e2b-nomulti-f16` + léxico | 43 % | 99 % / 58 % / 81 % | 28 % | 59.5 | 377 ms | 9.27 GB | — |
-| **`genlingo-2026-10d-e2b` + léxico (Q5_K_M)** | 44 % | 100 % / 54 % / 80 % | 28 % | 60.0 | 237 ms | 3.62 GB | $1.49 |
-| `genlingo-2026-10d-e2b-f16` + léxico | 43 % | 100 % / 62 % / 84 % | 28 % | 59.7 | 378 ms | 9.27 GB | — |
-| Goliath `gemini-3.8-flash` | 24 % | 96 % / 51 % / 77 % | 25 % | 53.7 | 3.06 s | — | — |
-| Goliath + léxico | 41 % | 99 % / 63 % / 83 % | 28 % | 56.4 | 3.20 s | — | — |
+| Base `gemma4:e2b-it-qat` | 21 % | 94 % / 10 % / 58 % | 14 % | 50.3 | 152 ms | 4.34 GB | — |
+| Base E2B + léxico | 47 % | 98 % / 16 % / 62 % | 25 % | 55.0 | 228 ms | 4.34 GB | — |
+| Base `gemma4:e4b` | 27 % | 98 % / 31 % / 69 % | 17 % | 48.2 | 222 ms | 6.58 GB | — |
+| `genlingo-2026-09` (edición mínima, Q4_K_M) | 23 % | 93 % / 21 % / 62 % | 14 % | 54.9 | 155 ms | 3.42 GB | $0.41 |
+| `genlingo-2026-10-e2b` + glosario (Q4_K_M) | 33 % | 96 % / 29 % / 67 % | 17 % | 55.9 | 199 ms | 3.42 GB | $0.67 |
+| `genlingo-2026-10-e2b-q5_k_m` + glosario | 33 % | 97 % / 36 % / 71 % | 17 % | 55.6 | 216 ms | 3.62 GB | — |
+| `genlingo-2026-10-e2b-f16` + glosario | 35 % | 98 % / 34 % / 70 % | 18 % | 56.3 | 360 ms | 9.27 GB | — |
+| `genlingo-2026-10b-e2b` + glosario (Q5_K_M) | 41 % | 99 % / 53 % / 79 % | 23 % | 56.5 | 214 ms | 3.62 GB | $0.71 |
+| `genlingo-2026-10c-e2b-nomulti` + léxico (Q5_K_M) | 49 % | 100 % / 50 % / 78 % | 26 % | 59.0 | 249 ms | 3.62 GB | $0.97 |
+| `genlingo-2026-10c-e2b-nomulti-f16` + léxico | 49 % | 99 % / 54 % / 80 % | 28 % | 59.2 | 387 ms | 9.27 GB | — |
+| `genlingo-2026-10d-e2b` + léxico (Q5_K_M) | 54 % | 100 % / 50 % / 78 % | 28 % | 59.8 | 256 ms | 3.62 GB | $1.49 |
+| `genlingo-2026-10d-e2b-f16` + léxico | 53 % | 100 % / 53 % / 80 % | 27 % | 59.4 | 402 ms | 9.27 GB | — |
+| **`genlingo-2026-10e-e2b` + léxico (Q5_K_M)** | **58 %** | 100 % / 57 % / 81 % | 29 % | **60.7** | 253 ms | 3.62 GB | $1.44 |
+| `genlingo-2026-10e-e2b-f16` + léxico | 56 % | 100 % / 54 % / 80 % | 30 % | 60.9 | 394 ms | 9.27 GB | — |
+| Goliath `gemini-3.8-flash` | 34 % | 97 % / 51 % / 77 % | 25 % | 53.2 | 3.49 s | — | — |
+| Goliath + léxico | 48 % | 100 % / 57 % / 81 % | 25 % | 56.9 | 3.28 s | — | — |
 | Copiar la frase | 1 % | 0 % / 3 % / 1 % | 0 % | 53.2 | — | — | — |
 
-Las latencias son de una L4 en la nube con Ollama (David responde una frase a la vez; Goliath cuatro a la vez). La versión del 2026-10-04, corrida en una Mac, está en el historial de `evals/report.md`.
+Las latencias son de una L4 en la nube con Ollama (David responde una frase a la vez; Goliath cuatro a la vez). Las versiones anteriores de esta tabla están en el historial de `evals/report.md`.
+
+### Ronda 5 en el set de desarrollo (280 pares, 69 de ellos con varios términos; 2026-10-07)
+
+La ronda 5 se decidió aquí, con la regla registrada antes de entrenar: más jerga correcta en las combinaciones de desarrollo, sin bajar más de 2 puntos en todo el desarrollo contra `10d` y con p50 < 1 s ([evals/report_dev.md](evals/report_dev.md), [nota](evals/experiments/2026-10-07-ronda5-combinaciones.md)).
+
+| Variante | Qué prueba | Ejemplos | Jerga correcta (dev) | En combinaciones (dev) | p50 | Entrenar |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| **`genlingo-2026-10e-e2b`** | todos los datos nuevos, sintéticos viejos al 60 % | 4,321 | 58.1 % | **56.5 %** | 275 ms | $1.44 |
+| `…-all` | todo, sin recortar (1.9 épocas) | 5,670 | 57.3 % | 49.3 % | 272 ms | $1.39 |
+| `…-webonly` | solo las oraciones reales nuevas | 3,073 | 56.4 % | 47.8 % | 271 ms | $1.24 |
+| `…-nocombo` | sin las combinaciones sintéticas | 3,673 | 53.1 % | 46.4 % | 273 ms | $1.44 |
+| `…-v2` | como el ganador, con el banco depurado | 4,042 | 59.3 % | 52.2 % | 270 ms | $1.39 |
+| `…-v2-nocombo` | `-v2` sin combinaciones sintéticas | 3,520 | 54.4 % | 40.6 % | 270 ms | $1.33 |
+| `genlingo-2026-10d-e2b` | el David anterior | — | 49.0 % | 34.8 % | 278 ms | — |
+| Goliath | rival | — | 39.6 % | 35.3 % | 3.38 s | — |
+| Goliath + léxico | referencia | — | 58.9 % | 59.4 % | 3.40 s | — |
 
 ### Ronda 3 en el set de desarrollo (146 pares, eval del 2026-10-04)
 
@@ -265,17 +304,33 @@ Detalle y fechas en [docs/BITACORA.md](docs/BITACORA.md); decisiones técnicas e
     - *Qué probó:* correr el eval en un Cloud Run Job con la misma L4 y los kernels de CUDA ya compilados de David.
     - *Resultado:* cada modelo responde las 399 frases en ~80 s, con p50 de 237 ms para David. Un job con GPU dura como máximo una hora, así que `make eval` corre los modelos en cuatro jobs seguidos y los junta.
 
-**Costo total:** las ejecuciones de entrenamiento con registro costaron $10.64 ($9.15 hasta la ronda 3 más $1.49 de la ronda 4), incluidas cinco de las seis fallidas ($3.44; la sexta no dejó registro de costo).
+21. **Ronda 5: frases con varios términos de jerga** (`genlingo-2026-10e-e2b`, 2026-10-07).
+    - *Qué probó:* si David gana cuando una frase junta 2–4 términos del mismo país. Datos: 422 oraciones reales nuevas comprobadas palabra por palabra (México 89, español neutro 130, Colombia 150, Guatemala 53; 120 son ejemplos escritos por editores y solo sirven para entrenar), 202 términos nuevos, 324 frases sintéticas naturales con 2–3 términos validados uno por uno por significado ($0.42) y 600 pares sintéticos papás → Gen Z fuera de Guatemala ($0.30).
+    - *Por qué no repite el error del experimento 12:* frases cortas (5–22 palabras) y naturales en vez de términos forzados, cada término comprobado por significado, las dos direcciones y el 15 % del entrenamiento. El p50 quedó en 253 ms.
+    - *Resultado:* en el nicho de combinaciones, 62 % contra 45 % de Goliath (+16.7 [+7.5, +25.9]); en el set completo, 58 % contra 34 %; México pasa a ganarlo (65 % contra 48 %). Costó $1.44 (66 min en la nube).
+    - *Qué aprendimos:* las combinaciones sintéticas validadas son lo que más sumó (sin ellas, 46 % en las combinaciones de desarrollo). El español neutro, papás → Gen Z y la jerga de todo internet siguen en empate.
+22. **Solo las oraciones reales nuevas** (`…-webonly`).
+    - *Resultado:* 47.8 % en las combinaciones de desarrollo contra 56.5 % del ganador; 3,073 ejemplos, $1.24.
+    - *Qué aprendimos:* las oraciones reales con varios términos son pocas en la web (las páginas que explican jerga casi nunca dan una frase con más de un término); los sintéticos validados las multiplican.
+23. **Todos los datos, sin recortar** (`…-all`).
+    - *Resultado:* 49.3 % en las combinaciones de desarrollo; con 5,670 ejemplos solo caben 1.9 épocas en la hora que dura un job con GPU.
+    - *Qué aprendimos:* recortar los sintéticos viejos al 60 % deja espacio para 2.5 épocas y rinde más.
+24. **El banco depurado** (`…-v2`, `…-v2-nocombo`).
+    - *Qué probó:* reentrenar después de quitar 121 términos que eran palabras normales («pues», «video») o duplicados.
+    - *Resultado:* 52.2 % en las combinaciones de desarrollo contra 56.5 % del ganador (que se entrenó antes de depurar y en el eval usa el banco depurado); sin combinaciones, 40.6 %.
+    - *Qué aprendimos:* la regla registrada eligió `10e`; la diferencia entre los dos es de 3 frases de 69. La variante `-v2-all` no llegó a entrenar (falló la subida de sus datos).
+
+**Costo total:** las ejecuciones de entrenamiento con registro costaron $18.87 ($9.15 hasta la ronda 3, $1.49 de la ronda 4 y $8.23 de las seis variantes de la ronda 5), incluidas cinco de las seis fallidas ($3.44; la sexta no dejó registro de costo).
 
 ## Por qué la demo usa solo el modelo final
 
-La página usa `genlingo-2026-10d-e2b` en Q5_K_M con el prompt de léxico, y ningún otro David:
+La página usa `genlingo-2026-10e-e2b` en Q5_K_M con el prompt de léxico, y ningún otro David:
 
-- **Es el mejor en lo que la demo enseña.** Tiene la jerga correcta más alta del set de prueba: 44 %, contra 41 % de `10c`, 33 % de `10b`, 26 % de `10-e2b` y 17 % de `2026-09`, y el chrF++ más alto (60.0). Se eligió en el set de desarrollo (46 % contra 40 % de `10c`), no en el de prueba.
-- **Cabe en el presupuesto de 1 s.** p50 de 237 ms en el eval en la nube y ~0.6 s a través de la página, con 3.62 GB. La variante con pares de varios términos rondaba los 2 s en dev, y la selección entre 4 respuestas los 4.4 s.
-- **Q5_K_M no pierde jerga contra f16** (44 % contra 43 %) y pesa 2.6 veces menos. Q4_K_M sí perdía jerga.
-- **Los anteriores ya no enseñan nada nuevo en la página.** Su historia (de 14 % a 44 % de jerga correcta, a $0.41–$1.49 por ronda de entrenamiento) está en las tablas de arriba y en la bitácora.
-- **Los ejemplos de la página son del caso donde gana:** slang chapín (+30.4 puntos de jerga correcta). México, Colombia de papás a Gen Z, el español neutro y la jerga Gen Z general, donde David empata, quedan documentados aquí y no se muestran como ejemplo.
+- **Es el mejor en lo que la demo enseña.** Tiene la jerga correcta más alta del set de prueba: 58 %, contra 54 % de `10d`, 49 % de `10c`, 41 % de `10b`, 33 % de `10-e2b` y 23 % de `2026-09`, y el chrF++ más alto (60.7). En el nicho de combinaciones le gana a Goliath (62 % contra 45 %), donde `10d` no. Se eligió en el set de desarrollo, no en el de prueba.
+- **Cabe en el presupuesto de 1 s.** p50 de 253 ms en el eval en la nube y ~0.5 s a través de la página, con 3.62 GB.
+- **Q5_K_M no pierde jerga contra f16** (58 % contra 56 %) y pesa 2.6 veces menos.
+- **Los anteriores ya no enseñan nada nuevo en la página.** Su historia (de 21 % a 58 % de jerga correcta, a $0.41–$1.49 por ronda de entrenamiento) está en las tablas de arriba y en la bitácora. `genlingo-2026-10d-e2b` sigue en el bucket para volver atrás.
+- **Los ejemplos de la página son de lo que gana:** jerga chapina, frases con dos términos y una mexicana. La jerga de todo internet, donde empata, se muestra escrita en vivo para que se vea el empate; Colombia y el español neutro quedan documentados aquí.
 
 ## Arranque rápido
 
