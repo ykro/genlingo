@@ -28,6 +28,12 @@ Los cinco ejemplos son frases del set de prueba (David nunca las vio al entrenar
 5. **Evals con métricas de término:** chrF++ más *jerga correcta*, *jerga resuelta* y *cambios acertados*, con un set de desarrollo aparte para decidir y nichos definidos antes de mirar resultados.
 6. **Tu modelo en tu propia GPU:** David corre con Ollama en Cloud Run con una L4, privado, y escala a cero entre charlas; la página lo despierta al abrirse. Entrenar, evaluar y servir: todo en la nube, nada en la laptop.
 
+## Taller / Codelab de 60 Minutos (En Vivo — 100% Gemma 4)
+
+- **Codelab Interactivo (Firebase Hosting):** [https://david-vs-goliath-2027.web.app](https://david-vs-goliath-2027.web.app)
+- **App del Codelab funcionando en vivo (`SoporteLocal` con `gemma4:e2b` sobre Ollama en Cloud Run):** [https://soporte-local-611681112050.us-central1.run.app](https://soporte-local-611681112050.us-central1.run.app)
+- **Código ejecutable y pruebas del Codelab:** [`codelab/demo-app/`](codelab/demo-app/) (`node --test codelab/demo-app/duel.test.mjs`)
+
 ## Las métricas, en palabras simples
 
 Ningún modelo califica a otro: todas las métricas las calcula un programa con reglas fijas.

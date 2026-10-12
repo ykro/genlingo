@@ -28,6 +28,12 @@ The five examples are test-set phrases (David never saw them in training), from 
 5. **Evals with term metrics:** chrF++ plus *correct slang*, *slang handled* and *reference changes*, with a separate dev set for decisions and niches defined before looking at results.
 6. **Your model on your own GPU:** David runs with Ollama on Cloud Run with an L4, private, and scales to zero between talks; the page wakes him when it opens. Training, evaluating and serving: all in the cloud, nothing on the laptop.
 
+## 60-Minute Interactive Codelab (Live — 100% Gemma 4)
+
+- **Interactive Codelab (Firebase Hosting):** [https://david-vs-goliath-2027.web.app](https://david-vs-goliath-2027.web.app)
+- **Live Codelab App (`SoporteLocal` running `gemma4:e2b` on Ollama on Cloud Run):** [https://soporte-local-611681112050.us-central1.run.app](https://soporte-local-611681112050.us-central1.run.app)
+- **Runnable Codelab code and test suite:** [`codelab/demo-app/`](codelab/demo-app/) (`node --test codelab/demo-app/duel.test.mjs`)
+
 ## The metrics, in plain words
 
 No model grades another: every metric is computed by a program with fixed rules.
