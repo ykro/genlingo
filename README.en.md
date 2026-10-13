@@ -28,11 +28,9 @@ The five examples are test-set phrases (David never saw them in training), from 
 5. **Evals with term metrics:** chrF++ plus *correct slang*, *slang handled* and *reference changes*, with a separate dev set for decisions and niches defined before looking at results.
 6. **Your model on your own GPU:** David runs with Ollama on Cloud Run with an L4, private, and scales to zero between talks; the page wakes him when it opens. Training, evaluating and serving: all in the cloud, nothing on the laptop.
 
-## 60-Minute Interactive Codelab (Live — 100% Gemma 4)
+## Hands-on codelab
 
-- **Interactive Codelab (Firebase Hosting):** [https://david-vs-goliath-2027.web.app](https://david-vs-goliath-2027.web.app)
-- **Live Codelab App (`SoporteLocal` running `gemma4:e2b` on Ollama on Cloud Run):** [https://soporte-local-611681112050.us-central1.run.app](https://soporte-local-611681112050.us-central1.run.app)
-- **Runnable Codelab code and test suite:** [`codelab/demo-app/`](codelab/demo-app/) (`node --test codelab/demo-app/duel.test.mjs`)
+The codelab for this talk is “Train your own David” ([codelabs-2027/entrena-tu-david](https://github.com/ykro/codelabs-2027/tree/main/entrena-tu-david)), in Spanish: you fine-tune Gemma 4 E2B with LoRA on Colab and measure it against the base model. It runs in the browser with a Google account and ends with something that works.
 
 ## The metrics, in plain words
 
