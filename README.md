@@ -28,6 +28,10 @@ Los cinco ejemplos son frases del set de prueba (David nunca las vio al entrenar
 5. **Evals con métricas de término:** chrF++ más *jerga correcta*, *jerga resuelta* y *cambios acertados*, con un set de desarrollo aparte para decidir y nichos definidos antes de mirar resultados.
 6. **Tu modelo en tu propia GPU:** David corre con Ollama en Cloud Run con una L4, privado, y escala a cero entre charlas; la página lo despierta al abrirse. Entrenar, evaluar y servir: todo en la nube, nada en la laptop.
 
+## Diapositivas
+
+Esta demo es parte de la charla «David vs. Goliath». Las diapositivas están en Google Slides: [David vs. Goliath](https://docs.google.com/presentation/d/1MddCAi51juUAEXbbiUyXwL6CqYzId0ELFSBwzREUW6U/edit?usp=sharing).
+
 ## Taller práctico
 
 El taller de esta charla es «Entrena a tu propio David» ([codelabs-2027/entrena-tu-david](https://github.com/ykro/codelabs-2027/tree/main/entrena-tu-david)): ajustas Gemma 4 E2B con LoRA en Colab y lo comparas con el modelo base. Se sigue desde el navegador, con una cuenta de Google, y termina con algo que funciona.
